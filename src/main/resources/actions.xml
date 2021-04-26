@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<actions>
+    <action type="OPEN_URL_WITH_TEXT">
+        <label>label</label>
+        <description>description</description>
+        <baseUrl>baseUrl</baseUrl>
+        <placeholder>placeholder</placeholder>
+    </action>
+
+    <action type="OPEN_URL">
+        <label>label</label>
+        <description>description</description>
+        <url>url</url>
+    </action>
+
+    <action type="COPY_TO_CLIPBOARD">
+        <label>label</label>
+        <description>description</description>
+        <text>text</text>
+    </action>
+
+    <action type="OPEN_FILE">
+        <label>label</label>
+        <description>description</description>
+        <text>text</text>
+    </action>
+
+    <action type="GROUP">
+        <label>GROUP</label>
+        <description>description</description>
+
+        <actions>
+
+            <action type="COPY_TO_CLIPBOARD">
+                <label>label1</label>
+                <description>description</description>
+                <text>text</text>
+            </action>
+
+            <action type="OPEN_FILE">
+                <label>label1</label>
+                <description>description</description>
+                <text>text</text>
+            </action>
+
+            <action type="GROUP">
+                <label>GROUP</label>
+                <description>description</description>
+
+                <actions>
+
+                    <action type="COPY_TO_CLIPBOARD">
+                        <label>label2</label>
+                        <description>description</description>
+                        <text>text</text>
+                    </action>
+
+                    <action type="OPEN_FILE">
+                        <label>label2</label>
+                        <description>description</description>
+                        <text>text</text>
+                    </action>
+
+                </actions>
+            </action>
+
+        </actions>
+    </action>
+</actions>
