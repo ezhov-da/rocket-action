@@ -20,7 +20,7 @@ public class XmlQuickActionRepositoryTest {
 
             List<QuickAction> list = repository.actions();
 
-            assertEquals(5, list.size());
+            assertEquals(6, list.size());
         } catch (IOException | QuickActionRepositoryException e) {
             e.printStackTrace();
         }
