@@ -1,26 +1,33 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <actions>
     <action type="OPEN_URL_WITH_TEXT">
-        <label>label</label>
+        <label>OPEN_URL_WITH_TEXT</label>
         <description>description</description>
-        <baseUrl>baseUrl</baseUrl>
-        <placeholder>placeholder</placeholder>
+        <baseUrl>https://github.com/_____/</baseUrl>
+        <placeholder>_____</placeholder>
+    </action>
+
+    <action type="OPEN_URL_WITH_TEXT_HISTORY">
+        <label>OPEN_URL_WITH_TEXT_HISTORY</label>
+        <description>description</description>
+        <baseUrl>https://github.com/_____/</baseUrl>
+        <placeholder>_____</placeholder>
     </action>
 
     <action type="OPEN_URL">
-        <label>label</label>
+        <label>OPEN_URL</label>
         <description>description</description>
         <url>url</url>
     </action>
 
     <action type="COPY_TO_CLIPBOARD">
-        <label>label</label>
+        <label>COPY_TO_CLIPBOARD</label>
         <description>description</description>
-        <text>text</text>
+        <text>COPY_TO_CLIPBOARD</text>
     </action>
 
     <action type="OPEN_FILE">
-        <label>label</label>
+        <label>OPEN_FILE</label>
         <description>description</description>
         <text>text</text>
     </action>

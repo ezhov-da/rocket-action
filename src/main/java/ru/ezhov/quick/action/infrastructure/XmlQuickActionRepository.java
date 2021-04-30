@@ -11,6 +11,7 @@ import ru.ezhov.quick.action.types.CopyToClipboardQuickAction;
 import ru.ezhov.quick.action.types.GroupQuickAction;
 import ru.ezhov.quick.action.types.OpenFileQuickAction;
 import ru.ezhov.quick.action.types.OpenUrlQuickAction;
+import ru.ezhov.quick.action.types.OpenUrlWithTextHistoryQuickAction;
 import ru.ezhov.quick.action.types.OpenUrlWithTextQuickAction;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -90,6 +91,14 @@ public class XmlQuickActionRepository implements QuickActionRepository {
                             mapOpenUrlText.get("description"),
                             mapOpenUrlText.get("baseUrl"),
                             mapOpenUrlText.get("placeholder")
+                    );
+                case OPEN_URL_WITH_TEXT_HISTORY:
+                    Map<String, String> mapOpenUrlTextHistory = fieldsAndValues(action);
+                    return new OpenUrlWithTextHistoryQuickAction(
+                            mapOpenUrlTextHistory.get("label"),
+                            mapOpenUrlTextHistory.get("description"),
+                            mapOpenUrlTextHistory.get("baseUrl"),
+                            mapOpenUrlTextHistory.get("placeholder")
                     );
                 case OPEN_FILE:
                     Map<String, String> mapOpenFile = fieldsAndValues(action);
