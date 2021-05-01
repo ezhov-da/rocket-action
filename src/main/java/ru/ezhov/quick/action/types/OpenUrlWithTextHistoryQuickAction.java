@@ -1,6 +1,6 @@
 package ru.ezhov.quick.action.types;
 
-import ru.ezhov.quick.action.QuickAction;
+import ru.ezhov.quick.action.contract.QuickAction;
 
 import javax.swing.ImageIcon;
 import javax.swing.JMenu;
@@ -24,11 +24,6 @@ public class OpenUrlWithTextHistoryQuickAction implements QuickAction {
         this.description = description;
         this.baseUrl = baseUrl;
         this.placeholder = placeholder;
-    }
-
-    @Override
-    public ActionType type() {
-        return ActionType.OPEN_URL_WITH_TEXT;
     }
 
     public Component create() {

@@ -1,6 +1,6 @@
 package ru.ezhov.quick.action.types;
 
-import ru.ezhov.quick.action.QuickAction;
+import ru.ezhov.quick.action.contract.QuickAction;
 
 import javax.swing.ImageIcon;
 import javax.swing.JMenuItem;
@@ -18,11 +18,6 @@ public class OpenUrlQuickAction implements QuickAction {
         this.label = label;
         this.description = description;
         this.url = url;
-    }
-
-    @Override
-    public ActionType type() {
-        return ActionType.OPEN_URL;
     }
 
     public Component create() {

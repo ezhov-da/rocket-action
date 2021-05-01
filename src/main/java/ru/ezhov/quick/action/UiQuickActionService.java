@@ -1,6 +1,8 @@
 package ru.ezhov.quick.action;
 
+import ru.ezhov.quick.action.contract.QuickAction;
 import ru.ezhov.quick.action.infrastructure.XmlQuickActionRepository;
+import ru.ezhov.quick.action.infrastructure.YmlQuickActionRepository;
 
 import javax.swing.ImageIcon;
 import javax.swing.JDialog;
@@ -54,10 +56,10 @@ public class UiQuickActionService {
                 inputStream = new FileInputStream(new File(userPathToAction));
             } else {
                 System.out.println("Use absolute path to `action.xml` file as argument");
-                inputStream = App.class.getResourceAsStream("/actions.xml");
+                inputStream = App.class.getResourceAsStream("/actions.yml");
             }
 
-            QuickActionRepository quickActionRepository = new XmlQuickActionRepository(inputStream);
+            QuickActionRepository quickActionRepository = new YmlQuickActionRepository(inputStream);
             return quickActionRepository.actions();
         } finally {
             if (inputStream != null) {

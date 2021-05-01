@@ -1,6 +1,6 @@
 package ru.ezhov.quick.action.types;
 
-import ru.ezhov.quick.action.QuickAction;
+import ru.ezhov.quick.action.contract.QuickAction;
 
 import javax.swing.ImageIcon;
 import javax.swing.JMenu;
@@ -17,11 +17,6 @@ public class GroupQuickAction implements QuickAction {
         this.label = label;
         this.description = description;
         this.quickActions = quickActions;
-    }
-
-    @Override
-    public ActionType type() {
-        return ActionType.GROUP;
     }
 
     @Override

@@ -1,6 +1,6 @@
 package ru.ezhov.quick.action.types;
 
-import ru.ezhov.quick.action.QuickAction;
+import ru.ezhov.quick.action.contract.QuickAction;
 
 import javax.swing.ImageIcon;
 import javax.swing.JMenuItem;
@@ -19,11 +19,6 @@ public class CopyToClipboardQuickAction implements QuickAction {
         this.label = label;
         this.description = description;
         this.text = text;
-    }
-
-    @Override
-    public ActionType type() {
-        return ActionType.COPY_TO_CLIPBOARD;
     }
 
     public Component create() {

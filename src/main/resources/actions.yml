@@ -1,0 +1,57 @@
+---
+actions:
+  - type: OPEN_URL_WITH_TEXT
+    label: OPEN_URL_WITH_TEXT
+    description: description
+    baseUrl: https://github.com/_____/
+    placeholder: _____
+
+  - type: OPEN_URL_WITH_TEXT_HISTORY
+    label: OPEN_URL_WITH_TEXT_HISTORY
+    description: description
+    baseUrl: https://github.com/_____/
+    placeholder: _____
+
+  - type: OPEN_URL
+    label: OPEN_URL
+    description: description
+    url: url
+
+  - type: COPY_TO_CLIPBOARD
+    label: COPY_TO_CLIPBOARD
+    description: description
+    text: COPY_TO_CLIPBOARD
+
+  - type: OPEN_FILE
+    label: OPEN_FILE
+    description: description
+    path: text
+
+  - type: GROUP
+    label: GROUP
+    description: description
+    actions:
+      - type: COPY_TO_CLIPBOARD
+        label: label1
+        description: description
+        text: text
+
+      - type: OPEN_FILE
+        label: label1
+        description: description
+        path: text
+
+      - type: GROUP
+        label: GROUP
+        description: description
+        actions:
+          - type: COPY_TO_CLIPBOARD
+            label: label2
+            description: description
+            text: text
+
+          - type: OPEN_FILE
+            label: label2
+            description: description
+            path: text
+...

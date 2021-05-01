@@ -3,7 +3,7 @@ package ru.ezhov.quick.action.infrastructure;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import ru.ezhov.quick.action.QuickAction;
+import ru.ezhov.quick.action.contract.QuickAction;
 import ru.ezhov.quick.action.QuickActionRepository;
 import ru.ezhov.quick.action.QuickActionRepositoryException;
 import ru.ezhov.quick.action.types.ActionType;
