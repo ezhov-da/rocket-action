@@ -8,29 +8,22 @@ import java.awt.Component;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
+import java.util.Map;
 
 public class CopyToClipboardQuickAction implements QuickAction {
 
-    private String label;
-    private String description;
-    private String text;
+    private static final String LABEL = "label";
+    private static final String DESCRIPTION = "description";
+    private static final String TEXT = "text";
 
-    public CopyToClipboardQuickAction(String label, String description, String text) {
-        this.label = label;
-        this.description = description;
-        this.text = text;
-    }
-
-    public Component create() {
-        JMenuItem menuItem = new JMenuItem(label);
+    public Component create(Map<String, Object> configuration) {
+        JMenuItem menuItem = new JMenuItem(ConfigurationUtil.getValue(configuration, LABEL));
         menuItem.setIcon(new ImageIcon(this.getClass().getResource("/clipboard_16x16.png")));
-        if (description != null && !"".equals(description)) {
-            menuItem.setToolTipText(description);
-        }
+        menuItem.setToolTipText(ConfigurationUtil.getValue(configuration, DESCRIPTION));
         menuItem.addActionListener(e -> {
             Toolkit defaultToolkit = Toolkit.getDefaultToolkit();
             Clipboard clipboard = defaultToolkit.getSystemClipboard();
-            clipboard.setContents(new StringSelection(text), null);
+            clipboard.setContents(new StringSelection(ConfigurationUtil.getValue(configuration, TEXT)), null);
         });
         return menuItem;
     }

@@ -3,6 +3,7 @@ package ru.ezhov.quick.action;
 import javax.swing.JDialog;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
+import java.time.Instant;
 
 public class App {
     public static void main(String[] args) {

@@ -5,30 +5,26 @@ import ru.ezhov.quick.action.contract.QuickAction;
 import javax.swing.ImageIcon;
 import javax.swing.JMenu;
 import java.awt.Component;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class GroupQuickAction implements QuickAction {
 
-    private String label;
-    private String description;
-    private List<QuickAction> quickActions;
-
-    public GroupQuickAction(String label, String description, List<QuickAction> quickActions) {
-        this.label = label;
-        this.description = description;
-        this.quickActions = quickActions;
-    }
+    private static final String LABEL = "label";
+    private static final String DESCRIPTION = "description";
+    private static final String COMPONENTS = "components";
 
     @Override
-    public Component create() {
-        JMenu menu = new JMenu(label);
+    public Component create(Map<String, Object> configuration) {
+        JMenu menu = new JMenu(ConfigurationUtil.getValue(configuration, LABEL));
         menu.setIcon(new ImageIcon(this.getClass().getResource("/group_16x16.png")));
-        if (description != null && !"".equals(description)) {
-            menu.setToolTipText(description);
-        }
+        menu.setToolTipText(ConfigurationUtil.getValue(configuration, DESCRIPTION));
 
-        for (QuickAction quickAction : quickActions) {
-            menu.add(quickAction.create());
+        List<Component> components = (List<Component>) configuration.getOrDefault(COMPONENTS, new ArrayList<Component>());
+
+        for (Component component : components) {
+            menu.add(component);
         }
 
         return menu;

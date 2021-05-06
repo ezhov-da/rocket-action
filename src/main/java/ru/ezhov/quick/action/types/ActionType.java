@@ -6,5 +6,6 @@ public enum ActionType {
     OPEN_URL,
     COPY_TO_CLIPBOARD,
     OPEN_FILE,
-    GROUP
+    GROUP,
+    SHOW_IMAGE
 }

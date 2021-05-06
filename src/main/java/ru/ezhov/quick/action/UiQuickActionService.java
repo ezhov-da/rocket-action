@@ -1,7 +1,6 @@
 package ru.ezhov.quick.action;
 
 import ru.ezhov.quick.action.contract.QuickAction;
-import ru.ezhov.quick.action.infrastructure.XmlQuickActionRepository;
 import ru.ezhov.quick.action.infrastructure.YmlQuickActionRepository;
 
 import javax.swing.ImageIcon;
@@ -31,11 +30,11 @@ public class UiQuickActionService {
 
     public JMenuBar createMenu(JDialog dialog) throws UiQuickActionServiceException {
         try {
-            List<QuickAction> actions = quickActions();
+            List<Component> actions = quickActions();
 
             JMenu menu = new JMenu();
             menu.setIcon(new ImageIcon(App.class.getResource("/rocket_16x16.png")));
-            actions.forEach(a -> menu.add(a.create()));
+            actions.forEach(menu::add);
             menu.add(createTools(dialog));
 
             JMenuBar menuBar = new JMenuBar();
@@ -48,7 +47,7 @@ public class UiQuickActionService {
         }
     }
 
-    private List<QuickAction> quickActions() throws Exception {
+    private List<Component> quickActions() throws Exception {
         InputStream inputStream = null;
 
         try {

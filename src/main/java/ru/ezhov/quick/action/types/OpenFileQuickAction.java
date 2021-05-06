@@ -7,30 +7,24 @@ import javax.swing.JMenuItem;
 import java.awt.Component;
 import java.awt.Desktop;
 import java.io.File;
+import java.util.Map;
 
 public class OpenFileQuickAction implements QuickAction {
 
-    private final String label;
-    private final String description;
-    private final String path;
+    private static final String LABEL = "label";
+    private static final String DESCRIPTION = "description";
+    private static final String PATH = "path";
 
-    public OpenFileQuickAction(String label, String description, String path) {
-        this.label = label;
-        this.description = description;
-        this.path = path;
-    }
-
-    public Component create() {
-        JMenuItem menuItem = new JMenuItem(label);
+    public Component create(Map<String, Object> configuration) {
+        JMenuItem menuItem = new JMenuItem(ConfigurationUtil.getValue(configuration, LABEL));
         menuItem.setIcon(new ImageIcon(this.getClass().getResource("/file_16x16.png")));
-        if (description != null && !"".equals(description)) {
-            menuItem.setToolTipText(description);
-        }
+        menuItem.setToolTipText(ConfigurationUtil.getValue(configuration, DESCRIPTION));
         menuItem.addActionListener(e -> {
             if (Desktop.isDesktopSupported()) {
                 try {
-                    Desktop.getDesktop().open(new File(path));
-                } catch (Exception ioException) {
+                    Desktop.getDesktop().open(new File(ConfigurationUtil.getValue(configuration, PATH)));
+                } catch (Exception ex) {
+                    ex.printStackTrace();
                 }
             }
         });

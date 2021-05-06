@@ -11,41 +11,41 @@ import java.awt.Component;
 import java.awt.Desktop;
 import java.awt.Graphics;
 import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
 
 public class OpenUrlWithTextHistoryQuickAction implements QuickAction {
 
-    private final String label;
-    private final String description;
-    private final String baseUrl;
-    private final String placeholder;
+    private static final String LABEL = "label";
+    private static final String DESCRIPTION = "description";
+    private static final String BASE_URL = "baseUrl";
+    private static final String PLACEHOLDER = "placeholder";
 
-    public OpenUrlWithTextHistoryQuickAction(String label, String description, String baseUrl, String placeholder) {
-        this.label = label;
-        this.description = description;
-        this.baseUrl = baseUrl;
-        this.placeholder = placeholder;
-    }
-
-    public Component create() {
-        JMenu menu = new JMenu(label);
+    public Component create(Map<String, Object> configuration) {
+        JMenu menu = new JMenu(ConfigurationUtil.getValue(configuration, LABEL));
         menu.setIcon(new ImageIcon(this.getClass().getResource("/link_16x16.png")));
 
-        TextFieldWithText textField = new TextFieldWithText(label);
+        TextFieldWithText textField = new TextFieldWithText(ConfigurationUtil.getValue(configuration, LABEL));
         textField.setColumns(10);
 
-        if (description != null && !"".equals(description)) {
-            textField.setToolTipText(description);
-        }
+        textField.setToolTipText(ConfigurationUtil.getValue(configuration, DESCRIPTION));
 
         textField.addActionListener(e -> {
             String text = textField.getText();
             if (text != null && !"".equals(text)) {
                 if (Desktop.isDesktopSupported()) {
                     try {
-                        URI uri = new URI(baseUrl.replaceAll(placeholder, text));
+                        URI uri = new URI(
+                                ConfigurationUtil.getValue(configuration, BASE_URL)
+                                        .replaceAll(ConfigurationUtil.getValue(configuration, PLACEHOLDER), text)
+                        );
                         Desktop.getDesktop().browse(uri);
                         SwingUtilities.invokeLater(() -> {
-                            menu.add(new OpenUrlQuickAction(text, "Open link", uri.toString()).create());
+                            Map<String, Object> map = new HashMap<>();
+                            map.put("label", text);
+                            map.put("description", "Open link");
+                            map.put("url", uri.toString());
+                            menu.add(new OpenUrlQuickAction().create(map));
                             menu.revalidate();
                             menu.repaint();
                         });

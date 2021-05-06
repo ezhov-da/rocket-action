@@ -5,7 +5,6 @@ import org.w3c.dom.NodeList;
 import org.yaml.snakeyaml.Yaml;
 import ru.ezhov.quick.action.QuickActionRepository;
 import ru.ezhov.quick.action.QuickActionRepositoryException;
-import ru.ezhov.quick.action.contract.QuickAction;
 import ru.ezhov.quick.action.types.ActionType;
 import ru.ezhov.quick.action.types.CopyToClipboardQuickAction;
 import ru.ezhov.quick.action.types.GroupQuickAction;
@@ -13,7 +12,9 @@ import ru.ezhov.quick.action.types.OpenFileQuickAction;
 import ru.ezhov.quick.action.types.OpenUrlQuickAction;
 import ru.ezhov.quick.action.types.OpenUrlWithTextHistoryQuickAction;
 import ru.ezhov.quick.action.types.OpenUrlWithTextQuickAction;
+import ru.ezhov.quick.action.types.ShowImageQuickAction;
 
+import java.awt.Component;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,9 +31,9 @@ public class YmlQuickActionRepository implements QuickActionRepository {
     }
 
     @Override
-    public List<QuickAction> actions() throws QuickActionRepositoryException {
+    public List<Component> actions() throws QuickActionRepositoryException {
         try {
-            List<QuickAction> actions = new ArrayList<>();
+            List<Component> actions = new ArrayList<>();
             Yaml yaml = new Yaml();
             Map<String, Object> obj = yaml.load(inputStream);
 
@@ -51,66 +52,43 @@ public class YmlQuickActionRepository implements QuickActionRepository {
         }
     }
 
-    private QuickAction createAction(LinkedHashMap<String, Object> action) throws QuickActionRepositoryException {
+    private Component createAction(LinkedHashMap<String, Object> action) throws QuickActionRepositoryException {
         String typeAsString = action.get("type").toString();
         ActionType actionType = ActionType.valueOf(typeAsString);
         return QuickActionFactory.create(actionType, action);
     }
 
     private static class QuickActionFactory {
-        static QuickAction createAction(LinkedHashMap<String, Object> action) throws QuickActionRepositoryException {
+        static Component createAction(LinkedHashMap<String, Object> action) throws QuickActionRepositoryException {
             String typeAsString = action.get("type").toString();
             ActionType actionType = ActionType.valueOf(typeAsString);
             return QuickActionFactory.create(actionType, action);
         }
 
-        static QuickAction create(ActionType actionType, LinkedHashMap<String, Object> action) throws QuickActionRepositoryException {
+        static Component create(ActionType actionType, LinkedHashMap<String, Object> action) throws QuickActionRepositoryException {
             switch (actionType) {
                 case OPEN_URL:
-                    return new OpenUrlQuickAction(
-                            action.get("label").toString(),
-                            action.get("description").toString(),
-                            action.get("url").toString()
-                    );
+                    return new OpenUrlQuickAction().create(action);
                 case OPEN_URL_WITH_TEXT:
-                    return new OpenUrlWithTextQuickAction(
-                            action.get("label").toString(),
-                            action.get("description").toString(),
-                            action.get("baseUrl").toString(),
-                            action.get("placeholder").toString()
-                    );
+                    return new OpenUrlWithTextQuickAction().create(action);
                 case OPEN_URL_WITH_TEXT_HISTORY:
-                    return new OpenUrlWithTextHistoryQuickAction(
-                            action.get("label").toString(),
-                            action.get("description").toString(),
-                            action.get("baseUrl").toString(),
-                            action.get("placeholder").toString()
-                    );
+                    return new OpenUrlWithTextHistoryQuickAction().create(action);
                 case OPEN_FILE:
-                    return new OpenFileQuickAction(
-                            action.get("label").toString(),
-                            action.get("description").toString(),
-                            action.get("path").toString()
-                    );
+                    return new OpenFileQuickAction().create(action);
                 case COPY_TO_CLIPBOARD:
-                    return new CopyToClipboardQuickAction(
-                            action.get("label").toString(),
-                            action.get("description").toString(),
-                            action.get("text").toString()
-                    );
+                    return new CopyToClipboardQuickAction().create(action);
+                case SHOW_IMAGE:
+                    return new ShowImageQuickAction().create(action);
                 case GROUP:
-                    List<QuickAction> actions = new ArrayList<>();
+                    List<Component> components = new ArrayList<>();
 
                     ArrayList<LinkedHashMap<String, Object>> linkedHashMaps =
                             (ArrayList<LinkedHashMap<String, Object>>) action.get("actions");
                     for (LinkedHashMap<String, Object> a : linkedHashMaps) {
-                        actions.add(createAction(a));
+                        components.add(createAction(a));
                     }
-                    return new GroupQuickAction(
-                            action.get("label").toString(),
-                            action.get("description").toString(),
-                            actions
-                    );
+                    action.put("components", components);
+                    return new GroupQuickAction().create(action);
                 default:
                     throw new QuickActionRepositoryException("//TODO");
             }

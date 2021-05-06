@@ -54,4 +54,8 @@ actions:
             label: label2
             description: description
             path: text
+  - type: SHOW_IMAGE
+    label: SHOW_IMAGE
+    description: SHOW_IMAGE
+    imageUrl: http://www.plantuml.com/plantuml/png/dOvD3i8W48MleWkMTcYDMbqsquDKIeI4duQ29fxUEBCeRjsyV0mVlDdRe5oPTKbkPt9UrXj0cbxDmsPJxcNLISMGTSYDYXxqsyJdOPu04S5FDe10AQwZm5Rqyil3aP8PANlA2y_9F5VpiJAHRWVYa-WaQnjiJiSEDtBx7__JiQyMRYbP67-UT18HcwLuzm40
 ...

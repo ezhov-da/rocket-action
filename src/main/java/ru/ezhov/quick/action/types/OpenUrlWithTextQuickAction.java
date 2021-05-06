@@ -13,23 +13,17 @@ import java.awt.Component;
 import java.awt.Desktop;
 import java.awt.Graphics;
 import java.net.URI;
+import java.util.Map;
 
 public class OpenUrlWithTextQuickAction implements QuickAction {
 
-    private final String label;
-    private final String description;
-    private final String baseUrl;
-    private final String placeholder;
+    private final String LABEL = "label";
+    private final String DESCRIPTION = "description";
+    private final String BASE_URL = "baseUrl";
+    private final String PLACEHOLDER = "placeholder";
 
-    public OpenUrlWithTextQuickAction(String label, String description, String baseUrl, String placeholder) {
-        this.label = label;
-        this.description = description;
-        this.baseUrl = baseUrl;
-        this.placeholder = placeholder;
-    }
-
-    public Component create() {
-        JMenu menu = new JMenu(label);
+    public Component create(Map<String, Object> configuration) {
+        JMenu menu = new JMenu(ConfigurationUtil.getValue(configuration, LABEL));
         menu.setIcon(new ImageIcon(this.getClass().getResource("/link_16x16.png")));
 
         JPanel panel = new JPanel();
@@ -37,21 +31,26 @@ public class OpenUrlWithTextQuickAction implements QuickAction {
         panel.add(
                 new JLabel(new ImageIcon(this.getClass().getResource("/link_16x16.png")))
         );
-        TextFieldWithText textField = new TextFieldWithText(label);
+        TextFieldWithText textField = new TextFieldWithText(ConfigurationUtil.getValue(configuration, LABEL));
         textField.setColumns(10);
         panel.add(textField);
 
-        if (description != null && !"".equals(description)) {
-            textField.setToolTipText(description);
-        }
+        textField.setToolTipText(ConfigurationUtil.getValue(configuration, DESCRIPTION));
 
         textField.addActionListener(e -> {
             String text = textField.getText();
             if (text != null && !"".equals(text)) {
                 if (Desktop.isDesktopSupported()) {
                     try {
-                        Desktop.getDesktop().browse(new URI(baseUrl.replaceAll(placeholder, text)));
-                    } catch (Exception ioException) {
+                        Desktop.getDesktop().browse(
+                                new URI(
+                                        ConfigurationUtil.getValue(configuration, BASE_URL).replaceAll(
+                                                ConfigurationUtil.getValue(configuration, PLACEHOLDER), text
+                                        )
+                                )
+                        );
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
                     }
                 }
             }
