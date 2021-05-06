@@ -18,7 +18,7 @@ public class YmlQuickActionRepositoryTest {
 
             List<Component> list = repository.actions();
 
-            assertEquals(7, list.size());
+            assertEquals(8, list.size());
         } catch (IOException | QuickActionRepositoryException e) {
             e.printStackTrace();
         }

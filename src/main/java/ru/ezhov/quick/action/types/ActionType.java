@@ -7,5 +7,6 @@ public enum ActionType {
     COPY_TO_CLIPBOARD,
     OPEN_FILE,
     GROUP,
-    SHOW_IMAGE
+    SHOW_IMAGE,
+    SEPARATOR
 }

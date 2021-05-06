@@ -12,6 +12,8 @@ actions:
     baseUrl: https://github.com/_____/
     placeholder: _____
 
+  - type: SEPARATOR
+
   - type: OPEN_URL
     label: OPEN_URL
     description: description

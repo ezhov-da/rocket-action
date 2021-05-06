@@ -12,6 +12,7 @@ import ru.ezhov.quick.action.types.OpenFileQuickAction;
 import ru.ezhov.quick.action.types.OpenUrlQuickAction;
 import ru.ezhov.quick.action.types.OpenUrlWithTextHistoryQuickAction;
 import ru.ezhov.quick.action.types.OpenUrlWithTextQuickAction;
+import ru.ezhov.quick.action.types.SeparatorQuickAction;
 import ru.ezhov.quick.action.types.ShowImageQuickAction;
 
 import java.awt.Component;
@@ -79,6 +80,8 @@ public class YmlQuickActionRepository implements QuickActionRepository {
                     return new CopyToClipboardQuickAction().create(action);
                 case SHOW_IMAGE:
                     return new ShowImageQuickAction().create(action);
+                case SEPARATOR:
+                    return new SeparatorQuickAction().create(action);
                 case GROUP:
                     List<Component> components = new ArrayList<>();
 
