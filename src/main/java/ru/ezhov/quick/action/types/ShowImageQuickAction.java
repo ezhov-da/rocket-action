@@ -1,13 +1,17 @@
 package ru.ezhov.quick.action.types;
 
+import org.jdesktop.swingx.JXImageView;
+import org.jdesktop.swingx.JXPanel;
 import ru.ezhov.quick.action.contract.QuickAction;
 
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
-import javax.swing.JScrollPane;
+import javax.swing.JPanel;
+import java.awt.BorderLayout;
 import java.awt.Component;
-import java.net.MalformedURLException;
+import java.awt.Dimension;
+import java.awt.Toolkit;
 import java.net.URL;
 import java.util.Map;
 
@@ -24,14 +28,40 @@ public class ShowImageQuickAction implements QuickAction {
                 new ImageIcon(this.getClass().getResource("/image_16x16.png"))
         );
         try {
-            JLabel label;
+
+            Component component;
             if (configuration.containsKey(IMAGE_URL)) {
-                label = new JLabel(new ImageIcon(new URL(ConfigurationUtil.getValue(configuration, IMAGE_URL))));
+                final Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
+                Dimension newDimension = new Dimension(dimension.width - 200, dimension.height - 200);
+
+                JXPanel panel = new JXPanel(new BorderLayout());
+
+                panel.setPreferredSize(newDimension);
+                panel.setMaximumSize(newDimension);
+                panel.setMinimumSize(newDimension);
+
+                JXImageView imageView = new JXImageView();
+                imageView.setImageURL(new URL(ConfigurationUtil.getValue(configuration, IMAGE_URL)));
+                imageView.setPreferredSize(newDimension);
+                imageView.setMaximumSize(newDimension);
+                imageView.setMinimumSize(newDimension);
+
+                imageView.setAutoscrolls(true);
+
+                panel.add(
+                        imageView,
+                        BorderLayout.CENTER
+                );
+
+                component = imageView;
             } else {
-                label = new JLabel(ConfigurationUtil.getValue(configuration, IMAGE_URL));
+                JPanel panel = new JPanel();
+                panel.add(new JLabel(ConfigurationUtil.getValue(configuration, IMAGE_URL)));
+
+                component = panel;
             }
-            menu.add(new JScrollPane(label));
-        } catch (MalformedURLException e) {
+            menu.add(component);
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
