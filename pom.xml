@@ -5,10 +5,10 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>ru.ezhov</groupId>
-    <artifactId>quick-action</artifactId>
+    <artifactId>rocket-action</artifactId>
     <version>1.0</version>
 
-    <name>quick-action</name>
+    <name>rocket-action</name>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -17,6 +17,20 @@
     </properties>
 
     <dependencies>
+        <!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>30.1.1-jre</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.reflections/reflections -->
+        <dependency>
+            <groupId>org.reflections</groupId>
+            <artifactId>reflections</artifactId>
+            <version>0.9.12</version>
+        </dependency>
+
         <!-- https://mvnrepository.com/artifact/org.swinglabs/swingx -->
         <dependency>
             <groupId>org.swinglabs</groupId>
@@ -49,7 +63,7 @@
                     </descriptorRefs>
                     <archive>
                         <manifest>
-                            <mainClass>ru.ezhov.quick.action.App</mainClass>
+                            <mainClass>ru.ezhov.rocket.action.App</mainClass>
                         </manifest>
                     </archive>
                     <finalName>${project.artifactId}</finalName>
