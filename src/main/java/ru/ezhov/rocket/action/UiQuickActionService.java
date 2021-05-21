@@ -15,6 +15,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.SwingUtilities;
+import javax.swing.SwingWorker;
 import java.awt.Component;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
@@ -44,24 +45,14 @@ public class UiQuickActionService {
     public JMenuBar createMenu(JDialog dialog) throws UiQuickActionServiceException {
         this.dialog = dialog;
         try {
-            List<RocketActionSettings> actionSettings = rocketActionSettings();
-
-            JMenu menu = new JMenu();
-            menu.setIcon(new ImageIcon(App.class.getResource("/rocket_16x16.png")));
-
-            for (RocketActionSettings rocketActionSettings : actionSettings) {
-                final Optional<RocketActionUi> actionUiOptional = rocketActionUiRepository.by(rocketActionSettings.type());
-                if (actionUiOptional.isPresent()) {
-                    menu.add(actionUiOptional.get().create(rocketActionSettings));
-                }
-            }
-
-            menu.add(createTools(dialog));
-
             JMenuBar menuBar = new JMenuBar();
+            JMenu menu = new JMenu();
+            menu.setIcon(new ImageIcon(App.class.getResource("/load_16x16.gif")));
+
             menuBar.add(menu);
             menuBar.add(createMoveComponent(dialog));
 
+            new CreateMenuWorker(menu).execute();
             return menuBar;
         } catch (Exception e) {
             throw new UiQuickActionServiceException("Error", e);
@@ -174,5 +165,31 @@ public class UiQuickActionService {
         label.addMouseMotionListener(mouseAdapter);
 
         return label;
+    }
+
+    private class CreateMenuWorker extends SwingWorker<String, String> {
+        private JMenu menu;
+
+        public CreateMenuWorker(JMenu menu) {
+            this.menu = menu;
+        }
+
+        @Override
+        protected String doInBackground() throws Exception {
+            List<RocketActionSettings> actionSettings = rocketActionSettings();
+            for (RocketActionSettings rocketActionSettings : actionSettings) {
+                final Optional<RocketActionUi> actionUiOptional = rocketActionUiRepository.by(rocketActionSettings.type());
+                if (actionUiOptional.isPresent()) {
+                    menu.add(actionUiOptional.get().create(rocketActionSettings));
+                }
+            }
+            menu.add(createTools(dialog));
+            return null;
+        }
+
+        @Override
+        protected void done() {
+            menu.setIcon(new ImageIcon(App.class.getResource("/rocket_16x16.png")));
+        }
     }
 }
