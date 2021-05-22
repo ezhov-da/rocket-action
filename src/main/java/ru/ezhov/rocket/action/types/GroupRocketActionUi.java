@@ -4,9 +4,9 @@ import ru.ezhov.rocket.action.RocketActionUiRepository;
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty;
 import ru.ezhov.rocket.action.api.RocketActionSettings;
 import ru.ezhov.rocket.action.api.RocketActionUi;
+import ru.ezhov.rocket.action.icon.IconRepositoryFactory;
 import ru.ezhov.rocket.action.infrastructure.ReflectionRocketActionUiRepository;
 
-import javax.swing.ImageIcon;
 import javax.swing.JMenu;
 import java.awt.Component;
 import java.util.Arrays;
@@ -43,7 +43,7 @@ public class GroupRocketActionUi extends AbstractRocketAction {
 
     private JMenu createGroup(RocketActionSettings settings) {
         JMenu menu = new JMenu(ConfigurationUtil.getValue(settings.settings(), LABEL));
-        menu.setIcon(new ImageIcon(this.getClass().getResource("/group_16x16.png")));
+        menu.setIcon(IconRepositoryFactory.getInstance().by("project-2x").get());
         menu.setToolTipText(ConfigurationUtil.getValue(settings.settings(), DESCRIPTION));
         return menu;
     }

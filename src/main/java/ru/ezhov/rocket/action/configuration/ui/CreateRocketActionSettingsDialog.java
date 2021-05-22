@@ -22,8 +22,6 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dialog;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.util.Collections;
 import java.util.Comparator;

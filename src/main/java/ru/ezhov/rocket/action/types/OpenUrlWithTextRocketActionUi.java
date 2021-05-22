@@ -2,9 +2,9 @@ package ru.ezhov.rocket.action.types;
 
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty;
 import ru.ezhov.rocket.action.api.RocketActionSettings;
+import ru.ezhov.rocket.action.icon.IconRepositoryFactory;
 
 import javax.swing.BoxLayout;
-import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JPanel;
@@ -26,12 +26,12 @@ public class OpenUrlWithTextRocketActionUi extends AbstractRocketAction {
 
     public Component create(RocketActionSettings settings) {
         JMenu menu = new JMenu(ConfigurationUtil.getValue(settings.settings(), LABEL));
-        menu.setIcon(new ImageIcon(this.getClass().getResource("/link_16x16.png")));
+        menu.setIcon(IconRepositoryFactory.getInstance().by("link-intact-2x").get());
 
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.LINE_AXIS));
         panel.add(
-                new JLabel(new ImageIcon(this.getClass().getResource("/link_16x16.png")))
+                new JLabel(IconRepositoryFactory.getInstance().by("link-intact-2x").get())
         );
         TextFieldWithText textField = new TextFieldWithText(ConfigurationUtil.getValue(settings.settings(), LABEL));
         textField.setColumns(10);

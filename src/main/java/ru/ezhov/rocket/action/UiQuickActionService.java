@@ -4,6 +4,7 @@ import ru.ezhov.rocket.action.api.RocketActionSettings;
 import ru.ezhov.rocket.action.api.RocketActionUi;
 import ru.ezhov.rocket.action.configuration.ui.ConfigurationFrame;
 import ru.ezhov.rocket.action.configuration.ui.RocketActionConfigurationRepository;
+import ru.ezhov.rocket.action.icon.IconRepositoryFactory;
 import ru.ezhov.rocket.action.infrastructure.ReflectionRocketActionConfigurationRepository;
 import ru.ezhov.rocket.action.infrastructure.ReflectionRocketActionUiRepository;
 import ru.ezhov.rocket.action.infrastructure.YmlRocketActionSettingsRepository;
@@ -74,10 +75,10 @@ public class UiQuickActionService {
 
     private JMenu createTools(JDialog dialog) {
         JMenu menuTools = new JMenu("Tools");
-        menuTools.setIcon(new ImageIcon(App.class.getResource("/tools_16x16.png")));
+        menuTools.setIcon(IconRepositoryFactory.getInstance().by("wrench-2x").get());
 
         JMenuItem menuItemUpdate = new JMenuItem("Update");
-        menuItemUpdate.setIcon(new ImageIcon(App.class.getResource("/update_16x16.png")));
+        menuItemUpdate.setIcon(IconRepositoryFactory.getInstance().by("reload-2x").get());
         menuItemUpdate.addActionListener(e -> SwingUtilities.invokeLater(() -> {
             JMenuBar newMenuBar = null;
             try {
@@ -96,7 +97,7 @@ public class UiQuickActionService {
         menuTools.add(menuItemUpdate);
 
         JMenuItem menuItemEditor = new JMenuItem("Editor");
-        menuItemEditor.setIcon(new ImageIcon(App.class.getResource("/editor_16x16.png")));
+        menuItemEditor.setIcon(IconRepositoryFactory.getInstance().by("pencil-2x").get());
 
         menuItemEditor.addActionListener(e -> SwingUtilities.invokeLater(() -> {
             if (configurationFrame == null) {
@@ -118,8 +119,14 @@ public class UiQuickActionService {
         }));
         menuTools.add(menuItemEditor);
 
+        JMenu menuInfo = new JMenu("Info");
+        menuInfo.setIcon(IconRepositoryFactory.getInstance().by("info-2x").get());
+        JLabel label = new JLabel("Used icons https://useiconic.com/open");
+        menuInfo.add(label);
+        menuTools.add(menuInfo);
+
         JMenuItem menuItemClose = new JMenuItem("Close");
-        menuItemClose.setIcon(new ImageIcon(App.class.getResource("/close_16x16.png")));
+        menuItemClose.setIcon(IconRepositoryFactory.getInstance().by("x-2x").get());
         menuItemClose.addActionListener(e -> SwingUtilities.invokeLater(dialog::dispose));
         menuTools.add(menuItemClose);
 
@@ -127,7 +134,7 @@ public class UiQuickActionService {
     }
 
     private Component createMoveComponent(JDialog dialog) {
-        JLabel label = new JLabel(new ImageIcon(App.class.getResource("/cursor_drag_arrow_16x16.png")));
+        JLabel label = new JLabel(IconRepositoryFactory.getInstance().by("move-2x").get());
         MouseAdapter mouseAdapter = new MouseAdapter() {
             boolean pressed = false;
             int x = 0;

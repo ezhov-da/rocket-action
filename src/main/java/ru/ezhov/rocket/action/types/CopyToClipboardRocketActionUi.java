@@ -2,8 +2,8 @@ package ru.ezhov.rocket.action.types;
 
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty;
 import ru.ezhov.rocket.action.api.RocketActionSettings;
+import ru.ezhov.rocket.action.icon.IconRepositoryFactory;
 
-import javax.swing.ImageIcon;
 import javax.swing.JMenuItem;
 import java.awt.Component;
 import java.awt.Toolkit;
@@ -20,7 +20,7 @@ public class CopyToClipboardRocketActionUi extends AbstractRocketAction {
 
     public Component create(RocketActionSettings settings) {
         JMenuItem menuItem = new JMenuItem(ConfigurationUtil.getValue(settings.settings(), LABEL));
-        menuItem.setIcon(new ImageIcon(this.getClass().getResource("/clipboard_16x16.png")));
+        menuItem.setIcon(IconRepositoryFactory.getInstance().by("clipboard-2x").get());
         menuItem.setToolTipText(ConfigurationUtil.getValue(settings.settings(), DESCRIPTION));
         menuItem.addActionListener(e -> {
             Toolkit defaultToolkit = Toolkit.getDefaultToolkit();
