@@ -10,6 +10,7 @@ import ru.ezhov.rocket.action.types.ConfigurationUtil;
 
 import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JMenu;
@@ -38,6 +39,7 @@ public class GistRocketAction extends AbstractRocketAction {
     public static final String TOKEN = "gistToken";
     public static final String USERNAME = "username";
     public static final String BASE_GIST_URL = "baseGistUrl";
+    private JMenu menu;
 
     @Override
     public String description() {
@@ -64,9 +66,8 @@ public class GistRocketAction extends AbstractRocketAction {
 
     @Override
     public Component create(RocketActionSettings settings) {
-        JMenu menu = new JMenu(ConfigurationUtil.getValue(settings.settings(), LABEL));
-        menu.setIcon(new ImageIcon(this.getClass().getResource("/load_16x16.gif")));
-        new GistWorker(menu, settings).execute();
+        menu = new JMenu(ConfigurationUtil.getValue(settings.settings(), LABEL));
+        new GistWorker(settings).execute();
         return menu;
     }
 
@@ -76,11 +77,11 @@ public class GistRocketAction extends AbstractRocketAction {
     }
 
     private class GistWorker extends SwingWorker<GistPanel, String> {
-        private JMenu parent;
         private RocketActionSettings settings;
 
-        public GistWorker(JMenu parent, RocketActionSettings settings) {
-            this.parent = parent;
+        public GistWorker(RocketActionSettings settings) {
+            menu.removeAll();
+            menu.setIcon(new ImageIcon(this.getClass().getResource("/load_16x16.gif")));
             this.settings = settings;
         }
 
@@ -88,14 +89,15 @@ public class GistRocketAction extends AbstractRocketAction {
         protected GistPanel doInBackground() throws Exception {
             GistActionService gistActionService = new GistActionService();
             final List<Gist> gists = gistActionService.gists(settings);
-            return new GistPanel(gists, settings.settings().get(BASE_GIST_URL));
+            return new GistPanel(gists, settings.settings().get(BASE_GIST_URL), settings);
         }
 
         @Override
         protected void done() {
-            parent.setIcon(IconRepositoryFactory.getInstance().by("bookmark-2x").get());
+            menu.setIcon(IconRepositoryFactory.getInstance().by("bookmark-2x").get());
             try {
-                parent.add(this.get());
+                menu.removeAll();
+                menu.add(this.get());
             } catch (InterruptedException e) {
                 e.printStackTrace();
             } catch (ExecutionException e) {
@@ -104,12 +106,12 @@ public class GistRocketAction extends AbstractRocketAction {
         }
     }
 
-    private static class GistPanel extends JPanel {
+    private class GistPanel extends JPanel {
         private List<GistListItem> gistItems;
         private JTextField textFieldSearch = new JTextField();
         private DefaultListModel<GistListItem> model = new DefaultListModel<>();
 
-        public GistPanel(List<Gist> gists, String gistUrl) {
+        public GistPanel(List<Gist> gists, String gistUrl, RocketActionSettings settings) {
             super(new BorderLayout());
             this.gistItems = new ArrayList<>();
             for (Gist gist : gists) {
@@ -136,7 +138,14 @@ public class GistRocketAction extends AbstractRocketAction {
                     }
                 }
             });
-            add(textFieldSearch, BorderLayout.NORTH);
+
+            JPanel panelSearchAndUpdate = new JPanel(new BorderLayout());
+            JButton buttonUpdate = new JButton(IconRepositoryFactory.getInstance().by("reload-2x").get());
+            buttonUpdate.addActionListener(e -> new GistWorker(settings).execute());
+            panelSearchAndUpdate.add(textFieldSearch, BorderLayout.CENTER);
+            panelSearchAndUpdate.add(buttonUpdate, BorderLayout.EAST);
+
+            add(panelSearchAndUpdate, BorderLayout.NORTH);
             add(new JScrollPane(list), BorderLayout.CENTER);
 
             if (gistUrl != null && !"".equals(gistUrl)) {
