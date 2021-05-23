@@ -149,7 +149,7 @@ class TreeTransferHandler extends TransferHandler {
      * Defensive copy used in createTransferable.
      */
     private DefaultMutableTreeNode copy(DefaultMutableTreeNode copy) {
-        DefaultMutableTreeNode treeNodeTo = new DefaultMutableTreeNode(copy.getUserObject());
+        DefaultMutableTreeNode treeNodeTo = new DefaultMutableTreeNode(copy.getUserObject(), true);
         for (int i = 0; i < copy.getChildCount(); i++) {
             DefaultMutableTreeNode child = (DefaultMutableTreeNode) copy.getChildAt(i);
             treeNodeTo.add(copy(child));

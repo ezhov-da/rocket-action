@@ -160,7 +160,7 @@ public class ConfigurationFrame {
                                     );
 
                                     defaultTreeModel.insertNodeInto(
-                                            new DefaultMutableTreeNode(newActionSettings),
+                                            new DefaultMutableTreeNode(newActionSettings, true),
                                             (MutableTreeNode) mutableTreeNode.getParent(),
                                             mutableTreeNode.getParent().getIndex(mutableTreeNode)
 
@@ -185,7 +185,8 @@ public class ConfigurationFrame {
                                                                     rocketActionSettings.type(),
                                                                     rocketActionSettings.settings(),
                                                                     rocketActionSettings.actions()
-                                                            )
+                                                            ),
+                                                            true
                                                     ),
                                                     (MutableTreeNode) mutableTreeNode.getParent(),
                                                     mutableTreeNode.getParent().getIndex(mutableTreeNode) + 1
@@ -205,11 +206,18 @@ public class ConfigurationFrame {
                                 public void actionPerformed(ActionEvent e) {
                                     createRocketActionSettingsDialog.show(rocketActionSettings -> {
                                         SwingUtilities.invokeLater(() -> {
-                                            mutableTreeNode.add(new DefaultMutableTreeNode(new MutableRocketActionSettings(
-                                                    rocketActionSettings.type(),
-                                                    rocketActionSettings.settings(),
-                                                    rocketActionSettings.actions()
-                                            )));
+                                            mutableTreeNode.add(
+                                                    new DefaultMutableTreeNode(
+                                                            new MutableRocketActionSettings(
+                                                                    rocketActionSettings.type(),
+                                                                    rocketActionSettings.settings(),
+                                                                    rocketActionSettings.actions()
+                                                            ),
+                                                            true
+                                                    )
+                                            );
+
+                                            defaultTreeModel.reload(mutableTreeNode);
                                         });
                                     });
                                 }
