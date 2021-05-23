@@ -1,6 +1,11 @@
 ---
 actions:
 
+  - type: GIST
+    label: Gists
+    baseGistUrl: https://gist.github.com/ezhov-da
+    username: ezhov-da
+
   - type: SHOW_TEXT
     text: >
       <html>Lorem Ipsum is simply dummy <b>text</b> of the printing and typesetting industry. <br>
