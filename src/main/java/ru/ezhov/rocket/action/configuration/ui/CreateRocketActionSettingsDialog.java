@@ -22,6 +22,7 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dialog;
+import java.awt.Dimension;
 import java.awt.event.ItemEvent;
 import java.util.Collections;
 import java.util.Comparator;
@@ -47,7 +48,8 @@ public class CreateRocketActionSettingsDialog {
             RocketActionUiRepository rocketActionUiRepository
     ) throws Exception {
         dialog = new JDialog(owner, "Create rocket action");
-        dialog.setSize(500, 400);
+        final Dimension ownerSize = owner.getSize();
+        dialog.setSize((int) (ownerSize.width * 0.7), (int) (ownerSize.height * 0.7));
         this.rocketActionConfigurationRepository = rocketActionConfigurationRepository;
         this.rocketActionUiRepository = rocketActionUiRepository;
 

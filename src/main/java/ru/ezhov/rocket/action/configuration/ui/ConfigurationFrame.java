@@ -32,6 +32,8 @@ import javax.swing.tree.TreeSelectionModel;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dialog;
+import java.awt.Dimension;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -61,15 +63,15 @@ public class ConfigurationFrame {
         this.rocketActionConfigurationRepository = rocketActionConfigurationRepository;
         this.rocketActionUiRepository = rocketActionUiRepository;
         this.rocketActionSettingsRepository = rocketActionSettingsRepository;
+
+        final Dimension size = Toolkit.getDefaultToolkit().getScreenSize();
+        dialog.setSize((int) (size.width * 0.6), (int) (size.height * 0.6));
+        dialog.setLocationRelativeTo(null);
         createRocketActionSettingsDialog = new CreateRocketActionSettingsDialog(
                 dialog,
                 rocketActionConfigurationRepository,
                 rocketActionUiRepository
         );
-
-        dialog.setSize(700, 500);
-        dialog.setLocationRelativeTo(null);
-//        frame.setAlwaysOnTop(true);
         dialog.add(panel(), BorderLayout.CENTER);
     }
 
