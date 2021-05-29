@@ -3,6 +3,7 @@ package ru.ezhov.rocket.action.types;
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty;
 import ru.ezhov.rocket.action.api.RocketActionSettings;
 import ru.ezhov.rocket.action.icon.IconRepositoryFactory;
+import ru.ezhov.rocket.action.notification.NotificationFactory;
 import ru.ezhov.rocket.action.types.service.IconService;
 
 import javax.swing.JMenuItem;
@@ -42,6 +43,8 @@ public class OpenUrlRocketActionUi extends AbstractRocketAction {
                     Toolkit defaultToolkit = Toolkit.getDefaultToolkit();
                     Clipboard clipboard = defaultToolkit.getSystemClipboard();
                     clipboard.setContents(new StringSelection(ConfigurationUtil.getValue(settings.settings(), URL)), null);
+
+                    NotificationFactory.getInstance().show("URL copy to clipboard");
                 } else if (e.getButton() == MouseEvent.BUTTON1) {
                     if (Desktop.isDesktopSupported()) {
                         try {

@@ -2,6 +2,7 @@ package ru.ezhov.rocket.action.types;
 
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty;
 import ru.ezhov.rocket.action.api.RocketActionSettings;
+import ru.ezhov.rocket.action.notification.NotificationFactory;
 
 import javax.swing.JLabel;
 import java.awt.Component;
@@ -37,6 +38,8 @@ public class TextRocketActionUi extends AbstractRocketAction {
                     Toolkit defaultToolkit = Toolkit.getDefaultToolkit();
                     Clipboard clipboard = defaultToolkit.getSystemClipboard();
                     clipboard.setContents(new StringSelection(text), null);
+
+                    NotificationFactory.getInstance().show("Text copy to clipboard");
                 }
             }
         });

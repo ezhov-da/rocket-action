@@ -5,6 +5,7 @@ import org.eclipse.egit.github.core.GistFile;
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty;
 import ru.ezhov.rocket.action.api.RocketActionSettings;
 import ru.ezhov.rocket.action.icon.IconRepositoryFactory;
+import ru.ezhov.rocket.action.notification.NotificationFactory;
 import ru.ezhov.rocket.action.types.AbstractRocketAction;
 import ru.ezhov.rocket.action.types.ConfigurationUtil;
 
@@ -98,6 +99,8 @@ public class GistRocketAction extends AbstractRocketAction {
             try {
                 menu.removeAll();
                 menu.add(this.get());
+
+                NotificationFactory.getInstance().show("Gists loaded");
             } catch (InterruptedException e) {
                 e.printStackTrace();
             } catch (ExecutionException e) {
