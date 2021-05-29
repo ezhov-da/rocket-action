@@ -19,6 +19,7 @@ class Message extends JWindow {
         label.setHorizontalAlignment(JLabel.CENTER);
         panel.add(label, BorderLayout.CENTER);
         add(panel, BorderLayout.CENTER);
+        setAlwaysOnTop(true);
     }
 
     public void showMessage(Point location, Dimension size) {
