@@ -6,7 +6,7 @@ import ru.ezhov.rocket.action.api.RocketActionSettings;
 import ru.ezhov.rocket.action.api.RocketActionUi;
 import ru.ezhov.rocket.action.icon.IconRepositoryFactory;
 import ru.ezhov.rocket.action.infrastructure.ReflectionRocketActionUiRepository;
-import ru.ezhov.rocket.action.types.utils.IconService;
+import ru.ezhov.rocket.action.types.service.IconService;
 
 import javax.swing.ImageIcon;
 import javax.swing.JMenu;

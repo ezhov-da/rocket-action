@@ -3,7 +3,7 @@ package ru.ezhov.rocket.action.types;
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty;
 import ru.ezhov.rocket.action.api.RocketActionSettings;
 import ru.ezhov.rocket.action.icon.IconRepositoryFactory;
-import ru.ezhov.rocket.action.types.utils.IconService;
+import ru.ezhov.rocket.action.types.service.IconService;
 
 import javax.swing.JMenuItem;
 import java.awt.Component;
