@@ -8,6 +8,11 @@ import ru.ezhov.rocket.action.types.service.IconService;
 import javax.swing.JMenuItem;
 import java.awt.Component;
 import java.awt.Desktop;
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.StringSelection;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
@@ -29,12 +34,22 @@ public class OpenUrlRocketActionUi extends AbstractRocketAction {
                 )
         );
         menuItem.setToolTipText(ConfigurationUtil.getValue(settings.settings(), DESCRIPTION));
-        menuItem.addActionListener(e -> {
-            if (Desktop.isDesktopSupported()) {
-                try {
-                    Desktop.getDesktop().browse(new URI(ConfigurationUtil.getValue(settings.settings(), URL)));
-                } catch (Exception ex) {
-                    ex.printStackTrace();
+
+        menuItem.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                if (e.getButton() == MouseEvent.BUTTON3) {
+                    Toolkit defaultToolkit = Toolkit.getDefaultToolkit();
+                    Clipboard clipboard = defaultToolkit.getSystemClipboard();
+                    clipboard.setContents(new StringSelection(ConfigurationUtil.getValue(settings.settings(), URL)), null);
+                } else if (e.getButton() == MouseEvent.BUTTON1) {
+                    if (Desktop.isDesktopSupported()) {
+                        try {
+                            Desktop.getDesktop().browse(new URI(ConfigurationUtil.getValue(settings.settings(), URL)));
+                        } catch (Exception ex) {
+                            ex.printStackTrace();
+                        }
+                    }
                 }
             }
         });
