@@ -1,10 +1,10 @@
 package ru.ezhov.rocket.action.types;
 
-import com.google.common.hash.Hashing;
 import org.jdesktop.swingx.JXImageView;
 import org.jdesktop.swingx.JXPanel;
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty;
 import ru.ezhov.rocket.action.api.RocketActionSettings;
+import ru.ezhov.rocket.action.caching.CacheFactory;
 import ru.ezhov.rocket.action.icon.IconRepositoryFactory;
 
 import javax.imageio.ImageIO;
@@ -31,13 +31,11 @@ import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
 public class ShowImageRocketActionUi extends AbstractRocketAction {
@@ -76,7 +74,6 @@ public class ShowImageRocketActionUi extends AbstractRocketAction {
     }
 
     private class LoadImageWorker extends SwingWorker<Image, String> {
-        private String cacheFolder = System.getProperty("java.io.tmpdir") + File.separator;
         private JMenu menu;
         private RocketActionSettings settings;
         private File cachedImage;
@@ -89,24 +86,14 @@ public class ShowImageRocketActionUi extends AbstractRocketAction {
         @Override
         protected Image doInBackground() throws Exception {
             String url = ConfigurationUtil.getValue(settings.settings(), IMAGE_URL);
-            String sha256hexUrl = Hashing.sha256()
-                    .hashString(url, StandardCharsets.UTF_8)
-                    .toString();
-            File file = new File(cacheFolder + "si-" + sha256hexUrl);
-            cachedImage = file;
-            if (file.exists()) {
-                return ImageIO.read(file);
-            } else {
-                try (InputStream inputStream = new URL(url).openStream();
-                     FileOutputStream fileOutputStream = new FileOutputStream(file)) {
-                    byte[] buf = new byte[256];
-                    int p;
-                    while ((p = inputStream.read(buf)) != -1) {
-                        fileOutputStream.write(buf, 0, p);
-                    }
-                    return ImageIO.read(file);
-                }
+            final Optional<File> optionalFile = CacheFactory.getInstance().fromCache(new URL(url));
+            Image image = null;
+            if (optionalFile.isPresent()) {
+                cachedImage = optionalFile.get();
+                image = ImageIO.read(optionalFile.get());
             }
+
+            return image;
         }
 
         @Override

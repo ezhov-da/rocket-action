@@ -3,6 +3,7 @@ package ru.ezhov.rocket.action.types;
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty;
 import ru.ezhov.rocket.action.api.RocketActionSettings;
 import ru.ezhov.rocket.action.icon.IconRepositoryFactory;
+import ru.ezhov.rocket.action.types.utils.IconService;
 
 import javax.swing.JMenu;
 import javax.swing.JTextField;
@@ -17,17 +18,25 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public class OpenUrlWithTextHistoryRocketActionUi extends AbstractRocketAction {
 
     private static final String LABEL = "label";
     private static final String DESCRIPTION = "description";
     private static final String BASE_URL = "baseUrl";
+    private static final String ICON_URL = "iconUrl";
     private static final String PLACEHOLDER = "placeholder";
 
     public Component create(RocketActionSettings settings) {
         JMenu menu = new JMenu(ConfigurationUtil.getValue(settings.settings(), LABEL));
-        menu.setIcon(IconRepositoryFactory.getInstance().by("link-intact-2x").get());
+
+        menu.setIcon(
+                IconService.load(
+                        Optional.ofNullable(settings.settings().get(ICON_URL)),
+                        IconRepositoryFactory.getInstance().by("link-intact-2x").get()
+                )
+        );
 
         TextFieldWithText textField = new TextFieldWithText(ConfigurationUtil.getValue(settings.settings(), LABEL));
         textField.setColumns(10);
@@ -96,7 +105,8 @@ public class OpenUrlWithTextHistoryRocketActionUi extends AbstractRocketAction {
                 createRocketActionProperty(LABEL, "TEST", true),
                 createRocketActionProperty(DESCRIPTION, "TEST", true),
                 createRocketActionProperty(BASE_URL, "TEST", true),
-                createRocketActionProperty(PLACEHOLDER, "TEST", true)
+                createRocketActionProperty(PLACEHOLDER, "TEST", true),
+                createRocketActionProperty(ICON_URL, "Icon URL", false)
         );
     }
 

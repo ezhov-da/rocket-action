@@ -21,6 +21,20 @@ actions:
 
   - type: OPEN_URL_WITH_TEXT
     label: OPEN_URL_WITH_TEXT
+    iconUrl: https://github.githubassets.com/favicons/favicon.png
+    description: description
+    baseUrl: https://github.com/_____/
+    placeholder: _____
+
+  - type: OPEN_URL_WITH_TEXT
+    label: OPEN_URL_WITH_TEXT
+    description: description
+    baseUrl: https://github.com/_____/
+    placeholder: _____
+
+  - type: OPEN_URL_WITH_TEXT_HISTORY
+    label: OPEN_URL_WITH_TEXT_HISTORY
+    iconUrl: https://github.githubassets.com/favicons/favicon.png
     description: description
     baseUrl: https://github.com/_____/
     placeholder: _____
@@ -35,6 +49,7 @@ actions:
 
   - type: OPEN_URL
     label: OPEN_URL
+    iconUrl: https://github.githubassets.com/favicons/favicon.png
     description: description
     url: url
 
@@ -50,6 +65,7 @@ actions:
 
   - type: GROUP
     label: GROUP
+    iconUrl: https://www.elastic.co/favicon.ico
     description: description
     actions:
       - type: COPY_TO_CLIPBOARD

@@ -3,6 +3,7 @@ package ru.ezhov.rocket.action.types;
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty;
 import ru.ezhov.rocket.action.api.RocketActionSettings;
 import ru.ezhov.rocket.action.icon.IconRepositoryFactory;
+import ru.ezhov.rocket.action.types.utils.IconService;
 
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
@@ -16,6 +17,7 @@ import java.awt.Graphics;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 public class OpenUrlWithTextRocketActionUi extends AbstractRocketAction {
 
@@ -23,10 +25,16 @@ public class OpenUrlWithTextRocketActionUi extends AbstractRocketAction {
     private final String DESCRIPTION = "description";
     private final String BASE_URL = "baseUrl";
     private final String PLACEHOLDER = "placeholder";
+    private static final String ICON_URL = "iconUrl";
 
     public Component create(RocketActionSettings settings) {
         JMenu menu = new JMenu(ConfigurationUtil.getValue(settings.settings(), LABEL));
-        menu.setIcon(IconRepositoryFactory.getInstance().by("link-intact-2x").get());
+        menu.setIcon(
+                IconService.load(
+                        Optional.ofNullable(settings.settings().get(ICON_URL)),
+                        IconRepositoryFactory.getInstance().by("link-intact-2x").get()
+                )
+        );
 
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.LINE_AXIS));
@@ -79,7 +87,8 @@ public class OpenUrlWithTextRocketActionUi extends AbstractRocketAction {
                 createRocketActionProperty(LABEL, "TEST", true),
                 createRocketActionProperty(DESCRIPTION, "TEST", true),
                 createRocketActionProperty(BASE_URL, "TEST", true),
-                createRocketActionProperty(PLACEHOLDER, "TEST", true)
+                createRocketActionProperty(PLACEHOLDER, "TEST", true),
+                createRocketActionProperty(ICON_URL, "Icon URL", false)
         );
     }
 
