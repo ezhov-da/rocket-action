@@ -43,6 +43,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.TreeMap;
 import java.util.Vector;
+import java.util.stream.Collectors;
 
 public class ConfigurationFrame {
 
@@ -393,6 +394,21 @@ public class ConfigurationFrame {
                 } else {
                     row.add(null);
                 }
+                tableModel.addRow(row);
+            });
+
+            final List<RocketActionConfigurationProperty> notSetProperty =
+                    finalConfiguration
+                            .properties()
+                            .stream()
+                            .filter(p -> !map.containsKey(p.name()))
+                            .collect(Collectors.toList());
+
+            notSetProperty.forEach(p -> {
+                Vector<String> row = new Vector<>();
+                row.add(p.name());
+                row.add("");
+                row.add(p.description());
                 tableModel.addRow(row);
             });
         }
