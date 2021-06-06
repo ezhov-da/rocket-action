@@ -26,7 +26,7 @@ public class YmlRocketActionSettingsRepositoryTest {
 
         final List<RocketActionSettings> actions = repository.actions();
 
-        assertEquals(14, actions.size());
+        assertEquals(16, actions.size());
 
         System.out.println(actions);
     }

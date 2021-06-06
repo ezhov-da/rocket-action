@@ -9,6 +9,6 @@ public class ReflectionRocketActionUiRepositoryTest {
     public void test() {
         ReflectionRocketActionUiRepository repository = new ReflectionRocketActionUiRepository();
 
-        assertEquals(10, repository.all().size());
+        assertEquals(11, repository.all().size());
     }
 }

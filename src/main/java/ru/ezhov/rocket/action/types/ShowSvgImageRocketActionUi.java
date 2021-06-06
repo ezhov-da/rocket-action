@@ -1,7 +1,8 @@
 package ru.ezhov.rocket.action.types;
 
-import org.jdesktop.swingx.JXImageView;
-import org.jdesktop.swingx.JXPanel;
+import org.apache.batik.swing.JSVGCanvas;
+import org.apache.batik.swing.JSVGScrollPane;
+import org.apache.batik.swing.svg.JSVGComponent;
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty;
 import ru.ezhov.rocket.action.api.RocketActionSettings;
 import ru.ezhov.rocket.action.caching.CacheFactory;
@@ -15,7 +16,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JPanel;
-import javax.swing.JSlider;
+import javax.swing.JScrollPane;
 import javax.swing.JToolBar;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
@@ -36,9 +37,8 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.ExecutionException;
 
-public class ShowImageRocketActionUi extends AbstractRocketAction {
+public class ShowSvgImageRocketActionUi extends AbstractRocketAction {
     private static final String LABEL = "label";
     private static final String DESCRIPTION = "description";
     private static final String IMAGE_URL = "imageUrl";
@@ -56,12 +56,12 @@ public class ShowImageRocketActionUi extends AbstractRocketAction {
 
     @Override
     public String type() {
-        return "SHOW_IMAGE";
+        return "SHOW_SVG_IMAGE";
     }
 
     @Override
     public String description() {
-        return "Show *.png and *.jpg images";
+        return "SVG image show (beta)";
     }
 
     @Override
@@ -102,23 +102,21 @@ public class ShowImageRocketActionUi extends AbstractRocketAction {
             try {
                 Component component;
                 if (settings.settings().containsKey(IMAGE_URL)) {
-                    component = new ImagePanel(this.get(), cachedImage);
+                    component = new ImagePanel(cachedImage);
                 } else {
                     JPanel panel = new JPanel();
                     panel.add(new JLabel(ConfigurationUtil.getValue(settings.settings(), IMAGE_URL)));
                     component = panel;
                 }
                 menu.add(component);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } catch (ExecutionException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
     }
 
-    private class ImagePanel extends JXPanel {
-        public ImagePanel(Image image, File cachedImage) {
+    private class ImagePanel extends JPanel {
+        public ImagePanel(File cachedImage) {
             super(new BorderLayout());
             final Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
             int widthNew = (int) (dimension.width * 0.5);
@@ -138,7 +136,7 @@ public class ShowImageRocketActionUi extends AbstractRocketAction {
                 public void actionPerformed(ActionEvent e) {
                     SwingUtilities.invokeLater(() -> {
                         JFrame frame = new JFrame(cachedImage.getAbsolutePath());
-                        frame.add(new ImagePanel(image, cachedImage));
+                        frame.add(new ShowSvgImageRocketActionUi.ImagePanel(cachedImage));
                         frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
                         frame.setSize((int) (dimension.width * 0.8), (int) (dimension.height * 0.8));
                         frame.setLocationRelativeTo(null);
@@ -151,29 +149,28 @@ public class ShowImageRocketActionUi extends AbstractRocketAction {
             setMaximumSize(newDimension);
             setMinimumSize(newDimension);
 
-            JXPanel panelImage = new JXPanel(new BorderLayout());
-            JXImageView imageView = new JXImageView();
-            imageView.setImage(image);
-            imageView.setAutoscrolls(true);
-            panelImage.add(
-                    imageView,
-                    BorderLayout.CENTER
-            );
+            JPanel panelImage = new JPanel();
+
+            JSVGCanvas svgCanvas = new JSVGCanvas();
+            svgCanvas.setDocumentState(JSVGComponent.ALWAYS_DYNAMIC);
+            svgCanvas.setURI(cachedImage.toURI().toString());
+            panelImage.add(new JSVGScrollPane(svgCanvas));
 
             add(
                     toolBar,
                     BorderLayout.NORTH
             );
             add(
-                    panelImage,
+                    new JScrollPane(panelImage),
                     BorderLayout.CENTER
             );
 
-            JSlider slider = new JSlider(1, 100, 100);
-            toolBar.add(slider);
-            slider.addChangeListener(e -> {
-                imageView.setScale(slider.getValue() / 100D);
-            });
+            //TODO scale
+            //JSlider slider = new JSlider(1, 100, 100);
+            //toolBar.add(slider);
+            //slider.addChangeListener(e -> {
+            //imageView.setScale(slider.getValue() / 100D);
+            //});
 
             final JLabel cachedLabel = new JLabel("Cached: " + cachedImage.getAbsolutePath());
             cachedLabel.addMouseListener(new MouseAdapter() {

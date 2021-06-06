@@ -19,15 +19,26 @@ import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import java.awt.Component;
 import java.awt.Point;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.UnsupportedFlavorException;
+import java.awt.dnd.DnDConstants;
+import java.awt.dnd.DropTarget;
+import java.awt.dnd.DropTargetAdapter;
+import java.awt.dnd.DropTargetDropEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
+import java.io.IOException;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.List;
 import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class UiQuickActionService {
-
+    private static final Logger LOGGER = Logger.getLogger(UiQuickActionService.class.getName());
     private RocketActionConfigurationRepository rocketActionConfigurationRepository;
     private RocketActionSettingsRepository rocketActionSettingsRepository;
     private RocketActionUiRepository rocketActionUiRepository;
@@ -51,6 +62,8 @@ public class UiQuickActionService {
             menu.setIcon(new ImageIcon(App.class.getResource("/load_16x16.gif")));
 
             menuBar.add(menu);
+            //TODO: избранное
+            //menuBar.add(createFavoriteComponent());
             menuBar.add(createMoveComponent(dialog));
 
             new CreateMenuWorker(menu).execute();
@@ -65,7 +78,7 @@ public class UiQuickActionService {
         if (userPathToAction != null) {
             uri = new File(userPathToAction).toURI();
         } else {
-            System.out.println("Use absolute path to `action.xml` file as argument");
+            LOGGER.log(Level.INFO, "Use absolute path to `action.xml` file as argument");
             uri = App.class.getResource("/actions.yml").toURI();
         }
 
@@ -121,7 +134,16 @@ public class UiQuickActionService {
 
         JMenu menuInfo = new JMenu("Info");
         menuInfo.setIcon(IconRepositoryFactory.getInstance().by("info-2x").get());
-        JLabel label = new JLabel("Used icons https://useiconic.com/open");
+
+        String info = "undefined";
+
+        try {
+            File file = new File(this.getClass().getResource("/info.txt").toURI());
+            info = new String(Files.readAllBytes(file.toPath()), StandardCharsets.UTF_8);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        JLabel label = new JLabel(info);
         menuInfo.add(label);
         menuTools.add(menuInfo);
 
@@ -172,6 +194,32 @@ public class UiQuickActionService {
         label.addMouseMotionListener(mouseAdapter);
 
         return label;
+    }
+
+    private Component createFavoriteComponent() {
+        JMenu menu = new JMenu();
+        menu.setIcon(IconRepositoryFactory.getInstance().by("star-2x").get());
+
+        menu.setDropTarget(new DropTarget(
+                menu,
+                new DropTargetAdapter() {
+
+                    @Override
+                    public void drop(DropTargetDropEvent dtde) {
+                        try {
+                            dtde.acceptDrop(DnDConstants.ACTION_COPY);
+                            String text = (String) dtde.getTransferable().getTransferData(DataFlavor.stringFlavor);
+                            menu.add(new JLabel(text));
+                        } catch (UnsupportedFlavorException e) {
+                            e.printStackTrace();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+        ));
+
+        return menu;
     }
 
     private class CreateMenuWorker extends SwingWorker<String, String> {
