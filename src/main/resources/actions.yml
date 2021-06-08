@@ -1,6 +1,10 @@
 ---
 actions:
 
+  - type: TODOIST
+    label: Todoist
+    todoistToken:
+
   - type: SHOW_SVG_IMAGE
     label: SVG big image
     description: description

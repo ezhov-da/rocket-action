@@ -100,7 +100,7 @@ public class YmlRocketActionSettingsRepository implements RocketActionSettingsRe
 
             if (actions == null || actions.isEmpty()) {
                 Map<String, String> map = new TreeMap<>();
-                action.forEach((k, v) -> map.put(k, v.toString()));
+                action.forEach((k, v) -> map.put(k, v == null ? "" : v.toString()));
 
                 return new MutableRocketActionSettings(actionType, map, Collections.emptyList());
             } else {
