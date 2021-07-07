@@ -121,4 +121,9 @@ actions:
     command: D:\programs\jmc-8.0.1_windows-x64\JDK Mission Control\jmc.exe
     workingDirectory:
     iconUrl:
+
+  - type: COPY_TO_CLIPBOARD_TEMPLATE
+    label: kubectl get all -n $ns
+    description: COPY_TO_CLIPBOARD_TEMPLATE
+    text: kubectl get all -n $ns
 ...
