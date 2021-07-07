@@ -15,7 +15,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class TextRocketActionUi extends AbstractRocketAction {
-    private static String TEXT = "text";
+    private static String LABEL = "label";
 
     @Override
     public String description() {
@@ -24,12 +24,12 @@ public class TextRocketActionUi extends AbstractRocketAction {
 
     @Override
     public List<RocketActionConfigurationProperty> properties() {
-        return Arrays.asList(createRocketActionProperty(TEXT, "Text to display", true));
+        return Arrays.asList(createRocketActionProperty(LABEL, "Text to display", true));
     }
 
     @Override
     public Component create(RocketActionSettings settings) {
-        String text = ConfigurationUtil.getValue(settings.settings(), TEXT);
+        String text = ConfigurationUtil.getValue(settings.settings(), LABEL);
         JLabel label = new JLabel(text);
         label.addMouseListener(new MouseAdapter() {
             @Override

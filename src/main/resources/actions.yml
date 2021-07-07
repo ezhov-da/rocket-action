@@ -21,7 +21,7 @@ actions:
     username: ezhov-da
 
   - type: SHOW_TEXT
-    text: >
+    label: >
       <html>Lorem Ipsum is simply dummy <b>text</b> of the printing and typesetting industry. <br>
       Lorem Ipsum has been the industry's standard dummy text ever since the 1500s,<br>
       when an unknown printer took a <delete>galley</delete> of type and scrambled it to make a type specimen book.<br>
@@ -30,7 +30,7 @@ actions:
       and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
 
   - type: SHOW_TEXT
-    text: >
+    label: >
       Simple text
 
   - type: OPEN_URL_WITH_TEXT
