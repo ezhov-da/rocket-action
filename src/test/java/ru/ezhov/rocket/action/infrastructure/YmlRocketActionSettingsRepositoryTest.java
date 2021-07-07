@@ -42,6 +42,11 @@ public class YmlRocketActionSettingsRepositoryTest {
         repository.save(Arrays.asList(
                 new RocketActionSettings() {
                     @Override
+                    public String id() {
+                        return "id1";
+                    }
+
+                    @Override
                     public String type() {
                         return "test";
                     }
@@ -60,6 +65,11 @@ public class YmlRocketActionSettingsRepositoryTest {
                 },
                 new RocketActionSettings() {
                     @Override
+                    public String id() {
+                        return "id2";
+                    }
+
+                    @Override
                     public String type() {
                         return "test";
                     }
@@ -75,6 +85,11 @@ public class YmlRocketActionSettingsRepositoryTest {
                     public List<RocketActionSettings> actions() {
                         return Arrays.asList(
                                 new RocketActionSettings() {
+                                    @Override
+                                    public String id() {
+                                        return "id4";
+                                    }
+
                                     @Override
                                     public String type() {
                                         return "test";
@@ -93,6 +108,11 @@ public class YmlRocketActionSettingsRepositoryTest {
                                     }
                                 },
                                 new RocketActionSettings() {
+                                    @Override
+                                    public String id() {
+                                        return "id5";
+                                    }
+
                                     @Override
                                     public String type() {
                                         return "test";

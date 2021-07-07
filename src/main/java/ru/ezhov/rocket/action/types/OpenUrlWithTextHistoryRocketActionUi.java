@@ -60,6 +60,11 @@ public class OpenUrlWithTextHistoryRocketActionUi extends AbstractRocketAction {
                             map.put("url", uri.toString());
                             menu.add(new OpenUrlRocketActionUi().create(new RocketActionSettings() {
                                 @Override
+                                public String id() {
+                                    return null; //TODO: откорректировать
+                                }
+
+                                @Override
                                 public String type() {
                                     return null; //TODO: откорректировать
                                 }

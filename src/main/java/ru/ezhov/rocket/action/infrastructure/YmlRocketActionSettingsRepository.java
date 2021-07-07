@@ -17,10 +17,14 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.UUID;
 
 public class YmlRocketActionSettingsRepository implements RocketActionSettingsRepository {
 
     private final URI uri;
+    private static final String TYPE = "type";
+    private static final String ID = "_id";
+    private static final String ACTIONS = "actions";
 
     public YmlRocketActionSettingsRepository(URI uri) {
         this.uri = uri;
@@ -34,7 +38,7 @@ public class YmlRocketActionSettingsRepository implements RocketActionSettingsRe
             Map<String, Object> obj = yaml.load(inputStream);
 
             for (Map.Entry<String, Object> e : obj.entrySet()) {
-                if ("actions".equals(e.getKey())) {
+                if (ACTIONS.equals(e.getKey())) {
                     ArrayList<LinkedHashMap<String, Object>> linkedHashMaps =
                             (ArrayList<LinkedHashMap<String, Object>>) e.getValue();
                     for (LinkedHashMap<String, Object> l : linkedHashMaps) {
@@ -51,14 +55,18 @@ public class YmlRocketActionSettingsRepository implements RocketActionSettingsRe
     @Override
     public void save(List<RocketActionSettings> settings) throws RocketActionSettingsRepositoryException {
         File file = new File(uri.getPath());
-        try (OutputStreamWriter outputStreamWriter = new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8)) {
+        try (OutputStreamWriter outputStreamWriter =
+                     new OutputStreamWriter(
+                             new FileOutputStream(file),
+                             StandardCharsets.UTF_8)
+        ) {
             Yaml yaml = new Yaml();
 
             List<Map<String, Object>> all = new ArrayList<>();
             recursiveSettings(settings, all);
 
             Map<String, Object> map = new LinkedHashMap<>();
-            map.put("actions", all);
+            map.put(ACTIONS, all);
             yaml.dump(map, outputStreamWriter);
         } catch (Exception ex) {
             throw new RocketActionSettingsRepositoryException("//TODO", ex);
@@ -68,13 +76,14 @@ public class YmlRocketActionSettingsRepository implements RocketActionSettingsRe
     private void recursiveSettings(List<RocketActionSettings> settings, List<Map<String, Object>> actions) {
         for (RocketActionSettings data : settings) {
             Map<String, Object> object = new LinkedHashMap<>();
-            object.put("type", data.type());
+            object.put(TYPE, data.type());
+            object.put(ID, data.id());
             data.settings().forEach(object::put);
             final List<RocketActionSettings> actionsOriginal = data.actions();
             if (!actionsOriginal.isEmpty()) {
                 List<Map<String, Object>> actionsForWrite = new ArrayList<>();
                 recursiveSettings(actionsOriginal, actionsForWrite);
-                object.put("actions", actionsForWrite);
+                object.put(ACTIONS, actionsForWrite);
             }
 
             actions.add(object);
@@ -82,27 +91,42 @@ public class YmlRocketActionSettingsRepository implements RocketActionSettingsRe
     }
 
     private RocketActionSettings createAction(LinkedHashMap<String, Object> action) throws RocketActionSettingsRepositoryException {
-        String typeAsString = action.get("type").toString();
-        return QuickActionFactory.create(typeAsString, action);
+        return QuickActionFactory.create(
+                getOrGenerateId(action),
+                action.get(TYPE).toString(),
+                action
+        );
+    }
+
+    private static String getOrGenerateId(LinkedHashMap<String, Object> action) {
+        Object idAsObject = action.get(ID);
+        if (idAsObject == null || "".equals(idAsObject.toString())) {
+            idAsObject = UUID.randomUUID().toString();
+        }
+        return idAsObject.toString();
     }
 
     private static class QuickActionFactory {
         static RocketActionSettings createAction(LinkedHashMap<String, Object> action) throws RocketActionSettingsRepositoryException {
-            String typeAsString = action.get("type").toString();
-            return QuickActionFactory.create(typeAsString, action);
+            return QuickActionFactory.create(
+                    getOrGenerateId(action),
+                    action.get(TYPE).toString(),
+                    action
+            );
         }
 
-        static RocketActionSettings create(String actionType, LinkedHashMap<String, Object> action) throws RocketActionSettingsRepositoryException {
+        static RocketActionSettings create(String id, String actionType, LinkedHashMap<String, Object> action) throws RocketActionSettingsRepositoryException {
             ArrayList<LinkedHashMap<String, Object>> actions =
-                    (ArrayList<LinkedHashMap<String, Object>>) action.get("actions");
-            action.remove("type");
-            action.remove("actions");
+                    (ArrayList<LinkedHashMap<String, Object>>) action.get(ACTIONS);
+            action.remove(TYPE);
+            action.remove(ID);
+            action.remove(ACTIONS);
 
             if (actions == null || actions.isEmpty()) {
                 Map<String, String> map = new TreeMap<>();
                 action.forEach((k, v) -> map.put(k, v == null ? "" : v.toString()));
 
-                return new MutableRocketActionSettings(actionType, map, Collections.emptyList());
+                return new MutableRocketActionSettings(id, actionType, map, Collections.emptyList());
             } else {
                 List<RocketActionSettings> settings = new ArrayList<>();
                 for (LinkedHashMap<String, Object> a : actions) {
@@ -110,7 +134,7 @@ public class YmlRocketActionSettingsRepository implements RocketActionSettingsRe
                 }
                 Map<String, String> map = new TreeMap<>();
                 action.forEach((k, v) -> map.put(k, v.toString()));
-                return new MutableRocketActionSettings(actionType, map, settings);
+                return new MutableRocketActionSettings(id, actionType, map, settings);
             }
         }
     }

@@ -157,6 +157,7 @@ public class ConfigurationFrame {
                             createRocketActionSettingsDialog.show(rocketActionSettings -> {
                                 SwingUtilities.invokeLater(() -> {
                                     MutableRocketActionSettings newActionSettings = new MutableRocketActionSettings(
+                                            rocketActionSettings.id(),
                                             rocketActionSettings.type(),
                                             rocketActionSettings.settings(),
                                             rocketActionSettings.actions()
@@ -185,6 +186,7 @@ public class ConfigurationFrame {
                                             defaultTreeModel.insertNodeInto(
                                                     new DefaultMutableTreeNode(
                                                             new MutableRocketActionSettings(
+                                                                    rocketActionSettings.id(),
                                                                     rocketActionSettings.type(),
                                                                     rocketActionSettings.settings(),
                                                                     rocketActionSettings.actions()
@@ -212,6 +214,7 @@ public class ConfigurationFrame {
                                             mutableTreeNode.add(
                                                     new DefaultMutableTreeNode(
                                                             new MutableRocketActionSettings(
+                                                                    rocketActionSettings.id(),
                                                                     rocketActionSettings.type(),
                                                                     rocketActionSettings.settings(),
                                                                     rocketActionSettings.actions()
@@ -281,7 +284,11 @@ public class ConfigurationFrame {
     private void recursiveGetSettings(DefaultMutableTreeNode node, List<RocketActionSettings> settings, MutableRocketActionSettings parent) {
         MutableRocketActionSettings originalActionSettings = (MutableRocketActionSettings) node.getUserObject();
         MutableRocketActionSettings finalActionSettings =
-                new MutableRocketActionSettings(originalActionSettings.type(), originalActionSettings.settings());
+                new MutableRocketActionSettings(
+                        originalActionSettings.id(),
+                        originalActionSettings.type(),
+                        originalActionSettings.settings()
+                );
         if (parent == null) {
             settings.add(finalActionSettings);
         } else {
@@ -425,7 +432,12 @@ public class ConfigurationFrame {
                 map.put(name.toString(), value.toString());
             }
 
-            return new MutableRocketActionSettings(currentSettings.type(), map, currentSettings.actions());
+            return new MutableRocketActionSettings(
+                    currentSettings.id(),
+                    currentSettings.type(),
+                    map,
+                    currentSettings.actions()
+            );
         }
     }
 }

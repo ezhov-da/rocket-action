@@ -8,6 +8,11 @@ import java.util.Map;
  */
 public interface RocketActionSettings {
     /**
+     * @return configurable action id
+     */
+    String id();
+
+    /**
      * @return configurable action type
      */
     String type();

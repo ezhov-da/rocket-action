@@ -18,6 +18,11 @@ public class TodoistProjectRepositoryTest {
         TodoistProjectRepository repository = new TodoistProjectRepository();
         final List<Project> projects = repository.projects(new RocketActionSettings() {
             @Override
+            public String id() {
+                return null;
+            }
+
+            @Override
             public String type() {
                 return null;
             }

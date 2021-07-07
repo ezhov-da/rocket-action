@@ -28,15 +28,10 @@ import java.awt.dnd.DropTargetDropEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.BufferedInputStream;
-import java.io.DataInputStream;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.util.List;
 import java.util.Optional;
 import java.util.logging.Level;
@@ -126,8 +121,8 @@ public class UiQuickActionService {
                             rocketActionUiRepository,
                             rocketActionSettingsRepository
                     );
-                } catch (Exception exception) {
-                    exception.printStackTrace();
+                } catch (Exception ex) {
+                    ex.printStackTrace();
                 }
             }
 
@@ -142,7 +137,7 @@ public class UiQuickActionService {
 
         String info = "undefined";
 
-        try( BufferedInputStream is = new BufferedInputStream(this.getClass().getResourceAsStream("/info.txt"))) {
+        try (BufferedInputStream is = new BufferedInputStream(this.getClass().getResourceAsStream("/info.txt"))) {
             byte[] bytes = new byte[is.available()];
             is.read(bytes);
             info = new String(bytes, StandardCharsets.UTF_8);

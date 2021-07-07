@@ -7,27 +7,37 @@ import java.util.List;
 import java.util.Map;
 
 public class MutableRocketActionSettings implements RocketActionSettings {
+    private String id;
     private String type;
     private Map<String, String> settings;
     private List<RocketActionSettings> actions;
 
     public MutableRocketActionSettings(
+            String id,
             String type,
             Map<String, String> settings,
             List<RocketActionSettings> actions
     ) {
+        this.id = id;
         this.type = type;
         this.settings = settings;
         this.actions = actions;
     }
 
     public MutableRocketActionSettings(
+            String id,
             String type,
             Map<String, String> settings
     ) {
+        this.id = id;
         this.type = type;
         this.settings = settings;
         this.actions = new ArrayList<>();
+    }
+
+    @Override
+    public String id() {
+        return id;
     }
 
     @Override

@@ -6,11 +6,6 @@ import javax.swing.UIManager;
 
 public class App {
     public static void main(String[] args) {
-        System.setProperty(
-                "java.util.logging.config.file",
-                App.class.getResource("/logging.properties").getFile()
-        );
-
         SwingUtilities.invokeLater(() -> {
             try {
                 UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());

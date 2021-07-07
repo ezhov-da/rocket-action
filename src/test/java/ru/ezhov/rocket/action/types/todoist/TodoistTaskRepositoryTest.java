@@ -24,6 +24,11 @@ public class TodoistTaskRepositoryTest {
     private RocketActionSettings stubRocketActionSettings() {
         return new RocketActionSettings() {
             @Override
+            public String id() {
+                return null;
+            }
+
+            @Override
             public String type() {
                 return null;
             }

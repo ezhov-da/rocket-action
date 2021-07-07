@@ -4,8 +4,10 @@ import ru.ezhov.rocket.action.api.RocketActionSettings;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 public class NewRocketActionSettings implements RocketActionSettings {
+    private String id;
     private String type;
     private Map<String, String> settings;
     private List<RocketActionSettings> actions;
@@ -18,6 +20,12 @@ public class NewRocketActionSettings implements RocketActionSettings {
         this.type = type;
         this.settings = settings;
         this.actions = actions;
+        this.id = UUID.randomUUID().toString();
+    }
+
+    @Override
+    public String id() {
+        return null;
     }
 
     @Override
