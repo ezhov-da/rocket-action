@@ -1,4 +1,4 @@
-package ru.ezhov.rocket.action.types.service;
+package ru.ezhov.rocket.action.icon;
 
 import com.mortennobel.imagescaling.AdvancedResizeOp;
 import com.mortennobel.imagescaling.ResampleOp;

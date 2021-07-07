@@ -1,39 +1,51 @@
-package ru.ezhov.rocket.action.types;
+package ru.ezhov.rocket.action.types.exec;
 
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty;
 import ru.ezhov.rocket.action.api.RocketActionSettings;
 import ru.ezhov.rocket.action.icon.IconRepositoryFactory;
-import ru.ezhov.rocket.action.notification.NotificationFactory;
 import ru.ezhov.rocket.action.icon.IconService;
+import ru.ezhov.rocket.action.notification.NotificationFactory;
+import ru.ezhov.rocket.action.types.AbstractRocketAction;
+import ru.ezhov.rocket.action.types.ConfigurationUtil;
 
+import javax.swing.Icon;
 import javax.swing.JMenuItem;
+import javax.swing.filechooser.FileSystemView;
 import java.awt.Component;
-import java.awt.Desktop;
 import java.awt.Toolkit;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.net.URI;
+import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-public class OpenUrlRocketActionUi extends AbstractRocketAction {
+public class ExecRocketActionUi extends AbstractRocketAction {
 
     private static final String LABEL = "label";
     private static final String DESCRIPTION = "description";
-    private static final String URL = "url";
+    private static final String COMMAND = "command";
+    private static final String WORKING_DIR = "workingDirectory";
     private static final String ICON_URL = "iconUrl";
 
     public Component create(RocketActionSettings settings) {
         JMenuItem menuItem = new JMenuItem(ConfigurationUtil.getValue(settings.settings(), LABEL));
-        menuItem.setIcon(
-                IconService.load(
-                        Optional.ofNullable(settings.settings().get(ICON_URL)),
-                        IconRepositoryFactory.getInstance().by("link-intact-2x").get()
-                )
-        );
+
+        String absolutePath = ConfigurationUtil.getValue(settings.settings(), COMMAND);
+
+        Icon icon;
+        try {
+            icon = FileSystemView.getFileSystemView()
+                    .getSystemIcon(new File(absolutePath));
+        } catch (Exception ex) {
+            icon = IconService.load(
+                    Optional.ofNullable(settings.settings().get(ICON_URL)),
+                    IconRepositoryFactory.getInstance().by("fire-2x").get()
+            );
+        }
+        menuItem.setIcon(icon);
         menuItem.setToolTipText(ConfigurationUtil.getValue(settings.settings(), DESCRIPTION));
 
         menuItem.addMouseListener(new MouseAdapter() {
@@ -42,16 +54,19 @@ public class OpenUrlRocketActionUi extends AbstractRocketAction {
                 if (e.getButton() == MouseEvent.BUTTON3) {
                     Toolkit defaultToolkit = Toolkit.getDefaultToolkit();
                     Clipboard clipboard = defaultToolkit.getSystemClipboard();
-                    clipboard.setContents(new StringSelection(ConfigurationUtil.getValue(settings.settings(), URL)), null);
+                    clipboard.setContents(new StringSelection(ConfigurationUtil.getValue(settings.settings(), COMMAND)), null);
 
                     NotificationFactory.getInstance().show("URL copy to clipboard");
                 } else if (e.getButton() == MouseEvent.BUTTON1) {
-                    if (Desktop.isDesktopSupported()) {
-                        try {
-                            Desktop.getDesktop().browse(new URI(ConfigurationUtil.getValue(settings.settings(), URL)));
-                        } catch (Exception ex) {
-                            ex.printStackTrace();
+                    try {
+                        String workingDir = ConfigurationUtil.getValue(settings.settings(), WORKING_DIR);
+                        if (workingDir == null || "".equals(workingDir)) {
+                            Runtime.getRuntime().exec(ConfigurationUtil.getValue(settings.settings(), COMMAND));
+                        } else {
+                            Runtime.getRuntime().exec(ConfigurationUtil.getValue(settings.settings(), COMMAND), null, new File("c:\\program files\\test\\"));
                         }
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
                     }
                 }
             }
@@ -61,7 +76,7 @@ public class OpenUrlRocketActionUi extends AbstractRocketAction {
 
     @Override
     public String type() {
-        return "OPEN_URL";
+        return "EXEC";
     }
 
     @Override
@@ -73,8 +88,9 @@ public class OpenUrlRocketActionUi extends AbstractRocketAction {
     public List<RocketActionConfigurationProperty> properties() {
         return Arrays.asList(
                 createRocketActionProperty(LABEL, "TEST", true),
-                createRocketActionProperty(DESCRIPTION, "TEST", true),
-                createRocketActionProperty(URL, "TEST", true),
+                createRocketActionProperty(COMMAND, "TEST", true),
+                createRocketActionProperty(WORKING_DIR, "TEST", true),
+                createRocketActionProperty(DESCRIPTION, "TEST", false),
                 createRocketActionProperty(ICON_URL, "Icon URL", false)
         );
     }

@@ -27,8 +27,13 @@ import java.awt.dnd.DropTargetAdapter;
 import java.awt.dnd.DropTargetDropEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.BufferedInputStream;
+import java.io.DataInputStream;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -137,9 +142,10 @@ public class UiQuickActionService {
 
         String info = "undefined";
 
-        try {
-            File file = new File(this.getClass().getResource("/info.txt").toURI());
-            info = new String(Files.readAllBytes(file.toPath()), StandardCharsets.UTF_8);
+        try( BufferedInputStream is = new BufferedInputStream(this.getClass().getResourceAsStream("/info.txt"))) {
+            byte[] bytes = new byte[is.available()];
+            is.read(bytes);
+            info = new String(bytes, StandardCharsets.UTF_8);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -147,7 +153,7 @@ public class UiQuickActionService {
         menuInfo.add(label);
         menuTools.add(menuInfo);
 
-        JMenuItem menuItemClose = new JMenuItem("Close");
+        JMenuItem menuItemClose = new JMenuItem("Exit");
         menuItemClose.setIcon(IconRepositoryFactory.getInstance().by("x-2x").get());
         menuItemClose.addActionListener(e -> SwingUtilities.invokeLater(dialog::dispose));
         menuTools.add(menuItemClose);
