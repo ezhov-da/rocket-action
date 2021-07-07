@@ -33,17 +33,19 @@ public class ExecRocketActionUi extends AbstractRocketAction {
     public Component create(RocketActionSettings settings) {
         JMenuItem menuItem = new JMenuItem(ConfigurationUtil.getValue(settings.settings(), LABEL));
 
-        String absolutePath = ConfigurationUtil.getValue(settings.settings(), COMMAND);
+        String command = ConfigurationUtil.getValue(settings.settings(), COMMAND);
 
-        Icon icon;
+        Icon icon = IconService.load(
+                Optional.ofNullable("".equals(settings.settings().get(ICON_URL)) ? null : ICON_URL),
+                IconRepositoryFactory.getInstance().by("fire-2x").get()
+        );
         try {
-            icon = FileSystemView.getFileSystemView()
-                    .getSystemIcon(new File(absolutePath));
+            File file = new File(command);
+            if (file.exists()) {
+                icon = FileSystemView.getFileSystemView().getSystemIcon(file);
+            }
         } catch (Exception ex) {
-            icon = IconService.load(
-                    Optional.ofNullable(settings.settings().get(ICON_URL)),
-                    IconRepositoryFactory.getInstance().by("fire-2x").get()
-            );
+            ex.printStackTrace();
         }
         menuItem.setIcon(icon);
         menuItem.setToolTipText(ConfigurationUtil.getValue(settings.settings(), DESCRIPTION));
@@ -56,14 +58,18 @@ public class ExecRocketActionUi extends AbstractRocketAction {
                     Clipboard clipboard = defaultToolkit.getSystemClipboard();
                     clipboard.setContents(new StringSelection(ConfigurationUtil.getValue(settings.settings(), COMMAND)), null);
 
-                    NotificationFactory.getInstance().show("URL copy to clipboard");
+                    NotificationFactory.getInstance().show("Command '" + command + "' copy to clipboard");
                 } else if (e.getButton() == MouseEvent.BUTTON1) {
                     try {
                         String workingDir = ConfigurationUtil.getValue(settings.settings(), WORKING_DIR);
                         if (workingDir == null || "".equals(workingDir)) {
                             Runtime.getRuntime().exec(ConfigurationUtil.getValue(settings.settings(), COMMAND));
                         } else {
-                            Runtime.getRuntime().exec(ConfigurationUtil.getValue(settings.settings(), COMMAND), null, new File("c:\\program files\\test\\"));
+                            Runtime.getRuntime().exec(
+                                    ConfigurationUtil.getValue(settings.settings(), COMMAND),
+                                    null,
+                                    new File(workingDir)
+                            );
                         }
                     } catch (Exception ex) {
                         ex.printStackTrace();

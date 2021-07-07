@@ -15,12 +15,19 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class IconService {
+    private static final Logger LOG = Logger.getLogger(IconService.class.getName());
+
     public static Icon load(Optional<String> iconUrl, Icon defaultIcon) {
         Icon resultIcon = defaultIcon;
         if (iconUrl.isPresent()) {
             final String urlAsString = iconUrl.get();
+            if ("".equals(urlAsString)) {
+                return defaultIcon;
+            }
             try {
                 final Optional<File> optionalFile = CacheFactory.getInstance().fromCache(new URL(urlAsString));
                 if (optionalFile.isPresent()) {
@@ -39,7 +46,7 @@ public class IconService {
                     resultIcon = new ImageIcon(handleICOImage(image));
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                LOG.log(Level.WARNING, String.format("Exception when load icon url='%s'", urlAsString), e);
             }
         }
         return resultIcon;
