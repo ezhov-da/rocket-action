@@ -16,7 +16,9 @@ public class ConfigurationFrameTest {
                         dialog,
                         new ReflectionRocketActionConfigurationRepository(),
                         new ReflectionRocketActionUiRepository(),
-                        new YmlRocketActionSettingsRepository(ConfigurationFrameTest.class.getResource("/actions.yml").toURI())
+                        new YmlRocketActionSettingsRepository(ConfigurationFrameTest.class.getResource("/actions.yml").toURI()),
+                        e -> {
+                        }
                 ).setVisible(true);
             } catch (Exception e) {
                 e.printStackTrace();

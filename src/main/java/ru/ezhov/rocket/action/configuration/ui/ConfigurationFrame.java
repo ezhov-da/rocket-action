@@ -6,6 +6,7 @@ import ru.ezhov.rocket.action.RocketActionUiRepository;
 import ru.ezhov.rocket.action.api.RocketActionConfiguration;
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty;
 import ru.ezhov.rocket.action.api.RocketActionSettings;
+import ru.ezhov.rocket.action.icon.IconRepositoryFactory;
 import ru.ezhov.rocket.action.infrastructure.MutableRocketActionSettings;
 
 import javax.swing.AbstractAction;
@@ -14,6 +15,7 @@ import javax.swing.DropMode;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
@@ -35,6 +37,7 @@ import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -52,18 +55,32 @@ public class ConfigurationFrame {
     private RocketActionUiRepository rocketActionUiRepository;
     private CreateRocketActionSettingsDialog createRocketActionSettingsDialog;
     private RocketActionSettingsRepository rocketActionSettingsRepository;
+    private ActionListener updateActionListener;
 
     public ConfigurationFrame(
             Dialog owner,
             RocketActionConfigurationRepository rocketActionConfigurationRepository,
             RocketActionUiRepository rocketActionUiRepository,
-            RocketActionSettingsRepository rocketActionSettingsRepository
+            RocketActionSettingsRepository rocketActionSettingsRepository,
+            ActionListener updateActionListener
     ) throws Exception {
         dialog = new JDialog(owner, "Rocket action configuration");
 
+        this.updateActionListener = updateActionListener;
         this.rocketActionConfigurationRepository = rocketActionConfigurationRepository;
         this.rocketActionUiRepository = rocketActionUiRepository;
         this.rocketActionSettingsRepository = rocketActionSettingsRepository;
+
+        JMenuBar menuBar = new JMenuBar();
+
+        JMenuItem menuItemUpdate = new JMenuItem("Update");
+        menuItemUpdate.setIcon(IconRepositoryFactory.getInstance().by("reload-2x").get());
+        menuItemUpdate.addActionListener(e -> SwingUtilities.invokeLater(() -> {
+            updateActionListener.actionPerformed(e);
+            ConfigurationFrame.this.setVisible(false);
+        }));
+        menuBar.add(menuItemUpdate);
+
 
         final Dimension size = Toolkit.getDefaultToolkit().getScreenSize();
         dialog.setSize((int) (size.width * 0.6), (int) (size.height * 0.6));
@@ -73,6 +90,7 @@ public class ConfigurationFrame {
                 rocketActionConfigurationRepository,
                 rocketActionUiRepository
         );
+        dialog.add(menuBar, BorderLayout.NORTH);
         dialog.add(panel(), BorderLayout.CENTER);
     }
 
@@ -123,7 +141,7 @@ public class ConfigurationFrame {
         panelTree.add(new JScrollPane(tree), BorderLayout.CENTER);
         JPanel panelSaveTree = new JPanel();
 
-        JButton buttonSaveTree = new JButton("Save");
+        JButton buttonSaveTree = new JButton("Save actions");
         buttonSaveTree.addActionListener(e -> saveSettings(defaultTreeModel));
 
         panelSaveTree.add(buttonSaveTree);
@@ -355,7 +373,7 @@ public class ConfigurationFrame {
 
         private JPanel testAndCreate() {
             JPanel panel = new JPanel();
-            JButton button = new JButton("Save");
+            JButton button = new JButton("Save current action");
             button.addActionListener(e -> callback.saved(create()));
             panel.add(button);
             return panel;

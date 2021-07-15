@@ -6,7 +6,7 @@
 
     <groupId>ru.ezhov</groupId>
     <artifactId>rocket-action</artifactId>
-    <version>1.0</version>
+    <version>0.11.5</version>
 
     <name>rocket-action</name>
 
@@ -100,6 +100,13 @@
     </dependencies>
 
     <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+
         <plugins>
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>

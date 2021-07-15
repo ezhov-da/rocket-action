@@ -8,6 +8,8 @@ import ru.ezhov.rocket.action.icon.IconRepositoryFactory;
 import ru.ezhov.rocket.action.infrastructure.ReflectionRocketActionConfigurationRepository;
 import ru.ezhov.rocket.action.infrastructure.ReflectionRocketActionUiRepository;
 import ru.ezhov.rocket.action.infrastructure.YmlRocketActionSettingsRepository;
+import ru.ezhov.rocket.action.properties.GeneralPropertiesRepository;
+import ru.ezhov.rocket.action.properties.ResourceGeneralPropertiesRepository;
 
 import javax.swing.ImageIcon;
 import javax.swing.JDialog;
@@ -25,6 +27,7 @@ import java.awt.dnd.DnDConstants;
 import java.awt.dnd.DropTarget;
 import java.awt.dnd.DropTargetAdapter;
 import java.awt.dnd.DropTargetDropEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.BufferedInputStream;
@@ -90,9 +93,7 @@ public class UiQuickActionService {
         JMenu menuTools = new JMenu("Tools");
         menuTools.setIcon(IconRepositoryFactory.getInstance().by("wrench-2x").get());
 
-        JMenuItem menuItemUpdate = new JMenuItem("Update");
-        menuItemUpdate.setIcon(IconRepositoryFactory.getInstance().by("reload-2x").get());
-        menuItemUpdate.addActionListener(e -> SwingUtilities.invokeLater(() -> {
+        ActionListener updateActionListener = e -> SwingUtilities.invokeLater(() -> {
             JMenuBar newMenuBar = null;
             try {
                 newMenuBar = createMenu(dialog);
@@ -106,7 +107,12 @@ public class UiQuickActionService {
                 dialog.revalidate();
                 dialog.repaint();
             }
-        }));
+        });
+
+
+        JMenuItem menuItemUpdate = new JMenuItem("Update");
+        menuItemUpdate.setIcon(IconRepositoryFactory.getInstance().by("reload-2x").get());
+        menuItemUpdate.addActionListener(updateActionListener);
         menuTools.add(menuItemUpdate);
 
         JMenuItem menuItemEditor = new JMenuItem("Editor");
@@ -119,7 +125,8 @@ public class UiQuickActionService {
                             dialog,
                             rocketActionConfigurationRepository,
                             rocketActionUiRepository,
-                            rocketActionSettingsRepository
+                            rocketActionSettingsRepository,
+                            updateActionListener
                     );
                 } catch (Exception ex) {
                     ex.printStackTrace();
@@ -135,17 +142,22 @@ public class UiQuickActionService {
         JMenu menuInfo = new JMenu("Info");
         menuInfo.setIcon(IconRepositoryFactory.getInstance().by("info-2x").get());
 
-        String info = "undefined";
 
-        try (BufferedInputStream is = new BufferedInputStream(this.getClass().getResourceAsStream("/info.txt"))) {
+        GeneralPropertiesRepository repository = new ResourceGeneralPropertiesRepository();
+        menuInfo.add(new JLabel(repository.all().getProperty("version", "not found")));
+
+        String info = "undefined";
+        try (BufferedInputStream is = new BufferedInputStream(this.getClass().getResourceAsStream("/info.html"))) {
             byte[] bytes = new byte[is.available()];
             is.read(bytes);
             info = new String(bytes, StandardCharsets.UTF_8);
         } catch (Exception e) {
             e.printStackTrace();
         }
-        JLabel label = new JLabel(info);
+        JLabel label = new JLabel("<html>" + info);
         menuInfo.add(label);
+
+
         menuTools.add(menuInfo);
 
         JMenuItem menuItemClose = new JMenuItem("Exit");
