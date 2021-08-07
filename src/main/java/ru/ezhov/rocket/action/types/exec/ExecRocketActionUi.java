@@ -2,9 +2,11 @@ package ru.ezhov.rocket.action.types.exec;
 
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty;
 import ru.ezhov.rocket.action.api.RocketActionSettings;
+import ru.ezhov.rocket.action.icon.AppIcon;
 import ru.ezhov.rocket.action.icon.IconRepositoryFactory;
 import ru.ezhov.rocket.action.icon.IconService;
 import ru.ezhov.rocket.action.notification.NotificationFactory;
+import ru.ezhov.rocket.action.notification.NotificationType;
 import ru.ezhov.rocket.action.types.AbstractRocketAction;
 import ru.ezhov.rocket.action.types.ConfigurationUtil;
 
@@ -37,7 +39,7 @@ public class ExecRocketActionUi extends AbstractRocketAction {
 
         Icon icon = IconService.load(
                 Optional.ofNullable("".equals(settings.settings().get(ICON_URL)) ? null : ICON_URL),
-                IconRepositoryFactory.getInstance().by("fire-2x").get()
+                IconRepositoryFactory.instance().by(AppIcon.FIRE)
         );
         try {
             File file = new File(command);
@@ -58,7 +60,7 @@ public class ExecRocketActionUi extends AbstractRocketAction {
                     Clipboard clipboard = defaultToolkit.getSystemClipboard();
                     clipboard.setContents(new StringSelection(ConfigurationUtil.getValue(settings.settings(), COMMAND)), null);
 
-                    NotificationFactory.getInstance().show("Command '" + command + "' copy to clipboard");
+                    NotificationFactory.getInstance().show(NotificationType.INFO, "Command '" + command + "' copy to clipboard");
                 } else if (e.getButton() == MouseEvent.BUTTON1) {
                     try {
                         String workingDir = ConfigurationUtil.getValue(settings.settings(), WORKING_DIR);

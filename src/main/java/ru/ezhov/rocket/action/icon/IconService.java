@@ -5,6 +5,8 @@ import com.mortennobel.imagescaling.ResampleOp;
 import net.sf.image4j.codec.ico.ICODecoder;
 import net.sf.image4j.codec.ico.ICOImage;
 import ru.ezhov.rocket.action.caching.CacheFactory;
+import ru.ezhov.rocket.action.notification.NotificationFactory;
+import ru.ezhov.rocket.action.notification.NotificationType;
 
 import javax.imageio.ImageIO;
 import javax.swing.Icon;
@@ -47,6 +49,8 @@ public class IconService {
                 }
             } catch (Exception e) {
                 LOG.log(Level.WARNING, String.format("Exception when load icon url='%s'", urlAsString), e);
+
+                NotificationFactory.getInstance().show(NotificationType.ERROR, "Error icon loading");
             }
         }
         return resultIcon;

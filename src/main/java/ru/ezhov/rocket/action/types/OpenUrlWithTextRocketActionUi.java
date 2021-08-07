@@ -2,8 +2,11 @@ package ru.ezhov.rocket.action.types;
 
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty;
 import ru.ezhov.rocket.action.api.RocketActionSettings;
+import ru.ezhov.rocket.action.icon.AppIcon;
 import ru.ezhov.rocket.action.icon.IconRepositoryFactory;
 import ru.ezhov.rocket.action.icon.IconService;
+import ru.ezhov.rocket.action.notification.NotificationFactory;
+import ru.ezhov.rocket.action.notification.NotificationType;
 
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
@@ -32,14 +35,14 @@ public class OpenUrlWithTextRocketActionUi extends AbstractRocketAction {
         menu.setIcon(
                 IconService.load(
                         Optional.ofNullable(settings.settings().get(ICON_URL)),
-                        IconRepositoryFactory.getInstance().by("link-intact-2x").get()
+                        IconRepositoryFactory.instance().by(AppIcon.LINK_INTACT)
                 )
         );
 
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.LINE_AXIS));
         panel.add(
-                new JLabel(IconRepositoryFactory.getInstance().by("link-intact-2x").get())
+                new JLabel(IconRepositoryFactory.instance().by(AppIcon.LINK_INTACT))
         );
         TextFieldWithText textField = new TextFieldWithText(ConfigurationUtil.getValue(settings.settings(), LABEL));
         textField.setColumns(10);
@@ -61,6 +64,8 @@ public class OpenUrlWithTextRocketActionUi extends AbstractRocketAction {
                         );
                     } catch (Exception ex) {
                         ex.printStackTrace();
+
+                        NotificationFactory.getInstance().show(NotificationType.ERROR, "Error open URL");
                     }
                 }
             }

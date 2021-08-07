@@ -4,8 +4,10 @@ import org.eclipse.egit.github.core.Gist;
 import org.eclipse.egit.github.core.GistFile;
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty;
 import ru.ezhov.rocket.action.api.RocketActionSettings;
+import ru.ezhov.rocket.action.icon.AppIcon;
 import ru.ezhov.rocket.action.icon.IconRepositoryFactory;
 import ru.ezhov.rocket.action.notification.NotificationFactory;
+import ru.ezhov.rocket.action.notification.NotificationType;
 import ru.ezhov.rocket.action.types.AbstractRocketAction;
 import ru.ezhov.rocket.action.types.ConfigurationUtil;
 
@@ -95,12 +97,12 @@ public class GistRocketAction extends AbstractRocketAction {
 
         @Override
         protected void done() {
-            menu.setIcon(IconRepositoryFactory.getInstance().by("bookmark-2x").get());
+            menu.setIcon(IconRepositoryFactory.instance().by(AppIcon.BOOKMARK));
             try {
                 menu.removeAll();
                 menu.add(this.get());
 
-                NotificationFactory.getInstance().show("Gists loaded");
+                NotificationFactory.getInstance().show(NotificationType.INFO, "Gists loaded");
             } catch (InterruptedException e) {
                 e.printStackTrace();
             } catch (ExecutionException e) {
@@ -143,7 +145,7 @@ public class GistRocketAction extends AbstractRocketAction {
             });
 
             JPanel panelSearchAndUpdate = new JPanel(new BorderLayout());
-            JButton buttonUpdate = new JButton(IconRepositoryFactory.getInstance().by("reload-2x").get());
+            JButton buttonUpdate = new JButton(IconRepositoryFactory.instance().by(AppIcon.RELOAD));
             buttonUpdate.addActionListener(e -> new GistWorker(settings).execute());
             panelSearchAndUpdate.add(textFieldSearch, BorderLayout.CENTER);
             panelSearchAndUpdate.add(buttonUpdate, BorderLayout.EAST);

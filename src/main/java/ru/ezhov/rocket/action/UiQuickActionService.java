@@ -4,14 +4,18 @@ import ru.ezhov.rocket.action.api.RocketActionSettings;
 import ru.ezhov.rocket.action.api.RocketActionUi;
 import ru.ezhov.rocket.action.configuration.ui.ConfigurationFrame;
 import ru.ezhov.rocket.action.configuration.ui.RocketActionConfigurationRepository;
+import ru.ezhov.rocket.action.icon.AppIcon;
 import ru.ezhov.rocket.action.icon.IconRepositoryFactory;
 import ru.ezhov.rocket.action.infrastructure.ReflectionRocketActionConfigurationRepository;
 import ru.ezhov.rocket.action.infrastructure.ReflectionRocketActionUiRepository;
 import ru.ezhov.rocket.action.infrastructure.YmlRocketActionSettingsRepository;
+import ru.ezhov.rocket.action.notification.NotificationFactory;
+import ru.ezhov.rocket.action.notification.NotificationType;
 import ru.ezhov.rocket.action.properties.GeneralPropertiesRepository;
 import ru.ezhov.rocket.action.properties.ResourceGeneralPropertiesRepository;
 
 import javax.swing.ImageIcon;
+import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -91,7 +95,7 @@ public class UiQuickActionService {
 
     private JMenu createTools(JDialog dialog) {
         JMenu menuTools = new JMenu("Tools");
-        menuTools.setIcon(IconRepositoryFactory.getInstance().by("wrench-2x").get());
+        menuTools.setIcon(IconRepositoryFactory.instance().by(AppIcon.WRENCH));
 
         ActionListener updateActionListener = e -> SwingUtilities.invokeLater(() -> {
             JMenuBar newMenuBar = null;
@@ -99,6 +103,7 @@ public class UiQuickActionService {
                 newMenuBar = createMenu(dialog);
             } catch (UiQuickActionServiceException ex) {
                 ex.printStackTrace();
+                NotificationFactory.getInstance().show(NotificationType.ERROR, "Tools menu created error");
             }
             if (newMenuBar != null) {
                 // пока костыль, но мы то знаем это "пока" :)
@@ -111,12 +116,12 @@ public class UiQuickActionService {
 
 
         JMenuItem menuItemUpdate = new JMenuItem("Update");
-        menuItemUpdate.setIcon(IconRepositoryFactory.getInstance().by("reload-2x").get());
+        menuItemUpdate.setIcon(IconRepositoryFactory.instance().by(AppIcon.RELOAD));
         menuItemUpdate.addActionListener(updateActionListener);
         menuTools.add(menuItemUpdate);
 
         JMenuItem menuItemEditor = new JMenuItem("Editor");
-        menuItemEditor.setIcon(IconRepositoryFactory.getInstance().by("pencil-2x").get());
+        menuItemEditor.setIcon(IconRepositoryFactory.instance().by(AppIcon.PENCIL));
 
         menuItemEditor.addActionListener(e -> SwingUtilities.invokeLater(() -> {
             if (configurationFrame == null) {
@@ -130,6 +135,7 @@ public class UiQuickActionService {
                     );
                 } catch (Exception ex) {
                     ex.printStackTrace();
+                    NotificationFactory.getInstance().show(NotificationType.ERROR, "Editor menu created error");
                 }
             }
 
@@ -140,7 +146,7 @@ public class UiQuickActionService {
         menuTools.add(menuItemEditor);
 
         JMenu menuInfo = new JMenu("Info");
-        menuInfo.setIcon(IconRepositoryFactory.getInstance().by("info-2x").get());
+        menuInfo.setIcon(IconRepositoryFactory.instance().by(AppIcon.INFO));
 
 
         GeneralPropertiesRepository repository = new ResourceGeneralPropertiesRepository();
@@ -153,6 +159,7 @@ public class UiQuickActionService {
             info = new String(bytes, StandardCharsets.UTF_8);
         } catch (Exception e) {
             e.printStackTrace();
+            NotificationFactory.getInstance().show(NotificationType.ERROR, "Info menu created error");
         }
         JLabel label = new JLabel("<html>" + info);
         menuInfo.add(label);
@@ -161,7 +168,7 @@ public class UiQuickActionService {
         menuTools.add(menuInfo);
 
         JMenuItem menuItemClose = new JMenuItem("Exit");
-        menuItemClose.setIcon(IconRepositoryFactory.getInstance().by("x-2x").get());
+        menuItemClose.setIcon(IconRepositoryFactory.instance().by(AppIcon.X));
         menuItemClose.addActionListener(e -> SwingUtilities.invokeLater(dialog::dispose));
         menuTools.add(menuItemClose);
 
@@ -169,7 +176,7 @@ public class UiQuickActionService {
     }
 
     private Component createMoveComponent(JDialog dialog) {
-        JLabel label = new JLabel(IconRepositoryFactory.getInstance().by("move-2x").get());
+        JLabel label = new JLabel(IconRepositoryFactory.instance().by(AppIcon.MOVE));
         MouseAdapter mouseAdapter = new MouseAdapter() {
             boolean pressed = false;
             int x = 0;
@@ -211,7 +218,7 @@ public class UiQuickActionService {
 
     private Component createFavoriteComponent() {
         JMenu menu = new JMenu();
-        menu.setIcon(IconRepositoryFactory.getInstance().by("star-2x").get());
+        menu.setIcon(IconRepositoryFactory.instance().by(AppIcon.STAR));
 
         menu.setDropTarget(new DropTarget(
                 menu,

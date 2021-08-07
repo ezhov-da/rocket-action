@@ -2,9 +2,11 @@ package ru.ezhov.rocket.action.types;
 
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty;
 import ru.ezhov.rocket.action.api.RocketActionSettings;
+import ru.ezhov.rocket.action.icon.AppIcon;
 import ru.ezhov.rocket.action.icon.IconRepositoryFactory;
 import ru.ezhov.rocket.action.notification.NotificationFactory;
 import ru.ezhov.rocket.action.icon.IconService;
+import ru.ezhov.rocket.action.notification.NotificationType;
 
 import javax.swing.JMenuItem;
 import java.awt.Component;
@@ -31,7 +33,7 @@ public class OpenUrlRocketActionUi extends AbstractRocketAction {
         menuItem.setIcon(
                 IconService.load(
                         Optional.ofNullable(settings.settings().get(ICON_URL)),
-                        IconRepositoryFactory.getInstance().by("link-intact-2x").get()
+                        IconRepositoryFactory.instance().by(AppIcon.LINK_INTACT)
                 )
         );
         menuItem.setToolTipText(ConfigurationUtil.getValue(settings.settings(), DESCRIPTION));
@@ -44,13 +46,15 @@ public class OpenUrlRocketActionUi extends AbstractRocketAction {
                     Clipboard clipboard = defaultToolkit.getSystemClipboard();
                     clipboard.setContents(new StringSelection(ConfigurationUtil.getValue(settings.settings(), URL)), null);
 
-                    NotificationFactory.getInstance().show("URL copy to clipboard");
+                    NotificationFactory.getInstance().show(NotificationType.INFO, "URL copy to clipboard");
                 } else if (e.getButton() == MouseEvent.BUTTON1) {
                     if (Desktop.isDesktopSupported()) {
                         try {
                             Desktop.getDesktop().browse(new URI(ConfigurationUtil.getValue(settings.settings(), URL)));
                         } catch (Exception ex) {
                             ex.printStackTrace();
+
+                            NotificationFactory.getInstance().show(NotificationType.ERROR, "Error open url");
                         }
                     }
                 }

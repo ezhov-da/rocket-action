@@ -2,7 +2,10 @@ package ru.ezhov.rocket.action.types;
 
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty;
 import ru.ezhov.rocket.action.api.RocketActionSettings;
+import ru.ezhov.rocket.action.icon.AppIcon;
 import ru.ezhov.rocket.action.icon.IconRepositoryFactory;
+import ru.ezhov.rocket.action.notification.NotificationFactory;
+import ru.ezhov.rocket.action.notification.NotificationType;
 
 import javax.swing.JMenuItem;
 import java.awt.Component;
@@ -19,7 +22,7 @@ public class OpenFileRocketActionUi extends AbstractRocketAction {
 
     public Component create(RocketActionSettings settings) {
         JMenuItem menuItem = new JMenuItem(ConfigurationUtil.getValue(settings.settings(), LABEL));
-        menuItem.setIcon(IconRepositoryFactory.getInstance().by("file-2x").get());
+        menuItem.setIcon(IconRepositoryFactory.instance().by(AppIcon.FILE));
         menuItem.setToolTipText(ConfigurationUtil.getValue(settings.settings(), DESCRIPTION));
         menuItem.addActionListener(e -> {
             if (Desktop.isDesktopSupported()) {
@@ -27,6 +30,8 @@ public class OpenFileRocketActionUi extends AbstractRocketAction {
                     Desktop.getDesktop().open(new File(ConfigurationUtil.getValue(settings.settings(), PATH)));
                 } catch (Exception ex) {
                     ex.printStackTrace();
+
+                    NotificationFactory.getInstance().show(NotificationType.ERROR, "Error open file");
                 }
             }
         });

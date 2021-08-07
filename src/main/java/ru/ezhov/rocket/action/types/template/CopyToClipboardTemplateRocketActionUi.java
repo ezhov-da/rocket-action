@@ -2,6 +2,7 @@ package ru.ezhov.rocket.action.types.template;
 
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty;
 import ru.ezhov.rocket.action.api.RocketActionSettings;
+import ru.ezhov.rocket.action.icon.AppIcon;
 import ru.ezhov.rocket.action.icon.IconRepositoryFactory;
 import ru.ezhov.rocket.action.template.infrastructure.VelocityEngineImpl;
 import ru.ezhov.rocket.action.types.AbstractRocketAction;
@@ -23,7 +24,7 @@ public class CopyToClipboardTemplateRocketActionUi extends AbstractRocketAction 
         NotePanelEngine notePanelEngine = new NotePanelEngine(text, new VelocityEngineImpl());
 
         JMenu menu = new JMenu(ConfigurationUtil.getValue(settings.settings(), LABEL));
-        menu.setIcon(IconRepositoryFactory.getInstance().by("clipboard-2x").get());
+        menu.setIcon(IconRepositoryFactory.instance().by(AppIcon.CLIPBOARD));
         menu.setToolTipText(ConfigurationUtil.getValue(settings.settings(), DESCRIPTION));
         menu.add(notePanelEngine);
 

@@ -1,5 +1,5 @@
 package ru.ezhov.rocket.action.notification;
 
 public interface NotificationService {
-    void show(String text);
+    void show(NotificationType type, String text);
 }

@@ -2,21 +2,17 @@ package ru.ezhov.rocket.action.icon;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
-import java.util.Optional;
+import java.net.URL;
 
 public class ResourceIconRepository implements IconRepository {
+    private URL defaultIcon = this.getClass().getResource("/default_16x16.png");
+
     @Override
-    public Optional<Icon> by(String name) {
-        Optional<Icon> icon;
-        try {
-            icon = Optional.of(
-                    new ImageIcon(
-                            this.getClass().getResource("/open-iconic/png/" + name + ".png")
-                    )
-            );
-        } catch (Exception ex) {
-            icon = Optional.empty();
+    public Icon by(AppIcon icon) {
+        URL url = this.getClass().getResource("/open-iconic/png/" + icon.getIconName() + ".png");
+        if (url == null) {
+            url = defaultIcon;
         }
-        return icon;
+        return new ImageIcon(url);
     }
 }

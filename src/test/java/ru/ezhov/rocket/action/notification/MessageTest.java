@@ -7,7 +7,7 @@ import java.awt.Point;
 public class MessageTest {
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
-            Message message = new Message(4000, "Test");
+            Message message = new Message(NotificationType.INFO, 4000, "Test");
             message.showMessage(new Point(300, 200), new Dimension(300, 200));
         });
     }

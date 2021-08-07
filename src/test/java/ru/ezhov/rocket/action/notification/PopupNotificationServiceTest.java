@@ -10,7 +10,9 @@ public class PopupNotificationServiceTest {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            popupNotificationService.show("" + i);
+            popupNotificationService.show(NotificationType.INFO, "" + i);
+            popupNotificationService.show(NotificationType.WARN, "" + i);
+            popupNotificationService.show(NotificationType.ERROR, "" + i);
         }
     }
 }

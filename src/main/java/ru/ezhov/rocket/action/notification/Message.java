@@ -1,5 +1,8 @@
 package ru.ezhov.rocket.action.notification;
 
+import ru.ezhov.rocket.action.icon.AppIcon;
+import ru.ezhov.rocket.action.icon.IconRepositoryFactory;
+
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JWindow;
@@ -12,10 +15,22 @@ class Message extends JWindow {
     private float opacity = 1F;
     private int delay;
 
-    public Message(int delay, String text) {
+    public Message(NotificationType type, int delay, String text) {
         this.delay = delay;
         JPanel panel = new JPanel(new BorderLayout());
         final JLabel label = new JLabel(text);
+        switch (type) {
+            case INFO:
+                label.setIcon(IconRepositoryFactory.instance().by(AppIcon.INFO));
+                break;
+            case WARN:
+                label.setIcon(IconRepositoryFactory.instance().by(AppIcon.WARNING));
+                break;
+            case ERROR:
+                label.setIcon(IconRepositoryFactory.instance().by(AppIcon.BAN));
+                break;
+        }
+
         label.setHorizontalAlignment(JLabel.CENTER);
         panel.add(label, BorderLayout.CENTER);
         add(panel, BorderLayout.CENTER);

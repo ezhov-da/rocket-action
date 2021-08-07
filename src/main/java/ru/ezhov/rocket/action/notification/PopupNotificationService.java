@@ -13,17 +13,17 @@ class PopupNotificationService implements NotificationService {
     private static final int SPACE_BETWEEN_MESSAGES = 15;
 
     @Override
-    public void show(String text) {
-        SwingUtilities.invokeLater(() -> createAndShowMessage(text));
+    public void show(NotificationType type, String text) {
+        SwingUtilities.invokeLater(() -> createAndShowMessage(type, text));
     }
 
-    private void createAndShowMessage(String text) {
+    private void createAndShowMessage(NotificationType type, String text) {
         final Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         Dimension messageDimension = new Dimension(
                 (int) (screenSize.width * 0.1),
                 (int) (screenSize.height * 0.07)
         );
-        Message message = new Message(3000, text);
+        Message message = new Message(type, 3000, text);
         Point point;
         if (messages.isEmpty()) {
             point = new Point(screenSize.width - SPACE_BETWEEN_MESSAGES - messageDimension.width,

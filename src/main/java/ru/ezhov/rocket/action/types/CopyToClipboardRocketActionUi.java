@@ -2,8 +2,10 @@ package ru.ezhov.rocket.action.types;
 
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty;
 import ru.ezhov.rocket.action.api.RocketActionSettings;
+import ru.ezhov.rocket.action.icon.AppIcon;
 import ru.ezhov.rocket.action.icon.IconRepositoryFactory;
 import ru.ezhov.rocket.action.notification.NotificationFactory;
+import ru.ezhov.rocket.action.notification.NotificationType;
 
 import javax.swing.JMenuItem;
 import java.awt.Component;
@@ -21,14 +23,14 @@ public class CopyToClipboardRocketActionUi extends AbstractRocketAction {
 
     public Component create(RocketActionSettings settings) {
         JMenuItem menuItem = new JMenuItem(ConfigurationUtil.getValue(settings.settings(), LABEL));
-        menuItem.setIcon(IconRepositoryFactory.getInstance().by("clipboard-2x").get());
+        menuItem.setIcon(IconRepositoryFactory.instance().by(AppIcon.CLIPBOARD));
         menuItem.setToolTipText(ConfigurationUtil.getValue(settings.settings(), DESCRIPTION));
         menuItem.addActionListener(e -> {
             Toolkit defaultToolkit = Toolkit.getDefaultToolkit();
             Clipboard clipboard = defaultToolkit.getSystemClipboard();
             clipboard.setContents(new StringSelection(ConfigurationUtil.getValue(settings.settings(), TEXT)), null);
 
-            NotificationFactory.getInstance().show("Text copy to clipboard");
+            NotificationFactory.getInstance().show(NotificationType.INFO,"Text copy to clipboard");
         });
         return menuItem;
     }

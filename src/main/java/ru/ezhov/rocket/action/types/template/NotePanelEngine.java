@@ -1,6 +1,7 @@
 package ru.ezhov.rocket.action.types.template;
 
 import ru.ezhov.rocket.action.notification.NotificationFactory;
+import ru.ezhov.rocket.action.notification.NotificationType;
 import ru.ezhov.rocket.action.template.domain.Engine;
 
 import javax.swing.JButton;
@@ -55,7 +56,7 @@ public class NotePanelEngine extends JPanel {
             Clipboard clipboard = defaultToolkit.getSystemClipboard();
             clipboard.setContents(new StringSelection(finalText), null);
 
-            NotificationFactory.getInstance().show("Template text copy to clipboard");
+            NotificationFactory.getInstance().show(NotificationType.INFO, "Template text copy to clipboard");
         });
     }
 }

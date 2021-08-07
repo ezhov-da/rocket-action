@@ -6,8 +6,11 @@ import ru.ezhov.rocket.action.RocketActionUiRepository;
 import ru.ezhov.rocket.action.api.RocketActionConfiguration;
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty;
 import ru.ezhov.rocket.action.api.RocketActionSettings;
+import ru.ezhov.rocket.action.icon.AppIcon;
 import ru.ezhov.rocket.action.icon.IconRepositoryFactory;
 import ru.ezhov.rocket.action.infrastructure.MutableRocketActionSettings;
+import ru.ezhov.rocket.action.notification.NotificationFactory;
+import ru.ezhov.rocket.action.notification.NotificationType;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -74,7 +77,7 @@ public class ConfigurationFrame {
         JMenuBar menuBar = new JMenuBar();
 
         JMenuItem menuItemUpdate = new JMenuItem("Update");
-        menuItemUpdate.setIcon(IconRepositoryFactory.getInstance().by("reload-2x").get());
+        menuItemUpdate.setIcon(IconRepositoryFactory.instance().by(AppIcon.RELOAD));
         menuItemUpdate.addActionListener(e -> SwingUtilities.invokeLater(() -> {
             updateActionListener.actionPerformed(e);
             ConfigurationFrame.this.setVisible(false);
@@ -294,8 +297,12 @@ public class ConfigurationFrame {
 
         try {
             rocketActionSettingsRepository.save(settings);
+
+            NotificationFactory.getInstance().show(NotificationType.INFO, "Actions saved");
         } catch (RocketActionSettingsRepositoryException e) {
             e.printStackTrace();
+
+            NotificationFactory.getInstance().show(NotificationType.ERROR, "Error actions saving");
         }
     }
 
@@ -374,7 +381,10 @@ public class ConfigurationFrame {
         private JPanel testAndCreate() {
             JPanel panel = new JPanel();
             JButton button = new JButton("Save current action");
-            button.addActionListener(e -> callback.saved(create()));
+            button.addActionListener(e -> {
+                callback.saved(create());
+                NotificationFactory.getInstance().show(NotificationType.INFO, "Current action saved");
+            });
             panel.add(button);
             return panel;
         }

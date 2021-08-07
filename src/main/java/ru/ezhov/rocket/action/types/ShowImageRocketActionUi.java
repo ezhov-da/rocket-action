@@ -5,6 +5,7 @@ import org.jdesktop.swingx.JXPanel;
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty;
 import ru.ezhov.rocket.action.api.RocketActionSettings;
 import ru.ezhov.rocket.action.caching.CacheFactory;
+import ru.ezhov.rocket.action.icon.AppIcon;
 import ru.ezhov.rocket.action.icon.IconRepositoryFactory;
 
 import javax.imageio.ImageIO;
@@ -98,7 +99,7 @@ public class ShowImageRocketActionUi extends AbstractRocketAction {
 
         @Override
         protected void done() {
-            menu.setIcon(IconRepositoryFactory.getInstance().by("image-2x").get());
+            menu.setIcon(IconRepositoryFactory.instance().by(AppIcon.IMAGE));
             try {
                 Component component;
                 if (settings.settings().containsKey(IMAGE_URL)) {

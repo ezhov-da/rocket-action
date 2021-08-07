@@ -4,6 +4,7 @@ import ru.ezhov.rocket.action.RocketActionUiRepository;
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty;
 import ru.ezhov.rocket.action.api.RocketActionSettings;
 import ru.ezhov.rocket.action.api.RocketActionUi;
+import ru.ezhov.rocket.action.icon.AppIcon;
 import ru.ezhov.rocket.action.icon.IconRepositoryFactory;
 import ru.ezhov.rocket.action.infrastructure.ReflectionRocketActionUiRepository;
 import ru.ezhov.rocket.action.icon.IconService;
@@ -105,7 +106,7 @@ public class GroupRocketActionUi extends AbstractRocketAction {
             parentMenu.setIcon(
                     IconService.load(
                             Optional.ofNullable(settings.settings().get(ICON_URL)),
-                            IconRepositoryFactory.getInstance().by("project-2x").get()
+                            IconRepositoryFactory.instance().by(AppIcon.PROJECT)
                     )
             );
         }

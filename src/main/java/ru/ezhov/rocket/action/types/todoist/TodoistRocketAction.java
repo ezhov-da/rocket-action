@@ -2,8 +2,10 @@ package ru.ezhov.rocket.action.types.todoist;
 
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty;
 import ru.ezhov.rocket.action.api.RocketActionSettings;
+import ru.ezhov.rocket.action.icon.AppIcon;
 import ru.ezhov.rocket.action.icon.IconRepositoryFactory;
 import ru.ezhov.rocket.action.notification.NotificationFactory;
+import ru.ezhov.rocket.action.notification.NotificationType;
 import ru.ezhov.rocket.action.types.AbstractRocketAction;
 import ru.ezhov.rocket.action.types.ConfigurationUtil;
 import ru.ezhov.rocket.action.types.todoist.model.Project;
@@ -82,12 +84,12 @@ public class TodoistRocketAction extends AbstractRocketAction {
 
         @Override
         protected void done() {
-            menu.setIcon(IconRepositoryFactory.getInstance().by("bookmark-2x").get());
+            menu.setIcon(IconRepositoryFactory.instance().by(AppIcon.BOOKMARK));
             try {
                 menu.removeAll();
                 menu.add(this.get());
 
-                NotificationFactory.getInstance().show("Todoist loaded");
+                NotificationFactory.getInstance().show(NotificationType.INFO, "Todoist loaded");
             } catch (InterruptedException e) {
                 e.printStackTrace();
             } catch (ExecutionException e) {
