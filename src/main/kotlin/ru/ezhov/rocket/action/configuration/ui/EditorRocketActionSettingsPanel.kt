@@ -3,6 +3,7 @@ package ru.ezhov.rocket.action.configuration.ui
 import ru.ezhov.rocket.action.api.RocketActionConfiguration
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
 import ru.ezhov.rocket.action.api.RocketActionSettings
+import ru.ezhov.rocket.action.configuration.domain.RocketActionConfigurationRepository
 import ru.ezhov.rocket.action.icon.AppIcon
 import ru.ezhov.rocket.action.icon.IconRepositoryFactory
 import ru.ezhov.rocket.action.infrastructure.MutableRocketActionSettings
@@ -77,7 +78,15 @@ class EditorRocketActionSettingsPanel(
                             )
                         }.orEmpty()
 
-        rocketActionSettingsPanel.setRocketActionConfiguration(values)
+
+        rocketActionSettingsPanel
+                .setRocketActionConfiguration(
+                        values
+                                .sortedWith(
+                                        compareByDescending<Value> { it.required }
+                                                .thenBy { it.name }
+                                )
+                )
     }
 
     private data class Value(

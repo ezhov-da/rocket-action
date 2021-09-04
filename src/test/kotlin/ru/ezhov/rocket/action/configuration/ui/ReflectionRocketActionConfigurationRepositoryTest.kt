@@ -2,7 +2,7 @@ package ru.ezhov.rocket.action.configuration.ui
 
 import org.junit.Assert
 import org.junit.Test
-import ru.ezhov.rocket.action.infrastructure.ReflectionRocketActionConfigurationRepository
+import ru.ezhov.rocket.action.configuration.infrastructure.ReflectionRocketActionConfigurationRepository
 
 class ReflectionRocketActionConfigurationRepositoryTest {
     @Test

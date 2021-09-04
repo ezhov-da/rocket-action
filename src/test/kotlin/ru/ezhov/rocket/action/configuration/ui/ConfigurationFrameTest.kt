@@ -1,6 +1,6 @@
 package ru.ezhov.rocket.action.configuration.ui
 
-import ru.ezhov.rocket.action.infrastructure.ReflectionRocketActionConfigurationRepository
+import ru.ezhov.rocket.action.configuration.infrastructure.ReflectionRocketActionConfigurationRepository
 import ru.ezhov.rocket.action.infrastructure.ReflectionRocketActionUiRepository
 import ru.ezhov.rocket.action.infrastructure.YmlRocketActionSettingsRepository
 import java.awt.event.ActionEvent

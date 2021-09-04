@@ -1,9 +1,10 @@
 package ru.ezhov.rocket.action.configuration.ui
 
-import ru.ezhov.rocket.action.RocketActionUiRepository
 import ru.ezhov.rocket.action.api.RocketActionConfiguration
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
 import ru.ezhov.rocket.action.api.RocketActionSettings
+import ru.ezhov.rocket.action.configuration.domain.RocketActionConfigurationRepository
+import ru.ezhov.rocket.action.domain.RocketActionUiRepository
 import ru.ezhov.rocket.action.icon.AppIcon
 import ru.ezhov.rocket.action.icon.IconRepositoryFactory
 import java.awt.BorderLayout
@@ -13,30 +14,52 @@ import java.awt.Dialog
 import java.awt.event.ActionEvent
 import java.awt.event.ItemEvent
 import java.util.function.Consumer
-import javax.swing.*
+import javax.swing.BorderFactory
+import javax.swing.Box
+import javax.swing.BoxLayout
+import javax.swing.DefaultComboBoxModel
+import javax.swing.DefaultListCellRenderer
+import javax.swing.JButton
+import javax.swing.JComboBox
+import javax.swing.JDialog
+import javax.swing.JLabel
+import javax.swing.JList
+import javax.swing.JMenuBar
+import javax.swing.JPanel
+import javax.swing.JScrollPane
+import javax.swing.JTextPane
+import javax.swing.SwingUtilities
+import javax.swing.WindowConstants
 
 class CreateRocketActionSettingsDialog(
         owner: Dialog,
-        rocketActionConfigurationRepository: RocketActionConfigurationRepository,
-        rocketActionUiRepository: RocketActionUiRepository
+        private val rocketActionConfigurationRepository: RocketActionConfigurationRepository,
+        private val rocketActionUiRepository: RocketActionUiRepository
 ) {
-    private val dialog: JDialog
-    private val rocketActionConfigurationRepository: RocketActionConfigurationRepository
-    private var comboBox: JComboBox<RocketActionConfiguration?>? = null
+    private val comboBoxModel = DefaultComboBoxModel<RocketActionConfiguration>()
+    private var comboBox: JComboBox<RocketActionConfiguration> = JComboBox(comboBoxModel)
     private val actionSettingsPanel: RocketActionSettingsPanel = RocketActionSettingsPanel()
     private var currentCallback: CreatedRocketActionSettingsCallback? = null
-    private val rocketActionUiRepository: RocketActionUiRepository
     private val testPanel: TestPanel = TestPanel()
+
+    private val dialog: JDialog = JDialog(owner, "Create rocket action").apply {
+        val ownerSize = owner.size
+        setSize((ownerSize.width * 0.7).toInt(), (ownerSize.height * 0.7).toInt())
+        add(panelComboBox(), BorderLayout.NORTH)
+        actionSettingsPanel.setRocketActionConfiguration(comboBox.selectedItem as RocketActionConfiguration)
+        add(JScrollPane(actionSettingsPanel), BorderLayout.CENTER)
+        add(createTestAndSaveDialog(), BorderLayout.SOUTH)
+        defaultCloseOperation = WindowConstants.HIDE_ON_CLOSE
+        setLocationRelativeTo(owner)
+    }
 
     @Throws(Exception::class)
     private fun panelComboBox(): JPanel {
-        val comboBoxModel = DefaultComboBoxModel<RocketActionConfiguration?>()
         val all = rocketActionConfigurationRepository.all()
         val sortedAll = all.sortedBy { it.name() }
         sortedAll.forEach(Consumer { anObject: RocketActionConfiguration? -> comboBoxModel.addElement(anObject) })
         val panel = JPanel(BorderLayout())
-        comboBox = JComboBox(comboBoxModel)
-        comboBox!!.renderer = object : DefaultListCellRenderer() {
+        comboBox.renderer = object : DefaultListCellRenderer() {
             override fun getListCellRendererComponent(list: JList<*>?, value: Any, index: Int, isSelected: Boolean, cellHasFocus: Boolean): Component {
                 val label = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus) as JLabel
                 value.let {
@@ -47,7 +70,7 @@ class CreateRocketActionSettingsDialog(
                 return label
             }
         }
-        comboBox!!.addItemListener { e: ItemEvent ->
+        comboBox.addItemListener { e: ItemEvent ->
             if (e.stateChange == ItemEvent.SELECTED) {
                 SwingUtilities.invokeLater {
                     actionSettingsPanel.setRocketActionConfiguration(e.item as RocketActionConfiguration)
@@ -92,7 +115,7 @@ class CreateRocketActionSettingsDialog(
                         else -> {
                             val p = JPanel(BorderLayout())
                             val menuBar = JMenuBar()
-                            val component = actionUi.create(settings)
+                            val component = actionUi.create(settings).component()
                             menuBar.add(component)
                             p.add(menuBar, BorderLayout.CENTER)
                             p
@@ -139,6 +162,10 @@ class CreateRocketActionSettingsDialog(
             this.currentConfiguration = configuration
             configuration
                     .properties()
+                    .sortedWith(
+                            compareByDescending<RocketActionConfigurationProperty> { it.isRequired }
+                                    .thenBy { it.name() }
+                    )
                     .forEach { p: RocketActionConfigurationProperty ->
                         val panel = SettingPanel(p)
                         this.add(panel)
@@ -180,20 +207,5 @@ class CreateRocketActionSettingsDialog(
         }
 
         fun value(): Pair<String, String> = Pair(first = property.key(), value.text)
-    }
-
-    init {
-        dialog = JDialog(owner, "Create rocket action")
-        val ownerSize = owner.size
-        dialog.setSize((ownerSize.width * 0.7).toInt(), (ownerSize.height * 0.7).toInt())
-        this.rocketActionConfigurationRepository = rocketActionConfigurationRepository
-        rocketActionConfigurationRepository.load()
-        this.rocketActionUiRepository = rocketActionUiRepository
-        dialog.add(panelComboBox(), BorderLayout.NORTH)
-        actionSettingsPanel.setRocketActionConfiguration(comboBox!!.selectedItem as RocketActionConfiguration)
-        dialog.add(JScrollPane(actionSettingsPanel), BorderLayout.CENTER)
-        dialog.add(createTestAndSaveDialog(), BorderLayout.SOUTH)
-        dialog.defaultCloseOperation = WindowConstants.HIDE_ON_CLOSE
-        dialog.setLocationRelativeTo(owner)
     }
 }

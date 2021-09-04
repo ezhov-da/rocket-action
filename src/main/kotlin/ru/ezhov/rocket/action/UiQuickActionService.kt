@@ -1,17 +1,20 @@
 package ru.ezhov.rocket.action
 
 import ru.ezhov.rocket.action.api.RocketActionSettings
+import ru.ezhov.rocket.action.configuration.domain.RocketActionConfigurationRepository
 import ru.ezhov.rocket.action.configuration.ui.ConfigurationFrame
-import ru.ezhov.rocket.action.configuration.ui.RocketActionConfigurationRepository
+import ru.ezhov.rocket.action.domain.RocketActionSettingsRepository
+import ru.ezhov.rocket.action.domain.RocketActionUiRepository
 import ru.ezhov.rocket.action.icon.AppIcon
 import ru.ezhov.rocket.action.icon.IconRepositoryFactory
-import ru.ezhov.rocket.action.infrastructure.ReflectionRocketActionConfigurationRepository
-import ru.ezhov.rocket.action.infrastructure.ReflectionRocketActionUiRepository
+import ru.ezhov.rocket.action.infrastructure.RocketActionComponentCacheFactory
 import ru.ezhov.rocket.action.infrastructure.YmlRocketActionSettingsRepository
 import ru.ezhov.rocket.action.notification.NotificationFactory
 import ru.ezhov.rocket.action.notification.NotificationType
 import ru.ezhov.rocket.action.properties.GeneralPropertiesRepository
 import ru.ezhov.rocket.action.properties.ResourceGeneralPropertiesRepository
+import ru.ezhov.rocket.action.types.group.GroupRocketActionUi
+import ru.ezhov.rocket.action.ui.swing.common.TextFieldWithText
 import java.awt.Component
 import java.awt.Point
 import java.awt.datatransfer.DataFlavor
@@ -22,6 +25,8 @@ import java.awt.dnd.DropTargetAdapter
 import java.awt.dnd.DropTargetDropEvent
 import java.awt.event.ActionEvent
 import java.awt.event.ActionListener
+import java.awt.event.KeyAdapter
+import java.awt.event.KeyEvent
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import java.io.BufferedInputStream
@@ -30,12 +35,22 @@ import java.io.IOException
 import java.nio.charset.StandardCharsets
 import java.util.logging.Level
 import java.util.logging.Logger
-import javax.swing.*
+import javax.swing.ImageIcon
+import javax.swing.JDialog
+import javax.swing.JLabel
+import javax.swing.JMenu
+import javax.swing.JMenuBar
+import javax.swing.JMenuItem
+import javax.swing.SwingUtilities
+import javax.swing.SwingWorker
 
-class UiQuickActionService(userPathToAction: String?) {
-    private val rocketActionConfigurationRepository: RocketActionConfigurationRepository
+class UiQuickActionService(
+        userPathToAction: String?,
+        private val rocketActionConfigurationRepository: RocketActionConfigurationRepository,
+        private val rocketActionUiRepository: RocketActionUiRepository
+) {
+
     private val rocketActionSettingsRepository: RocketActionSettingsRepository
-    private val rocketActionUiRepository: RocketActionUiRepository
     private var configurationFrame: ConfigurationFrame? = null
     private var dialog: JDialog? = null
 
@@ -53,12 +68,16 @@ class UiQuickActionService(userPathToAction: String?) {
     fun createMenu(dialog: JDialog): JMenuBar {
         this.dialog = dialog
         return try {
+            RocketActionComponentCacheFactory.cache.clear()
             val menuBar = JMenuBar()
             val menu = JMenu()
             menu.icon = ImageIcon(this::class.java.getResource("/load_16x16.gif"))
+
             menuBar.add(menu)
             //TODO: избранное
             //menuBar.add(createFavoriteComponent());
+
+            menuBar.add(createSearchField(dialog, menu))
             menuBar.add(createMoveComponent(dialog))
             CreateMenuWorker(menu).execute()
             menuBar
@@ -69,6 +88,37 @@ class UiQuickActionService(userPathToAction: String?) {
 
     @Throws(Exception::class)
     private fun rocketActionSettings(): List<RocketActionSettings> = rocketActionSettingsRepository.actions()
+
+    private fun createSearchField(dialog: JDialog, menu: JMenu) = TextFieldWithText("Search").apply {
+        columns = 5
+        addKeyListener(object : KeyAdapter() {
+            override fun keyPressed(e: KeyEvent?) {
+                e?.takeIf { it.keyCode == KeyEvent.VK_ENTER }?.let {
+
+                    val cache = RocketActionComponentCacheFactory.cache
+
+                    if (text.isNotEmpty()) {
+                        cache
+                                .all()
+                                .filter { it.action().contains(text) }
+                                .takeIf { it.isNotEmpty() }
+                                ?.let { ccl ->
+                                    LOGGER.info("found by search $text: ${ccl.size}")
+
+                                    SwingUtilities.invokeLater {
+                                        menu.removeAll()
+                                        ccl.forEach { menu.add(it.component()) }
+                                        menu.add(createTools(dialog))
+                                        menu.doClick()
+                                    }
+                                }
+                    } else {
+                        CreateMenuWorker(menu).execute()
+                    }
+                }
+            }
+        })
+    }
 
     private fun createTools(dialog: JDialog): JMenu {
         val menuTools = JMenu("Tools")
@@ -97,7 +147,7 @@ class UiQuickActionService(userPathToAction: String?) {
         menuTools.add(menuItemUpdate)
         val menuItemEditor = JMenuItem("Editor")
         menuItemEditor.icon = IconRepositoryFactory.repository.by(AppIcon.PENCIL)
-        menuItemEditor.addActionListener { e: ActionEvent? ->
+        menuItemEditor.addActionListener {
             SwingUtilities.invokeLater {
                 if (configurationFrame == null) {
                     try {
@@ -201,14 +251,37 @@ class UiQuickActionService(userPathToAction: String?) {
     private inner class CreateMenuWorker(private val menu: JMenu) : SwingWorker<String?, String?>() {
         @Throws(Exception::class)
         override fun doInBackground(): String? {
+            menu.removeAll()
+            val cache = RocketActionComponentCacheFactory.cache
             val actionSettings = rocketActionSettings()
+            fillCache(actionSettings)
             for (rocketActionSettings in actionSettings) {
                 rocketActionUiRepository.by(rocketActionSettings.type())?.let {
-                    menu.add(it.create(rocketActionSettings))
+                    val component = cache.by(rocketActionSettings.id())?.component()
+                            ?: it.create(rocketActionSettings).component()
+                    menu.add(component)
                 }
             }
             menu.add(createTools(dialog!!))
             return null
+        }
+
+        private fun fillCache(actionSettings: List<RocketActionSettings>) {
+            val cache = RocketActionComponentCacheFactory.cache
+            for (rocketActionSettings in actionSettings) {
+                rocketActionUiRepository.by(rocketActionSettings.type())?.let {
+                    if (rocketActionSettings.type() != GroupRocketActionUi.TYPE) {
+                        cache.add(
+                                rocketActionSettings.id(),
+                                it.create(rocketActionSettings)
+                        )
+                    } else {
+                        if (rocketActionSettings.actions().isNotEmpty()) {
+                            fillCache(rocketActionSettings.actions())
+                        }
+                    }
+                }
+            }
         }
 
         override fun done() {
@@ -218,11 +291,5 @@ class UiQuickActionService(userPathToAction: String?) {
 
     companion object {
         private val LOGGER = Logger.getLogger(UiQuickActionService::class.java.name)
-    }
-
-    init {
-        rocketActionConfigurationRepository = ReflectionRocketActionConfigurationRepository()
-        rocketActionUiRepository = ReflectionRocketActionUiRepository()
-        rocketActionUiRepository.load()
     }
 }

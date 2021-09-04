@@ -2,13 +2,13 @@ package ru.ezhov.rocket.action.infrastructure
 
 import org.reflections.Reflections
 import org.reflections.scanners.SubTypesScanner
-import ru.ezhov.rocket.action.RocketActionUiRepository
+import ru.ezhov.rocket.action.domain.RocketActionUiRepository
 import ru.ezhov.rocket.action.api.RocketActionUi
 import java.lang.reflect.Modifier
 
 class ReflectionRocketActionUiRepository : RocketActionUiRepository {
     private var list: MutableList<RocketActionUi> = mutableListOf()
-    override fun load() {
+    fun load() {
         val reflections = Reflections("", SubTypesScanner(true))
         val classes = reflections.getSubTypesOf(RocketActionUi::class.java)
         for (aClass in classes) {

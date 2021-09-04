@@ -1,9 +1,10 @@
 package ru.ezhov.rocket.action.configuration.ui
 
-import ru.ezhov.rocket.action.RocketActionSettingsRepository
-import ru.ezhov.rocket.action.RocketActionSettingsRepositoryException
-import ru.ezhov.rocket.action.RocketActionUiRepository
+import ru.ezhov.rocket.action.domain.RocketActionSettingsRepository
+import ru.ezhov.rocket.action.domain.RocketActionSettingsRepositoryException
+import ru.ezhov.rocket.action.domain.RocketActionUiRepository
 import ru.ezhov.rocket.action.api.RocketActionSettings
+import ru.ezhov.rocket.action.configuration.domain.RocketActionConfigurationRepository
 import ru.ezhov.rocket.action.icon.AppIcon
 import ru.ezhov.rocket.action.icon.IconRepositoryFactory
 import ru.ezhov.rocket.action.infrastructure.MutableRocketActionSettings

@@ -1,39 +1,67 @@
-package ru.ezhov.rocket.action.types
+package ru.ezhov.rocket.action.types.showimagesvg
 
-import org.jdesktop.swingx.JXImageView
-import org.jdesktop.swingx.JXPanel
+import org.apache.batik.swing.JSVGCanvas
+import org.apache.batik.swing.JSVGScrollPane
+import org.apache.batik.swing.svg.JSVGComponent
+import ru.ezhov.rocket.action.api.Action
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
 import ru.ezhov.rocket.action.api.RocketActionSettings
+import ru.ezhov.rocket.action.api.SearchableAction
 import ru.ezhov.rocket.action.caching.CacheFactory
 import ru.ezhov.rocket.action.icon.AppIcon
 import ru.ezhov.rocket.action.icon.IconRepositoryFactory
-import java.awt.*
+import ru.ezhov.rocket.action.types.AbstractRocketAction
+import ru.ezhov.rocket.action.types.ConfigurationUtil
+import java.awt.BorderLayout
+import java.awt.Color
+import java.awt.Component
+import java.awt.Desktop
+import java.awt.Dimension
+import java.awt.Image
+import java.awt.Toolkit
 import java.awt.event.ActionEvent
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import java.io.File
 import java.io.IOException
 import java.net.URL
-import java.util.concurrent.ExecutionException
 import javax.imageio.ImageIO
-import javax.swing.*
-import javax.swing.event.ChangeEvent
+import javax.swing.AbstractAction
+import javax.swing.ImageIcon
+import javax.swing.JFrame
+import javax.swing.JLabel
+import javax.swing.JMenu
+import javax.swing.JPanel
+import javax.swing.JScrollPane
+import javax.swing.JToolBar
+import javax.swing.SwingUtilities
+import javax.swing.SwingWorker
+import javax.swing.WindowConstants
 
-class ShowImageRocketActionUi : AbstractRocketAction() {
-    override fun create(settings: RocketActionSettings): Component {
-        val menu = JMenu(ConfigurationUtil.getValue(settings!!.settings(), LABEL))
+class ShowSvgImageRocketActionUi : AbstractRocketAction() {
+
+    override fun create(settings: RocketActionSettings): ru.ezhov.rocket.action.api.Action {
+        val label = ConfigurationUtil.getValue(settings.settings(), LABEL)
+        val menu = JMenu(ConfigurationUtil.getValue(settings.settings(), LABEL))
         menu.toolTipText = ConfigurationUtil.getValue(settings.settings(), DESCRIPTION)
         menu.icon = ImageIcon(this.javaClass.getResource("/load_16x16.gif"))
         LoadImageWorker(menu, settings).execute()
-        return menu
+        return object : Action {
+            override fun action(): SearchableAction = object : SearchableAction {
+                override fun contains(search: String): Boolean =
+                        label.contains(search, ignoreCase = true)
+            }
+
+            override fun component(): Component = menu
+        }
     }
 
     override fun type(): String {
-        return "SHOW_IMAGE"
+        return "SHOW_SVG_IMAGE"
     }
 
     override fun description(): String {
-        return "Show *.png and *.jpg images"
+        return "SVG image show (beta)"
     }
 
     override fun properties(): List<RocketActionConfigurationProperty> {
@@ -44,8 +72,6 @@ class ShowImageRocketActionUi : AbstractRocketAction() {
         )
     }
 
-    override fun name(): String = "Показать изображение *.png и *.jpg"
-
     private inner class LoadImageWorker(private val menu: JMenu, private val settings: RocketActionSettings) : SwingWorker<Image?, String?>() {
         private var cachedImage: File? = null
 
@@ -53,30 +79,30 @@ class ShowImageRocketActionUi : AbstractRocketAction() {
         override fun doInBackground(): Image? {
             val url = ConfigurationUtil.getValue(settings.settings(), IMAGE_URL)
             val file = CacheFactory.cache.get(URL(url))
-            return file?.let { f -> cachedImage = f; ImageIO.read(f) }
+            return file?.let { f ->
+                cachedImage = f
+                ImageIO.read(f)
+            }
         }
 
         override fun done() {
             menu.icon = IconRepositoryFactory.repository.by(AppIcon.IMAGE)
             try {
-                val component: Component
-                if (settings.settings().containsKey(IMAGE_URL)) {
-                    component = ImagePanel(this.get(), cachedImage!!)
+                val component = if (settings.settings().containsKey(IMAGE_URL)) {
+                    ImagePanel(cachedImage!!)
                 } else {
                     val panel = JPanel()
                     panel.add(JLabel(ConfigurationUtil.getValue(settings.settings(), IMAGE_URL)))
-                    component = panel
+                    panel
                 }
                 menu.add(component)
-            } catch (e: InterruptedException) {
-                e.printStackTrace()
-            } catch (e: ExecutionException) {
+            } catch (e: Exception) {
                 e.printStackTrace()
             }
         }
     }
 
-    private inner class ImagePanel(image: Image?, cachedImage: File) : JXPanel(BorderLayout()) {
+    private inner class ImagePanel(cachedImage: File) : JPanel(BorderLayout()) {
         init {
             val dimension = Toolkit.getDefaultToolkit().screenSize
             val widthNew = (dimension.width * 0.5).toInt()
@@ -88,7 +114,7 @@ class ShowImageRocketActionUi : AbstractRocketAction() {
                 override fun actionPerformed(e: ActionEvent) {
                     SwingUtilities.invokeLater {
                         val frame = JFrame(cachedImage.absolutePath)
-                        frame.add(ImagePanel(image, cachedImage))
+                        frame.add(ImagePanel(cachedImage))
                         frame.defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
                         frame.setSize((dimension.width * 0.8).toInt(), (dimension.height * 0.8).toInt())
                         frame.setLocationRelativeTo(null)
@@ -103,25 +129,26 @@ class ShowImageRocketActionUi : AbstractRocketAction() {
             preferredSize = newDimension
             maximumSize = newDimension
             minimumSize = newDimension
-            val panelImage = JXPanel(BorderLayout())
-            val imageView = JXImageView()
-            imageView.image = image
-            imageView.autoscrolls = true
-            panelImage.add(
-                    imageView,
-                    BorderLayout.CENTER
-            )
+            val panelImage = JPanel()
+            val svgCanvas = JSVGCanvas()
+            svgCanvas.setDocumentState(JSVGComponent.ALWAYS_DYNAMIC)
+            svgCanvas.uri = cachedImage.toURI().toString()
+            panelImage.add(JSVGScrollPane(svgCanvas))
             add(
                     toolBar,
                     BorderLayout.NORTH
             )
             add(
-                    panelImage,
+                    JScrollPane(panelImage),
                     BorderLayout.CENTER
             )
-            val slider = JSlider(1, 100, 100)
-            toolBar.add(slider)
-            slider.addChangeListener { e: ChangeEvent? -> imageView.scale = slider.value / 100.0 }
+
+            //TODO scale
+            //JSlider slider = new JSlider(1, 100, 100);
+            //toolBar.add(slider);
+            //slider.addChangeListener(e -> {
+            //imageView.setScale(slider.getValue() / 100D);
+            //});
             val cachedLabel = JLabel("Cached: " + cachedImage.absolutePath)
             cachedLabel.addMouseListener(object : MouseAdapter() {
                 override fun mouseReleased(e: MouseEvent) {
@@ -150,6 +177,8 @@ class ShowImageRocketActionUi : AbstractRocketAction() {
             )
         }
     }
+
+    override fun name(): String = "Показать изображение *.svg (beta)"
 
     companion object {
         private const val LABEL = "label"

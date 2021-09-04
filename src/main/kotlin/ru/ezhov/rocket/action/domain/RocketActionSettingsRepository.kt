@@ -1,4 +1,4 @@
-package ru.ezhov.rocket.action
+package ru.ezhov.rocket.action.domain
 
 import ru.ezhov.rocket.action.api.RocketActionSettings
 

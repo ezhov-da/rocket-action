@@ -1,12 +1,17 @@
-package ru.ezhov.rocket.action.types
+package ru.ezhov.rocket.action.types.openurlwithtexthistory
 
+import ru.ezhov.rocket.action.api.Action
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
 import ru.ezhov.rocket.action.api.RocketActionSettings
+import ru.ezhov.rocket.action.api.SearchableAction
 import ru.ezhov.rocket.action.icon.AppIcon
 import ru.ezhov.rocket.action.icon.IconRepositoryFactory
 import ru.ezhov.rocket.action.icon.IconService
 import ru.ezhov.rocket.action.notification.NotificationFactory
 import ru.ezhov.rocket.action.notification.NotificationType
+import ru.ezhov.rocket.action.types.AbstractRocketAction
+import ru.ezhov.rocket.action.types.ConfigurationUtil
+import ru.ezhov.rocket.action.types.openurl.OpenUrlRocketActionUi
 import ru.ezhov.rocket.action.ui.swing.common.TextFieldWithText
 import java.awt.Component
 import java.awt.Desktop
@@ -16,7 +21,10 @@ import javax.swing.JMenu
 import javax.swing.SwingUtilities
 
 class OpenUrlWithTextHistoryRocketActionUi : AbstractRocketAction() {
-    override fun create(settings: RocketActionSettings): Component {
+    private var label: String? = null
+
+    override fun create(settings: RocketActionSettings): Action {
+        val label = ConfigurationUtil.getValue(settings.settings(), LABEL)
         val menu = JMenu(ConfigurationUtil.getValue(settings.settings(), LABEL))
         menu.icon = IconService().load(
                 settings.settings()[ICON_URL].orEmpty(),
@@ -50,7 +58,7 @@ class OpenUrlWithTextHistoryRocketActionUi : AbstractRocketAction() {
                                         override fun settings(): MutableMap<String, String> = mutableMapOf()
 
                                         override fun actions(): List<RocketActionSettings> = emptyList()
-                                    }))
+                                    }).component())
                                     menu.revalidate()
                                     menu.repaint()
                                 }
@@ -62,12 +70,17 @@ class OpenUrlWithTextHistoryRocketActionUi : AbstractRocketAction() {
                     }
         }
         menu.add(textField)
-        return menu
+        return object : Action {
+            override fun action(): SearchableAction = object : SearchableAction {
+                override fun contains(search: String): Boolean =
+                        label.contains(search, ignoreCase = true)
+            }
+
+            override fun component(): Component = menu
+        }
     }
 
-    override fun type(): String {
-        return "OPEN_URL_WITH_TEXT_HISTORY"
-    }
+    override fun type(): String = "OPEN_URL_WITH_TEXT_HISTORY"
 
     override fun description(): String {
         return "description"

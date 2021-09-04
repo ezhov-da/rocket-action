@@ -1,7 +1,7 @@
 package ru.ezhov.rocket.action.configuration.ui
 
 import ru.ezhov.rocket.action.api.RocketActionSettings
-import ru.ezhov.rocket.action.infrastructure.ReflectionRocketActionConfigurationRepository
+import ru.ezhov.rocket.action.configuration.infrastructure.ReflectionRocketActionConfigurationRepository
 import ru.ezhov.rocket.action.infrastructure.ReflectionRocketActionUiRepository
 import javax.swing.JDialog
 import javax.swing.SwingUtilities

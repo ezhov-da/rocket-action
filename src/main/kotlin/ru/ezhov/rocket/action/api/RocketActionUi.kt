@@ -1,7 +1,5 @@
 package ru.ezhov.rocket.action.api
 
-import java.awt.Component
-
 /**
  * UI action builder
  */
@@ -11,7 +9,7 @@ interface RocketActionUi {
      *
      * @return component to display
      */
-    fun create(settings: RocketActionSettings): Component
+    fun create(settings: RocketActionSettings): Action
 
     /**
      * @return action type

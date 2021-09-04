@@ -1,8 +1,8 @@
 package ru.ezhov.rocket.action.infrastructure
 
 import org.yaml.snakeyaml.Yaml
-import ru.ezhov.rocket.action.RocketActionSettingsRepository
-import ru.ezhov.rocket.action.RocketActionSettingsRepositoryException
+import ru.ezhov.rocket.action.domain.RocketActionSettingsRepository
+import ru.ezhov.rocket.action.domain.RocketActionSettingsRepositoryException
 import ru.ezhov.rocket.action.api.RocketActionSettings
 import java.io.File
 import java.io.FileOutputStream

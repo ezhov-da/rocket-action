@@ -3,7 +3,7 @@ package ru.ezhov.rocket.action.infrastructure
 import org.junit.Assert
 import org.junit.Ignore
 import org.junit.Test
-import ru.ezhov.rocket.action.RocketActionSettingsRepositoryException
+import ru.ezhov.rocket.action.domain.RocketActionSettingsRepositoryException
 import ru.ezhov.rocket.action.api.RocketActionSettings
 import java.io.File
 import java.net.URISyntaxException

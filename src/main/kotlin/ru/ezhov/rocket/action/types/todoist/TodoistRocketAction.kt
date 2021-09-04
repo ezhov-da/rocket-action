@@ -1,7 +1,9 @@
 package ru.ezhov.rocket.action.types.todoist
 
+import ru.ezhov.rocket.action.api.Action
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
 import ru.ezhov.rocket.action.api.RocketActionSettings
+import ru.ezhov.rocket.action.api.SearchableAction
 import ru.ezhov.rocket.action.icon.AppIcon
 import ru.ezhov.rocket.action.icon.IconRepositoryFactory
 import ru.ezhov.rocket.action.notification.NotificationFactory
@@ -19,11 +21,20 @@ import java.io.IOException
 import java.net.URI
 import java.net.URISyntaxException
 import java.util.concurrent.ExecutionException
-import javax.swing.*
+import javax.swing.DefaultListCellRenderer
+import javax.swing.DefaultListModel
+import javax.swing.ImageIcon
+import javax.swing.JLabel
+import javax.swing.JList
+import javax.swing.JMenu
+import javax.swing.JPanel
+import javax.swing.JScrollPane
+import javax.swing.JTextPane
+import javax.swing.SwingWorker
 import javax.swing.event.ListSelectionEvent
 
 class TodoistRocketAction : AbstractRocketAction() {
-    private var menu: JMenu? = null
+
     override fun description(): String {
         return "Simple todoist client"
     }
@@ -42,17 +53,21 @@ class TodoistRocketAction : AbstractRocketAction() {
 
     override fun name(): String = "Работа с Todois"
 
-    override fun create(settings: RocketActionSettings): Component {
-        menu = JMenu(ConfigurationUtil.getValue(settings.settings(), LABEL))
-        TodoistWorker(settings).execute()
-        return menu!!
+    override fun create(settings: RocketActionSettings): Action {
+        val menu = JMenu(ConfigurationUtil.getValue(settings.settings(), LABEL))
+        TodoistWorker(menu, settings).execute()
+        return object : Action {
+            override fun action(): SearchableAction = object : SearchableAction {
+                override fun contains(search: String): Boolean = false
+            }
+
+            override fun component(): Component = menu
+        }
     }
 
-    override fun type(): String {
-        return "TODOIST"
-    }
+    override fun type(): String = "TODOIST"
 
-    private inner class TodoistWorker(settings: RocketActionSettings) : SwingWorker<TodoistPanel, String?>() {
+    private inner class TodoistWorker(private val menu: JMenu, settings: RocketActionSettings) : SwingWorker<TodoistPanel, String?>() {
         private val settings: RocketActionSettings
 
         @Throws(Exception::class)
@@ -61,10 +76,10 @@ class TodoistRocketAction : AbstractRocketAction() {
         }
 
         override fun done() {
-            menu!!.icon = IconRepositoryFactory.repository.by(AppIcon.BOOKMARK)
+            menu.icon = IconRepositoryFactory.repository.by(AppIcon.BOOKMARK)
             try {
-                menu!!.removeAll()
-                menu!!.add(this.get())
+                menu.removeAll()
+                menu.add(this.get())
                 NotificationFactory.notification.show(NotificationType.INFO, "Todoist loaded")
             } catch (e: InterruptedException) {
                 e.printStackTrace()
@@ -74,8 +89,8 @@ class TodoistRocketAction : AbstractRocketAction() {
         }
 
         init {
-            menu!!.removeAll()
-            menu!!.icon = ImageIcon(this.javaClass.getResource("/load_16x16.gif"))
+            menu.removeAll()
+            menu.icon = ImageIcon(this.javaClass.getResource("/load_16x16.gif"))
             this.settings = settings
         }
     }

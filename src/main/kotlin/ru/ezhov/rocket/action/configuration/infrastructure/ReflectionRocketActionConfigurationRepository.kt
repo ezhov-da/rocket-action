@@ -1,14 +1,15 @@
-package ru.ezhov.rocket.action.infrastructure
+package ru.ezhov.rocket.action.configuration.infrastructure
 
 import org.reflections.Reflections
 import org.reflections.scanners.SubTypesScanner
 import ru.ezhov.rocket.action.api.RocketActionConfiguration
-import ru.ezhov.rocket.action.configuration.ui.RocketActionConfigurationRepository
+import ru.ezhov.rocket.action.configuration.domain.RocketActionConfigurationRepository
 import java.lang.reflect.Modifier
 
 class ReflectionRocketActionConfigurationRepository : RocketActionConfigurationRepository {
     private var list: MutableList<RocketActionConfiguration> = mutableListOf()
-    override fun load() {
+
+    fun load() {
         list = mutableListOf()
         val reflections = Reflections("", SubTypesScanner(true))
         val classes = reflections.getSubTypesOf(RocketActionConfiguration::class.java)
