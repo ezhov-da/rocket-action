@@ -3,9 +3,12 @@ package ru.ezhov.rocket.action.types.template
 import ru.ezhov.rocket.action.notification.NotificationFactory
 import ru.ezhov.rocket.action.notification.NotificationType
 import ru.ezhov.rocket.action.template.domain.Engine
-import java.awt.*
+import java.awt.BorderLayout
+import java.awt.Toolkit
 import java.awt.datatransfer.StringSelection
-import java.awt.event.*
+import java.awt.event.ActionEvent
+import java.awt.event.KeyAdapter
+import java.awt.event.KeyEvent
 import javax.swing.JButton
 import javax.swing.JLabel
 import javax.swing.JPanel

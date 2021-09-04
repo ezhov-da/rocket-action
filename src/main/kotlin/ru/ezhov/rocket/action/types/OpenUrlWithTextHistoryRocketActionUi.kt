@@ -75,13 +75,15 @@ class OpenUrlWithTextHistoryRocketActionUi : AbstractRocketAction() {
 
     override fun properties(): List<RocketActionConfigurationProperty> {
         return listOf(
-                createRocketActionProperty(LABEL, "TEST", true),
-                createRocketActionProperty(DESCRIPTION, "TEST", true),
-                createRocketActionProperty(BASE_URL, "TEST", true),
-                createRocketActionProperty(PLACEHOLDER, "TEST", true),
-                createRocketActionProperty(ICON_URL, "Icon URL", false)
+                createRocketActionProperty(LABEL, LABEL, "TEST", true),
+                createRocketActionProperty(DESCRIPTION, DESCRIPTION, "TEST", true),
+                createRocketActionProperty(BASE_URL, BASE_URL, "TEST", true),
+                createRocketActionProperty(PLACEHOLDER, PLACEHOLDER, "TEST", true),
+                createRocketActionProperty(ICON_URL, ICON_URL, "Icon URL", false)
         )
     }
+
+    override fun name(): String = "Открытие ссылки с подстановкой и с сохранением истории"
 
     companion object {
         private const val LABEL = "label"

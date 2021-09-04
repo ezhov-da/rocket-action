@@ -9,8 +9,12 @@ import ru.ezhov.rocket.action.notification.NotificationFactory
 import ru.ezhov.rocket.action.notification.NotificationType
 import ru.ezhov.rocket.action.types.AbstractRocketAction
 import ru.ezhov.rocket.action.types.ConfigurationUtil
-import java.awt.*
-import java.awt.event.*
+import java.awt.BorderLayout
+import java.awt.Component
+import java.awt.Desktop
+import java.awt.event.ActionEvent
+import java.awt.event.MouseAdapter
+import java.awt.event.MouseEvent
 import java.io.IOException
 import java.net.URI
 import java.net.URISyntaxException
@@ -25,16 +29,20 @@ class GistRocketAction : AbstractRocketAction() {
         return "Github gist loader"
     }
 
+    override fun name(): String = "Работа с Gists"
+
     override fun properties(): List<RocketActionConfigurationProperty> {
         return Arrays.asList(
-                createRocketActionProperty(LABEL, "Label", true),
+                createRocketActionProperty(LABEL, LABEL, "Label", true),
                 createRocketActionProperty(
+                        TOKEN,
                         TOKEN,
                         "Use this or -D" + GistActionService.TOKEN_PROPERTY,
                         false
                 ),
-                createRocketActionProperty(USERNAME, "", true),
+                createRocketActionProperty(USERNAME, USERNAME, "", true),
                 createRocketActionProperty(
+                        BASE_GIST_URL,
                         BASE_GIST_URL,
                         "Url gists for open",
                         false

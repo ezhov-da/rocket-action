@@ -9,11 +9,14 @@ import ru.ezhov.rocket.action.api.RocketActionUi
  */
 abstract class AbstractRocketAction : RocketActionUi, RocketActionConfiguration {
     protected fun createRocketActionProperty(
+            key: String,
             name: String,
             description: String,
             required: Boolean
     ): RocketActionConfigurationProperty {
         return object : RocketActionConfigurationProperty {
+            override fun key(): String = key
+
             override fun name(): String = name
 
             override fun description(): String = description

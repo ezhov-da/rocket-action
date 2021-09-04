@@ -4,16 +4,16 @@ import ru.ezhov.rocket.action.RocketActionUiRepository
 import ru.ezhov.rocket.action.api.RocketActionConfiguration
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
 import ru.ezhov.rocket.action.api.RocketActionSettings
+import ru.ezhov.rocket.action.icon.AppIcon
+import ru.ezhov.rocket.action.icon.IconRepositoryFactory
 import java.awt.BorderLayout
+import java.awt.Color
 import java.awt.Component
 import java.awt.Dialog
 import java.awt.event.ActionEvent
 import java.awt.event.ItemEvent
-import java.util.*
 import java.util.function.Consumer
-import java.util.stream.Collectors
 import javax.swing.*
-import javax.swing.table.DefaultTableModel
 
 class CreateRocketActionSettingsDialog(
         owner: Dialog,
@@ -32,24 +32,21 @@ class CreateRocketActionSettingsDialog(
     private fun panelComboBox(): JPanel {
         val comboBoxModel = DefaultComboBoxModel<RocketActionConfiguration?>()
         val all = rocketActionConfigurationRepository.all()
-        val sortedAll = all
-                .stream()
-                .sorted(Comparator.comparing { obj: RocketActionConfiguration? -> obj!!.type() })
-                .collect(Collectors.toList())
+        val sortedAll = all.sortedBy { it.name() }
         sortedAll.forEach(Consumer { anObject: RocketActionConfiguration? -> comboBoxModel.addElement(anObject) })
         val panel = JPanel(BorderLayout())
         comboBox = JComboBox(comboBoxModel)
-        comboBox!!.setRenderer(object : DefaultListCellRenderer() {
+        comboBox!!.renderer = object : DefaultListCellRenderer() {
             override fun getListCellRendererComponent(list: JList<*>?, value: Any, index: Int, isSelected: Boolean, cellHasFocus: Boolean): Component {
                 val label = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus) as JLabel
-                if (value != null) {
+                value.let {
                     val configuration = value as RocketActionConfiguration
-                    label.text = configuration.type() + " - " + configuration.description()
+                    label.text = configuration.name()
                     label.toolTipText = configuration.description()
                 }
                 return label
             }
-        })
+        }
         comboBox!!.addItemListener { e: ItemEvent ->
             if (e.stateChange == ItemEvent.SELECTED) {
                 SwingUtilities.invokeLater {
@@ -122,50 +119,67 @@ class CreateRocketActionSettingsDialog(
         init {
             val panel = JPanel()
             val buttonTest = JButton("Test")
-            buttonTest.addActionListener { e: ActionEvent? -> SwingUtilities.invokeLater { createTest(actionSettingsPanel.create()) } }
+            buttonTest.addActionListener { SwingUtilities.invokeLater { createTest(actionSettingsPanel.create()) } }
             panel.add(buttonTest)
             add(panel, BorderLayout.SOUTH)
         }
     }
 
-    private inner class RocketActionSettingsPanel : JPanel(BorderLayout()) {
-        private val tableModel = DefaultTableModel()
-        private val table = JTable(tableModel)
+    private inner class RocketActionSettingsPanel : JPanel() {
+        private val settingPanels = mutableListOf<SettingPanel>()
         private var currentConfiguration: RocketActionConfiguration? = null
-        fun setRocketActionConfiguration(configuration: RocketActionConfiguration) {
-            currentConfiguration = configuration
-            while (tableModel.rowCount != 0) {
-                tableModel.removeRow(0)
-            }
-            configuration.properties().forEach(Consumer { c: RocketActionConfigurationProperty? ->
-                val row = Vector<String?>()
-                row.add(c!!.name())
-                row.add("")
-                row.add(c.description())
-                row.add(java.lang.Boolean.toString(c.isRequired))
-                tableModel.addRow(row)
-            })
-        }
-
-        fun create(): RocketActionSettings {
-            checkNotNull(currentConfiguration) { "Must be set current selected configuration" }
-            val rowCount = tableModel.rowCount
-            val map: MutableMap<String, String> = TreeMap()
-            for (i in 0 until rowCount) {
-                val name = tableModel.getValueAt(i, 0)
-                val value = tableModel.getValueAt(i, 1)
-                map[name.toString()] = value.toString()
-            }
-            return NewRocketActionSettings(currentConfiguration!!.type(), map, emptyList())
-        }
 
         init {
-            tableModel.addColumn("Name")
-            tableModel.addColumn("Value")
-            tableModel.addColumn("Description")
-            tableModel.addColumn("Required")
-            add(JScrollPane(table))
+            this.layout = BoxLayout(this, BoxLayout.Y_AXIS)
         }
+
+        fun setRocketActionConfiguration(configuration: RocketActionConfiguration) {
+            removeAll()
+            settingPanels.clear()
+            this.currentConfiguration = configuration
+            configuration
+                    .properties()
+                    .forEach { p: RocketActionConfigurationProperty ->
+                        val panel = SettingPanel(p)
+                        this.add(panel)
+                        settingPanels.add(panel)
+                    }
+            this.add(Box.createVerticalBox())
+            repaint()
+            revalidate()
+        }
+
+        fun create(): RocketActionSettings = NewRocketActionSettings(
+                currentConfiguration!!.type(),
+                settingPanels.associate { panel -> panel.value() }
+        )
+    }
+
+    private class SettingPanel(private val property: RocketActionConfigurationProperty) : JPanel() {
+        private val value = JTextPane()
+
+        init {
+            this.layout = BorderLayout()
+            this.border = BorderFactory.createEmptyBorder(2, 2, 2, 2)
+            val labelName = JLabel(property.name())
+            val labelDescription = JLabel(IconRepositoryFactory.repository.by(AppIcon.INFO))
+            labelDescription.toolTipText = property.description()
+
+            val topPanel = JPanel()
+            topPanel.layout = BoxLayout(topPanel, BoxLayout.X_AXIS)
+            topPanel.border = BorderFactory.createEmptyBorder(0, 0, 1, 0)
+            topPanel.add(labelName)
+            if (property.isRequired) {
+                topPanel.add(JLabel("*").apply { foreground = Color.RED })
+            }
+            topPanel.add(labelDescription)
+            val centerPanel = JPanel(BorderLayout())
+            centerPanel.add(JScrollPane(value), BorderLayout.CENTER)
+            this.add(topPanel, BorderLayout.NORTH)
+            this.add(centerPanel, BorderLayout.CENTER)
+        }
+
+        fun value(): Pair<String, String> = Pair(first = property.key(), value.text)
     }
 
     init {
@@ -177,7 +191,7 @@ class CreateRocketActionSettingsDialog(
         this.rocketActionUiRepository = rocketActionUiRepository
         dialog.add(panelComboBox(), BorderLayout.NORTH)
         actionSettingsPanel.setRocketActionConfiguration(comboBox!!.selectedItem as RocketActionConfiguration)
-        dialog.add(actionSettingsPanel, BorderLayout.CENTER)
+        dialog.add(JScrollPane(actionSettingsPanel), BorderLayout.CENTER)
         dialog.add(createTestAndSaveDialog(), BorderLayout.SOUTH)
         dialog.defaultCloseOperation = WindowConstants.HIDE_ON_CLOSE
         dialog.setLocationRelativeTo(owner)

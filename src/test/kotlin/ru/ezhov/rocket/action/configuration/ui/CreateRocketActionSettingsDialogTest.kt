@@ -11,11 +11,16 @@ object CreateRocketActionSettingsDialogTest {
     fun main(args: Array<String>) {
         SwingUtilities.invokeLater {
             val dialog = JDialog()
+            dialog.setSize(1000, 900)
+            val reflectionRocketActionConfigurationRepository = ReflectionRocketActionConfigurationRepository()
+            reflectionRocketActionConfigurationRepository.load()
+            val reflectionRocketActionUiRepository = ReflectionRocketActionUiRepository()
+            reflectionRocketActionUiRepository.load()
             try {
                 CreateRocketActionSettingsDialog(
                         dialog,
-                        ReflectionRocketActionConfigurationRepository(),
-                        ReflectionRocketActionUiRepository()
+                        reflectionRocketActionConfigurationRepository,
+                        reflectionRocketActionUiRepository
                 )
                         .show(object : CreatedRocketActionSettingsCallback {
                             override fun create(rocketActionSettings: RocketActionSettings) {

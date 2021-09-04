@@ -10,6 +10,11 @@ interface RocketActionConfiguration {
     fun type(): String
 
     /**
+     * @return configurable action name
+     */
+    fun name(): String
+
+    /**
      * @return configurable action description
      */
     fun description(): String

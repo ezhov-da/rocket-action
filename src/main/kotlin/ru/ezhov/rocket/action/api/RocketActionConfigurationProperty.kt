@@ -5,7 +5,12 @@ package ru.ezhov.rocket.action.api
  */
 interface RocketActionConfigurationProperty {
     /**
-     * @return property name
+     * @return property key
+     */
+    fun key(): String
+
+    /**
+     * @return property key
      */
     fun name(): String
 

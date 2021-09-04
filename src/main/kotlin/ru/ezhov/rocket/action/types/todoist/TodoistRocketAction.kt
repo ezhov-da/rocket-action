@@ -10,12 +10,14 @@ import ru.ezhov.rocket.action.types.AbstractRocketAction
 import ru.ezhov.rocket.action.types.ConfigurationUtil
 import ru.ezhov.rocket.action.types.todoist.model.Project
 import ru.ezhov.rocket.action.types.todoist.model.Task
-import java.awt.*
-import java.awt.event.*
+import java.awt.BorderLayout
+import java.awt.Component
+import java.awt.Desktop
+import java.awt.event.MouseAdapter
+import java.awt.event.MouseEvent
 import java.io.IOException
 import java.net.URI
 import java.net.URISyntaxException
-import java.util.*
 import java.util.concurrent.ExecutionException
 import javax.swing.*
 import javax.swing.event.ListSelectionEvent
@@ -28,14 +30,17 @@ class TodoistRocketAction : AbstractRocketAction() {
 
     override fun properties(): List<RocketActionConfigurationProperty> {
         return listOf(
-                createRocketActionProperty(LABEL, "Label", true),
+                createRocketActionProperty(LABEL, LABEL, "Label", true),
                 createRocketActionProperty(
+                        TOKEN,
                         TOKEN,
                         "Use this or -D" + TodoistProjectRepository.TOKEN_PROPERTY,
                         false
                 )
         )
     }
+
+    override fun name(): String = "Работа с Todois"
 
     override fun create(settings: RocketActionSettings): Component {
         menu = JMenu(ConfigurationUtil.getValue(settings.settings(), LABEL))

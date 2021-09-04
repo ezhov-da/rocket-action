@@ -56,12 +56,14 @@ class OpenUrlRocketActionUi : AbstractRocketAction() {
 
     override fun properties(): List<RocketActionConfigurationProperty> {
         return listOf(
-                createRocketActionProperty(LABEL, "TEST", true),
-                createRocketActionProperty(DESCRIPTION, "TEST", true),
-                createRocketActionProperty(URL, "TEST", true),
-                createRocketActionProperty(ICON_URL, "Icon URL", false)
+                createRocketActionProperty(LABEL, LABEL, "TEST", true),
+                createRocketActionProperty(DESCRIPTION, DESCRIPTION, "TEST", true),
+                createRocketActionProperty(URL, URL, "TEST", true),
+                createRocketActionProperty(ICON_URL, ICON_URL, "Icon URL", false)
         )
     }
+
+    override fun name(): String = "Открыть ссылку"
 
     companion object {
         private const val LABEL = "label"

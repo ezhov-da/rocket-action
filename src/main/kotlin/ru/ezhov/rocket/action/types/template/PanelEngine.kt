@@ -6,7 +6,6 @@ import java.awt.event.KeyListener
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import java.net.URI
-import java.util.*
 import java.util.stream.Collectors
 import javax.swing.JLabel
 import javax.swing.JPanel

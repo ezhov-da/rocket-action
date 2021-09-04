@@ -40,11 +40,13 @@ class OpenFileRocketActionUi : AbstractRocketAction() {
 
     override fun properties(): List<RocketActionConfigurationProperty> {
         return listOf(
-                createRocketActionProperty(LABEL, "TEST", true),
-                createRocketActionProperty(DESCRIPTION, "TEST", true),
-                createRocketActionProperty(PATH, "TEST", true)
+                createRocketActionProperty(LABEL, LABEL, "TEST", true),
+                createRocketActionProperty(DESCRIPTION, DESCRIPTION, "TEST", true),
+                createRocketActionProperty(PATH, PATH, "TEST", true)
         )
     }
+
+    override fun name(): String = "Открыть файл"
 
     companion object {
         private const val LABEL = "label"

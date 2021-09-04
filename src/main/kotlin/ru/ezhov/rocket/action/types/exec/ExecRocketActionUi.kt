@@ -68,17 +68,19 @@ class ExecRocketActionUi : AbstractRocketAction() {
         return "EXEC"
     }
 
+    override fun name(): String = "Выполнить команду"
+
     override fun description(): String {
         return "description"
     }
 
     override fun properties(): List<RocketActionConfigurationProperty> {
         return listOf(
-                createRocketActionProperty(LABEL, "TEST", true),
-                createRocketActionProperty(COMMAND, "TEST", true),
-                createRocketActionProperty(WORKING_DIR, "TEST", true),
-                createRocketActionProperty(DESCRIPTION, "TEST", false),
-                createRocketActionProperty(ICON_URL, "Icon URL", false)
+                createRocketActionProperty(LABEL, LABEL, "TEST", true),
+                createRocketActionProperty(COMMAND, COMMAND, "TEST", true),
+                createRocketActionProperty(WORKING_DIR, WORKING_DIR, "TEST", true),
+                createRocketActionProperty(DESCRIPTION, DESCRIPTION, "TEST", false),
+                createRocketActionProperty(ICON_URL, ICON_URL, "Icon URL", false)
         )
     }
 

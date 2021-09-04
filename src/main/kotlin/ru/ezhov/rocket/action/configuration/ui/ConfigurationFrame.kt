@@ -3,8 +3,6 @@ package ru.ezhov.rocket.action.configuration.ui
 import ru.ezhov.rocket.action.RocketActionSettingsRepository
 import ru.ezhov.rocket.action.RocketActionSettingsRepositoryException
 import ru.ezhov.rocket.action.RocketActionUiRepository
-import ru.ezhov.rocket.action.api.RocketActionConfiguration
-import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
 import ru.ezhov.rocket.action.api.RocketActionSettings
 import ru.ezhov.rocket.action.icon.AppIcon
 import ru.ezhov.rocket.action.icon.IconRepositoryFactory
@@ -19,12 +17,8 @@ import java.awt.event.ActionEvent
 import java.awt.event.ActionListener
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
-import java.util.*
-import java.util.function.Consumer
-import java.util.stream.Collectors
 import javax.swing.*
 import javax.swing.event.TreeSelectionEvent
-import javax.swing.table.DefaultTableModel
 import javax.swing.tree.*
 
 class ConfigurationFrame(
@@ -57,7 +51,7 @@ class ConfigurationFrame(
         val root = DefaultMutableTreeNode(null, true)
         fillTreeNodes(actions, root)
         val defaultTreeModel = DefaultTreeModel(root)
-        val rocketActionSettingsPanel: RocketActionSettingsPanel = RocketActionSettingsPanel()
+        val rocketActionSettingsPanel = EditorRocketActionSettingsPanel(rocketActionConfigurationRepository)
         val panel = JPanel(BorderLayout())
         val tree = JTree(defaultTreeModel)
         tree.selectionModel.selectionMode = TreeSelectionModel.SINGLE_TREE_SELECTION
@@ -271,102 +265,6 @@ class ConfigurationFrame(
         }
     }
 
-    private inner class RocketActionSettingsPanel : JPanel(BorderLayout()) {
-        private val tableModel = DefaultTableModel()
-        private val table = JTable(tableModel)
-        private var currentSettings: RocketActionSettings? = null
-        private var callback: SavedRocketActionSettingsPanelCallback? = null
-        private val labelType = JLabel()
-        private val labelDescription = JLabel()
-        private fun top(): JPanel {
-            val panel = JPanel(BorderLayout())
-            panel.add(labelType, BorderLayout.NORTH)
-            panel.add(labelDescription, BorderLayout.CENTER)
-            return panel
-        }
-
-        private fun testAndCreate(): JPanel {
-            val panel = JPanel()
-            val button = JButton("Save current action")
-            button.addActionListener { e: ActionEvent? ->
-                callback!!.saved(create())
-                NotificationFactory.notification.show(NotificationType.INFO, "Current action saved")
-            }
-            panel.add(button)
-            return panel
-        }
-
-        fun show(settings: RocketActionSettings, callback: SavedRocketActionSettingsPanelCallback) {
-            currentSettings = settings
-            labelType.text = settings.type()
-            this.callback = callback
-            while (tableModel.rowCount != 0) {
-                tableModel.removeRow(0)
-            }
-            val configuration: RocketActionConfiguration? = rocketActionConfigurationRepository.by(settings.type())
-            configuration?.let {
-                labelDescription.text = configuration.description()
-            }
-            val settings = settings.settings()
-            settings.forEach { (k: String?, v: String?) ->
-                val row = Vector<String?>()
-                row.add(k)
-                row.add(v)
-                configuration?.let { conf ->
-                    val optional = conf
-                            .properties()
-                            .stream()
-                            .filter { p: RocketActionConfigurationProperty? -> p!!.name() == k }
-                            .findFirst()
-                    if (optional.isPresent) {
-                        row.add(optional.get().description())
-                    } else {
-                        row.add("Unregistered property")
-                    }
-                } ?: row.add(null)
-                tableModel.addRow(row)
-            }
-            configuration?.let { conf ->
-                conf.properties()
-                        .stream()
-                        .filter { p: RocketActionConfigurationProperty? -> !settings.containsKey(p!!.name()) }
-                        .collect(Collectors.toList())
-                        .forEach(Consumer { p: RocketActionConfigurationProperty? ->
-                            val row = Vector<String?>()
-                            row.add(p!!.name())
-                            row.add("")
-                            row.add(p.description())
-                            tableModel.addRow(row)
-                        })
-            }
-        }
-
-        private fun create(): RocketActionSettings {
-            checkNotNull(currentSettings) { "Must be set current selected configuration" }
-            val rowCount = tableModel.rowCount
-            val map: MutableMap<String, String> = TreeMap()
-            for (i in 0 until rowCount) {
-                val name = tableModel.getValueAt(i, 0)
-                val value = tableModel.getValueAt(i, 1)
-                map[name.toString()] = value.toString()
-            }
-            return MutableRocketActionSettings(
-                    currentSettings!!.id(),
-                    currentSettings!!.type(),
-                    map,
-                    currentSettings!!.actions().toMutableList()
-            )
-        }
-
-        init {
-            tableModel.addColumn("Name")
-            tableModel.addColumn("Value")
-            tableModel.addColumn("Description")
-            add(top(), BorderLayout.NORTH)
-            add(JScrollPane(table), BorderLayout.CENTER)
-            add(testAndCreate(), BorderLayout.SOUTH)
-        }
-    }
 
     init {
         dialog = JDialog(owner, "Rocket action configuration")

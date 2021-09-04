@@ -37,9 +37,9 @@ class ShowSvgImageRocketActionUi : AbstractRocketAction() {
 
     override fun properties(): List<RocketActionConfigurationProperty> {
         return listOf(
-                createRocketActionProperty(LABEL, "TEST", true),
-                createRocketActionProperty(DESCRIPTION, "TEST", true),
-                createRocketActionProperty(IMAGE_URL, "TEST", true)
+                createRocketActionProperty(LABEL, LABEL, "TEST", true),
+                createRocketActionProperty(DESCRIPTION, DESCRIPTION, "TEST", true),
+                createRocketActionProperty(IMAGE_URL, IMAGE_URL, "TEST", true)
         )
     }
 
@@ -148,6 +148,8 @@ class ShowSvgImageRocketActionUi : AbstractRocketAction() {
             )
         }
     }
+
+    override fun name(): String = "Показать изображение *.svg (beta)"
 
     companion object {
         private const val LABEL = "label"

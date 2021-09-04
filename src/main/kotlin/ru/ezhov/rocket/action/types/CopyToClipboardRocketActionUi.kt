@@ -34,11 +34,13 @@ class CopyToClipboardRocketActionUi : AbstractRocketAction() {
         return "Allows you to copy a previously prepared text to the clipboard"
     }
 
+    override fun name(): String = "Копировать в буфер"
+
     override fun properties(): List<RocketActionConfigurationProperty> {
         return listOf(
-                createRocketActionProperty(LABEL, "Displayed title", true),
-                createRocketActionProperty(DESCRIPTION, "Description that will be displayed as a hint", true),
-                createRocketActionProperty(TEXT, "Text prepared for copying to the clipboard", true)
+                createRocketActionProperty(LABEL, LABEL, "Displayed title", true),
+                createRocketActionProperty(DESCRIPTION, DESCRIPTION, "Description that will be displayed as a hint", true),
+                createRocketActionProperty(TEXT, TEXT, "Text prepared for copying to the clipboard", true)
         )
     }
 

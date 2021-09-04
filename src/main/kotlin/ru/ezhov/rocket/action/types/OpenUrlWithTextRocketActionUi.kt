@@ -18,7 +18,7 @@ import javax.swing.JPanel
 
 class OpenUrlWithTextRocketActionUi : AbstractRocketAction() {
     override fun create(settings: RocketActionSettings): Component {
-        val menu = JMenu(ConfigurationUtil.getValue(settings!!.settings(), LABEL))
+        val menu = JMenu(ConfigurationUtil.getValue(settings.settings(), LABEL))
         menu.icon = IconService().load(
                 settings.settings()[ICON_URL].orEmpty(),
                 IconRepositoryFactory.repository.by(AppIcon.LINK_INTACT)
@@ -67,13 +67,15 @@ class OpenUrlWithTextRocketActionUi : AbstractRocketAction() {
 
     override fun properties(): List<RocketActionConfigurationProperty> {
         return listOf(
-                createRocketActionProperty(LABEL, "TEST", true),
-                createRocketActionProperty(DESCRIPTION, "TEST", true),
-                createRocketActionProperty(BASE_URL, "TEST", true),
-                createRocketActionProperty(PLACEHOLDER, "TEST", true),
-                createRocketActionProperty(ICON_URL, "Icon URL", false)
+                createRocketActionProperty(LABEL, LABEL, "TEST", true),
+                createRocketActionProperty(DESCRIPTION, DESCRIPTION, "TEST", true),
+                createRocketActionProperty(BASE_URL, BASE_URL, "TEST", true),
+                createRocketActionProperty(PLACEHOLDER, PLACEHOLDER, "TEST", true),
+                createRocketActionProperty(ICON_URL, ICON_URL, "Icon URL", false)
         )
     }
+
+    override fun name(): String = "Открыть ссылку с подстановкой"
 
     companion object {
         private const val ICON_URL = "iconUrl"

@@ -34,11 +34,13 @@ class GroupRocketActionUi : AbstractRocketAction() {
 
     override fun properties(): List<RocketActionConfigurationProperty> {
         return listOf(
-                createRocketActionProperty(LABEL, "TEST", true),
-                createRocketActionProperty(DESCRIPTION, "TEST", true),
-                createRocketActionProperty(ICON_URL, "URL for icon", false)
+                createRocketActionProperty(LABEL, LABEL, "TEST", true),
+                createRocketActionProperty(DESCRIPTION, DESCRIPTION, "TEST", true),
+                createRocketActionProperty(ICON_URL, ICON_URL, "URL for icon", false)
         )
     }
+
+    override fun name(): String = "Группа"
 
     private class GroupSwingWorker(private val parentMenu: JMenu, private val settings: RocketActionSettings) : SwingWorker<List<Component?>, String?>() {
         @Throws(Exception::class)

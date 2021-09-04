@@ -38,11 +38,13 @@ class ShowImageRocketActionUi : AbstractRocketAction() {
 
     override fun properties(): List<RocketActionConfigurationProperty> {
         return listOf(
-                createRocketActionProperty(LABEL, "TEST", true),
-                createRocketActionProperty(DESCRIPTION, "TEST", true),
-                createRocketActionProperty(IMAGE_URL, "TEST", true)
+                createRocketActionProperty(LABEL, LABEL, "TEST", true),
+                createRocketActionProperty(DESCRIPTION, DESCRIPTION, "TEST", true),
+                createRocketActionProperty(IMAGE_URL, IMAGE_URL, "TEST", true)
         )
     }
+
+    override fun name(): String = "Показать изображение *.png и *.jpg"
 
     private inner class LoadImageWorker(private val menu: JMenu, private val settings: RocketActionSettings) : SwingWorker<Image?, String?>() {
         private var cachedImage: File? = null

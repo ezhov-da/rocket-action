@@ -6,7 +6,7 @@ import java.util.*
 class NewRocketActionSettings(
         private val type: String,
         private val settings: Map<String, String>,
-        private val actions: List<RocketActionSettings>
+        private val actions: List<RocketActionSettings> = emptyList()
 ) : RocketActionSettings {
     private val id: String = UUID.randomUUID().toString()
 

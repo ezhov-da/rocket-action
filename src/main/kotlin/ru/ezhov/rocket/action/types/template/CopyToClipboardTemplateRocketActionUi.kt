@@ -21,6 +21,8 @@ class CopyToClipboardTemplateRocketActionUi : AbstractRocketAction() {
         return menu
     }
 
+    override fun name(): String = "Копировать в буфер по шаблону"
+
     override fun type(): String {
         return "COPY_TO_CLIPBOARD_TEMPLATE"
     }
@@ -31,9 +33,9 @@ class CopyToClipboardTemplateRocketActionUi : AbstractRocketAction() {
 
     override fun properties(): List<RocketActionConfigurationProperty> {
         return listOf(
-                createRocketActionProperty(LABEL, "Displayed title", true),
-                createRocketActionProperty(DESCRIPTION, "Description that will be displayed as a hint", true),
-                createRocketActionProperty(TEXT, "Text prepared for copying to the clipboard", true)
+                createRocketActionProperty(LABEL, LABEL, "Displayed title", true),
+                createRocketActionProperty(DESCRIPTION, DESCRIPTION, "Description that will be displayed as a hint", true),
+                createRocketActionProperty(TEXT, TEXT, "Text prepared for copying to the clipboard", true)
         )
     }
 

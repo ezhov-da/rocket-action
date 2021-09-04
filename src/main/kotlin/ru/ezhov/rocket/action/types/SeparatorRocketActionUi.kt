@@ -10,6 +10,8 @@ class SeparatorRocketActionUi : AbstractRocketAction() {
 
     override fun type(): String = "SEPARATOR"
 
+    override fun name(): String = "Разделитель"
+
     override fun description(): String = "description"
 
     override fun properties(): List<RocketActionConfigurationProperty> = emptyList()
