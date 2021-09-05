@@ -4,35 +4,35 @@ import ru.ezhov.rocket.action.api.Action
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
 import ru.ezhov.rocket.action.api.RocketActionSettings
 import ru.ezhov.rocket.action.api.SearchableAction
-import ru.ezhov.rocket.action.domain.RocketActionUiRepository
 import ru.ezhov.rocket.action.icon.AppIcon
 import ru.ezhov.rocket.action.icon.IconRepositoryFactory
 import ru.ezhov.rocket.action.icon.IconService
 import ru.ezhov.rocket.action.infrastructure.RocketActionComponentCacheFactory
-import ru.ezhov.rocket.action.infrastructure.RocketActionUiRepositoryFactory
 import ru.ezhov.rocket.action.types.AbstractRocketAction
-import ru.ezhov.rocket.action.types.ConfigurationUtil
 import java.awt.Component
 import java.util.concurrent.ExecutionException
-import java.util.function.Consumer
 import javax.swing.ImageIcon
 import javax.swing.JMenu
 import javax.swing.SwingWorker
 
 class GroupRocketActionUi : AbstractRocketAction() {
-    override fun create(settings: RocketActionSettings): Action {
-        val menu = JMenu(ConfigurationUtil.getValue(settings.settings(), LABEL))
-        menu.icon = ImageIcon(this.javaClass.getResource("/load_16x16.gif"))
-        menu.toolTipText = ConfigurationUtil.getValue(settings.settings(), DESCRIPTION)
-        GroupSwingWorker(menu, settings).execute()
-        return object : Action {
-            override fun action(): SearchableAction = object : SearchableAction {
-                override fun contains(search: String): Boolean = false
-            }
+    override fun create(settings: RocketActionSettings): Action? =
+            settings.settings()[LABEL]?.takeIf { it.isNotEmpty() }?.let { label ->
+                val description = settings.settings()[DESCRIPTION]?.takeIf { it.isNotEmpty() } ?: label
+                val iconUrl = settings.settings()[ICON_URL].orEmpty()
+                val menu = JMenu(label)
+                menu.icon = ImageIcon(this.javaClass.getResource("/load_16x16.gif"))
+                menu.toolTipText = description
+                GroupSwingWorker(menu, iconUrl, settings).execute()
 
-            override fun component(): Component = menu
-        }
-    }
+                object : Action {
+                    override fun action(): SearchableAction = object : SearchableAction {
+                        override fun contains(search: String): Boolean = false
+                    }
+
+                    override fun component(): Component = menu
+                }
+            }
 
     override fun type(): String = TYPE
 
@@ -48,42 +48,53 @@ class GroupRocketActionUi : AbstractRocketAction() {
 
     override fun name(): String = "Группа"
 
-    private class GroupSwingWorker(private val parentMenu: JMenu, private val settings: RocketActionSettings) : SwingWorker<List<Component?>, String?>() {
+    private class GroupSwingWorker(
+            private val parentMenu: JMenu,
+            private val iconUrl: String,
+            private val settings: RocketActionSettings
+    ) : SwingWorker<List<Component?>, String?>() {
         @Throws(Exception::class)
-        override fun doInBackground(): List<Component?> {
-            val rocketActionUiRepository: RocketActionUiRepository = RocketActionUiRepositoryFactory.repository
-            return createGroup(rocketActionUiRepository, settings.actions(), parentMenu)
+        override fun doInBackground(): List<Component> {
+            return createGroup(settings.actions(), parentMenu)
         }
 
-        private fun createGroup(rocketActionUiRepository: RocketActionUiRepository, actionSettings: List<RocketActionSettings?>?, parent: JMenu): List<Component?> {
+        private fun createGroup(
+                actionSettings: List<RocketActionSettings>,
+                parent: JMenu
+        ): List<Component> {
             val cache = RocketActionComponentCacheFactory.cache
-            val children: MutableList<Component?> = ArrayList()
-            for (settings in actionSettings!!) {
-                if (settings!!.type() == TYPE) {
-                    val menu = JMenu(ConfigurationUtil.getValue(settings.settings(), LABEL))
-                    menu.icon = ImageIcon(this.javaClass.getResource("/load_16x16.gif"))
-                    menu.toolTipText = ConfigurationUtil.getValue(settings.settings(), DESCRIPTION)
-                    GroupSwingWorker(menu, settings).execute()
-                    createGroup(rocketActionUiRepository, settings.actions(), menu)
-                    children.add(menu)
+            val children: MutableList<Component> = ArrayList()
+            for (settings in actionSettings) {
+                if (settings.type() == TYPE) {
+                    settings.settings()[LABEL]?.let { label ->
+                        val description = settings.settings()[DESCRIPTION] ?: label
+                        val iconUrl = settings.settings()[ICON_URL].orEmpty()
+
+                        val menu = JMenu(label)
+                        menu.icon = ImageIcon(this.javaClass.getResource("/load_16x16.gif"))
+                        menu.toolTipText = description
+                        GroupSwingWorker(menu, iconUrl, settings).execute()
+                        createGroup(settings.actions(), menu)
+                        children.add(menu)
+                    }
                 } else {
                     cache.by(settings.id())?.let { children.add(it.component()) }
                 }
             }
-            return children
+            return children.toList()
         }
 
         override fun done() {
             try {
                 val components = this.get()
-                components!!.forEach(Consumer { c: Component? -> parentMenu.add(c) })
+                components!!.forEach { c -> parentMenu.add(c) }
             } catch (e: InterruptedException) {
                 e.printStackTrace()
             } catch (e: ExecutionException) {
                 e.printStackTrace()
             }
             parentMenu.icon = IconService().load(
-                    settings.settings()[ICON_URL].orEmpty(),
+                    iconUrl,
                     IconRepositoryFactory.repository.by(AppIcon.PROJECT)
             )
         }

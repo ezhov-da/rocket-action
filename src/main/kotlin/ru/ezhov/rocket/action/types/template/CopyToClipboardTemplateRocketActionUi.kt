@@ -8,29 +8,31 @@ import ru.ezhov.rocket.action.icon.AppIcon
 import ru.ezhov.rocket.action.icon.IconRepositoryFactory
 import ru.ezhov.rocket.action.template.infrastructure.VelocityEngineImpl
 import ru.ezhov.rocket.action.types.AbstractRocketAction
-import ru.ezhov.rocket.action.types.ConfigurationUtil
 import java.awt.Component
 import javax.swing.JMenu
 
 class CopyToClipboardTemplateRocketActionUi : AbstractRocketAction() {
 
-    override fun create(settings: RocketActionSettings): Action {
-        val label = ConfigurationUtil.getValue(settings.settings(), LABEL)
-        val text = ConfigurationUtil.getValue(settings.settings(), TEXT)
-        val notePanelEngine = NotePanelEngine(text, VelocityEngineImpl())
-        val menu = JMenu(ConfigurationUtil.getValue(settings.settings(), LABEL))
-        menu.icon = IconRepositoryFactory.repository.by(AppIcon.CLIPBOARD)
-        menu.toolTipText = ConfigurationUtil.getValue(settings.settings(), DESCRIPTION)
-        menu.add(notePanelEngine)
-        return object : Action {
-            override fun action(): SearchableAction = object : SearchableAction {
-                override fun contains(search: String): Boolean =
-                        label.contains(search, ignoreCase = true)
-            }
+    override fun create(settings: RocketActionSettings): Action? =
+            settings.settings()[TEXT]?.takeIf { it.isNotEmpty() }?.let { text ->
+                val label = settings.settings()[LABEL]?.takeIf { it.isNotEmpty() } ?: text
+                val description = settings.settings()[DESCRIPTION]?.takeIf { it.isNotEmpty() } ?: text
 
-            override fun component(): Component = menu
-        }
-    }
+                val notePanelEngine = NotePanelEngine(text, VelocityEngineImpl())
+                val menu = JMenu(label)
+                menu.icon = IconRepositoryFactory.repository.by(AppIcon.CLIPBOARD)
+                menu.toolTipText = description
+                menu.add(notePanelEngine)
+
+                object : Action {
+                    override fun action(): SearchableAction = object : SearchableAction {
+                        override fun contains(search: String): Boolean =
+                                label.contains(search, ignoreCase = true)
+                    }
+
+                    override fun component(): Component = menu
+                }
+            }
 
     override fun name(): String = "Копировать в буфер по шаблону"
 
@@ -40,8 +42,8 @@ class CopyToClipboardTemplateRocketActionUi : AbstractRocketAction() {
 
     override fun properties(): List<RocketActionConfigurationProperty> {
         return listOf(
-                createRocketActionProperty(LABEL, LABEL, "Displayed title", true),
-                createRocketActionProperty(DESCRIPTION, DESCRIPTION, "Description that will be displayed as a hint", true),
+                createRocketActionProperty(LABEL, LABEL, "Displayed title", false),
+                createRocketActionProperty(DESCRIPTION, DESCRIPTION, "Description that will be displayed as a hint", false),
                 createRocketActionProperty(TEXT, TEXT, "Text prepared for copying to the clipboard", true)
         )
     }

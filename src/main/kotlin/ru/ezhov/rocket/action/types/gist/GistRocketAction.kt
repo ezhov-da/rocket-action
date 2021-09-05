@@ -10,7 +10,6 @@ import ru.ezhov.rocket.action.icon.IconRepositoryFactory
 import ru.ezhov.rocket.action.notification.NotificationFactory
 import ru.ezhov.rocket.action.notification.NotificationType
 import ru.ezhov.rocket.action.types.AbstractRocketAction
-import ru.ezhov.rocket.action.types.ConfigurationUtil
 import java.awt.BorderLayout
 import java.awt.Component
 import java.awt.Desktop
@@ -48,7 +47,7 @@ class GistRocketAction : AbstractRocketAction() {
                 createRocketActionProperty(
                         TOKEN,
                         TOKEN,
-                        "Use this or -D" + GistActionService.TOKEN_PROPERTY,
+                        "Use this or -D$TOKEN_PROPERTY",
                         false
                 ),
                 createRocketActionProperty(USERNAME, USERNAME, "", true),
@@ -61,30 +60,44 @@ class GistRocketAction : AbstractRocketAction() {
         )
     }
 
-    override fun create(settings: RocketActionSettings): Action {
-        val menu = JMenu(ConfigurationUtil.getValue(settings.settings(), LABEL))
-        GistWorker(menu, settings).execute()
-        return object : Action {
-            override fun action(): SearchableAction = object : SearchableAction {
-                override fun contains(search: String): Boolean = false
+    override fun create(settings: RocketActionSettings): Action? =
+            settings.settings()[LABEL]?.takeIf { it.isNotEmpty() }?.let { label ->
+                geToken(settings)?.takeIf { it.isNotEmpty() }?.let { token ->
+                    settings.settings()[USERNAME]?.takeIf { it.isNotEmpty() }?.let { username ->
+                        settings.settings()[BASE_GIST_URL]?.let { url ->
+                            val menu = JMenu(label)
+                            GistWorker(menu, gistUrl = url, token = token, username = username).execute()
+
+                            object : Action {
+                                override fun action(): SearchableAction = object : SearchableAction {
+                                    override fun contains(search: String): Boolean = false
+                                }
+
+                                override fun component(): Component = menu
+                            }
+                        }
+                    }
+                }
             }
 
-            override fun component(): Component = menu
-        }
-    }
+    private fun geToken(settings: RocketActionSettings) =
+            settings.settings()[TOKEN] ?: System.getProperty(TOKEN_PROPERTY, "").takeIf { it.isNotEmpty() }
 
-    override fun type(): String {
-        return "GIST"
-    }
 
-    private inner class GistWorker(private val menu: JMenu, settings: RocketActionSettings) : SwingWorker<GistPanel, String?>() {
-        private val settings: RocketActionSettings
+    override fun type(): String = "GIST"
+
+    private inner class GistWorker(
+            private val menu: JMenu,
+            private val gistUrl: String,
+            private val token: String,
+            private val username: String
+    ) : SwingWorker<GistPanel, String?>() {
 
         @Throws(Exception::class)
         override fun doInBackground(): GistPanel {
             val gistActionService = GistActionService()
-            val gists = gistActionService.gists(settings)
-            return GistPanel(menu, gists, settings.settings()[BASE_GIST_URL]!!, settings)
+            val gists = gistActionService.gists(token = token, username = username)
+            return GistPanel(menu, gists, gistUrl = gistUrl, token = token, username = username)
         }
 
         override fun done() {
@@ -103,11 +116,16 @@ class GistRocketAction : AbstractRocketAction() {
         init {
             menu.removeAll()
             menu.icon = ImageIcon(this.javaClass.getResource("/load_16x16.gif"))
-            this.settings = settings
         }
     }
 
-    private inner class GistPanel(menu: JMenu, gists: List<Gist>, gistUrl: String, settings: RocketActionSettings) : JPanel(BorderLayout()) {
+    private inner class GistPanel(
+            menu: JMenu,
+            gists: List<Gist>,
+            gistUrl: String,
+            token: String,
+            username: String,
+    ) : JPanel(BorderLayout()) {
         private val gistItems: MutableList<GistListItem>
         private val textFieldSearch = JTextField()
         private val model = DefaultListModel<GistListItem>()
@@ -157,7 +175,7 @@ class GistRocketAction : AbstractRocketAction() {
             })
             val panelSearchAndUpdate = JPanel(BorderLayout())
             val buttonUpdate = JButton(IconRepositoryFactory.repository.by(AppIcon.RELOAD))
-            buttonUpdate.addActionListener { e: ActionEvent? -> GistWorker(menu, settings).execute() }
+            buttonUpdate.addActionListener { GistWorker(menu, gistUrl = gistUrl, token = token, username = username).execute() }
             panelSearchAndUpdate.add(textFieldSearch, BorderLayout.CENTER)
             panelSearchAndUpdate.add(buttonUpdate, BorderLayout.EAST)
             add(panelSearchAndUpdate, BorderLayout.NORTH)
@@ -188,5 +206,7 @@ class GistRocketAction : AbstractRocketAction() {
         const val TOKEN = "gistToken"
         const val USERNAME = "username"
         const val BASE_GIST_URL = "baseGistUrl"
+
+        const val TOKEN_PROPERTY = "rocket.action.gist.token"
     }
 }

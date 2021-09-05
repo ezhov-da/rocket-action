@@ -10,7 +10,6 @@ import ru.ezhov.rocket.action.icon.IconService
 import ru.ezhov.rocket.action.notification.NotificationFactory
 import ru.ezhov.rocket.action.notification.NotificationType
 import ru.ezhov.rocket.action.types.AbstractRocketAction
-import ru.ezhov.rocket.action.types.ConfigurationUtil
 import java.awt.Component
 import java.awt.Desktop
 import java.awt.Toolkit
@@ -21,42 +20,51 @@ import java.net.URI
 import javax.swing.JMenuItem
 
 class OpenUrlRocketActionUi : AbstractRocketAction() {
-    override fun create(settings: RocketActionSettings): Action {
-        val label = ConfigurationUtil.getValue(settings.settings(), LABEL)
-        val menuItem = JMenuItem(ConfigurationUtil.getValue(settings.settings(), LABEL))
-        menuItem.icon = IconService().load(
-                settings.settings()[ICON_URL].orEmpty(),
-                IconRepositoryFactory.repository.by(AppIcon.LINK_INTACT)
-        )
-        menuItem.toolTipText = ConfigurationUtil.getValue(settings.settings(), DESCRIPTION)
-        menuItem.addMouseListener(object : MouseAdapter() {
-            override fun mouseReleased(e: MouseEvent) {
-                if (e.button == MouseEvent.BUTTON3) {
-                    val defaultToolkit = Toolkit.getDefaultToolkit()
-                    val clipboard = defaultToolkit.systemClipboard
-                    clipboard.setContents(StringSelection(ConfigurationUtil.getValue(settings.settings(), URL)), null)
-                    NotificationFactory.notification.show(NotificationType.INFO, "URL copy to clipboard")
-                } else if (e.button == MouseEvent.BUTTON1) {
-                    if (Desktop.isDesktopSupported()) {
-                        try {
-                            Desktop.getDesktop().browse(URI(ConfigurationUtil.getValue(settings.settings(), URL)))
-                        } catch (ex: Exception) {
-                            ex.printStackTrace()
-                            NotificationFactory.notification.show(NotificationType.ERROR, "Error open url")
-                        }
+    override fun create(settings: RocketActionSettings): Action? =
+            settings.settings()[URL]?.takeIf { it.isNotEmpty() }?.let { url ->
+                val label = settings.settings()[LABEL]?.takeIf { it.isNotEmpty() } ?: url
+                val description = settings.settings()[DESCRIPTION]?.takeIf { it.isNotEmpty() } ?: url
+                val iconUrl = settings.settings()[ICON_URL].orEmpty()
+
+                object : Action {
+                    override fun action(): SearchableAction = object : SearchableAction {
+                        override fun contains(search: String): Boolean =
+                                label.contains(search, ignoreCase = true)
+                                        .or(description.contains(search, ignoreCase = true))
+                    }
+
+                    override fun component(): Component = JMenuItem(label).apply {
+                        icon = IconService().load(
+                                iconUrl,
+                                IconRepositoryFactory.repository.by(AppIcon.LINK_INTACT)
+                        )
+                        toolTipText = description
+                        addMouseListener(object : MouseAdapter() {
+                            override fun mouseReleased(e: MouseEvent) {
+                                when (e.button) {
+                                    MouseEvent.BUTTON3 -> {
+                                        val defaultToolkit = Toolkit.getDefaultToolkit()
+                                        val clipboard = defaultToolkit.systemClipboard
+                                        clipboard.setContents(StringSelection(url), null)
+                                        NotificationFactory.notification.show(NotificationType.INFO, "URL copy to clipboard")
+                                    }
+                                    MouseEvent.BUTTON1 -> {
+                                        if (Desktop.isDesktopSupported()) {
+                                            try {
+                                                Desktop.getDesktop().browse(URI(url))
+                                            } catch (ex: Exception) {
+                                                ex.printStackTrace()
+                                                NotificationFactory.notification.show(NotificationType.ERROR, "Error open url")
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        })
                     }
                 }
             }
-        })
-        return object : Action {
-            override fun action(): SearchableAction = object : SearchableAction {
-                override fun contains(search: String): Boolean =
-                        label.contains(search, ignoreCase = true)
-            }
 
-            override fun component(): Component = menuItem
-        }
-    }
 
     override fun type(): String = "OPEN_URL"
 
@@ -64,8 +72,8 @@ class OpenUrlRocketActionUi : AbstractRocketAction() {
 
     override fun properties(): List<RocketActionConfigurationProperty> {
         return listOf(
-                createRocketActionProperty(LABEL, LABEL, "TEST", true),
-                createRocketActionProperty(DESCRIPTION, DESCRIPTION, "TEST", true),
+                createRocketActionProperty(LABEL, LABEL, "TEST", false),
+                createRocketActionProperty(DESCRIPTION, DESCRIPTION, "TEST", false),
                 createRocketActionProperty(URL, URL, "TEST", true),
                 createRocketActionProperty(ICON_URL, ICON_URL, "Icon URL", false)
         )

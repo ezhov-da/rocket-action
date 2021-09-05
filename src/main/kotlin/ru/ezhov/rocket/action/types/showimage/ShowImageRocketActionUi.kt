@@ -10,7 +10,6 @@ import ru.ezhov.rocket.action.caching.CacheFactory
 import ru.ezhov.rocket.action.icon.AppIcon
 import ru.ezhov.rocket.action.icon.IconRepositoryFactory
 import ru.ezhov.rocket.action.types.AbstractRocketAction
-import ru.ezhov.rocket.action.types.ConfigurationUtil
 import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Component
@@ -41,21 +40,25 @@ import javax.swing.event.ChangeEvent
 
 class ShowImageRocketActionUi : AbstractRocketAction() {
 
-    override fun create(settings: RocketActionSettings): Action {
-        val label = ConfigurationUtil.getValue(settings.settings(), LABEL)
-        val menu = JMenu(ConfigurationUtil.getValue(settings.settings(), LABEL))
-        menu.toolTipText = ConfigurationUtil.getValue(settings.settings(), DESCRIPTION)
-        menu.icon = ImageIcon(this.javaClass.getResource("/load_16x16.gif"))
-        LoadImageWorker(menu, settings).execute()
-        return object : Action {
-            override fun action(): SearchableAction = object : SearchableAction {
-                override fun contains(search: String): Boolean =
-                        label.contains(search, ignoreCase = true)
-            }
+    override fun create(settings: RocketActionSettings): Action? =
+            settings.settings()[IMAGE_URL]?.takeIf { it.isNotEmpty() }?.let { imageUrl ->
+                val label = settings.settings()[LABEL]?.takeIf { it.isNotEmpty() } ?: imageUrl
+                val description = settings.settings()[DESCRIPTION]?.takeIf { it.isNotEmpty() } ?: imageUrl
 
-            override fun component(): Component = menu
-        }
-    }
+                val menu = JMenu(label)
+                menu.toolTipText = description
+                menu.icon = ImageIcon(this.javaClass.getResource("/load_16x16.gif"))
+                LoadImageWorker(imageUrl, menu, settings).execute()
+
+                object : Action {
+                    override fun action(): SearchableAction = object : SearchableAction {
+                        override fun contains(search: String): Boolean =
+                                label.contains(search, ignoreCase = true)
+                    }
+
+                    override fun component(): Component = menu
+                }
+            }
 
     override fun type(): String = "SHOW_IMAGE"
 
@@ -63,20 +66,23 @@ class ShowImageRocketActionUi : AbstractRocketAction() {
 
     override fun properties(): List<RocketActionConfigurationProperty> {
         return listOf(
-                createRocketActionProperty(LABEL, LABEL, "TEST", true),
-                createRocketActionProperty(DESCRIPTION, DESCRIPTION, "TEST", true),
+                createRocketActionProperty(LABEL, LABEL, "TEST", false),
+                createRocketActionProperty(DESCRIPTION, DESCRIPTION, "TEST", false),
                 createRocketActionProperty(IMAGE_URL, IMAGE_URL, "TEST", true)
         )
     }
 
     override fun name(): String = "Показать изображение *.png и *.jpg"
 
-    private inner class LoadImageWorker(private val menu: JMenu, private val settings: RocketActionSettings) : SwingWorker<Image?, String?>() {
+    private inner class LoadImageWorker(
+            private val imageUrl: String,
+            private val menu: JMenu, private val settings: RocketActionSettings
+    ) : SwingWorker<Image?, String?>() {
         private var cachedImage: File? = null
 
         @Throws(Exception::class)
         override fun doInBackground(): Image? {
-            val url = ConfigurationUtil.getValue(settings.settings(), IMAGE_URL)
+            val url = imageUrl
             val file = CacheFactory.cache.get(URL(url))
             return file?.let { f -> cachedImage = f; ImageIO.read(f) }
         }
@@ -89,7 +95,7 @@ class ShowImageRocketActionUi : AbstractRocketAction() {
                     component = ImagePanel(this.get(), cachedImage!!)
                 } else {
                     val panel = JPanel()
-                    panel.add(JLabel(ConfigurationUtil.getValue(settings.settings(), IMAGE_URL)))
+                    panel.add(JLabel(imageUrl))
                     component = panel
                 }
                 menu.add(component)

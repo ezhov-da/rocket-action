@@ -9,39 +9,45 @@ import ru.ezhov.rocket.action.icon.IconRepositoryFactory
 import ru.ezhov.rocket.action.notification.NotificationFactory
 import ru.ezhov.rocket.action.notification.NotificationType
 import ru.ezhov.rocket.action.types.AbstractRocketAction
-import ru.ezhov.rocket.action.types.ConfigurationUtil
 import java.awt.Component
 import java.awt.Desktop
-import java.awt.event.ActionEvent
 import java.io.File
 import javax.swing.JMenuItem
 
 class OpenFileRocketActionUi : AbstractRocketAction() {
 
-    override fun create(settings: RocketActionSettings): Action {
-        val label = ConfigurationUtil.getValue(settings.settings(), LABEL)
-        val menuItem = JMenuItem(ConfigurationUtil.getValue(settings.settings(), LABEL))
-        menuItem.icon = IconRepositoryFactory.repository.by(AppIcon.FILE)
-        menuItem.toolTipText = ConfigurationUtil.getValue(settings.settings(), DESCRIPTION)
-        menuItem.addActionListener { e: ActionEvent? ->
-            if (Desktop.isDesktopSupported()) {
-                try {
-                    Desktop.getDesktop().open(File(ConfigurationUtil.getValue(settings.settings(), PATH)))
-                } catch (ex: Exception) {
-                    ex.printStackTrace()
-                    NotificationFactory.notification.show(NotificationType.ERROR, "Error open file")
-                }
-            }
-        }
-        return object : Action {
-            override fun action(): SearchableAction = object : SearchableAction {
-                override fun contains(search: String): Boolean =
-                        label.contains(search, ignoreCase = true)
-            }
+    override fun create(settings: RocketActionSettings): Action? =
+            settings.settings()[PATH]
+                    ?.takeIf { it.isNotEmpty() }
+                    ?.let { path ->
+                        val label = settings.settings()[LABEL]?.takeIf { it.isNotEmpty() } ?: path.let { File(path).name }
+                        val description = settings.settings()[DESCRIPTION]?.takeIf { it.isNotEmpty() } ?: path
 
-            override fun component(): Component = menuItem
-        }
-    }
+                        val menuItem = JMenuItem(label)
+                        menuItem.icon = IconRepositoryFactory.repository.by(AppIcon.FILE)
+                        menuItem.toolTipText = description
+                        menuItem.addActionListener {
+                            if (Desktop.isDesktopSupported()) {
+                                try {
+                                    Desktop.getDesktop().open(File(path))
+                                } catch (ex: Exception) {
+                                    ex.printStackTrace()
+                                    NotificationFactory.notification.show(NotificationType.ERROR, "Error open file")
+                                }
+                            }
+                        }
+
+                        object : Action {
+                            override fun action(): SearchableAction = object : SearchableAction {
+                                override fun contains(search: String): Boolean =
+                                        path.contains(search, ignoreCase = true)
+                                                .or(label.contains(search, ignoreCase = true))
+                                                .or(description.contains(search, ignoreCase = true))
+                            }
+
+                            override fun component(): Component = menuItem
+                        }
+                    }
 
     override fun type(): String = "OPEN_FILE"
 
@@ -49,9 +55,28 @@ class OpenFileRocketActionUi : AbstractRocketAction() {
 
     override fun properties(): List<RocketActionConfigurationProperty> {
         return listOf(
-                createRocketActionProperty(LABEL, LABEL, "TEST", true),
-                createRocketActionProperty(DESCRIPTION, DESCRIPTION, "TEST", true),
-                createRocketActionProperty(PATH, PATH, "TEST", true)
+                createRocketActionProperty(
+                        key = LABEL,
+                        name = "Заголовок",
+                        description =
+                        """Заголовок, который будет отображаться. 
+                            |В случае отсутствия будет использоваться имя файла
+                        """.trimMargin(),
+                        required = false
+                ),
+                createRocketActionProperty(
+                        key = DESCRIPTION,
+                        name = "Описание",
+                        description = """Описание, которое будет всплывать при наведении, 
+                            |в случае отсутствия будет отображаться путь""".trimMargin(),
+                        required = false
+                ),
+                createRocketActionProperty(
+                        key = PATH,
+                        name = "Путь к файлу",
+                        description = "Путь по которому будет открываться файл",
+                        required = true
+                )
         )
     }
 

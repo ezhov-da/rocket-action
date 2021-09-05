@@ -7,61 +7,44 @@ import okhttp3.Request
 import okhttp3.Request.Builder
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
-import ru.ezhov.rocket.action.api.RocketActionSettings
 import ru.ezhov.rocket.action.types.todoist.model.Task
 import java.util.*
-import java.util.logging.Level
 import java.util.logging.Logger
 
 class TodoistTaskRepository {
     @Throws(TodoistRepositoryException::class)
-    fun tasks(settings: RocketActionSettings): List<Task> =
-            getToken(settings)?.let { token ->
-                val projects: MutableList<Task> = ArrayList()
-                return try {
-                    val request: Request = Builder()
-                            .url(URL_ALL_TASKS_GET)
-                            .header("Authorization", String.format("Bearer %s", token))
-                            .build()
-                    val client = OkHttpClient()
-                    val call = client.newCall(request)
-                    val response = call.execute()
-                    val code = response.code
-                    response.body.use { body ->
-                        val text = body!!.string()
-                        if (code == 200) {
-                            val gson = Gson()
-                            val tasksFromJson = gson.fromJson(text, Array<Task>::class.java)
-                            if (tasksFromJson.size > 0) {
-                                projects.addAll(Arrays.asList(*tasksFromJson))
-                            }
-                        } else {
-                            throw TodoistRepositoryException(
-                                    "Exception when get todoist tasks with code=$code and text=$text")
-                        }
+    fun tasks(token: String): List<Task> {
+        val projects: MutableList<Task> = ArrayList()
+        return try {
+            val request: Request = Builder()
+                    .url(URL_ALL_TASKS_GET)
+                    .header("Authorization", "Bearer $token")
+                    .build()
+            val client = OkHttpClient()
+            val call = client.newCall(request)
+            val response = call.execute()
+            val code = response.code
+            response.body.use { body ->
+                val text = body!!.string()
+                if (code == 200) {
+                    val gson = Gson()
+                    val tasksFromJson = gson.fromJson(text, Array<Task>::class.java)
+                    if (tasksFromJson.isNotEmpty()) {
+                        projects.addAll(listOf(*tasksFromJson))
                     }
-                    projects
-                } catch (e: Exception) {
-                    throw TodoistRepositoryException("Exception when get todoist projects", e)
+                } else {
+                    throw TodoistRepositoryException(
+                            "Exception when get todoist tasks with code=$code and text=$text")
                 }
-            } ?: emptyList()
-
-    private fun getToken(settings: RocketActionSettings): String? {
-        var token = settings.settings()[TodoistRocketAction.TOKEN]
-        if (token == null || "" == token) {
-            token = System.getProperty(TOKEN_PROPERTY, "")
+            }
+            projects
+        } catch (e: Exception) {
+            throw TodoistRepositoryException("Exception when get todoist projects", e)
         }
-        var debugToken = ""
-        if (token!!.length > 5) {
-            debugToken = token.substring(0, 4)
-        }
-        LOGGER.log(Level.INFO, "todoistToken={0}", debugToken)
-        return token.takeIf { it.isNotEmpty() }
     }
 
     @Throws(TodoistRepositoryException::class)
-    fun change(taskId: String?, content: String, settings: RocketActionSettings) {
-        val token = getToken(settings)
+    fun change(token: String, taskId: String?, content: String) {
         try {
             val requestBody: RequestBody =
                     Gson().toJson(Content(content)).toRequestBody("application/json".toMediaType())
@@ -89,8 +72,7 @@ class TodoistTaskRepository {
     }
 
     @Throws(TodoistRepositoryException::class)
-    fun close(taskId: String?, settings: RocketActionSettings) {
-        val token = getToken(settings)
+    fun close(token: String, taskId: String?) {
         try {
             val request: Request = Builder()
                     .url(String.format(URL_CLOSE_TASK_POST, taskId))
@@ -115,8 +97,7 @@ class TodoistTaskRepository {
     }
 
     @Throws(TodoistRepositoryException::class)
-    fun delete(taskId: String?, settings: RocketActionSettings) {
-        val token = getToken(settings)
+    fun delete(token: String, taskId: String?) {
         try {
             val request: Request = Builder()
                     .url(String.format(URL_DELETE_TASK_DELETE, taskId))
@@ -142,7 +123,6 @@ class TodoistTaskRepository {
 
     private inner class Content(private val content: String)
     companion object {
-        const val TOKEN_PROPERTY = "rocket.action.toodoist.token"
         private val LOGGER = Logger.getLogger(TodoistTaskRepository::class.java.name)
         private const val URL_ALL_TASKS_GET = "https://api.todoist.com/rest/v1/tasks"
         private const val URL_CHANGE_TASK_POST = "https://api.todoist.com/rest/v1/tasks/%s"

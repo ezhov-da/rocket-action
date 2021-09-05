@@ -9,7 +9,6 @@ import ru.ezhov.rocket.action.icon.IconRepositoryFactory
 import ru.ezhov.rocket.action.notification.NotificationFactory
 import ru.ezhov.rocket.action.notification.NotificationType
 import ru.ezhov.rocket.action.types.AbstractRocketAction
-import ru.ezhov.rocket.action.types.ConfigurationUtil
 import ru.ezhov.rocket.action.types.todoist.model.Project
 import ru.ezhov.rocket.action.types.todoist.model.Task
 import java.awt.BorderLayout
@@ -45,34 +44,43 @@ class TodoistRocketAction : AbstractRocketAction() {
                 createRocketActionProperty(
                         TOKEN,
                         TOKEN,
-                        "Use this or -D" + TodoistProjectRepository.TOKEN_PROPERTY,
-                        false
+                        "Use this or -D$TOKEN_PROPERTY",
+                        true
                 )
         )
     }
 
     override fun name(): String = "Работа с Todois"
 
-    override fun create(settings: RocketActionSettings): Action {
-        val menu = JMenu(ConfigurationUtil.getValue(settings.settings(), LABEL))
-        TodoistWorker(menu, settings).execute()
-        return object : Action {
-            override fun action(): SearchableAction = object : SearchableAction {
-                override fun contains(search: String): Boolean = false
+    override fun create(settings: RocketActionSettings): Action? =
+            getToken(settings)?.takeIf { it.isNotEmpty() }?.let { token ->
+                settings.settings()[LABEL]?.takeIf { it.isNotEmpty() }?.let { label ->
+                    val menu = JMenu(label)
+                    TodoistWorker(menu, token = token).execute()
+
+                    object : Action {
+                        override fun action(): SearchableAction = object : SearchableAction {
+                            override fun contains(search: String): Boolean = false
+                        }
+
+                        override fun component(): Component = menu
+                    }
+                }
             }
 
-            override fun component(): Component = menu
-        }
-    }
+    private fun getToken(settings: RocketActionSettings) =
+            settings.settings()[TOKEN] ?: System.getProperty(TOKEN_PROPERTY, "").takeIf { it.isNotEmpty() }
 
     override fun type(): String = "TODOIST"
 
-    private inner class TodoistWorker(private val menu: JMenu, settings: RocketActionSettings) : SwingWorker<TodoistPanel, String?>() {
-        private val settings: RocketActionSettings
+    private inner class TodoistWorker(
+            private val menu: JMenu,
+            private val token: String,
+    ) : SwingWorker<TodoistPanel, String?>() {
 
         @Throws(Exception::class)
         override fun doInBackground(): TodoistPanel {
-            return TodoistPanel(null, settings.settings()[BASE_GIST_URL], settings)
+            return TodoistPanel(token = token)
         }
 
         override fun done() {
@@ -91,11 +99,13 @@ class TodoistRocketAction : AbstractRocketAction() {
         init {
             menu.removeAll()
             menu.icon = ImageIcon(this.javaClass.getResource("/load_16x16.gif"))
-            this.settings = settings
         }
     }
 
-    private inner class TodoistPanel(gists: List<Project?>?, gistUrl: String?, settings: RocketActionSettings) : JPanel(BorderLayout()) {
+    private inner class TodoistPanel(
+            projects: List<Project> = emptyList(),
+            token: String,
+    ) : JPanel(BorderLayout()) {
         private val todoistTaskRepository = TodoistTaskRepository()
         private val projectListModel = DefaultListModel<Project>()
         private val taskListModel = DefaultListModel<Task?>()
@@ -134,7 +144,7 @@ class TodoistRocketAction : AbstractRocketAction() {
 
         init {
             try {
-                val tasks = todoistTaskRepository.tasks(settings)
+                val tasks = todoistTaskRepository.tasks(token)
                 taskListModel.removeAllElements()
                 for (task in tasks) {
                     taskListModel.addElement(task)
@@ -166,6 +176,6 @@ class TodoistRocketAction : AbstractRocketAction() {
     companion object {
         const val LABEL = "label"
         const val TOKEN = "todoistToken"
-        const val BASE_GIST_URL = "baseGistUrl"
+        const val TOKEN_PROPERTY = "rocket.action.toodoist.token"
     }
 }

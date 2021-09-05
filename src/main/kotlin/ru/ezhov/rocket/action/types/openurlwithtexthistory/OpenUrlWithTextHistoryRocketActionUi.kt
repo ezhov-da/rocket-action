@@ -10,12 +10,10 @@ import ru.ezhov.rocket.action.icon.IconService
 import ru.ezhov.rocket.action.notification.NotificationFactory
 import ru.ezhov.rocket.action.notification.NotificationType
 import ru.ezhov.rocket.action.types.AbstractRocketAction
-import ru.ezhov.rocket.action.types.ConfigurationUtil
 import ru.ezhov.rocket.action.types.openurl.OpenUrlRocketActionUi
 import ru.ezhov.rocket.action.ui.swing.common.TextFieldWithText
 import java.awt.Component
 import java.awt.Desktop
-import java.awt.event.ActionEvent
 import java.net.URI
 import javax.swing.JMenu
 import javax.swing.SwingUtilities
@@ -23,62 +21,70 @@ import javax.swing.SwingUtilities
 class OpenUrlWithTextHistoryRocketActionUi : AbstractRocketAction() {
     private var label: String? = null
 
-    override fun create(settings: RocketActionSettings): Action {
-        val label = ConfigurationUtil.getValue(settings.settings(), LABEL)
-        val menu = JMenu(ConfigurationUtil.getValue(settings.settings(), LABEL))
-        menu.icon = IconService().load(
-                settings.settings()[ICON_URL].orEmpty(),
-                IconRepositoryFactory.repository.by(AppIcon.LINK_INTACT)
-        )
-        val textField = TextFieldWithText(ConfigurationUtil.getValue(settings.settings(), LABEL))
-        textField.columns = 10
-        textField.toolTipText = ConfigurationUtil.getValue(settings.settings(), DESCRIPTION)
-        textField.addActionListener { e: ActionEvent? ->
-            textField
-                    .text
-                    ?.takeIf { it.isNotEmpty() }
-                    ?.let { t ->
-                        if (Desktop.isDesktopSupported()) {
-                            try {
-                                val uri = URI(
-                                        ConfigurationUtil.getValue(settings.settings(), BASE_URL)
-                                                .replace(ConfigurationUtil.getValue(settings.settings(), PLACEHOLDER).toRegex(), t)
-                                )
-                                Desktop.getDesktop().browse(uri)
-                                SwingUtilities.invokeLater {
-                                    val map: MutableMap<String, String> = HashMap()
-                                    map["label"] = t
-                                    map["description"] = "Open link"
-                                    map["url"] = uri.toString()
-                                    menu.add(OpenUrlRocketActionUi().create(object : RocketActionSettings {
-                                        override fun id(): String = ""
+    override fun create(settings: RocketActionSettings): Action? =
+            settings.settings()[BASE_URL]?.takeIf { it.isNotEmpty() }?.let { baseUrl ->
+                val placeholder = settings.settings()[PLACEHOLDER].orEmpty()
+                val label = settings.settings()[LABEL]?.takeIf { it.isNotEmpty() } ?: baseUrl
+                val description = settings.settings()[DESCRIPTION]?.takeIf { it.isNotEmpty() } ?: baseUrl
+                val iconUrl = settings.settings()[ICON_URL].orEmpty()
 
-                                        override fun type(): String = ""
+                val menu = JMenu(label)
+                menu.icon = IconService().load(
+                        iconUrl,
+                        IconRepositoryFactory.repository.by(AppIcon.LINK_INTACT)
+                )
+                val textField = TextFieldWithText(label)
+                textField.columns = 10
+                textField.toolTipText = description
+                textField.addActionListener {
+                    textField
+                            .text
+                            ?.takeIf { it.isNotEmpty() }
+                            ?.let { t ->
+                                if (Desktop.isDesktopSupported()) {
+                                    try {
+                                        val uri = URI(
+                                                baseUrl.replace(placeholder.toRegex(), t)
+                                        )
+                                        Desktop.getDesktop().browse(uri)
+                                        SwingUtilities.invokeLater {
+                                            val map: MutableMap<String, String> = HashMap()
+                                            map["label"] = t
+                                            map["description"] = "Open link"
+                                            map["url"] = uri.toString()
+                                            OpenUrlRocketActionUi().create(object : RocketActionSettings {
+                                                override fun id(): String = ""
 
-                                        override fun settings(): MutableMap<String, String> = mutableMapOf()
+                                                override fun type(): String = ""
 
-                                        override fun actions(): List<RocketActionSettings> = emptyList()
-                                    }).component())
-                                    menu.revalidate()
-                                    menu.repaint()
+                                                override fun settings(): MutableMap<String, String> = mutableMapOf()
+
+                                                override fun actions(): List<RocketActionSettings> = emptyList()
+                                            })?.component()?.let { c -> menu.add(c) }
+
+                                            menu.revalidate()
+                                            menu.repaint()
+                                        }
+                                    } catch (ex: Exception) {
+                                        ex.printStackTrace()
+                                        NotificationFactory.notification.show(NotificationType.ERROR, "Error open URL")
+                                    }
                                 }
-                            } catch (ex: Exception) {
-                                ex.printStackTrace()
-                                NotificationFactory.notification.show(NotificationType.ERROR, "Error open URL")
                             }
-                        }
-                    }
-        }
-        menu.add(textField)
-        return object : Action {
-            override fun action(): SearchableAction = object : SearchableAction {
-                override fun contains(search: String): Boolean =
-                        label.contains(search, ignoreCase = true)
-            }
+                }
+                menu.add(textField)
 
-            override fun component(): Component = menu
-        }
-    }
+                object : Action {
+                    override fun action(): SearchableAction = object : SearchableAction {
+                        override fun contains(search: String): Boolean =
+                                label.contains(search, ignoreCase = true)
+                                        .or(baseUrl.contains(search, ignoreCase = true))
+                                        .or(description.contains(search, ignoreCase = true))
+                    }
+
+                    override fun component(): Component = menu
+                }
+            }
 
     override fun type(): String = "OPEN_URL_WITH_TEXT_HISTORY"
 
@@ -88,10 +94,10 @@ class OpenUrlWithTextHistoryRocketActionUi : AbstractRocketAction() {
 
     override fun properties(): List<RocketActionConfigurationProperty> {
         return listOf(
-                createRocketActionProperty(LABEL, LABEL, "TEST", true),
-                createRocketActionProperty(DESCRIPTION, DESCRIPTION, "TEST", true),
                 createRocketActionProperty(BASE_URL, BASE_URL, "TEST", true),
                 createRocketActionProperty(PLACEHOLDER, PLACEHOLDER, "TEST", true),
+                createRocketActionProperty(LABEL, LABEL, "TEST", false),
+                createRocketActionProperty(DESCRIPTION, DESCRIPTION, "TEST", false),
                 createRocketActionProperty(ICON_URL, ICON_URL, "Icon URL", false)
         )
     }

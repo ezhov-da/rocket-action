@@ -1,9 +1,9 @@
 package ru.ezhov.rocket.action.infrastructure
 
 import org.yaml.snakeyaml.Yaml
+import ru.ezhov.rocket.action.api.RocketActionSettings
 import ru.ezhov.rocket.action.domain.RocketActionSettingsRepository
 import ru.ezhov.rocket.action.domain.RocketActionSettingsRepositoryException
-import ru.ezhov.rocket.action.api.RocketActionSettings
 import java.io.File
 import java.io.FileOutputStream
 import java.io.OutputStreamWriter
@@ -12,44 +12,34 @@ import java.nio.charset.StandardCharsets
 import java.util.*
 
 class YmlRocketActionSettingsRepository(private val uri: URI) : RocketActionSettingsRepository {
-    @Throws(RocketActionSettingsRepositoryException::class)
     override fun actions(): List<RocketActionSettings> {
-        try {
-            uri.toURL().openStream().use { inputStream ->
-                val actions: MutableList<RocketActionSettings> = ArrayList()
-                val yaml = Yaml()
-                val obj = yaml.load<Map<String, Any>>(inputStream)
-                for ((key, value) in obj) {
-                    if (ACTIONS == key) {
-                        val linkedHashMaps = value as ArrayList<LinkedHashMap<String, Any>>
-                        for (l in linkedHashMaps) {
-                            actions.add(createAction(l))
-                        }
+        uri.toURL().openStream().use { inputStream ->
+            val actions: MutableList<RocketActionSettings> = ArrayList()
+            val yaml = Yaml()
+            val obj = yaml.load<Map<String, Any>>(inputStream)
+            for ((key, value) in obj) {
+                if (ACTIONS == key) {
+                    val linkedHashMaps = value as ArrayList<LinkedHashMap<String, Any>>
+                    for (l in linkedHashMaps) {
+                        actions.add(createAction(l))
                     }
                 }
-                return actions
             }
-        } catch (ex: Exception) {
-            throw RocketActionSettingsRepositoryException("//TODO", ex)
+            return actions
         }
     }
 
-    @Throws(RocketActionSettingsRepositoryException::class)
     override fun save(settings: List<RocketActionSettings>) {
-        val file = File(uri!!.path)
-        try {
-            OutputStreamWriter(
-                    FileOutputStream(file),
-                    StandardCharsets.UTF_8).use { outputStreamWriter ->
-                val yaml = Yaml()
-                val all: MutableList<Map<String?, Any?>> = ArrayList()
-                recursiveSettings(settings, all)
-                val map: MutableMap<String, Any> = LinkedHashMap()
-                map[ACTIONS] = all
-                yaml.dump(map, outputStreamWriter)
-            }
-        } catch (ex: Exception) {
-            throw RocketActionSettingsRepositoryException("//TODO", ex)
+        val file = File(uri.path)
+        OutputStreamWriter(
+                FileOutputStream(file),
+                StandardCharsets.UTF_8).use { outputStreamWriter ->
+            val yaml = Yaml()
+            val all: MutableList<Map<String?, Any?>> = ArrayList()
+            recursiveSettings(settings, all)
+            val map: MutableMap<String, Any> = LinkedHashMap()
+            map[ACTIONS] = all
+            yaml.dump(map, outputStreamWriter)
         }
     }
 
@@ -60,7 +50,7 @@ class YmlRocketActionSettingsRepository(private val uri: URI) : RocketActionSett
             `object`[ID] = data.id()
             data.settings().forEach { (key: String?, value: String?) -> `object`[key] = value }
             val actionsOriginal = data.actions()
-            if (!actionsOriginal!!.isEmpty()) {
+            if (actionsOriginal.isNotEmpty()) {
                 val actionsForWrite: MutableList<Map<String?, Any?>> = ArrayList()
                 recursiveSettings(actionsOriginal, actionsForWrite)
                 `object`[ACTIONS] = actionsForWrite

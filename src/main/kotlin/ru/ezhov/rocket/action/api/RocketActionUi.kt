@@ -9,7 +9,7 @@ interface RocketActionUi {
      *
      * @return component to display
      */
-    fun create(settings: RocketActionSettings): Action
+    fun create(settings: RocketActionSettings): Action?
 
     /**
      * @return action type

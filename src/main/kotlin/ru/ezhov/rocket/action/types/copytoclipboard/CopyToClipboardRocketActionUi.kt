@@ -9,35 +9,45 @@ import ru.ezhov.rocket.action.icon.IconRepositoryFactory
 import ru.ezhov.rocket.action.notification.NotificationFactory
 import ru.ezhov.rocket.action.notification.NotificationType
 import ru.ezhov.rocket.action.types.AbstractRocketAction
-import ru.ezhov.rocket.action.types.ConfigurationUtil
 import java.awt.Component
 import java.awt.Toolkit
 import java.awt.datatransfer.StringSelection
-import java.awt.event.ActionEvent
 import javax.swing.JMenuItem
 
 class CopyToClipboardRocketActionUi : AbstractRocketAction() {
 
-    override fun create(settings: RocketActionSettings): Action {
-        val label = ConfigurationUtil.getValue(settings.settings(), LABEL)
-        val menuItem = JMenuItem(label)
-        menuItem.icon = IconRepositoryFactory.repository.by(AppIcon.CLIPBOARD)
-        menuItem.toolTipText = ConfigurationUtil.getValue(settings.settings(), DESCRIPTION)
-        menuItem.addActionListener { e: ActionEvent? ->
-            val defaultToolkit = Toolkit.getDefaultToolkit()
-            val clipboard = defaultToolkit.systemClipboard
-            clipboard.setContents(StringSelection(ConfigurationUtil.getValue(settings.settings(), TEXT)), null)
-            NotificationFactory.notification.show(NotificationType.INFO, "Text copy to clipboard")
-        }
-        return object : Action {
-            override fun action(): SearchableAction = object : SearchableAction {
-                override fun contains(search: String): Boolean =
-                        label.contains(search, ignoreCase = true)
-            }
-
-            override fun component(): Component = menuItem
-        }
+    companion object {
+        private const val LABEL = "label"
+        private const val DESCRIPTION = "description"
+        private const val TEXT = "text"
     }
+
+    override fun create(settings: RocketActionSettings): Action? =
+            settings.settings()[TEXT]?.takeIf { it.isNotEmpty() }?.let { text ->
+                val label = settings.settings()[LABEL]?.takeIf { it.isNotEmpty() } ?: text
+                val description = settings.settings()[DESCRIPTION]?.takeIf { it.isNotEmpty() } ?: text
+                val menuItem = JMenuItem(label)
+                menuItem.icon = IconRepositoryFactory.repository.by(AppIcon.CLIPBOARD)
+                menuItem.toolTipText = description
+                menuItem.addActionListener {
+                    val defaultToolkit = Toolkit.getDefaultToolkit()
+                    val clipboard = defaultToolkit.systemClipboard
+                    clipboard.setContents(StringSelection(text), null)
+                    NotificationFactory.notification.show(NotificationType.INFO, "Text copy to clipboard")
+                }
+
+                object : Action {
+                    override fun action(): SearchableAction = object : SearchableAction {
+                        override fun contains(search: String): Boolean =
+                                text.contains(search, ignoreCase = true)
+                                        .or(label.contains(search, ignoreCase = true))
+                                        .or(description.contains(search, ignoreCase = true))
+
+                    }
+
+                    override fun component(): Component = menuItem
+                }
+            }
 
     override fun type(): String = "COPY_TO_CLIPBOARD"
 
@@ -49,15 +59,11 @@ class CopyToClipboardRocketActionUi : AbstractRocketAction() {
 
     override fun properties(): List<RocketActionConfigurationProperty> {
         return listOf(
-                createRocketActionProperty(LABEL, LABEL, "Displayed title", true),
-                createRocketActionProperty(DESCRIPTION, DESCRIPTION, "Description that will be displayed as a hint", true),
+                createRocketActionProperty(LABEL, LABEL, "Displayed title", false),
+                createRocketActionProperty(DESCRIPTION, DESCRIPTION, "Description that will be displayed as a hint", false),
                 createRocketActionProperty(TEXT, TEXT, "Text prepared for copying to the clipboard", true)
         )
     }
 
-    companion object {
-        private const val LABEL = "label"
-        private const val DESCRIPTION = "description"
-        private const val TEXT = "text"
-    }
+
 }

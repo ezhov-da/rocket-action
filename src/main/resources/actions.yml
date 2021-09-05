@@ -2,25 +2,30 @@
 actions:
 
   - type: TODOIST
-    label: Todoist
-    todoistToken:
+    _id: 1
+    label: Todoist 23525245
+    todoistToken: ""
 
   - type: SHOW_SVG_IMAGE
-    label: SVG big image
+    _id: 2
+    label: SVG big image 2345234523466
     description: description
     imageUrl: http://www.plantuml.com/plantuml/svg/ZL9BRzf04BxxLsmvELA3Bpdr532eIGI9LKEJdj2iFS2g-x1srr1KzRztTi4kbAYgJzREz_ZcSUyyMDygoVAxrLIYGkrTya7eIhOrigttZVkKPHRsmutmsvQt3crbj2VSi38gQoJemBzrlfQ2P_dTRH6UblDPfi1vjFIqoea1GgCTDeHDajdesyjoiNfzN3oiPjFFq-T9UfCa1LfdT5grpXk5zYCR75z0iZ7exq9lM7wg3QWuOXsIcJNpMsISK0CIAWzah5PZq-eQx25rdE2Fci9ezBtM4JMu-Pam-lg8wHxvg6c8yOgSqPyK5NXXTF1yWXqmq3Kh6niqvb_py3n1ANQKDQPmdk0LEqs9ybpAkmQ8KH9R8YjWW-zvb9KLZOzE8xrf9SIE2sjseYOVaBBhMNHjyLDRwrPNGGgay8ShTnNCvuOB6Ns3wXiei8Ai-qADEr7Xtzm9JsiUcWKF71m6mXUKCJUhJu-ihBQe8DHARomw5Yx6NUM0HeGLDkA_9jor_bv_l_fzJt_ubBo59FpqDlnqEuuhSd6cmURcdA5qQ9nIhIqexAxZcf9Gh_rjn2NsQ--gVowtlw6bGnUq7XQBeYJS9IpAHCnLINMLJZnYuzXwqQVovJaxLrR_XaHChDSyBWzgnzRMg3ZmlHKU7VCcyYRZ_8BH3RP4JIGyZhTrfr6LyqL1y1wjz5c6j_ciZt1Fz5R9tm00
 
   - type: SHOW_SVG_IMAGE
-    label: SVG image
+    _id: 3
+    label: SVG image 5734572372357
     description: description
     imageUrl: http://www.plantuml.com/plantuml/svg/SoWkIImgAStDuNBAJrBGjLDmpCbCJbMmKiX8pSd9vt98pKi1IW80
 
   - type: GIST
-    label: Gists
+    _id: 4
+    label: Gists 3462362346
     baseGistUrl: https://gist.github.com/ezhov-da
     username: ezhov-da
 
   - type: SHOW_TEXT
+    _id: 5
     label: |
       Lorem Ipsum is simply dummy text of the printing and typesetting industry.
       Lorem Ipsum has been the industry's standard dummy text ever since the 1500s,
@@ -30,100 +35,125 @@ actions:
       and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
 
   - type: SHOW_TEXT
+    _id: 6
     label: >
-      Simple text
+      Simple text 234623462463
 
   - type: OPEN_URL_WITH_TEXT
-    label: OPEN_URL_WITH_TEXT
+    _id: 7
+    label: OPEN_URL_WITH_TEXT 23623462346
     iconUrl: https://github.githubassets.com/favicons/favicon.png
     description: description
     baseUrl: https://github.com/_____/
     placeholder: _____
 
   - type: OPEN_URL_WITH_TEXT
-    label: OPEN_URL_WITH_TEXT
+    _id: 8
+    label: OPEN_URL_WITH_TEXT 234623642346
     description: description
     baseUrl: https://github.com/_____/
     placeholder: _____
 
   - type: OPEN_URL_WITH_TEXT_HISTORY
-    label: OPEN_URL_WITH_TEXT_HISTORY
+    _id: 9
+    label: OPEN_URL_WITH_TEXT_HISTORY 23462346246
     iconUrl: https://github.githubassets.com/favicons/favicon.png
     description: description
     baseUrl: https://github.com/_____/
     placeholder: _____
 
   - type: OPEN_URL_WITH_TEXT_HISTORY
-    label: OPEN_URL_WITH_TEXT_HISTORY
+    _id: 10
+    label: OPEN_URL_WITH_TEXT_HISTORY 347357234572
     description: description
     baseUrl: https://github.com/_____/
     placeholder: _____
 
   - type: SEPARATOR
+    _id: 11
 
   - type: OPEN_URL
-    label: OPEN_URL
+    _id: 12
+    label: OPEN_URL 26234236
     iconUrl: https://github.githubassets.com/favicons/favicon.png
     description: description
     url: url
 
   - type: COPY_TO_CLIPBOARD
-    label: COPY_TO_CLIPBOARD
+    _id: 13
+    label: COPY_TO_CLIPBOARD 2363623462346
     description: description
     text: COPY_TO_CLIPBOARD
 
   - type: OPEN_FILE
-    label: OPEN_FILE
+    _id: 14
+    label: OPEN_FILE 2362362346
     description: description
     path: text
 
+  - type: OPEN_FILE
+    _id: 15
+    label:
+    description:
+    path: open file with only path
+
   - type: GROUP
-    label: GROUP
+    _id: 16
+    label: GROUP 2342362346
     iconUrl: https://www.elastic.co/favicon.ico
     description: description
     actions:
       - type: COPY_TO_CLIPBOARD
-        label: label1
+        _id: 17
+        label: label1 236236236
         description: description
         text: text
 
       - type: OPEN_FILE
-        label: label1
+        _id: 18
+        label: label1 236236236236
         description: description
         path: text
 
       - type: GROUP
-        label: GROUP
+        _id: 19
+        label: GROUP 234623462346
         description: description
         actions:
           - type: COPY_TO_CLIPBOARD
-            label: label2
+            _id: 20
+            label: label2 23462362346
             description: description
             text: text
 
           - type: OPEN_FILE
-            label: label2
+            _id: 21
+            label: label2 326423462346
             description: description
             path: text
   - type: SHOW_IMAGE
-    label: SHOW_IMAGE
+    _id: 22
+    label: SHOW_IMAGE 2362362346
     description: SHOW_IMAGE
     imageUrl: http://www.plantuml.com/plantuml/png/dOvD3i8W48MleWkMTcYDMbqsquDKIeI4duQ29fxUEBCeRjsyV0mVlDdRe5oPTKbkPt9UrXj0cbxDmsPJxcNLISMGTSYDYXxqsyJdOPu04S5FDe10AQwZm5Rqyil3aP8PANlA2y_9F5VpiJAHRWVYa-WaQnjiJiSEDtBx7__JiQyMRYbP67-UT18HcwLuzm40
 
   - type: SHOW_IMAGE
-    label: Стандарт описания задачи
+    _id: 23
+    label: Стандарт описания задачи 236232346
     description: Стандарт описания задачи
     imageUrl: https://github.com/ezhov-da/notes/blob/master/uml/%D0%A1%D1%82%D0%B0%D0%BD%D0%B4%D0%B0%D1%80%D1%82%20%D0%BE%D0%BF%D0%B8%D1%81%D0%B0%D0%BD%D0%B8%D1%8F%20%D0%B7%D0%B0%D0%B4%D0%B0%D1%87%D0%B8.png?raw=true
 
   - type: EXEC
-    label: Выполнить команду
+    _id: 24
+    label: Выполнить команду 23623462346
     description: Выполнить команду описание
     command: D:\programs\jmc-8.0.1_windows-x64\JDK Mission Control\jmc.exe
     workingDirectory:
     iconUrl:
 
   - type: COPY_TO_CLIPBOARD_TEMPLATE
-    label: kubectl get all -n $ns
+    _id: 25
+    label: kubectl get all -n $ns 2323462346
     description: COPY_TO_CLIPBOARD_TEMPLATE
     text: kubectl get all -n $ns
 ...

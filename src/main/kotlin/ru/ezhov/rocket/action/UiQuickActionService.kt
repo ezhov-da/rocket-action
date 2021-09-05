@@ -16,6 +16,7 @@ import ru.ezhov.rocket.action.properties.ResourceGeneralPropertiesRepository
 import ru.ezhov.rocket.action.types.group.GroupRocketActionUi
 import ru.ezhov.rocket.action.ui.swing.common.TextFieldWithText
 import java.awt.Component
+import java.awt.FlowLayout
 import java.awt.Point
 import java.awt.datatransfer.DataFlavor
 import java.awt.datatransfer.UnsupportedFlavorException
@@ -35,14 +36,17 @@ import java.io.IOException
 import java.nio.charset.StandardCharsets
 import java.util.logging.Level
 import java.util.logging.Logger
+import javax.swing.BorderFactory
 import javax.swing.ImageIcon
 import javax.swing.JDialog
 import javax.swing.JLabel
 import javax.swing.JMenu
 import javax.swing.JMenuBar
 import javax.swing.JMenuItem
+import javax.swing.JPanel
 import javax.swing.SwingUtilities
 import javax.swing.SwingWorker
+
 
 class UiQuickActionService(
         userPathToAction: String?,
@@ -89,36 +93,52 @@ class UiQuickActionService(
     @Throws(Exception::class)
     private fun rocketActionSettings(): List<RocketActionSettings> = rocketActionSettingsRepository.actions()
 
-    private fun createSearchField(dialog: JDialog, menu: JMenu) = TextFieldWithText("Search").apply {
-        columns = 5
-        addKeyListener(object : KeyAdapter() {
-            override fun keyPressed(e: KeyEvent?) {
-                e?.takeIf { it.keyCode == KeyEvent.VK_ENTER }?.let {
+    private fun createSearchField(dialog: JDialog, menu: JMenu): Component =
+            JPanel(FlowLayout(FlowLayout.LEFT, 0, 0)).apply {
+                border = BorderFactory.createEmptyBorder()
+                val textField =
+                        TextFieldWithText("Search").apply {
+                            columns = 5
+                            addKeyListener(object : KeyAdapter() {
+                                override fun keyPressed(e: KeyEvent?) {
+                                    e?.takeIf { it.keyCode == KeyEvent.VK_ENTER }?.let {
+                                        val cache = RocketActionComponentCacheFactory.cache
 
-                    val cache = RocketActionComponentCacheFactory.cache
+                                        if (text.isNotEmpty()) {
+                                            cache
+                                                    .all()
+                                                    .filter { it.action().contains(text) }
+                                                    .takeIf { it.isNotEmpty() }
+                                                    ?.let { ccl ->
+                                                        LOGGER.info("found by search '$text': ${ccl.size}")
 
-                    if (text.isNotEmpty()) {
-                        cache
-                                .all()
-                                .filter { it.action().contains(text) }
-                                .takeIf { it.isNotEmpty() }
-                                ?.let { ccl ->
-                                    LOGGER.info("found by search $text: ${ccl.size}")
-
-                                    SwingUtilities.invokeLater {
-                                        menu.removeAll()
-                                        ccl.forEach { menu.add(it.component()) }
-                                        menu.add(createTools(dialog))
-                                        menu.doClick()
+                                                        SwingUtilities.invokeLater {
+                                                            menu.removeAll()
+                                                            ccl.forEach { menu.add(it.component()) }
+                                                            menu.add(createTools(dialog))
+                                                            menu.doClick()
+                                                        }
+                                                    }
+                                        } else {
+                                            CreateMenuWorker(menu).execute()
+                                        }
                                     }
                                 }
-                    } else {
-                        CreateMenuWorker(menu).execute()
-                    }
-                }
+                            })
+                        }
+                add(textField)
+                add(
+                        JLabel(IconRepositoryFactory.repository.by(AppIcon.CLEAR))
+                                .apply {
+                                    addMouseListener(object : MouseAdapter() {
+                                        override fun mouseReleased(e: MouseEvent?) {
+                                            textField.text = ""
+                                            CreateMenuWorker(menu).execute()
+                                        }
+                                    })
+                                }
+                )
             }
-        })
-    }
 
     private fun createTools(dialog: JDialog): JMenu {
         val menuTools = JMenu("Tools")
@@ -134,7 +154,7 @@ class UiQuickActionService(
                 }
                 if (newMenuBar != null) {
                     // пока костыль, но мы то знаем это "пока" :)
-                    dialog!!.jMenuBar.removeAll()
+                    dialog.jMenuBar.removeAll()
                     dialog.jMenuBar = newMenuBar
                     dialog.revalidate()
                     dialog.repaint()
@@ -252,14 +272,19 @@ class UiQuickActionService(
         @Throws(Exception::class)
         override fun doInBackground(): String? {
             menu.removeAll()
-            val cache = RocketActionComponentCacheFactory.cache
             val actionSettings = rocketActionSettings()
             fillCache(actionSettings)
+            val cache = RocketActionComponentCacheFactory.cache
             for (rocketActionSettings in actionSettings) {
                 rocketActionUiRepository.by(rocketActionSettings.type())?.let {
-                    val component = cache.by(rocketActionSettings.id())?.component()
-                            ?: it.create(rocketActionSettings).component()
-                    menu.add(component)
+                    (
+                            cache
+                                    .by(rocketActionSettings.id())?.component()
+                                    ?: it.create(rocketActionSettings)?.component()
+                            )
+                            ?.let { component ->
+                                menu.add(component)
+                            }
                 }
             }
             menu.add(createTools(dialog!!))
@@ -267,21 +292,28 @@ class UiQuickActionService(
         }
 
         private fun fillCache(actionSettings: List<RocketActionSettings>) {
-            val cache = RocketActionComponentCacheFactory.cache
-            for (rocketActionSettings in actionSettings) {
-                rocketActionUiRepository.by(rocketActionSettings.type())?.let {
-                    if (rocketActionSettings.type() != GroupRocketActionUi.TYPE) {
-                        cache.add(
-                                rocketActionSettings.id(),
-                                it.create(rocketActionSettings)
-                        )
-                    } else {
-                        if (rocketActionSettings.actions().isNotEmpty()) {
-                            fillCache(rocketActionSettings.actions())
+            RocketActionComponentCacheFactory
+                    .cache
+                    .let { cache ->
+                        for (rocketActionSettings in actionSettings) {
+                            val rau = rocketActionUiRepository.by(rocketActionSettings.type())
+                            if (rau != null) {
+                                if (rocketActionSettings.type() != GroupRocketActionUi.TYPE) {
+                                    rau.create(rocketActionSettings)
+                                            ?.let { action ->
+                                                cache.add(
+                                                        rocketActionSettings.id(),
+                                                        action
+                                                )
+                                            }
+                                } else {
+                                    if (rocketActionSettings.actions().isNotEmpty()) {
+                                        fillCache(rocketActionSettings.actions())
+                                    }
+                                }
+                            }
                         }
                     }
-                }
-            }
         }
 
         override fun done() {

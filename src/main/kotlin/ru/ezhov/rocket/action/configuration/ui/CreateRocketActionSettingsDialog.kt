@@ -115,7 +115,7 @@ class CreateRocketActionSettingsDialog(
                         else -> {
                             val p = JPanel(BorderLayout())
                             val menuBar = JMenuBar()
-                            val component = actionUi.create(settings).component()
+                            val component = actionUi.create(settings)?.component() ?: JLabel("Not created component")
                             menuBar.add(component)
                             p.add(menuBar, BorderLayout.CENTER)
                             p
