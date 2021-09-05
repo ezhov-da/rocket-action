@@ -1,9 +1,8 @@
 package ru.ezhov.rocket.action.types.template
 
-import ru.ezhov.rocket.action.api.Action
+import ru.ezhov.rocket.action.api.RocketAction
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
 import ru.ezhov.rocket.action.api.RocketActionSettings
-import ru.ezhov.rocket.action.api.SearchableAction
 import ru.ezhov.rocket.action.icon.AppIcon
 import ru.ezhov.rocket.action.icon.IconRepositoryFactory
 import ru.ezhov.rocket.action.template.infrastructure.VelocityEngineImpl
@@ -13,7 +12,7 @@ import javax.swing.JMenu
 
 class CopyToClipboardTemplateRocketActionUi : AbstractRocketAction() {
 
-    override fun create(settings: RocketActionSettings): Action? =
+    override fun create(settings: RocketActionSettings): RocketAction? =
             settings.settings()[TEXT]?.takeIf { it.isNotEmpty() }?.let { text ->
                 val label = settings.settings()[LABEL]?.takeIf { it.isNotEmpty() } ?: text
                 val description = settings.settings()[DESCRIPTION]?.takeIf { it.isNotEmpty() } ?: text
@@ -24,11 +23,10 @@ class CopyToClipboardTemplateRocketActionUi : AbstractRocketAction() {
                 menu.toolTipText = description
                 menu.add(notePanelEngine)
 
-                object : Action {
-                    override fun action(): SearchableAction = object : SearchableAction {
-                        override fun contains(search: String): Boolean =
-                                label.contains(search, ignoreCase = true)
-                    }
+                object : RocketAction {
+                    override fun contains(search: String): Boolean =
+                            label.contains(search, ignoreCase = true)
+                                    .or(description.contains(search, ignoreCase = true))
 
                     override fun component(): Component = menu
                 }

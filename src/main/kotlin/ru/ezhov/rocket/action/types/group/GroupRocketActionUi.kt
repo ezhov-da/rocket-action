@@ -1,9 +1,8 @@
 package ru.ezhov.rocket.action.types.group
 
-import ru.ezhov.rocket.action.api.Action
+import ru.ezhov.rocket.action.api.RocketAction
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
 import ru.ezhov.rocket.action.api.RocketActionSettings
-import ru.ezhov.rocket.action.api.SearchableAction
 import ru.ezhov.rocket.action.icon.AppIcon
 import ru.ezhov.rocket.action.icon.IconRepositoryFactory
 import ru.ezhov.rocket.action.icon.IconService
@@ -16,7 +15,7 @@ import javax.swing.JMenu
 import javax.swing.SwingWorker
 
 class GroupRocketActionUi : AbstractRocketAction() {
-    override fun create(settings: RocketActionSettings): Action? =
+    override fun create(settings: RocketActionSettings): RocketAction? =
             settings.settings()[LABEL]?.takeIf { it.isNotEmpty() }?.let { label ->
                 val description = settings.settings()[DESCRIPTION]?.takeIf { it.isNotEmpty() } ?: label
                 val iconUrl = settings.settings()[ICON_URL].orEmpty()
@@ -25,10 +24,8 @@ class GroupRocketActionUi : AbstractRocketAction() {
                 menu.toolTipText = description
                 GroupSwingWorker(menu, iconUrl, settings).execute()
 
-                object : Action {
-                    override fun action(): SearchableAction = object : SearchableAction {
-                        override fun contains(search: String): Boolean = false
-                    }
+                object : RocketAction {
+                    override fun contains(search: String): Boolean = false
 
                     override fun component(): Component = menu
                 }
@@ -41,7 +38,7 @@ class GroupRocketActionUi : AbstractRocketAction() {
     override fun properties(): List<RocketActionConfigurationProperty> {
         return listOf(
                 createRocketActionProperty(LABEL, LABEL, "TEST", true),
-                createRocketActionProperty(DESCRIPTION, DESCRIPTION, "TEST", true),
+                createRocketActionProperty(DESCRIPTION, DESCRIPTION, "TEST", false),
                 createRocketActionProperty(ICON_URL, ICON_URL, "URL for icon", false)
         )
     }

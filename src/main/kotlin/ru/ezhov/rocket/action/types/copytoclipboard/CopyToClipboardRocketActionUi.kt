@@ -1,9 +1,8 @@
 package ru.ezhov.rocket.action.types.copytoclipboard
 
-import ru.ezhov.rocket.action.api.Action
+import ru.ezhov.rocket.action.api.RocketAction
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
 import ru.ezhov.rocket.action.api.RocketActionSettings
-import ru.ezhov.rocket.action.api.SearchableAction
 import ru.ezhov.rocket.action.icon.AppIcon
 import ru.ezhov.rocket.action.icon.IconRepositoryFactory
 import ru.ezhov.rocket.action.notification.NotificationFactory
@@ -22,7 +21,7 @@ class CopyToClipboardRocketActionUi : AbstractRocketAction() {
         private const val TEXT = "text"
     }
 
-    override fun create(settings: RocketActionSettings): Action? =
+    override fun create(settings: RocketActionSettings): RocketAction? =
             settings.settings()[TEXT]?.takeIf { it.isNotEmpty() }?.let { text ->
                 val label = settings.settings()[LABEL]?.takeIf { it.isNotEmpty() } ?: text
                 val description = settings.settings()[DESCRIPTION]?.takeIf { it.isNotEmpty() } ?: text
@@ -36,14 +35,11 @@ class CopyToClipboardRocketActionUi : AbstractRocketAction() {
                     NotificationFactory.notification.show(NotificationType.INFO, "Text copy to clipboard")
                 }
 
-                object : Action {
-                    override fun action(): SearchableAction = object : SearchableAction {
-                        override fun contains(search: String): Boolean =
-                                text.contains(search, ignoreCase = true)
-                                        .or(label.contains(search, ignoreCase = true))
-                                        .or(description.contains(search, ignoreCase = true))
-
-                    }
+                object : RocketAction {
+                    override fun contains(search: String): Boolean =
+                            text.contains(search, ignoreCase = true)
+                                    .or(label.contains(search, ignoreCase = true))
+                                    .or(description.contains(search, ignoreCase = true))
 
                     override fun component(): Component = menuItem
                 }

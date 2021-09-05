@@ -107,7 +107,7 @@ class UiQuickActionService(
                                         if (text.isNotEmpty()) {
                                             cache
                                                     .all()
-                                                    .filter { it.action().contains(text) }
+                                                    .filter { it.contains(text) }
                                                     .takeIf { it.isNotEmpty() }
                                                     ?.let { ccl ->
                                                         LOGGER.info("found by search '$text': ${ccl.size}")

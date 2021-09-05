@@ -3,10 +3,9 @@ package ru.ezhov.rocket.action.types.showimagesvg
 import org.apache.batik.swing.JSVGCanvas
 import org.apache.batik.swing.JSVGScrollPane
 import org.apache.batik.swing.svg.JSVGComponent
-import ru.ezhov.rocket.action.api.Action
+import ru.ezhov.rocket.action.api.RocketAction
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
 import ru.ezhov.rocket.action.api.RocketActionSettings
-import ru.ezhov.rocket.action.api.SearchableAction
 import ru.ezhov.rocket.action.caching.CacheFactory
 import ru.ezhov.rocket.action.icon.AppIcon
 import ru.ezhov.rocket.action.icon.IconRepositoryFactory
@@ -39,7 +38,7 @@ import javax.swing.WindowConstants
 
 class ShowSvgImageRocketActionUi : AbstractRocketAction() {
 
-    override fun create(settings: RocketActionSettings): Action? =
+    override fun create(settings: RocketActionSettings): RocketAction? =
             settings.settings()[IMAGE_URL]?.takeIf { it.isNotEmpty() }?.let { imageUrl ->
                 val label = settings.settings()[LABEL]?.takeIf { it.isNotEmpty() } ?: imageUrl
                 val description = settings.settings()[DESCRIPTION]?.takeIf { it.isNotEmpty() } ?: imageUrl
@@ -49,11 +48,10 @@ class ShowSvgImageRocketActionUi : AbstractRocketAction() {
                 menu.icon = ImageIcon(this.javaClass.getResource("/load_16x16.gif"))
                 LoadImageWorker(imageUrl, menu, settings).execute()
 
-                object : Action {
-                    override fun action(): SearchableAction = object : SearchableAction {
-                        override fun contains(search: String): Boolean =
-                                label.contains(search, ignoreCase = true)
-                    }
+                object : RocketAction {
+                    override fun contains(search: String): Boolean =
+                            label.contains(search, ignoreCase = true)
+                                    .or(description.contains(search, ignoreCase = true))
 
                     override fun component(): Component = menu
                 }

@@ -1,10 +1,9 @@
 package ru.ezhov.rocket.action.types.gist
 
 import org.eclipse.egit.github.core.Gist
-import ru.ezhov.rocket.action.api.Action
+import ru.ezhov.rocket.action.api.RocketAction
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
 import ru.ezhov.rocket.action.api.RocketActionSettings
-import ru.ezhov.rocket.action.api.SearchableAction
 import ru.ezhov.rocket.action.icon.AppIcon
 import ru.ezhov.rocket.action.icon.IconRepositoryFactory
 import ru.ezhov.rocket.action.notification.NotificationFactory
@@ -60,7 +59,7 @@ class GistRocketAction : AbstractRocketAction() {
         )
     }
 
-    override fun create(settings: RocketActionSettings): Action? =
+    override fun create(settings: RocketActionSettings): RocketAction? =
             settings.settings()[LABEL]?.takeIf { it.isNotEmpty() }?.let { label ->
                 geToken(settings)?.takeIf { it.isNotEmpty() }?.let { token ->
                     settings.settings()[USERNAME]?.takeIf { it.isNotEmpty() }?.let { username ->
@@ -68,10 +67,8 @@ class GistRocketAction : AbstractRocketAction() {
                             val menu = JMenu(label)
                             GistWorker(menu, gistUrl = url, token = token, username = username).execute()
 
-                            object : Action {
-                                override fun action(): SearchableAction = object : SearchableAction {
-                                    override fun contains(search: String): Boolean = false
-                                }
+                            object : RocketAction {
+                                override fun contains(search: String): Boolean = false
 
                                 override fun component(): Component = menu
                             }
@@ -81,7 +78,8 @@ class GistRocketAction : AbstractRocketAction() {
             }
 
     private fun geToken(settings: RocketActionSettings) =
-            settings.settings()[TOKEN] ?: System.getProperty(TOKEN_PROPERTY, "").takeIf { it.isNotEmpty() }
+            settings.settings()[TOKEN]?.takeIf { it.isNotEmpty() }
+                    ?: System.getProperty(TOKEN_PROPERTY, "").takeIf { it.isNotEmpty() }
 
 
     override fun type(): String = "GIST"

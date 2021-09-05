@@ -1,8 +1,8 @@
 package ru.ezhov.rocket.action.domain
 
-import ru.ezhov.rocket.action.api.RocketActionUi
+import ru.ezhov.rocket.action.api.RocketActionFactoryUi
 
 interface RocketActionUiRepository {
-    fun all(): List<RocketActionUi>
-    fun by(type: String): RocketActionUi?
+    fun all(): List<RocketActionFactoryUi>
+    fun by(type: String): RocketActionFactoryUi?
 }

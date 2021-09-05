@@ -1,9 +1,8 @@
 package ru.ezhov.rocket.action.types.text
 
-import ru.ezhov.rocket.action.api.Action
+import ru.ezhov.rocket.action.api.RocketAction
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
 import ru.ezhov.rocket.action.api.RocketActionSettings
-import ru.ezhov.rocket.action.api.SearchableAction
 import ru.ezhov.rocket.action.notification.NotificationFactory
 import ru.ezhov.rocket.action.notification.NotificationType
 import ru.ezhov.rocket.action.types.AbstractRocketAction
@@ -21,13 +20,11 @@ class TextRocketActionUi : AbstractRocketAction() {
     override fun properties(): List<RocketActionConfigurationProperty> =
             listOf(createRocketActionProperty(LABEL, LABEL, "Text to display", true))
 
-    override fun create(settings: RocketActionSettings): Action? =
+    override fun create(settings: RocketActionSettings): RocketAction? =
             settings.settings()[LABEL]?.takeIf { it.isNotEmpty() }?.let { label ->
-                object : Action {
-                    override fun action(): SearchableAction = object : SearchableAction {
-                        override fun contains(search: String): Boolean =
-                                label.contains(search, ignoreCase = true)
-                    }
+                object : RocketAction {
+                    override fun contains(search: String): Boolean =
+                            label.contains(search, ignoreCase = true)
 
                     override fun component(): Component = JTextPane().apply {
                         text = label

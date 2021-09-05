@@ -248,18 +248,14 @@ class ConfigurationFrame(
     private inner class RocketActionSettingsCellRender : DefaultTreeCellRenderer() {
         override fun getTreeCellRendererComponent(tree: JTree, value: Any, sel: Boolean, expanded: Boolean, leaf: Boolean, row: Int, hasFocus: Boolean): Component {
             val label = super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus) as JLabel
-            if (value != null) {
-                val node = value as DefaultMutableTreeNode
-                if (node.userObject is RocketActionSettings) {
-                    val settings = node.userObject as RocketActionSettings
-                    if (settings != null) {
-                        val labelProperty = settings.settings()["label"]
-                        if (labelProperty != null && "" != labelProperty) {
-                            label.text = labelProperty
-                        } else {
-                            label.text = settings.type()
-                        }
-                    }
+            val node = value as DefaultMutableTreeNode
+            if (node.userObject is RocketActionSettings) {
+                val settings = node.userObject as RocketActionSettings
+                val labelProperty = settings.settings()["label"]
+                if (labelProperty != null && "" != labelProperty) {
+                    label.text = labelProperty
+                } else {
+                    label.text = settings.type()
                 }
             }
             return label

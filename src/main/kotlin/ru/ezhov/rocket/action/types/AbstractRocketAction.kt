@@ -2,12 +2,12 @@ package ru.ezhov.rocket.action.types
 
 import ru.ezhov.rocket.action.api.RocketActionConfiguration
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
-import ru.ezhov.rocket.action.api.RocketActionUi
+import ru.ezhov.rocket.action.api.RocketActionFactoryUi
 
 /**
  * Base class for UI action
  */
-abstract class AbstractRocketAction : RocketActionUi, RocketActionConfiguration {
+abstract class AbstractRocketAction : RocketActionFactoryUi, RocketActionConfiguration {
     protected fun createRocketActionProperty(
             key: String,
             name: String,

@@ -1,13 +1,13 @@
 package ru.ezhov.rocket.action.domain
 
-import ru.ezhov.rocket.action.api.Action
+import ru.ezhov.rocket.action.api.RocketAction
 
 interface RocketActionComponentCache {
-    fun add(id: String, component: Action)
+    fun add(id: String, component: RocketAction)
 
-    fun by(id: String): Action?
+    fun by(id: String): RocketAction?
 
-    fun all(): List<Action>
+    fun all(): List<RocketAction>
 
     fun clear()
 }

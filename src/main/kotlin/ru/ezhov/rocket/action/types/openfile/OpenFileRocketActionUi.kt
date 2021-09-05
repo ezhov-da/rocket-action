@@ -1,9 +1,8 @@
 package ru.ezhov.rocket.action.types.openfile
 
-import ru.ezhov.rocket.action.api.Action
+import ru.ezhov.rocket.action.api.RocketAction
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
 import ru.ezhov.rocket.action.api.RocketActionSettings
-import ru.ezhov.rocket.action.api.SearchableAction
 import ru.ezhov.rocket.action.icon.AppIcon
 import ru.ezhov.rocket.action.icon.IconRepositoryFactory
 import ru.ezhov.rocket.action.notification.NotificationFactory
@@ -16,11 +15,12 @@ import javax.swing.JMenuItem
 
 class OpenFileRocketActionUi : AbstractRocketAction() {
 
-    override fun create(settings: RocketActionSettings): Action? =
+    override fun create(settings: RocketActionSettings): RocketAction? =
             settings.settings()[PATH]
                     ?.takeIf { it.isNotEmpty() }
                     ?.let { path ->
-                        val label = settings.settings()[LABEL]?.takeIf { it.isNotEmpty() } ?: path.let { File(path).name }
+                        val label = settings.settings()[LABEL]?.takeIf { it.isNotEmpty() }
+                                ?: path.let { File(path).name }
                         val description = settings.settings()[DESCRIPTION]?.takeIf { it.isNotEmpty() } ?: path
 
                         val menuItem = JMenuItem(label)
@@ -37,13 +37,11 @@ class OpenFileRocketActionUi : AbstractRocketAction() {
                             }
                         }
 
-                        object : Action {
-                            override fun action(): SearchableAction = object : SearchableAction {
-                                override fun contains(search: String): Boolean =
-                                        path.contains(search, ignoreCase = true)
-                                                .or(label.contains(search, ignoreCase = true))
-                                                .or(description.contains(search, ignoreCase = true))
-                            }
+                        object : RocketAction {
+                            override fun contains(search: String): Boolean =
+                                    path.contains(search, ignoreCase = true)
+                                            .or(label.contains(search, ignoreCase = true))
+                                            .or(description.contains(search, ignoreCase = true))
 
                             override fun component(): Component = menuItem
                         }

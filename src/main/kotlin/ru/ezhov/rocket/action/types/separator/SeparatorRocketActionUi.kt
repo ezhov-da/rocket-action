@@ -1,19 +1,16 @@
 package ru.ezhov.rocket.action.types.separator
 
-import ru.ezhov.rocket.action.api.Action
+import ru.ezhov.rocket.action.api.RocketAction
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
 import ru.ezhov.rocket.action.api.RocketActionSettings
-import ru.ezhov.rocket.action.api.SearchableAction
 import ru.ezhov.rocket.action.types.AbstractRocketAction
 import java.awt.Component
 import javax.swing.JSeparator
 
 class SeparatorRocketActionUi : AbstractRocketAction() {
-    override fun create(settings: RocketActionSettings): Action =
-            object : Action {
-                override fun action(): SearchableAction = object : SearchableAction {
-                    override fun contains(search: String): Boolean = false
-                }
+    override fun create(settings: RocketActionSettings): RocketAction =
+            object : RocketAction {
+                override fun contains(search: String): Boolean = false
 
                 override fun component(): Component = JSeparator()
             }

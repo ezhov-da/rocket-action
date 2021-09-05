@@ -1,9 +1,8 @@
 package ru.ezhov.rocket.action.types.openurl
 
-import ru.ezhov.rocket.action.api.Action
+import ru.ezhov.rocket.action.api.RocketAction
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
 import ru.ezhov.rocket.action.api.RocketActionSettings
-import ru.ezhov.rocket.action.api.SearchableAction
 import ru.ezhov.rocket.action.icon.AppIcon
 import ru.ezhov.rocket.action.icon.IconRepositoryFactory
 import ru.ezhov.rocket.action.icon.IconService
@@ -20,18 +19,16 @@ import java.net.URI
 import javax.swing.JMenuItem
 
 class OpenUrlRocketActionUi : AbstractRocketAction() {
-    override fun create(settings: RocketActionSettings): Action? =
+    override fun create(settings: RocketActionSettings): RocketAction? =
             settings.settings()[URL]?.takeIf { it.isNotEmpty() }?.let { url ->
                 val label = settings.settings()[LABEL]?.takeIf { it.isNotEmpty() } ?: url
                 val description = settings.settings()[DESCRIPTION]?.takeIf { it.isNotEmpty() } ?: url
                 val iconUrl = settings.settings()[ICON_URL].orEmpty()
 
-                object : Action {
-                    override fun action(): SearchableAction = object : SearchableAction {
-                        override fun contains(search: String): Boolean =
-                                label.contains(search, ignoreCase = true)
-                                        .or(description.contains(search, ignoreCase = true))
-                    }
+                object : RocketAction {
+                    override fun contains(search: String): Boolean =
+                            label.contains(search, ignoreCase = true)
+                                    .or(description.contains(search, ignoreCase = true))
 
                     override fun component(): Component = JMenuItem(label).apply {
                         icon = IconService().load(
