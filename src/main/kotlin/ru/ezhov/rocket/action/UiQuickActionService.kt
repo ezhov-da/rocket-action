@@ -1,5 +1,6 @@
 package ru.ezhov.rocket.action
 
+import mu.KotlinLogging
 import ru.ezhov.rocket.action.api.RocketActionSettings
 import ru.ezhov.rocket.action.configuration.domain.RocketActionConfigurationRepository
 import ru.ezhov.rocket.action.configuration.ui.ConfigurationFrame
@@ -35,8 +36,6 @@ import java.io.BufferedInputStream
 import java.io.File
 import java.io.IOException
 import java.nio.charset.StandardCharsets
-import java.util.logging.Level
-import java.util.logging.Logger
 import javax.swing.BorderFactory
 import javax.swing.ImageIcon
 import javax.swing.JDialog
@@ -48,6 +47,7 @@ import javax.swing.JPanel
 import javax.swing.SwingUtilities
 import javax.swing.SwingWorker
 
+private val logger = KotlinLogging.logger { }
 
 class UiQuickActionService(
         userPathToAction: String?,
@@ -63,7 +63,7 @@ class UiQuickActionService(
         val uri = if (userPathToAction != null) {
             File(userPathToAction).toURI()
         } else {
-            LOGGER.log(Level.INFO, "Use absolute path to `action.xml` file as argument")
+            logger.info { "Use absolute path to `action.xml` file as argument" }
             UiQuickActionService::class.java.getResource("/actions.yml").toURI()
         }
         rocketActionSettingsRepository = YmlRocketActionSettingsRepository(uri)
@@ -110,7 +110,7 @@ class UiQuickActionService(
                                                     .filter { it.contains(text) }
                                                     .takeIf { it.isNotEmpty() }
                                                     ?.let { ccl ->
-                                                        LOGGER.info("found by search '$text': ${ccl.size}")
+                                                        logger.info { "found by search '$text': ${ccl.size}" }
 
                                                         SwingUtilities.invokeLater {
                                                             tf.foreground = Color.GREEN
@@ -329,9 +329,5 @@ class UiQuickActionService(
             components.forEach { menu.add(it) }
             menu.icon = ImageIcon(this::class.java.getResource("/rocket_16x16.png"))
         }
-    }
-
-    companion object {
-        private val LOGGER = Logger.getLogger(UiQuickActionService::class.java.name)
     }
 }

@@ -4,7 +4,6 @@ import org.eclipse.egit.github.core.Gist
 import org.eclipse.egit.github.core.client.GitHubClient
 import org.eclipse.egit.github.core.service.GistService
 import java.io.IOException
-import java.util.logging.Logger
 
 class GistActionService {
     @Throws(GistActionServiceException::class)
@@ -18,9 +17,5 @@ class GistActionService {
         } catch (e: IOException) {
             throw GistActionServiceException("Error catch list Gist for user '$username'", e)
         }
-    }
-
-    companion object {
-        private val LOGGER = Logger.getLogger(GistActionService::class.java.name)
     }
 }

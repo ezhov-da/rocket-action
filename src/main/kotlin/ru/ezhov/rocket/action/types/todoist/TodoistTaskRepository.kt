@@ -9,7 +9,6 @@ import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import ru.ezhov.rocket.action.types.todoist.model.Task
 import java.util.*
-import java.util.logging.Logger
 
 class TodoistTaskRepository {
     @Throws(TodoistRepositoryException::class)
@@ -123,7 +122,6 @@ class TodoistTaskRepository {
 
     private inner class Content(private val content: String)
     companion object {
-        private val LOGGER = Logger.getLogger(TodoistTaskRepository::class.java.name)
         private const val URL_ALL_TASKS_GET = "https://api.todoist.com/rest/v1/tasks"
         private const val URL_CHANGE_TASK_POST = "https://api.todoist.com/rest/v1/tasks/%s"
         private const val URL_CLOSE_TASK_POST = "https://api.todoist.com/rest/v1/tasks/%s/close"

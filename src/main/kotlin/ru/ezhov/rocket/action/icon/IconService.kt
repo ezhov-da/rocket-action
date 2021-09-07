@@ -2,19 +2,18 @@ package ru.ezhov.rocket.action.icon
 
 import com.mortennobel.imagescaling.AdvancedResizeOp
 import com.mortennobel.imagescaling.ResampleOp
+import mu.KotlinLogging
 import net.sf.image4j.codec.ico.ICODecoder
 import ru.ezhov.rocket.action.caching.CacheFactory
 import ru.ezhov.rocket.action.notification.NotificationFactory
 import ru.ezhov.rocket.action.notification.NotificationType
 import java.awt.image.BufferedImage
 import java.net.URL
-import java.util.logging.Level
-import java.util.logging.Logger
 import javax.imageio.ImageIO
 import javax.swing.Icon
 import javax.swing.ImageIcon
 
-private val LOG = Logger.getLogger(IconService::class.java.name)
+private val logger = KotlinLogging.logger { }
 
 class IconService {
     fun load(iconUrl: String, defaultIcon: Icon): Icon =
@@ -33,7 +32,7 @@ class IconService {
                                 ImageIcon(handleICOImage(image))
                             }
                         } catch (e: Exception) {
-                            LOG.log(Level.WARNING, String.format("Exception when load icon url='%s'", iconUrl), e)
+                            logger.warn("Exception when load icon url='$iconUrl'", e)
                             NotificationFactory.notification.show(NotificationType.ERROR, "Error icon loading")
                             defaultIcon
                         }

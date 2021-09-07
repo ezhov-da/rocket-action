@@ -8,7 +8,6 @@ import org.apache.velocity.runtime.resource.loader.StringResourceLoader
 import org.apache.velocity.runtime.resource.util.StringResourceRepository
 import ru.ezhov.rocket.action.template.domain.Engine
 import java.io.StringWriter
-import java.util.logging.Logger
 import java.util.regex.Pattern
 
 class VelocityEngineImpl : Engine {
@@ -47,9 +46,5 @@ class VelocityEngineImpl : Engine {
             }
         }
         return words
-    }
-
-    companion object {
-        private val LOG = Logger.getLogger(VelocityEngineImpl::class.java.name)
     }
 }

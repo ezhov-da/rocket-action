@@ -1,14 +1,15 @@
 package ru.ezhov.rocket.action.types.todoist
 
 import com.google.gson.Gson
+import mu.KotlinLogging
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Request.Builder
 import ru.ezhov.rocket.action.api.RocketActionSettings
 import ru.ezhov.rocket.action.types.todoist.model.Project
 import java.util.*
-import java.util.logging.Level
-import java.util.logging.Logger
+
+private val logger = KotlinLogging.logger { }
 
 class TodoistProjectRepository {
     @Throws(TodoistRepositoryException::class)
@@ -22,7 +23,7 @@ class TodoistProjectRepository {
         if (token!!.length > 5) {
             debugToken = token.substring(0, 4)
         }
-        LOGGER.log(Level.INFO, "method=projects todoistToken={0}", debugToken)
+        logger.info { "method=projects todoistToken=$debugToken" }
         return try {
             val request: Request = Builder()
                     .url(BASE_URL)
@@ -53,7 +54,6 @@ class TodoistProjectRepository {
 
     companion object {
         const val TOKEN_PROPERTY = "rocket.action.toodoist.token"
-        private val LOGGER = Logger.getLogger(TodoistProjectRepository::class.java.name)
         private const val BASE_URL = "https://api.todoist.com/rest/v1/projects"
     }
 }
