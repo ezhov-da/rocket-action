@@ -15,6 +15,7 @@ import ru.ezhov.rocket.action.properties.GeneralPropertiesRepository
 import ru.ezhov.rocket.action.properties.ResourceGeneralPropertiesRepository
 import ru.ezhov.rocket.action.types.group.GroupRocketActionUi
 import ru.ezhov.rocket.action.ui.swing.common.TextFieldWithText
+import java.awt.Color
 import java.awt.Component
 import java.awt.FlowLayout
 import java.awt.Point
@@ -75,8 +76,6 @@ class UiQuickActionService(
             RocketActionComponentCacheFactory.cache.clear()
             val menuBar = JMenuBar()
             val menu = JMenu()
-            menu.icon = ImageIcon(this::class.java.getResource("/load_16x16.gif"))
-
             menuBar.add(menu)
             //TODO: избранное
             //menuBar.add(createFavoriteComponent());
@@ -97,7 +96,8 @@ class UiQuickActionService(
             JPanel(FlowLayout(FlowLayout.LEFT, 0, 0)).apply {
                 border = BorderFactory.createEmptyBorder()
                 val textField =
-                        TextFieldWithText("Search").apply {
+                        TextFieldWithText("Search").apply { ->
+                            val tf = this
                             columns = 5
                             addKeyListener(object : KeyAdapter() {
                                 override fun keyPressed(e: KeyEvent?) {
@@ -113,6 +113,7 @@ class UiQuickActionService(
                                                         LOGGER.info("found by search '$text': ${ccl.size}")
 
                                                         SwingUtilities.invokeLater {
+                                                            tf.foreground = Color.GREEN
                                                             menu.removeAll()
                                                             ccl.forEach { menu.add(it.component()) }
                                                             menu.add(createTools(dialog))
@@ -120,6 +121,7 @@ class UiQuickActionService(
                                                         }
                                                     }
                                         } else {
+                                            SwingUtilities.invokeLater { tf.foreground = Color.BLACK }
                                             CreateMenuWorker(menu).execute()
                                         }
                                     }
@@ -133,6 +135,7 @@ class UiQuickActionService(
                                     addMouseListener(object : MouseAdapter() {
                                         override fun mouseReleased(e: MouseEvent?) {
                                             textField.text = ""
+                                            SwingUtilities.invokeLater { textField.foreground = Color.BLACK }
                                             CreateMenuWorker(menu).execute()
                                         }
                                     })
@@ -268,13 +271,18 @@ class UiQuickActionService(
         return menu
     }
 
-    private inner class CreateMenuWorker(private val menu: JMenu) : SwingWorker<String?, String?>() {
-        @Throws(Exception::class)
-        override fun doInBackground(): String? {
+    private inner class CreateMenuWorker(private val menu: JMenu) : SwingWorker<List<Component>, String?>() {
+        init {
+            menu.icon = ImageIcon(this::class.java.getResource("/load_16x16.gif"))
             menu.removeAll()
+        }
+
+        @Throws(Exception::class)
+        override fun doInBackground(): List<Component> {
             val actionSettings = rocketActionSettings()
             fillCache(actionSettings)
             val cache = RocketActionComponentCacheFactory.cache
+            val components = mutableListOf<Component>()
             for (rocketActionSettings in actionSettings) {
                 rocketActionUiRepository.by(rocketActionSettings.type())?.let {
                     (
@@ -283,12 +291,12 @@ class UiQuickActionService(
                                     ?: it.create(rocketActionSettings)?.component()
                             )
                             ?.let { component ->
-                                menu.add(component)
+                                components.add(component)
                             }
                 }
             }
-            menu.add(createTools(dialog!!))
-            return null
+            components.add(createTools(dialog!!))
+            return components.toList()
         }
 
         private fun fillCache(actionSettings: List<RocketActionSettings>) {
@@ -317,6 +325,8 @@ class UiQuickActionService(
         }
 
         override fun done() {
+            val components = this.get()
+            components.forEach { menu.add(it) }
             menu.icon = ImageIcon(this::class.java.getResource("/rocket_16x16.png"))
         }
     }
