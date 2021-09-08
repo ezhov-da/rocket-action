@@ -70,6 +70,10 @@ class GistRocketAction : AbstractRocketAction() {
                             object : RocketAction {
                                 override fun contains(search: String): Boolean = false
 
+                                override fun isChanged(actionSettings: RocketActionSettings): Boolean =
+                                        !(settings.id() == actionSettings.id() &&
+                                                settings.settings() == actionSettings.settings())
+
                                 override fun component(): Component = menu
                             }
                         }

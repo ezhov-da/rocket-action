@@ -41,6 +41,10 @@ class CopyToClipboardRocketActionUi : AbstractRocketAction() {
                                     .or(label.contains(search, ignoreCase = true))
                                     .or(description.contains(search, ignoreCase = true))
 
+                    override fun isChanged(actionSettings: RocketActionSettings): Boolean =
+                            !(settings.id() == actionSettings.id() &&
+                                    settings.settings() == actionSettings.settings())
+
                     override fun component(): Component = menuItem
                 }
             }

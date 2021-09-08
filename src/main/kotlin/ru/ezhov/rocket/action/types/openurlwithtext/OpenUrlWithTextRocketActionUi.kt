@@ -64,6 +64,10 @@ class OpenUrlWithTextRocketActionUi : AbstractRocketAction() {
                     override fun contains(search: String): Boolean =
                             label.contains(search, ignoreCase = true)
 
+                    override fun isChanged(actionSettings: RocketActionSettings): Boolean =
+                            !(settings.id() == actionSettings.id() &&
+                                    settings.settings() == actionSettings.settings())
+
                     override fun component(): Component = menu
                 }
             }

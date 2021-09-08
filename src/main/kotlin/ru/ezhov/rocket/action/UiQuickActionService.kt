@@ -73,7 +73,6 @@ class UiQuickActionService(
     fun createMenu(dialog: JDialog): JMenuBar {
         this.dialog = dialog
         return try {
-            RocketActionComponentCacheFactory.cache.clear()
             val menuBar = JMenuBar()
             val menu = JMenu()
             menuBar.add(menu)
@@ -113,7 +112,7 @@ class UiQuickActionService(
                                                         logger.info { "found by search '$text': ${ccl.size}" }
 
                                                         SwingUtilities.invokeLater {
-                                                            tf.foreground = Color.GREEN
+                                                            tf.background = Color.GREEN
                                                             menu.removeAll()
                                                             ccl.forEach { menu.add(it.component()) }
                                                             menu.add(createTools(dialog))
@@ -121,7 +120,7 @@ class UiQuickActionService(
                                                         }
                                                     }
                                         } else {
-                                            SwingUtilities.invokeLater { tf.foreground = Color.BLACK }
+                                            SwingUtilities.invokeLater { tf.background = Color.WHITE }
                                             CreateMenuWorker(menu).execute()
                                         }
                                     }
@@ -135,7 +134,7 @@ class UiQuickActionService(
                                     addMouseListener(object : MouseAdapter() {
                                         override fun mouseReleased(e: MouseEvent?) {
                                             textField.text = ""
-                                            SwingUtilities.invokeLater { textField.foreground = Color.BLACK }
+                                            SwingUtilities.invokeLater { textField.background = Color.WHITE }
                                             CreateMenuWorker(menu).execute()
                                         }
                                     })
@@ -146,7 +145,7 @@ class UiQuickActionService(
     private fun createTools(dialog: JDialog): JMenu {
         val menuTools = JMenu("Tools")
         menuTools.icon = IconRepositoryFactory.repository.by(AppIcon.WRENCH)
-        val updateActionListener = ActionListener { e: ActionEvent? ->
+        val updateActionListener = ActionListener {
             SwingUtilities.invokeLater {
                 var newMenuBar: JMenuBar? = null
                 try {
@@ -287,8 +286,22 @@ class UiQuickActionService(
                 rocketActionUiRepository.by(rocketActionSettings.type())?.let {
                     (
                             cache
-                                    .by(rocketActionSettings.id())?.component()
-                                    ?: it.create(rocketActionSettings)?.component()
+                                    .by(rocketActionSettings.id())?.let {
+                                        logger.debug {
+                                            "found in cache type='${rocketActionSettings.type()}'" +
+                                                    "id='${rocketActionSettings.id()}"
+                                        }
+
+                                        it.component()
+                                    }
+                                    ?: run {
+                                        logger.debug {
+                                            "not found in cache type='${rocketActionSettings.type()}'" +
+                                                    "id='${rocketActionSettings.id()}. Create component"
+                                        }
+
+                                        it.create(rocketActionSettings)?.component()
+                                    }
                             )
                             ?.let { component ->
                                 components.add(component)
@@ -307,13 +320,29 @@ class UiQuickActionService(
                             val rau = rocketActionUiRepository.by(rocketActionSettings.type())
                             if (rau != null) {
                                 if (rocketActionSettings.type() != GroupRocketActionUi.TYPE) {
-                                    rau.create(rocketActionSettings)
-                                            ?.let { action ->
-                                                cache.add(
-                                                        rocketActionSettings.id(),
-                                                        action
-                                                )
-                                            }
+                                    val mustBeCreate = cache
+                                            .by(rocketActionSettings.id())
+                                            ?.isChanged(rocketActionSettings) ?: true
+
+                                    logger.debug {
+                                        "must be create '$mustBeCreate' type='${rocketActionSettings.type()}'" +
+                                                "id='${rocketActionSettings.id()}"
+                                    }
+
+                                    if (mustBeCreate) {
+                                        rau.create(rocketActionSettings)
+                                                ?.let { action ->
+                                                    logger.debug {
+                                                        "added to cache type='${rocketActionSettings.type()}'" +
+                                                                "id='${rocketActionSettings.id()}"
+                                                    }
+
+                                                    cache.add(
+                                                            rocketActionSettings.id(),
+                                                            action
+                                                    )
+                                                }
+                                    }
                                 } else {
                                     if (rocketActionSettings.actions().isNotEmpty()) {
                                         fillCache(rocketActionSettings.actions())

@@ -72,6 +72,10 @@ class ExecRocketActionUi : AbstractRocketAction() {
                             label.contains(search, ignoreCase = true)
                                     .or(command.contains(search, ignoreCase = true))
 
+                    override fun isChanged(actionSettings: RocketActionSettings): Boolean =
+                            !(settings.id() == actionSettings.id() &&
+                                    settings.settings() == actionSettings.settings())
+
                     override fun component(): Component = menuItem
                 }
             }

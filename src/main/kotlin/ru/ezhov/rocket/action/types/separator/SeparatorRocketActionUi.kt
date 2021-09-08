@@ -12,6 +12,8 @@ class SeparatorRocketActionUi : AbstractRocketAction() {
             object : RocketAction {
                 override fun contains(search: String): Boolean = false
 
+                override fun isChanged(actionSettings: RocketActionSettings): Boolean = false
+
                 override fun component(): Component = JSeparator()
             }
 
