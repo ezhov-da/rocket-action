@@ -22,10 +22,17 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
 
+        <arrow.version>0.13.2</arrow.version>
         <kotlin.version>1.5.30</kotlin.version>
     </properties>
 
     <dependencies>
+        <dependency>
+            <groupId>io.arrow-kt</groupId>
+            <artifactId>arrow-core</artifactId>
+            <version>${arrow.version}</version>
+        </dependency>
+
         <dependency>
             <groupId>io.github.microutils</groupId>
             <artifactId>kotlin-logging-jvm</artifactId>
