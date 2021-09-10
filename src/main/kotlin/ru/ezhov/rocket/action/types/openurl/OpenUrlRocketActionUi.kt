@@ -40,25 +40,12 @@ class OpenUrlRocketActionUi : AbstractRocketAction() {
                                 IconRepositoryFactory.repository.by(AppIcon.LINK_INTACT)
                         )
                         toolTipText = description
+                        addActionListener { openUrl(url) }
                         addMouseListener(object : MouseAdapter() {
                             override fun mouseReleased(e: MouseEvent) {
                                 when (e.button) {
-                                    MouseEvent.BUTTON3 -> {
-                                        val defaultToolkit = Toolkit.getDefaultToolkit()
-                                        val clipboard = defaultToolkit.systemClipboard
-                                        clipboard.setContents(StringSelection(url), null)
-                                        NotificationFactory.notification.show(NotificationType.INFO, "URL copy to clipboard")
-                                    }
-                                    MouseEvent.BUTTON1 -> {
-                                        if (Desktop.isDesktopSupported()) {
-                                            try {
-                                                Desktop.getDesktop().browse(URI(url))
-                                            } catch (ex: Exception) {
-                                                ex.printStackTrace()
-                                                NotificationFactory.notification.show(NotificationType.ERROR, "Error open url")
-                                            }
-                                        }
-                                    }
+                                    MouseEvent.BUTTON3 -> copyUrlToClipBoard(url)
+                                    MouseEvent.BUTTON1 -> openUrl(url)
                                 }
                             }
                         })
@@ -66,6 +53,23 @@ class OpenUrlRocketActionUi : AbstractRocketAction() {
                 }
             }
 
+    private fun copyUrlToClipBoard(url: String) {
+        val defaultToolkit = Toolkit.getDefaultToolkit()
+        val clipboard = defaultToolkit.systemClipboard
+        clipboard.setContents(StringSelection(url), null)
+        NotificationFactory.notification.show(NotificationType.INFO, "URL copy to clipboard")
+    }
+
+    private fun openUrl(url: String) {
+        if (Desktop.isDesktopSupported()) {
+            try {
+                Desktop.getDesktop().browse(URI(url))
+            } catch (ex: Exception) {
+                ex.printStackTrace()
+                NotificationFactory.notification.show(NotificationType.ERROR, "Error open url")
+            }
+        }
+    }
 
     override fun type(): String = "OPEN_URL"
 
