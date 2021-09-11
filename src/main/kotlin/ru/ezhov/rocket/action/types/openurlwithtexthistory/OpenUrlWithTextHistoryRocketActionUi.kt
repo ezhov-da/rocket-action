@@ -36,6 +36,9 @@ class OpenUrlWithTextHistoryRocketActionUi : AbstractRocketAction() {
                 val textField = TextFieldWithText(label)
                 textField.columns = 10
                 textField.toolTipText = description
+
+                val addedToHistory = mutableListOf<String>()
+
                 textField.addActionListener {
                     textField
                             .text
@@ -47,26 +50,27 @@ class OpenUrlWithTextHistoryRocketActionUi : AbstractRocketAction() {
                                                 baseUrl.replace(placeholder.toRegex(), t)
                                         )
                                         Desktop.getDesktop().browse(uri)
-                                        SwingUtilities.invokeLater {
+                                        if (!addedToHistory.contains(t)) {
+                                            SwingUtilities.invokeLater {
+                                                OpenUrlRocketActionUi()
+                                                        .create(object : RocketActionSettings {
+                                                            override fun id(): String = t
 
-                                            OpenUrlRocketActionUi()
-                                                    .create(object : RocketActionSettings {
-                                                        override fun id(): String = ""
+                                                            override fun type(): RocketActionType = RocketActionType { "" }
 
-                                                        override fun type(): RocketActionType = RocketActionType { "" }
+                                                            override fun settings(): MutableMap<String, String> = mutableMapOf(
+                                                                    "label" to t,
+                                                                    "description" to "Open link",
+                                                                    "url" to uri.toString(),
+                                                            )
 
-                                                        override fun settings(): MutableMap<String, String> = mutableMapOf(
-                                                                "label" to t,
-                                                                "description" to "Open link",
-                                                                "url" to uri.toString(),
-                                                        )
-
-                                                        override fun actions(): List<RocketActionSettings> = emptyList()
-                                                    })
-                                                    ?.component()
-                                                    ?.let { c -> menu.add(c) }
-                                            menu.revalidate()
-                                            menu.repaint()
+                                                            override fun actions(): List<RocketActionSettings> = emptyList()
+                                                        })
+                                                        ?.component()
+                                                        ?.let { c -> addedToHistory.add(t); menu.add(c) }
+                                                menu.revalidate()
+                                                menu.repaint()
+                                            }
                                         }
                                     } catch (ex: Exception) {
                                         ex.printStackTrace()

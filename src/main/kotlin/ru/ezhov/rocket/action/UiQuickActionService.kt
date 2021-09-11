@@ -18,6 +18,7 @@ import ru.ezhov.rocket.action.types.group.GroupRocketActionUi
 import ru.ezhov.rocket.action.ui.swing.common.TextFieldWithText
 import java.awt.Color
 import java.awt.Component
+import java.awt.Desktop
 import java.awt.FlowLayout
 import java.awt.Point
 import java.awt.datatransfer.DataFlavor
@@ -31,10 +32,9 @@ import java.awt.event.KeyAdapter
 import java.awt.event.KeyEvent
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
-import java.io.BufferedInputStream
 import java.io.File
 import java.io.IOException
-import java.nio.charset.StandardCharsets
+import java.net.URI
 import javax.swing.BorderFactory
 import javax.swing.ImageIcon
 import javax.swing.JDialog
@@ -193,25 +193,23 @@ class UiQuickActionService(
         val menuInfo = JMenu("Информация")
         menuInfo.icon = IconRepositoryFactory.repository.by(AppIcon.INFO)
         val repository: GeneralPropertiesRepository = ResourceGeneralPropertiesRepository()
-        menuInfo.add(JLabel(repository.all().getProperty("version", "not found")))
-        var info = "undefined"
-        try {
-            BufferedInputStream(this.javaClass.getResourceAsStream("/info.html")).use { `is` ->
-                val bytes = ByteArray(`is`.available())
-                `is`.read(bytes)
-                info = String(bytes, StandardCharsets.UTF_8)
-            }
-        } catch (e: Exception) {
-            e.printStackTrace()
-            NotificationFactory.notification.show(NotificationType.ERROR, "Ошибка создания меню информации")
-        }
-        val label = JLabel("<html>$info")
-        menuInfo.add(label)
+        val notFound = { key: String -> "Информация по полю '$key' не найдена" }
+        menuInfo.add(JMenuItem(repository.all().getProperty("version", notFound("версия"))))
+        menuInfo.add(JMenuItem(repository.all().getProperty("info", notFound("информация"))))
+        menuInfo.add(JMenuItem(repository.all().getProperty("repository", notFound("ссылка на репозиторий")))
+                .apply {
+                    addActionListener {
+                        if (Desktop.isDesktopSupported()) {
+                            Desktop.getDesktop().browse(URI.create(text))
+                        }
+                    }
+                })
         menuTools.add(menuInfo)
-        val menuItemClose = JMenuItem("Выход")
-        menuItemClose.icon = IconRepositoryFactory.repository.by(AppIcon.X)
-        menuItemClose.addActionListener { SwingUtilities.invokeLater { dialog.dispose() } }
-        menuTools.add(menuItemClose)
+
+        menuTools.add(JMenuItem("Выход").apply {
+            icon = IconRepositoryFactory.repository.by(AppIcon.X)
+            addActionListener { SwingUtilities.invokeLater { dialog.dispose() } }
+        })
         return menuTools
     }
 
