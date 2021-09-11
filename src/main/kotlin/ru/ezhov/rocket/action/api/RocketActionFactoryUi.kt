@@ -1,18 +1,15 @@
 package ru.ezhov.rocket.action.api
 
 /**
- * UI action builder
+ * Фабрика отвечающая за создание действия
  */
 interface RocketActionFactoryUi {
     /**
-     * Component creation should only happen when this method is called.
+     * Действие должно создаваться только после вызова этого метода
      *
-     * @return component to display
+     * @return действие
      */
     fun create(settings: RocketActionSettings): RocketAction?
 
-    /**
-     * @return action type
-     */
-    fun type(): String
+    fun type(): RocketActionType
 }

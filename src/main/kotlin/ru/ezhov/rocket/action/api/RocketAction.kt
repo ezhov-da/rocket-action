@@ -2,19 +2,25 @@ package ru.ezhov.rocket.action.api
 
 import java.awt.Component
 
+/**
+ * Созданное и готовое к работе действие
+ */
 interface RocketAction {
     /**
-     * True если действие подходит для поиска
+     * Определяет необходимость отображения этого действия в результатах поиска
+
+     * @return true если действие подходит для поиска
      */
     fun contains(search: String): Boolean
 
     /**
-     * Изменились ли настройки действия и нужно ли его пересоздать
+     * Изменились ли настройки действия и нужно ли его пересоздать.
+     * Используется для кеширования действия
      */
     fun isChanged(actionSettings: RocketActionSettings): Boolean
 
     /**
-     * Компонент для отображения
+     * Компонент действия для отображения
      */
     fun component(): Component
 }

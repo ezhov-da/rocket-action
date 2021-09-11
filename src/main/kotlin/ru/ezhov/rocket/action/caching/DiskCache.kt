@@ -51,23 +51,18 @@ class DiskCache : Cache {
         fun checkQuietly() {
             try {
                 HttpsURLConnection
-                        .setDefaultHostnameVerifier { hostname: String?, session: SSLSession? -> true }
+                        .setDefaultHostnameVerifier { _: String?, _: SSLSession? -> true }
                 val context = SSLContext.getInstance("TLS")
-                context.init(null, arrayOf<X509TrustManager>(object : X509TrustManager {
-                    override fun checkClientTrusted(chain: Array<X509Certificate>,
-                                                    authType: String) {
-                    }
-
-                    override fun checkServerTrusted(chain: Array<X509Certificate>,
-                                                    authType: String) {
-                    }
-
-                    override fun getAcceptedIssuers(): Array<X509Certificate> {
-                        return emptyArray()
-                    }
-                }), SecureRandom())
-                HttpsURLConnection.setDefaultSSLSocketFactory(context
-                        .socketFactory)
+                context.init(
+                        null,
+                        arrayOf<X509TrustManager>(object : X509TrustManager {
+                            override fun checkClientTrusted(chain: Array<X509Certificate>, authType: String) = Unit
+                            override fun checkServerTrusted(chain: Array<X509Certificate>, authType: String) = Unit
+                            override fun getAcceptedIssuers(): Array<X509Certificate> = emptyArray()
+                        }),
+                        SecureRandom()
+                )
+                HttpsURLConnection.setDefaultSSLSocketFactory(context.socketFactory)
             } catch (e: Exception) {
                 e.printStackTrace()
             }

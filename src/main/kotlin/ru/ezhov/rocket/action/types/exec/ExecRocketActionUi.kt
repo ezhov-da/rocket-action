@@ -3,6 +3,7 @@ package ru.ezhov.rocket.action.types.exec
 import ru.ezhov.rocket.action.api.RocketAction
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
 import ru.ezhov.rocket.action.api.RocketActionSettings
+import ru.ezhov.rocket.action.api.RocketActionType
 import ru.ezhov.rocket.action.icon.AppIcon
 import ru.ezhov.rocket.action.icon.IconRepositoryFactory
 import ru.ezhov.rocket.action.icon.IconService
@@ -49,7 +50,7 @@ class ExecRocketActionUi : AbstractRocketAction() {
                             val defaultToolkit = Toolkit.getDefaultToolkit()
                             val clipboard = defaultToolkit.systemClipboard
                             clipboard.setContents(StringSelection(command), null)
-                            NotificationFactory.notification.show(NotificationType.INFO, "Command '$command' copy to clipboard")
+                            NotificationFactory.notification.show(NotificationType.INFO, "Команда '$command' скопирована в буфер")
                         } else if (e.button == MouseEvent.BUTTON1) {
                             try {
                                 if (workingDir.isEmpty()) {
@@ -80,21 +81,19 @@ class ExecRocketActionUi : AbstractRocketAction() {
                 }
             }
 
-    override fun type(): String = "EXEC"
+    override fun type(): RocketActionType = RocketActionType { "EXEC" }
 
     override fun name(): String = "Выполнить команду"
 
-    override fun description(): String {
-        return "description"
-    }
+    override fun description(): String = "Выполнение команды"
 
     override fun properties(): List<RocketActionConfigurationProperty> {
         return listOf(
-                createRocketActionProperty(COMMAND, COMMAND, "TEST", true),
-                createRocketActionProperty(LABEL, LABEL, "TEST", false),
-                createRocketActionProperty(WORKING_DIR, WORKING_DIR, "TEST", false),
-                createRocketActionProperty(DESCRIPTION, DESCRIPTION, "TEST", false),
-                createRocketActionProperty(ICON_URL, ICON_URL, "Icon URL", false)
+                createRocketActionProperty(COMMAND, COMMAND, "Команда", true),
+                createRocketActionProperty(LABEL, LABEL, "Заголовок", false),
+                createRocketActionProperty(WORKING_DIR, WORKING_DIR, "Рабочий каталог", false),
+                createRocketActionProperty(DESCRIPTION, DESCRIPTION, "Описание", false),
+                createRocketActionProperty(ICON_URL, ICON_URL, "URL иконки", false)
         )
     }
 

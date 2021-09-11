@@ -3,6 +3,7 @@ package ru.ezhov.rocket.action.types.todoist
 import ru.ezhov.rocket.action.api.RocketAction
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
 import ru.ezhov.rocket.action.api.RocketActionSettings
+import ru.ezhov.rocket.action.api.RocketActionType
 import ru.ezhov.rocket.action.icon.AppIcon
 import ru.ezhov.rocket.action.icon.IconRepositoryFactory
 import ru.ezhov.rocket.action.notification.NotificationFactory
@@ -29,7 +30,6 @@ import javax.swing.JPanel
 import javax.swing.JScrollPane
 import javax.swing.JTextPane
 import javax.swing.SwingWorker
-import javax.swing.event.ListSelectionEvent
 
 class TodoistRocketAction : AbstractRocketAction() {
 
@@ -39,11 +39,11 @@ class TodoistRocketAction : AbstractRocketAction() {
 
     override fun properties(): List<RocketActionConfigurationProperty> {
         return listOf(
-                createRocketActionProperty(LABEL, LABEL, "Label", true),
+                createRocketActionProperty(LABEL, LABEL, "Заголовок", true),
                 createRocketActionProperty(
                         TOKEN,
                         TOKEN,
-                        "Use this or -D$TOKEN_PROPERTY",
+                        "Используйте это свойство или свойство Java из командной строки -D$TOKEN_PROPERTY",
                         true
                 )
         )
@@ -73,7 +73,7 @@ class TodoistRocketAction : AbstractRocketAction() {
             settings.settings()[TOKEN]?.takeIf { it.isNotEmpty() }
                     ?: System.getProperty(TOKEN_PROPERTY, "").takeIf { it.isNotEmpty() }
 
-    override fun type(): String = "TODOIST"
+    override fun type(): RocketActionType = RocketActionType { "TODOIST" }
 
     private inner class TodoistWorker(
             private val menu: JMenu,
@@ -90,7 +90,7 @@ class TodoistRocketAction : AbstractRocketAction() {
             try {
                 menu.removeAll()
                 menu.add(this.get())
-                NotificationFactory.notification.show(NotificationType.INFO, "Todoist loaded")
+                NotificationFactory.notification.show(NotificationType.INFO, "Todoist загружен")
             } catch (e: InterruptedException) {
                 e.printStackTrace()
             } catch (e: ExecutionException) {
@@ -126,7 +126,7 @@ class TodoistRocketAction : AbstractRocketAction() {
             init {
                 labelUrl.addMouseListener(object : MouseAdapter() {
                     override fun mouseReleased(e: MouseEvent) {
-                        if ("" != labelUrl.text) {
+                        if (labelUrl.text.isNotEmpty()) {
                             if (Desktop.isDesktopSupported()) {
                                 try {
                                     Desktop.getDesktop().browse(URI(labelUrl.text))
@@ -163,7 +163,7 @@ class TodoistRocketAction : AbstractRocketAction() {
                     return label
                 }
             })
-            taskJList.addListSelectionListener { e: ListSelectionEvent? ->
+            taskJList.addListSelectionListener {
                 val task = taskJList.selectedValue
                 if (task != null) {
                     panelTaskInfo.setTask(task)

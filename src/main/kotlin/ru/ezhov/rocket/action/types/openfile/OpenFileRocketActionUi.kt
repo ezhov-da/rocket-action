@@ -3,6 +3,7 @@ package ru.ezhov.rocket.action.types.openfile
 import ru.ezhov.rocket.action.api.RocketAction
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
 import ru.ezhov.rocket.action.api.RocketActionSettings
+import ru.ezhov.rocket.action.api.RocketActionType
 import ru.ezhov.rocket.action.icon.AppIcon
 import ru.ezhov.rocket.action.icon.IconRepositoryFactory
 import ru.ezhov.rocket.action.notification.NotificationFactory
@@ -32,7 +33,7 @@ class OpenFileRocketActionUi : AbstractRocketAction() {
                                     Desktop.getDesktop().open(File(path))
                                 } catch (ex: Exception) {
                                     ex.printStackTrace()
-                                    NotificationFactory.notification.show(NotificationType.ERROR, "Error open file")
+                                    NotificationFactory.notification.show(NotificationType.ERROR, "Ошибка открытия файла")
                                 }
                             }
                         }
@@ -51,9 +52,9 @@ class OpenFileRocketActionUi : AbstractRocketAction() {
                         }
                     }
 
-    override fun type(): String = "OPEN_FILE"
+    override fun type(): RocketActionType = RocketActionType { "OPEN_FILE" }
 
-    override fun description(): String = "description"
+    override fun description(): String = "Открыть файл"
 
     override fun properties(): List<RocketActionConfigurationProperty> {
         return listOf(

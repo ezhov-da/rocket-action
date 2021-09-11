@@ -3,6 +3,7 @@ package ru.ezhov.rocket.action.types.template
 import ru.ezhov.rocket.action.api.RocketAction
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
 import ru.ezhov.rocket.action.api.RocketActionSettings
+import ru.ezhov.rocket.action.api.RocketActionType
 import ru.ezhov.rocket.action.icon.AppIcon
 import ru.ezhov.rocket.action.icon.IconRepositoryFactory
 import ru.ezhov.rocket.action.template.infrastructure.VelocityEngineImpl
@@ -38,15 +39,15 @@ class CopyToClipboardTemplateRocketActionUi : AbstractRocketAction() {
 
     override fun name(): String = "Копировать в буфер по шаблону"
 
-    override fun type(): String = "COPY_TO_CLIPBOARD_TEMPLATE"
+    override fun type(): RocketActionType = RocketActionType { "COPY_TO_CLIPBOARD_TEMPLATE" }
 
-    override fun description(): String = "Allows you to copy a previously prepared text to the clipboard"
+    override fun description(): String = "Позволяет скопировать текст в буфер с указанием переменных"
 
     override fun properties(): List<RocketActionConfigurationProperty> {
         return listOf(
-                createRocketActionProperty(LABEL, LABEL, "Displayed title", false),
-                createRocketActionProperty(DESCRIPTION, DESCRIPTION, "Description that will be displayed as a hint", false),
-                createRocketActionProperty(TEXT, TEXT, "Text prepared for copying to the clipboard", true)
+                createRocketActionProperty(LABEL, LABEL, "Заголовок", false),
+                createRocketActionProperty(DESCRIPTION, DESCRIPTION, "Описание", false),
+                createRocketActionProperty(TEXT, TEXT, "Шаблон для копирования", true)
         )
     }
 

@@ -3,6 +3,7 @@ package ru.ezhov.rocket.action.types.openurlwithtexthistory
 import ru.ezhov.rocket.action.api.RocketAction
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
 import ru.ezhov.rocket.action.api.RocketActionSettings
+import ru.ezhov.rocket.action.api.RocketActionType
 import ru.ezhov.rocket.action.icon.AppIcon
 import ru.ezhov.rocket.action.icon.IconRepositoryFactory
 import ru.ezhov.rocket.action.icon.IconService
@@ -47,26 +48,29 @@ class OpenUrlWithTextHistoryRocketActionUi : AbstractRocketAction() {
                                         )
                                         Desktop.getDesktop().browse(uri)
                                         SwingUtilities.invokeLater {
-                                            val map: MutableMap<String, String> = HashMap()
-                                            map["label"] = t
-                                            map["description"] = "Open link"
-                                            map["url"] = uri.toString()
-                                            OpenUrlRocketActionUi().create(object : RocketActionSettings {
-                                                override fun id(): String = ""
 
-                                                override fun type(): String = ""
+                                            OpenUrlRocketActionUi()
+                                                    .create(object : RocketActionSettings {
+                                                        override fun id(): String = ""
 
-                                                override fun settings(): MutableMap<String, String> = mutableMapOf()
+                                                        override fun type(): RocketActionType = RocketActionType { "" }
 
-                                                override fun actions(): List<RocketActionSettings> = emptyList()
-                                            })?.component()?.let { c -> menu.add(c) }
+                                                        override fun settings(): MutableMap<String, String> = mutableMapOf(
+                                                                "label" to t,
+                                                                "description" to "Open link",
+                                                                "url" to uri.toString(),
+                                                        )
 
+                                                        override fun actions(): List<RocketActionSettings> = emptyList()
+                                                    })
+                                                    ?.component()
+                                                    ?.let { c -> menu.add(c) }
                                             menu.revalidate()
                                             menu.repaint()
                                         }
                                     } catch (ex: Exception) {
                                         ex.printStackTrace()
-                                        NotificationFactory.notification.show(NotificationType.ERROR, "Error open URL")
+                                        NotificationFactory.notification.show(NotificationType.ERROR, "Ошибка открытия URL")
                                     }
                                 }
                             }
@@ -87,19 +91,17 @@ class OpenUrlWithTextHistoryRocketActionUi : AbstractRocketAction() {
                 }
             }
 
-    override fun type(): String = "OPEN_URL_WITH_TEXT_HISTORY"
+    override fun type(): RocketActionType = RocketActionType { "OPEN_URL_WITH_TEXT_HISTORY" }
 
-    override fun description(): String {
-        return "description"
-    }
+    override fun description(): String = "Открыть ссылку с подстановкой и хранением истории открытий ссылок"
 
     override fun properties(): List<RocketActionConfigurationProperty> {
         return listOf(
-                createRocketActionProperty(BASE_URL, BASE_URL, "TEST", true),
-                createRocketActionProperty(PLACEHOLDER, PLACEHOLDER, "TEST", true),
-                createRocketActionProperty(LABEL, LABEL, "TEST", false),
-                createRocketActionProperty(DESCRIPTION, DESCRIPTION, "TEST", false),
-                createRocketActionProperty(ICON_URL, ICON_URL, "Icon URL", false)
+                createRocketActionProperty(BASE_URL, BASE_URL, "Шаблон URL", true),
+                createRocketActionProperty(PLACEHOLDER, PLACEHOLDER, "Строка подстановки", true),
+                createRocketActionProperty(LABEL, LABEL, "Заголовок", false),
+                createRocketActionProperty(DESCRIPTION, DESCRIPTION, "Описание", false),
+                createRocketActionProperty(ICON_URL, ICON_URL, "URL иконки", false)
         )
     }
 

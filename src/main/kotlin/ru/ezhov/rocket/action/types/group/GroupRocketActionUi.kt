@@ -3,6 +3,7 @@ package ru.ezhov.rocket.action.types.group
 import ru.ezhov.rocket.action.api.RocketAction
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
 import ru.ezhov.rocket.action.api.RocketActionSettings
+import ru.ezhov.rocket.action.api.RocketActionType
 import ru.ezhov.rocket.action.icon.AppIcon
 import ru.ezhov.rocket.action.icon.IconRepositoryFactory
 import ru.ezhov.rocket.action.icon.IconService
@@ -35,15 +36,15 @@ class GroupRocketActionUi : AbstractRocketAction() {
                 }
             }
 
-    override fun type(): String = TYPE
+    override fun type(): RocketActionType = RocketActionType { TYPE }
 
-    override fun description(): String = "description"
+    override fun description(): String = "Позволяет создать иерархию действий"
 
     override fun properties(): List<RocketActionConfigurationProperty> {
         return listOf(
-                createRocketActionProperty(LABEL, LABEL, "TEST", true),
-                createRocketActionProperty(DESCRIPTION, DESCRIPTION, "TEST", false),
-                createRocketActionProperty(ICON_URL, ICON_URL, "URL for icon", false)
+                createRocketActionProperty(LABEL, LABEL, "Заголовок", true),
+                createRocketActionProperty(DESCRIPTION, DESCRIPTION, "Описание", false),
+                createRocketActionProperty(ICON_URL, ICON_URL, "URL иконки", false)
         )
     }
 
@@ -66,7 +67,7 @@ class GroupRocketActionUi : AbstractRocketAction() {
             val cache = RocketActionComponentCacheFactory.cache
             val children: MutableList<Component> = ArrayList()
             for (settings in actionSettings) {
-                if (settings.type() == TYPE) {
+                if (settings.type().value() == TYPE) {
                     settings.settings()[LABEL]?.let { label ->
                         val description = settings.settings()[DESCRIPTION] ?: label
                         val iconUrl = settings.settings()[ICON_URL].orEmpty()

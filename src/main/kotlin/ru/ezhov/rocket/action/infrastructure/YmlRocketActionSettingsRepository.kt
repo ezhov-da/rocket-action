@@ -88,8 +88,8 @@ class YmlRocketActionSettingsRepository(private val uri: URI) : RocketActionSett
             action.remove(ACTIONS)
             return if (actions == null || actions.isEmpty()) {
                 val map: MutableMap<String, String> = TreeMap()
-                action.forEach { (k: String, v: Any?) -> map[k] = v?.toString() ?: "" }
-                MutableRocketActionSettings(id, actionType, map, mutableListOf())
+                action.forEach { (k: String, v: Any?) -> map[k] = v?.toString().orEmpty() }
+                MutableRocketActionSettings(id, { actionType }, map, mutableListOf())
             } else {
                 val settings: MutableList<RocketActionSettings> = ArrayList()
                 for (a in actions) {
@@ -97,7 +97,7 @@ class YmlRocketActionSettingsRepository(private val uri: URI) : RocketActionSett
                 }
                 val map: MutableMap<String, String> = TreeMap()
                 action.forEach { (k: String, v: Any) -> map[k] = v.toString() }
-                MutableRocketActionSettings(id, actionType, map, settings)
+                MutableRocketActionSettings(id, { actionType }, map, settings)
             }
         }
     }

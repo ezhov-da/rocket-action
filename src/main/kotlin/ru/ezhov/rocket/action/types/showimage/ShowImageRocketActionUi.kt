@@ -5,6 +5,7 @@ import org.jdesktop.swingx.JXPanel
 import ru.ezhov.rocket.action.api.RocketAction
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
 import ru.ezhov.rocket.action.api.RocketActionSettings
+import ru.ezhov.rocket.action.api.RocketActionType
 import ru.ezhov.rocket.action.caching.CacheFactory
 import ru.ezhov.rocket.action.icon.AppIcon
 import ru.ezhov.rocket.action.icon.IconRepositoryFactory
@@ -35,7 +36,6 @@ import javax.swing.JToolBar
 import javax.swing.SwingUtilities
 import javax.swing.SwingWorker
 import javax.swing.WindowConstants
-import javax.swing.event.ChangeEvent
 
 class ShowImageRocketActionUi : AbstractRocketAction() {
 
@@ -62,15 +62,15 @@ class ShowImageRocketActionUi : AbstractRocketAction() {
                 }
             }
 
-    override fun type(): String = "SHOW_IMAGE"
+    override fun type(): RocketActionType = RocketActionType { "SHOW_IMAGE" }
 
-    override fun description(): String = "Show *.png and *.jpg images"
+    override fun description(): String = "Показать изображения *.png и *.jpg"
 
     override fun properties(): List<RocketActionConfigurationProperty> {
         return listOf(
-                createRocketActionProperty(LABEL, LABEL, "TEST", false),
-                createRocketActionProperty(DESCRIPTION, DESCRIPTION, "TEST", false),
-                createRocketActionProperty(IMAGE_URL, IMAGE_URL, "TEST", true)
+                createRocketActionProperty(LABEL, LABEL, "Заголовок", false),
+                createRocketActionProperty(DESCRIPTION, DESCRIPTION, "Описание", false),
+                createRocketActionProperty(IMAGE_URL, IMAGE_URL, "URL изображения", true)
         )
     }
 
@@ -130,7 +130,7 @@ class ShowImageRocketActionUi : AbstractRocketAction() {
                 }
 
                 init {
-                    putValue(NAME, "Open in window")
+                    putValue(NAME, "Открыть в отдельном окне")
                 }
             })
             preferredSize = newDimension
@@ -154,7 +154,7 @@ class ShowImageRocketActionUi : AbstractRocketAction() {
             )
             val slider = JSlider(1, 100, 100)
             toolBar.add(slider)
-            slider.addChangeListener { e: ChangeEvent? -> imageView.scale = slider.value / 100.0 }
+            slider.addChangeListener { imageView.scale = slider.value / 100.0 }
             val cachedLabel = JLabel("Cached: " + cachedImage.absolutePath)
             cachedLabel.addMouseListener(object : MouseAdapter() {
                 override fun mouseReleased(e: MouseEvent) {

@@ -1,16 +1,17 @@
 package ru.ezhov.rocket.action.infrastructure
 
 import ru.ezhov.rocket.action.api.RocketActionSettings
+import ru.ezhov.rocket.action.api.RocketActionType
 
 class MutableRocketActionSettings : RocketActionSettings {
     private var id: String
-    private var type: String
+    private var type: RocketActionType
     private var settings: MutableMap<String, String>
     private var actions: MutableList<RocketActionSettings>
 
     constructor(
             id: String,
-            type: String,
+            type: RocketActionType,
             settings: MutableMap<String, String>,
             actions: MutableList<RocketActionSettings>
     ) {
@@ -22,7 +23,7 @@ class MutableRocketActionSettings : RocketActionSettings {
 
     constructor(
             id: String,
-            type: String,
+            type: RocketActionType,
             settings: MutableMap<String, String>
     ) {
         this.id = id
@@ -31,21 +32,13 @@ class MutableRocketActionSettings : RocketActionSettings {
         actions = ArrayList()
     }
 
-    override fun id(): String {
-        return id
-    }
+    override fun id(): String = id
 
-    override fun type(): String {
-        return type
-    }
+    override fun type(): RocketActionType = type
 
-    override fun settings(): MutableMap<String, String> {
-        return settings
-    }
+    override fun settings(): MutableMap<String, String> = settings
 
-    override fun actions(): List<RocketActionSettings> {
-        return actions
-    }
+    override fun actions(): List<RocketActionSettings> = actions
 
     fun add(key: String, value: String) {
         settings[key] = value

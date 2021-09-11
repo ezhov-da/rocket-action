@@ -1,15 +1,16 @@
 package ru.ezhov.rocket.action.configuration.ui
 
+import ru.ezhov.rocket.action.api.RocketActionSettings
+import ru.ezhov.rocket.action.configuration.domain.RocketActionConfigurationRepository
 import ru.ezhov.rocket.action.domain.RocketActionSettingsRepository
 import ru.ezhov.rocket.action.domain.RocketActionSettingsRepositoryException
 import ru.ezhov.rocket.action.domain.RocketActionUiRepository
-import ru.ezhov.rocket.action.api.RocketActionSettings
-import ru.ezhov.rocket.action.configuration.domain.RocketActionConfigurationRepository
 import ru.ezhov.rocket.action.icon.AppIcon
 import ru.ezhov.rocket.action.icon.IconRepositoryFactory
 import ru.ezhov.rocket.action.infrastructure.MutableRocketActionSettings
 import ru.ezhov.rocket.action.notification.NotificationFactory
 import ru.ezhov.rocket.action.notification.NotificationType
+import ru.ezhov.rocket.action.types.group.GroupRocketActionUi
 import java.awt.BorderLayout
 import java.awt.Component
 import java.awt.Dialog
@@ -18,9 +19,25 @@ import java.awt.event.ActionEvent
 import java.awt.event.ActionListener
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
-import javax.swing.*
+import javax.swing.AbstractAction
+import javax.swing.DropMode
+import javax.swing.JButton
+import javax.swing.JDialog
+import javax.swing.JLabel
+import javax.swing.JMenuBar
+import javax.swing.JMenuItem
+import javax.swing.JPanel
+import javax.swing.JPopupMenu
+import javax.swing.JScrollPane
+import javax.swing.JSplitPane
+import javax.swing.JTree
+import javax.swing.SwingUtilities
 import javax.swing.event.TreeSelectionEvent
-import javax.swing.tree.*
+import javax.swing.tree.DefaultMutableTreeNode
+import javax.swing.tree.DefaultTreeCellRenderer
+import javax.swing.tree.DefaultTreeModel
+import javax.swing.tree.MutableTreeNode
+import javax.swing.tree.TreeSelectionModel
 
 class ConfigurationFrame(
         owner: Dialog,
@@ -52,14 +69,16 @@ class ConfigurationFrame(
         val root = DefaultMutableTreeNode(null, true)
         fillTreeNodes(actions, root)
         val defaultTreeModel = DefaultTreeModel(root)
-        val rocketActionSettingsPanel = EditorRocketActionSettingsPanel(rocketActionConfigurationRepository)
+        val rocketActionSettingsPanel = EditorRocketActionSettingsPanel(
+                rocketActionConfigurationRepository,
+                rocketActionUiRepository
+        )
         val panel = JPanel(BorderLayout())
         val tree = JTree(defaultTreeModel)
         tree.selectionModel.selectionMode = TreeSelectionModel.SINGLE_TREE_SELECTION
         tree.addTreeSelectionListener { e: TreeSelectionEvent ->
             val path = e.newLeadSelectionPath ?: return@addTreeSelectionListener
             val node = path.lastPathComponent as DefaultMutableTreeNode
-                    ?: return@addTreeSelectionListener
             val o = node.userObject
             if (o != null) {
                 val settings = o as RocketActionSettings
@@ -80,8 +99,8 @@ class ConfigurationFrame(
         val panelTree = JPanel(BorderLayout())
         panelTree.add(JScrollPane(tree), BorderLayout.CENTER)
         val panelSaveTree = JPanel()
-        val buttonSaveTree = JButton("Save actions")
-        buttonSaveTree.addActionListener { e: ActionEvent? -> saveSettings(defaultTreeModel) }
+        val buttonSaveTree = JButton("Сохранить всю конфигурацию")
+        buttonSaveTree.addActionListener { saveSettings(defaultTreeModel) }
         panelSaveTree.add(buttonSaveTree)
         panelTree.add(panelSaveTree, BorderLayout.SOUTH)
         splitPane.leftComponent = panelTree
@@ -94,6 +113,7 @@ class ConfigurationFrame(
                 if (e.button == MouseEvent.BUTTON3) {
                     val treePath = tree.getClosestPathForLocation(e.x, e.y) ?: return
                     val mutableTreeNode = treePath.lastPathComponent as DefaultMutableTreeNode
+                    val userObject = mutableTreeNode.userObject as? RocketActionSettings
                     val popupMenu = JPopupMenu()
                     popupMenu.add(JMenuItem(object : AbstractAction() {
                         override fun actionPerformed(e: ActionEvent) {
@@ -117,7 +137,7 @@ class ConfigurationFrame(
                         }
 
                         init {
-                            putValue(NAME, "Add new TOP")
+                            putValue(NAME, "Добавить выше")
                         }
                     }))
                     popupMenu.add(JMenuItem(
@@ -146,38 +166,40 @@ class ConfigurationFrame(
                                 }
 
                                 init {
-                                    putValue(NAME, "Add new DOWN")
+                                    putValue(NAME, "Добавить ниже")
                                 }
                             }
                     ))
-                    popupMenu.add(JMenuItem(
-                            object : AbstractAction() {
-                                override fun actionPerformed(e: ActionEvent) {
-                                    createRocketActionSettingsDialog.show(object : CreatedRocketActionSettingsCallback {
-                                        override fun create(rocketActionSettings: RocketActionSettings) {
-                                            SwingUtilities.invokeLater {
-                                                mutableTreeNode.add(
-                                                        DefaultMutableTreeNode(
-                                                                MutableRocketActionSettings(
-                                                                        rocketActionSettings.id(),
-                                                                        rocketActionSettings.type(),
-                                                                        rocketActionSettings.settings().toMutableMap(),
-                                                                        rocketActionSettings.actions().toMutableList()
-                                                                ),
-                                                                true
-                                                        )
-                                                )
-                                                defaultTreeModel.reload(mutableTreeNode)
+                    if (userObject?.type()?.value() == GroupRocketActionUi.TYPE) {
+                        popupMenu.add(JMenuItem(
+                                object : AbstractAction() {
+                                    override fun actionPerformed(e: ActionEvent) {
+                                        createRocketActionSettingsDialog.show(object : CreatedRocketActionSettingsCallback {
+                                            override fun create(rocketActionSettings: RocketActionSettings) {
+                                                SwingUtilities.invokeLater {
+                                                    mutableTreeNode.add(
+                                                            DefaultMutableTreeNode(
+                                                                    MutableRocketActionSettings(
+                                                                            rocketActionSettings.id(),
+                                                                            rocketActionSettings.type(),
+                                                                            rocketActionSettings.settings().toMutableMap(),
+                                                                            rocketActionSettings.actions().toMutableList()
+                                                                    ),
+                                                                    true
+                                                            )
+                                                    )
+                                                    defaultTreeModel.reload(mutableTreeNode)
+                                                }
                                             }
-                                        }
-                                    })
-                                }
+                                        })
+                                    }
 
-                                init {
-                                    putValue(NAME, "Add new as child")
+                                    init {
+                                        putValue(NAME, "Создать и добавить как потомка")
+                                    }
                                 }
-                            }
-                    ))
+                        ))
+                    }
                     popupMenu.add(JMenuItem(
                             object : AbstractAction() {
                                 override fun actionPerformed(e: ActionEvent) {
@@ -188,7 +210,7 @@ class ConfigurationFrame(
                                 }
 
                                 init {
-                                    putValue(NAME, "Delete")
+                                    putValue(NAME, "Удалить")
                                 }
                             }
                     ))
@@ -204,7 +226,7 @@ class ConfigurationFrame(
         for (rocketActionSettings in actions!!) {
             val current = DefaultMutableTreeNode(rocketActionSettings, true)
             parent.add(current)
-            if (!rocketActionSettings!!.actions().isEmpty()) {
+            if (rocketActionSettings!!.actions().isNotEmpty()) {
                 val childAction = rocketActionSettings.actions()
                 fillTreeNodes(childAction, current)
             }
@@ -220,10 +242,10 @@ class ConfigurationFrame(
         }
         try {
             rocketActionSettingsRepository!!.save(settings)
-            NotificationFactory.notification.show(NotificationType.INFO, "Actions saved")
+            NotificationFactory.notification.show(NotificationType.INFO, "Сохранить действия")
         } catch (e: RocketActionSettingsRepositoryException) {
             e.printStackTrace()
-            NotificationFactory.notification.show(NotificationType.ERROR, "Error actions saving")
+            NotificationFactory.notification.show(NotificationType.ERROR, "Ошибка сохранения действий")
         }
     }
 
@@ -255,7 +277,7 @@ class ConfigurationFrame(
                 if (labelProperty != null && "" != labelProperty) {
                     label.text = labelProperty
                 } else {
-                    label.text = settings.type()
+                    label.text = settings.type().value()
                 }
             }
             return label
@@ -264,13 +286,13 @@ class ConfigurationFrame(
 
 
     init {
-        dialog = JDialog(owner, "Rocket action configuration")
+        dialog = JDialog(owner, "Конфигурирование действий")
         this.updateActionListener = updateActionListener
         this.rocketActionConfigurationRepository = rocketActionConfigurationRepository
         this.rocketActionUiRepository = rocketActionUiRepository
         this.rocketActionSettingsRepository = rocketActionSettingsRepository
         val menuBar = JMenuBar()
-        val menuItemUpdate = JMenuItem("Update")
+        val menuItemUpdate = JMenuItem("Обновить")
         menuItemUpdate.icon = IconRepositoryFactory.repository.by(AppIcon.RELOAD)
         menuItemUpdate.addActionListener { e: ActionEvent? ->
             SwingUtilities.invokeLater {

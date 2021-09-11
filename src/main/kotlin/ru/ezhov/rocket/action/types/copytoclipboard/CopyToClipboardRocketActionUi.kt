@@ -3,6 +3,7 @@ package ru.ezhov.rocket.action.types.copytoclipboard
 import ru.ezhov.rocket.action.api.RocketAction
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
 import ru.ezhov.rocket.action.api.RocketActionSettings
+import ru.ezhov.rocket.action.api.RocketActionType
 import ru.ezhov.rocket.action.icon.AppIcon
 import ru.ezhov.rocket.action.icon.IconRepositoryFactory
 import ru.ezhov.rocket.action.notification.NotificationFactory
@@ -32,7 +33,7 @@ class CopyToClipboardRocketActionUi : AbstractRocketAction() {
                     val defaultToolkit = Toolkit.getDefaultToolkit()
                     val clipboard = defaultToolkit.systemClipboard
                     clipboard.setContents(StringSelection(text), null)
-                    NotificationFactory.notification.show(NotificationType.INFO, "Text copy to clipboard")
+                    NotificationFactory.notification.show(NotificationType.INFO, "Текст скопирован в буфер")
                 }
 
                 object : RocketAction {
@@ -49,19 +50,19 @@ class CopyToClipboardRocketActionUi : AbstractRocketAction() {
                 }
             }
 
-    override fun type(): String = "COPY_TO_CLIPBOARD"
+    override fun type(): RocketActionType = RocketActionType { "COPY_TO_CLIPBOARD" }
 
     override fun description(): String {
-        return "Allows you to copy a previously prepared text to the clipboard"
+        return "Позволяет скопировать текст в буфер"
     }
 
     override fun name(): String = "Копировать в буфер"
 
     override fun properties(): List<RocketActionConfigurationProperty> {
         return listOf(
-                createRocketActionProperty(LABEL, LABEL, "Displayed title", false),
-                createRocketActionProperty(DESCRIPTION, DESCRIPTION, "Description that will be displayed as a hint", false),
-                createRocketActionProperty(TEXT, TEXT, "Text prepared for copying to the clipboard", true)
+                createRocketActionProperty(LABEL, LABEL, "Текст для отображения", false),
+                createRocketActionProperty(DESCRIPTION, DESCRIPTION, "Описание", false),
+                createRocketActionProperty(TEXT, TEXT, "Текст для копирования в буфер", true)
         )
     }
 

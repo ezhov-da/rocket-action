@@ -3,6 +3,7 @@ package ru.ezhov.rocket.action.types.openurl
 import ru.ezhov.rocket.action.api.RocketAction
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
 import ru.ezhov.rocket.action.api.RocketActionSettings
+import ru.ezhov.rocket.action.api.RocketActionType
 import ru.ezhov.rocket.action.icon.AppIcon
 import ru.ezhov.rocket.action.icon.IconRepositoryFactory
 import ru.ezhov.rocket.action.icon.IconService
@@ -45,7 +46,6 @@ class OpenUrlRocketActionUi : AbstractRocketAction() {
                             override fun mouseReleased(e: MouseEvent) {
                                 when (e.button) {
                                     MouseEvent.BUTTON3 -> copyUrlToClipBoard(url)
-                                    MouseEvent.BUTTON1 -> openUrl(url)
                                 }
                             }
                         })
@@ -57,7 +57,7 @@ class OpenUrlRocketActionUi : AbstractRocketAction() {
         val defaultToolkit = Toolkit.getDefaultToolkit()
         val clipboard = defaultToolkit.systemClipboard
         clipboard.setContents(StringSelection(url), null)
-        NotificationFactory.notification.show(NotificationType.INFO, "URL copy to clipboard")
+        NotificationFactory.notification.show(NotificationType.INFO, "URL скопирована в буфер")
     }
 
     private fun openUrl(url: String) {
@@ -66,21 +66,21 @@ class OpenUrlRocketActionUi : AbstractRocketAction() {
                 Desktop.getDesktop().browse(URI(url))
             } catch (ex: Exception) {
                 ex.printStackTrace()
-                NotificationFactory.notification.show(NotificationType.ERROR, "Error open url")
+                NotificationFactory.notification.show(NotificationType.ERROR, "Ошибка открытия URL")
             }
         }
     }
 
-    override fun type(): String = "OPEN_URL"
+    override fun type(): RocketActionType = RocketActionType { "OPEN_URL" }
 
-    override fun description(): String = "description"
+    override fun description(): String = "Открытие ссылки"
 
     override fun properties(): List<RocketActionConfigurationProperty> {
         return listOf(
-                createRocketActionProperty(LABEL, LABEL, "TEST", false),
-                createRocketActionProperty(DESCRIPTION, DESCRIPTION, "TEST", false),
-                createRocketActionProperty(URL, URL, "TEST", true),
-                createRocketActionProperty(ICON_URL, ICON_URL, "Icon URL", false)
+                createRocketActionProperty(LABEL, LABEL, "Заголовок", false),
+                createRocketActionProperty(DESCRIPTION, DESCRIPTION, "Описание", false),
+                createRocketActionProperty(URL, URL, "URL", true),
+                createRocketActionProperty(ICON_URL, ICON_URL, "URL иконка", false)
         )
     }
 

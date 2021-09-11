@@ -6,6 +6,7 @@ import org.apache.batik.swing.svg.JSVGComponent
 import ru.ezhov.rocket.action.api.RocketAction
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
 import ru.ezhov.rocket.action.api.RocketActionSettings
+import ru.ezhov.rocket.action.api.RocketActionType
 import ru.ezhov.rocket.action.caching.CacheFactory
 import ru.ezhov.rocket.action.icon.AppIcon
 import ru.ezhov.rocket.action.icon.IconRepositoryFactory
@@ -61,19 +62,17 @@ class ShowSvgImageRocketActionUi : AbstractRocketAction() {
                 }
             }
 
-    override fun type(): String {
-        return "SHOW_SVG_IMAGE"
-    }
+    override fun type(): RocketActionType = RocketActionType { "SHOW_SVG_IMAGE" }
 
     override fun description(): String {
-        return "SVG image show (beta)"
+        return "Отобразить изображение формата *.svg (beta)"
     }
 
     override fun properties(): List<RocketActionConfigurationProperty> {
         return listOf(
-                createRocketActionProperty(LABEL, LABEL, "TEST", false),
-                createRocketActionProperty(DESCRIPTION, DESCRIPTION, "TEST", false),
-                createRocketActionProperty(IMAGE_URL, IMAGE_URL, "TEST", true)
+                createRocketActionProperty(IMAGE_URL, IMAGE_URL, "URL изображения", true),
+                createRocketActionProperty(LABEL, LABEL, "Заголовок", false),
+                createRocketActionProperty(DESCRIPTION, DESCRIPTION, "Описание", false),
         )
     }
 
@@ -132,7 +131,7 @@ class ShowSvgImageRocketActionUi : AbstractRocketAction() {
                 }
 
                 init {
-                    putValue(NAME, "Open in window")
+                    putValue(NAME, "Открыть в отдельном окне")
                 }
             })
             preferredSize = newDimension

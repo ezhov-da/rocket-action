@@ -1,7 +1,11 @@
 package ru.ezhov.rocket.action.types.template
 
 import ru.ezhov.rocket.action.ui.swing.common.TextFieldWithText
-import java.awt.*
+import java.awt.BorderLayout
+import java.awt.Color
+import java.awt.Cursor
+import java.awt.Desktop
+import java.awt.GridLayout
 import java.awt.event.KeyListener
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
@@ -44,7 +48,7 @@ internal class PanelEngine(words: List<String>, keyListenerForAllTextFields: Key
     init {
         this.words = words.sortedBy { it }
         layout = BorderLayout()
-        val panelTextField = JPanel(GridLayout(words!!.size, 1))
+        val panelTextField = JPanel(GridLayout(words.size, 1))
         panelTextField.layout = GridLayout(words.size, 1)
         for (s in this.words) {
             val textField: JTextField = TextFieldWithText(s)

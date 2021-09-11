@@ -5,7 +5,6 @@ import ru.ezhov.rocket.action.icon.IconRepositoryFactory
 import java.awt.BorderLayout
 import java.awt.Dimension
 import java.awt.Point
-import java.awt.event.ActionEvent
 import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.JWindow
@@ -22,7 +21,7 @@ internal class Message(
         this.location = location
         val timer = Timer(20, null)
         timer.initialDelay = delay
-        timer.addActionListener { e: ActionEvent? ->
+        timer.addActionListener {
             this.messageOpacity = messageOpacity - 0.1f
             if (messageOpacity <= 0) {
                 timer.stop()

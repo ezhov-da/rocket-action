@@ -18,4 +18,5 @@ enum class AppIcon(val iconName: String) {
     WARNING("warning-2x"),
     BAN("ban-2x"),
     CLEAR("circle-x-2x"),
+    TEXT("text-2x"),
 }

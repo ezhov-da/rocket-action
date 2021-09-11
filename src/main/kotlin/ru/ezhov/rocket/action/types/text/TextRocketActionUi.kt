@@ -3,6 +3,7 @@ package ru.ezhov.rocket.action.types.text
 import ru.ezhov.rocket.action.api.RocketAction
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
 import ru.ezhov.rocket.action.api.RocketActionSettings
+import ru.ezhov.rocket.action.api.RocketActionType
 import ru.ezhov.rocket.action.notification.NotificationFactory
 import ru.ezhov.rocket.action.notification.NotificationType
 import ru.ezhov.rocket.action.types.AbstractRocketAction
@@ -18,13 +19,19 @@ class TextRocketActionUi : AbstractRocketAction() {
     override fun description(): String = "Show text"
 
     override fun properties(): List<RocketActionConfigurationProperty> =
-            listOf(createRocketActionProperty(LABEL, LABEL, "Text to display", true))
+            listOf(
+                    createRocketActionProperty(LABEL, LABEL, "Текст для отображения", true),
+                    createRocketActionProperty(DESCRIPTION, DESCRIPTION, "Описание", false)
+            )
 
     override fun create(settings: RocketActionSettings): RocketAction? =
             settings.settings()[LABEL]?.takeIf { it.isNotEmpty() }?.let { label ->
+                val description = settings.settings()[DESCRIPTION]
+
                 object : RocketAction {
                     override fun contains(search: String): Boolean =
                             label.contains(search, ignoreCase = true)
+                                    .or(description?.contains(search, ignoreCase = true) ?: false)
 
                     override fun isChanged(actionSettings: RocketActionSettings): Boolean =
                             !(settings.id() == actionSettings.id() &&
@@ -32,6 +39,9 @@ class TextRocketActionUi : AbstractRocketAction() {
 
                     override fun component(): Component = JTextPane().apply {
                         text = label
+                        description?.let { description ->
+                            this.toolTipText = description
+                        }
                         isEditable = false
                         background = JLabel().background
                         addMouseListener(object : MouseAdapter() {
@@ -40,7 +50,7 @@ class TextRocketActionUi : AbstractRocketAction() {
                                     val defaultToolkit = Toolkit.getDefaultToolkit()
                                     val clipboard = defaultToolkit.systemClipboard
                                     clipboard.setContents(StringSelection(text), null)
-                                    NotificationFactory.notification.show(NotificationType.INFO, "Text copy to clipboard")
+                                    NotificationFactory.notification.show(NotificationType.INFO, "Текст скопирован в буфер")
                                 }
                             }
                         })
@@ -48,10 +58,11 @@ class TextRocketActionUi : AbstractRocketAction() {
                 }
             }
 
-    override fun type(): String = "SHOW_TEXT"
+    override fun type(): RocketActionType = RocketActionType { "SHOW_TEXT" }
 
     companion object {
         private const val LABEL = "label"
+        private const val DESCRIPTION = "description"
     }
 
     override fun name(): String = "Отобразить текст"

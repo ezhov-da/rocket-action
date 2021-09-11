@@ -3,11 +3,11 @@ package ru.ezhov.rocket.action.infrastructure
 import org.junit.Assert
 import org.junit.Ignore
 import org.junit.Test
-import ru.ezhov.rocket.action.domain.RocketActionSettingsRepositoryException
 import ru.ezhov.rocket.action.api.RocketActionSettings
+import ru.ezhov.rocket.action.api.RocketActionType
+import ru.ezhov.rocket.action.domain.RocketActionSettingsRepositoryException
 import java.io.File
 import java.net.URISyntaxException
-import java.util.*
 
 class YmlRocketActionSettingsRepositoryTest {
     @Test
@@ -17,7 +17,7 @@ class YmlRocketActionSettingsRepositoryTest {
                 this.javaClass.getResource("/actions.yml")!!.toURI()
         )
         val actions = repository.actions()
-        Assert.assertEquals(20, actions.size.toLong())
+        Assert.assertEquals(21, actions.size.toLong())
         println(actions)
     }
 
@@ -30,78 +30,40 @@ class YmlRocketActionSettingsRepositoryTest {
         )
         repository.save(listOf(
                 object : RocketActionSettings {
-                    override fun id(): String {
-                        return "id1"
-                    }
+                    override fun id(): String = "id1"
 
-                    override fun type(): String {
-                        return "test"
-                    }
+                    override fun type(): RocketActionType = RocketActionType { "test" }
 
-                    override fun settings(): Map<String, String> {
-                        val map: MutableMap<String, String> = HashMap()
-                        map["1"] = "2"
-                        return map
-                    }
+                    override fun settings(): Map<String, String> = mapOf("1" to "2")
 
-                    override fun actions(): List<RocketActionSettings> {
-                        return emptyList()
-                    }
+                    override fun actions(): List<RocketActionSettings> = emptyList()
                 },
                 object : RocketActionSettings {
-                    override fun id(): String {
-                        return "id2"
-                    }
+                    override fun id(): String = "id2"
 
-                    override fun type(): String {
-                        return "test"
-                    }
+                    override fun type(): RocketActionType = RocketActionType { "test" }
 
-                    override fun settings(): Map<String, String> {
-                        val map: MutableMap<String, String> = HashMap()
-                        map["1"] = "2"
-                        return map
-                    }
+                    override fun settings(): Map<String, String> = mapOf("1" to "2")
 
                     override fun actions(): List<RocketActionSettings> {
                         return listOf(
                                 object : RocketActionSettings {
-                                    override fun id(): String {
-                                        return "id4"
-                                    }
+                                    override fun id(): String = "id4"
 
-                                    override fun type(): String {
-                                        return "test"
-                                    }
+                                    override fun type(): RocketActionType = RocketActionType { "test" }
 
-                                    override fun settings(): Map<String, String> {
-                                        val map: MutableMap<String, String> = HashMap()
-                                        map["1"] = "2"
-                                        return map
-                                    }
+                                    override fun settings(): Map<String, String> = mapOf("1" to "2")
 
-                                    override fun actions(): List<RocketActionSettings> {
-                                        return emptyList()
-                                    }
+                                    override fun actions(): List<RocketActionSettings> = emptyList()
                                 },
                                 object : RocketActionSettings {
-                                    override fun id(): String {
-                                        return "id5"
-                                    }
+                                    override fun id(): String = "id5"
 
-                                    override fun type(): String {
-                                        return "test"
-                                    }
+                                    override fun type(): RocketActionType = RocketActionType { "test" }
 
-                                    override fun settings(): Map<String, String> {
-                                        val map: MutableMap<String, String> = HashMap()
-                                        map["1"] = "2"
-                                        return map
-                                    }
+                                    override fun settings(): Map<String, String> = mapOf("1" to "2")
 
-                                    override fun actions(): List<RocketActionSettings> {
-                                        return emptyList()
-                                    }
+                                    override fun actions(): List<RocketActionSettings> = emptyList()
                                 }
                         )
                     }

@@ -5,7 +5,7 @@ import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
 import ru.ezhov.rocket.action.api.RocketActionFactoryUi
 
 /**
- * Base class for UI action
+ * Базовый класс для создания UI действия
  */
 abstract class AbstractRocketAction : RocketActionFactoryUi, RocketActionConfiguration {
     protected fun createRocketActionProperty(
@@ -13,15 +13,14 @@ abstract class AbstractRocketAction : RocketActionFactoryUi, RocketActionConfigu
             name: String,
             description: String,
             required: Boolean
-    ): RocketActionConfigurationProperty {
-        return object : RocketActionConfigurationProperty {
-            override fun key(): String = key
+    ): RocketActionConfigurationProperty =
+            object : RocketActionConfigurationProperty {
+                override fun key(): String = key
 
-            override fun name(): String = name
+                override fun name(): String = name
 
-            override fun description(): String = description
+                override fun description(): String = description
 
-            override val isRequired: Boolean = required
-        }
-    }
+                override val isRequired: Boolean = required
+            }
 }

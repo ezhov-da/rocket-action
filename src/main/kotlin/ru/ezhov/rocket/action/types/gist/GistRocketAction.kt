@@ -4,6 +4,7 @@ import org.eclipse.egit.github.core.Gist
 import ru.ezhov.rocket.action.api.RocketAction
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
 import ru.ezhov.rocket.action.api.RocketActionSettings
+import ru.ezhov.rocket.action.api.RocketActionType
 import ru.ezhov.rocket.action.icon.AppIcon
 import ru.ezhov.rocket.action.icon.IconRepositoryFactory
 import ru.ezhov.rocket.action.notification.NotificationFactory
@@ -12,7 +13,6 @@ import ru.ezhov.rocket.action.types.AbstractRocketAction
 import java.awt.BorderLayout
 import java.awt.Component
 import java.awt.Desktop
-import java.awt.event.ActionEvent
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import java.io.IOException
@@ -46,14 +46,14 @@ class GistRocketAction : AbstractRocketAction() {
                 createRocketActionProperty(
                         TOKEN,
                         TOKEN,
-                        "Use this or -D$TOKEN_PROPERTY",
+                        "Используйте это свойство или свойство командной строки Java -D$TOKEN_PROPERTY",
                         false
                 ),
                 createRocketActionProperty(USERNAME, USERNAME, "", true),
                 createRocketActionProperty(
                         BASE_GIST_URL,
                         BASE_GIST_URL,
-                        "Url gists for open",
+                        "Url gists",
                         false
                 )
         )
@@ -86,7 +86,7 @@ class GistRocketAction : AbstractRocketAction() {
                     ?: System.getProperty(TOKEN_PROPERTY, "").takeIf { it.isNotEmpty() }
 
 
-    override fun type(): String = "GIST"
+    override fun type(): RocketActionType = RocketActionType { "GIST" }
 
     private inner class GistWorker(
             private val menu: JMenu,
@@ -107,7 +107,7 @@ class GistRocketAction : AbstractRocketAction() {
             try {
                 menu.removeAll()
                 menu.add(this.get())
-                NotificationFactory.notification.show(NotificationType.INFO, "Gists loaded")
+                NotificationFactory.notification.show(NotificationType.INFO, "Gists загружены")
             } catch (e: InterruptedException) {
                 e.printStackTrace()
             } catch (e: ExecutionException) {
@@ -199,7 +199,7 @@ class GistRocketAction : AbstractRocketAction() {
                     }
                 })
             }
-            textFieldSearch.addActionListener { e: ActionEvent? -> SwingUtilities.invokeLater { fillAndSetModel(textFieldSearch.text) } }
+            textFieldSearch.addActionListener { SwingUtilities.invokeLater { fillAndSetModel(textFieldSearch.text) } }
         }
     }
 

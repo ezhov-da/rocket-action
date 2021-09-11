@@ -2,8 +2,9 @@ package ru.ezhov.rocket.action.infrastructure
 
 import org.reflections.Reflections
 import org.reflections.scanners.SubTypesScanner
-import ru.ezhov.rocket.action.domain.RocketActionUiRepository
 import ru.ezhov.rocket.action.api.RocketActionFactoryUi
+import ru.ezhov.rocket.action.api.RocketActionType
+import ru.ezhov.rocket.action.domain.RocketActionUiRepository
 import java.lang.reflect.Modifier
 
 class ReflectionRocketActionUiRepository : RocketActionUiRepository {
@@ -26,6 +27,6 @@ class ReflectionRocketActionUiRepository : RocketActionUiRepository {
 
     override fun all(): List<RocketActionFactoryUi> = list
 
-    override fun by(type: String): RocketActionFactoryUi? =
-            all().firstOrNull { r: RocketActionFactoryUi -> r.type() == type }
+    override fun by(type: RocketActionType): RocketActionFactoryUi? =
+            all().firstOrNull { r: RocketActionFactoryUi -> r.type().value() == type.value() }
 }

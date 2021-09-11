@@ -3,6 +3,7 @@ package ru.ezhov.rocket.action.configuration.infrastructure
 import org.reflections.Reflections
 import org.reflections.scanners.SubTypesScanner
 import ru.ezhov.rocket.action.api.RocketActionConfiguration
+import ru.ezhov.rocket.action.api.RocketActionType
 import ru.ezhov.rocket.action.configuration.domain.RocketActionConfigurationRepository
 import java.lang.reflect.Modifier
 
@@ -28,6 +29,6 @@ class ReflectionRocketActionConfigurationRepository : RocketActionConfigurationR
 
     override fun all(): List<RocketActionConfiguration> = list
 
-    override fun by(type: String): RocketActionConfiguration? =
-            all().firstOrNull { r: RocketActionConfiguration -> r.type() == type }
+    override fun by(type: RocketActionType): RocketActionConfiguration? =
+            all().firstOrNull { r: RocketActionConfiguration -> r.type().value() == type.value() }
 }

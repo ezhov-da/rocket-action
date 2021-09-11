@@ -26,7 +26,6 @@ import java.awt.dnd.DnDConstants
 import java.awt.dnd.DropTarget
 import java.awt.dnd.DropTargetAdapter
 import java.awt.dnd.DropTargetDropEvent
-import java.awt.event.ActionEvent
 import java.awt.event.ActionListener
 import java.awt.event.KeyAdapter
 import java.awt.event.KeyEvent
@@ -84,7 +83,7 @@ class UiQuickActionService(
             CreateMenuWorker(menu).execute()
             menuBar
         } catch (e: Exception) {
-            throw UiQuickActionServiceException("Error", e)
+            throw UiQuickActionServiceException("Ошибка", e)
         }
     }
 
@@ -95,7 +94,7 @@ class UiQuickActionService(
             JPanel(FlowLayout(FlowLayout.LEFT, 0, 0)).apply {
                 border = BorderFactory.createEmptyBorder()
                 val textField =
-                        TextFieldWithText("Search").apply { ->
+                        TextFieldWithText("Поиск").apply { ->
                             val tf = this
                             columns = 5
                             addKeyListener(object : KeyAdapter() {
@@ -143,7 +142,7 @@ class UiQuickActionService(
             }
 
     private fun createTools(dialog: JDialog): JMenu {
-        val menuTools = JMenu("Tools")
+        val menuTools = JMenu("Инструменты")
         menuTools.icon = IconRepositoryFactory.repository.by(AppIcon.WRENCH)
         val updateActionListener = ActionListener {
             SwingUtilities.invokeLater {
@@ -152,7 +151,7 @@ class UiQuickActionService(
                     newMenuBar = createMenu(dialog)
                 } catch (ex: UiQuickActionServiceException) {
                     ex.printStackTrace()
-                    NotificationFactory.notification.show(NotificationType.ERROR, "Tools menu created error")
+                    NotificationFactory.notification.show(NotificationType.ERROR, "Ошибка создания меню инструментов")
                 }
                 if (newMenuBar != null) {
                     // пока костыль, но мы то знаем это "пока" :)
@@ -163,11 +162,11 @@ class UiQuickActionService(
                 }
             }
         }
-        val menuItemUpdate = JMenuItem("Update")
+        val menuItemUpdate = JMenuItem("Обновить")
         menuItemUpdate.icon = IconRepositoryFactory.repository.by(AppIcon.RELOAD)
         menuItemUpdate.addActionListener(updateActionListener)
         menuTools.add(menuItemUpdate)
-        val menuItemEditor = JMenuItem("Editor")
+        val menuItemEditor = JMenuItem("Редактор")
         menuItemEditor.icon = IconRepositoryFactory.repository.by(AppIcon.PENCIL)
         menuItemEditor.addActionListener {
             SwingUtilities.invokeLater {
@@ -182,7 +181,7 @@ class UiQuickActionService(
                         )
                     } catch (ex: Exception) {
                         ex.printStackTrace()
-                        NotificationFactory.notification.show(NotificationType.ERROR, "Editor menu created error")
+                        NotificationFactory.notification.show(NotificationType.ERROR, "Ошибка создания меню конфигурирования")
                     }
                 }
                 if (configurationFrame != null) {
@@ -191,7 +190,7 @@ class UiQuickActionService(
             }
         }
         menuTools.add(menuItemEditor)
-        val menuInfo = JMenu("Info")
+        val menuInfo = JMenu("Информация")
         menuInfo.icon = IconRepositoryFactory.repository.by(AppIcon.INFO)
         val repository: GeneralPropertiesRepository = ResourceGeneralPropertiesRepository()
         menuInfo.add(JLabel(repository.all().getProperty("version", "not found")))
@@ -204,14 +203,14 @@ class UiQuickActionService(
             }
         } catch (e: Exception) {
             e.printStackTrace()
-            NotificationFactory.notification.show(NotificationType.ERROR, "Info menu created error")
+            NotificationFactory.notification.show(NotificationType.ERROR, "Ошибка создания меню информации")
         }
         val label = JLabel("<html>$info")
         menuInfo.add(label)
         menuTools.add(menuInfo)
-        val menuItemClose = JMenuItem("Exit")
+        val menuItemClose = JMenuItem("Выход")
         menuItemClose.icon = IconRepositoryFactory.repository.by(AppIcon.X)
-        menuItemClose.addActionListener { e: ActionEvent? -> SwingUtilities.invokeLater { dialog!!.dispose() } }
+        menuItemClose.addActionListener { SwingUtilities.invokeLater { dialog.dispose() } }
         menuTools.add(menuItemClose)
         return menuTools
     }
@@ -288,7 +287,7 @@ class UiQuickActionService(
                             cache
                                     .by(rocketActionSettings.id())?.let {
                                         logger.debug {
-                                            "found in cache type='${rocketActionSettings.type()}'" +
+                                            "found in cache type='${rocketActionSettings.type().value()}'" +
                                                     "id='${rocketActionSettings.id()}"
                                         }
 
@@ -296,7 +295,7 @@ class UiQuickActionService(
                                     }
                                     ?: run {
                                         logger.debug {
-                                            "not found in cache type='${rocketActionSettings.type()}'" +
+                                            "not found in cache type='${rocketActionSettings.type().value()}'" +
                                                     "id='${rocketActionSettings.id()}. Create component"
                                         }
 
@@ -319,13 +318,13 @@ class UiQuickActionService(
                         for (rocketActionSettings in actionSettings) {
                             val rau = rocketActionUiRepository.by(rocketActionSettings.type())
                             if (rau != null) {
-                                if (rocketActionSettings.type() != GroupRocketActionUi.TYPE) {
+                                if (rocketActionSettings.type().value() != GroupRocketActionUi.TYPE) {
                                     val mustBeCreate = cache
                                             .by(rocketActionSettings.id())
                                             ?.isChanged(rocketActionSettings) ?: true
 
                                     logger.debug {
-                                        "must be create '$mustBeCreate' type='${rocketActionSettings.type()}'" +
+                                        "must be create '$mustBeCreate' type='${rocketActionSettings.type().value()}'" +
                                                 "id='${rocketActionSettings.id()}"
                                     }
 
@@ -333,7 +332,7 @@ class UiQuickActionService(
                                         rau.create(rocketActionSettings)
                                                 ?.let { action ->
                                                     logger.debug {
-                                                        "added to cache type='${rocketActionSettings.type()}'" +
+                                                        "added to cache type='${rocketActionSettings.type().value()}'" +
                                                                 "id='${rocketActionSettings.id()}"
                                                     }
 

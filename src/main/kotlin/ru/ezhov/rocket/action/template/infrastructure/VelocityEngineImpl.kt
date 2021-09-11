@@ -26,7 +26,7 @@ class VelocityEngineImpl : Engine {
 
         // Set parameters for my template.
         val context = VelocityContext()
-        values!!.forEach { (key: String?, value: String?) -> context.put(key, value) }
+        values.forEach { (key: String?, value: String?) -> context.put(key, value) }
 
         // Get and merge the template with my parameters.
         val templateVelocity = engine.getTemplate("template", "UTF-8")
@@ -38,7 +38,7 @@ class VelocityEngineImpl : Engine {
     override fun words(text: String): List<String> {
         val words: MutableList<String> = ArrayList()
         val pattern = Pattern.compile("\\$\\w+")
-        val matcher = pattern.matcher(text!!.replace("\n\r", ""))
+        val matcher = pattern.matcher(text.replace("\n\r", ""))
         while (matcher.find()) {
             val w = matcher.group()
             if (!words.contains(w)) {

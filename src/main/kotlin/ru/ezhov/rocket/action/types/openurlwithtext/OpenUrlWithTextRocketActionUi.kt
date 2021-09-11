@@ -3,6 +3,7 @@ package ru.ezhov.rocket.action.types.openurlwithtext
 import ru.ezhov.rocket.action.api.RocketAction
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
 import ru.ezhov.rocket.action.api.RocketActionSettings
+import ru.ezhov.rocket.action.api.RocketActionType
 import ru.ezhov.rocket.action.icon.AppIcon
 import ru.ezhov.rocket.action.icon.IconRepositoryFactory
 import ru.ezhov.rocket.action.icon.IconService
@@ -53,7 +54,7 @@ class OpenUrlWithTextRocketActionUi : AbstractRocketAction() {
                                         )
                                     } catch (ex: Exception) {
                                         ex.printStackTrace()
-                                        NotificationFactory.notification.show(NotificationType.ERROR, "Error open URL")
+                                        NotificationFactory.notification.show(NotificationType.ERROR, "Ошибка открытия URL")
                                     }
                                 }
                             }
@@ -72,19 +73,17 @@ class OpenUrlWithTextRocketActionUi : AbstractRocketAction() {
                 }
             }
 
-    override fun type(): String = "OPEN_URL_WITH_TEXT"
+    override fun type(): RocketActionType = RocketActionType { "OPEN_URL_WITH_TEXT" }
 
-    override fun description(): String {
-        return "description"
-    }
+    override fun description(): String = "Открытие шаблонной ссылки с подставленным значением"
 
     override fun properties(): List<RocketActionConfigurationProperty> {
         return listOf(
-                createRocketActionProperty(LABEL, LABEL, "TEST", false),
-                createRocketActionProperty(DESCRIPTION, DESCRIPTION, "TEST", false),
-                createRocketActionProperty(BASE_URL, BASE_URL, "TEST", true),
-                createRocketActionProperty(PLACEHOLDER, PLACEHOLDER, "TEST", true),
-                createRocketActionProperty(ICON_URL, ICON_URL, "Icon URL", false)
+                createRocketActionProperty(LABEL, LABEL, "Заголовок", false),
+                createRocketActionProperty(DESCRIPTION, DESCRIPTION, "Описание", false),
+                createRocketActionProperty(BASE_URL, BASE_URL, "Шаблон URL", true),
+                createRocketActionProperty(PLACEHOLDER, PLACEHOLDER, "Строка подстановки", true),
+                createRocketActionProperty(ICON_URL, ICON_URL, "URL иконки", false)
         )
     }
 

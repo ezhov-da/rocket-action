@@ -6,7 +6,6 @@ import ru.ezhov.rocket.action.template.domain.Engine
 import java.awt.BorderLayout
 import java.awt.Toolkit
 import java.awt.datatransfer.StringSelection
-import java.awt.event.ActionEvent
 import java.awt.event.KeyAdapter
 import java.awt.event.KeyEvent
 import javax.swing.JButton
@@ -24,7 +23,7 @@ class NotePanelEngine(private val originText: String, private val engine: Engine
             val defaultToolkit = Toolkit.getDefaultToolkit()
             val clipboard = defaultToolkit.systemClipboard
             clipboard.setContents(StringSelection(finalText), null)
-            NotificationFactory.notification.show(NotificationType.INFO, "Template text copy to clipboard")
+            NotificationFactory.notification.show(NotificationType.INFO, "Шаблон скопирован в буфер")
         }
     }
 
@@ -38,13 +37,13 @@ class NotePanelEngine(private val originText: String, private val engine: Engine
             }
         })
         add(panelEngine, BorderLayout.CENTER)
-        val button = JButton("apply template (CTRL + ENTER field)")
+        val button = JButton("Применить (CTRL + ENTER на поле)")
         val panelButton = JPanel(BorderLayout())
         panelButton.add(button, BorderLayout.NORTH)
         labelText = JLabel(originText)
         panelButton.add(button, BorderLayout.NORTH)
         panelButton.add(labelText, BorderLayout.CENTER)
         add(panelButton, BorderLayout.SOUTH)
-        button.addActionListener { e: ActionEvent? -> apply() }
+        button.addActionListener { apply() }
     }
 }

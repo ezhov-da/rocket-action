@@ -11,7 +11,6 @@ import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Component
 import java.awt.Dialog
-import java.awt.event.ActionEvent
 import java.awt.event.ItemEvent
 import java.util.function.Consumer
 import javax.swing.BorderFactory
@@ -24,7 +23,6 @@ import javax.swing.JComboBox
 import javax.swing.JDialog
 import javax.swing.JLabel
 import javax.swing.JList
-import javax.swing.JMenuBar
 import javax.swing.JPanel
 import javax.swing.JScrollPane
 import javax.swing.JTextPane
@@ -34,15 +32,15 @@ import javax.swing.WindowConstants
 class CreateRocketActionSettingsDialog(
         owner: Dialog,
         private val rocketActionConfigurationRepository: RocketActionConfigurationRepository,
-        private val rocketActionUiRepository: RocketActionUiRepository
+        rocketActionUiRepository: RocketActionUiRepository
 ) {
     private val comboBoxModel = DefaultComboBoxModel<RocketActionConfiguration>()
     private var comboBox: JComboBox<RocketActionConfiguration> = JComboBox(comboBoxModel)
     private val actionSettingsPanel: RocketActionSettingsPanel = RocketActionSettingsPanel()
     private var currentCallback: CreatedRocketActionSettingsCallback? = null
-    private val testPanel: TestPanel = TestPanel()
+    private val testPanel: TestPanel = TestPanel(rocketActionUiRepository) { actionSettingsPanel.create() }
 
-    private val dialog: JDialog = JDialog(owner, "Create rocket action").apply {
+    private val dialog: JDialog = JDialog(owner, "Создать действие").apply {
         val ownerSize = owner.size
         setSize((ownerSize.width * 0.7).toInt(), (ownerSize.height * 0.7).toInt())
         add(panelComboBox(), BorderLayout.NORTH)
@@ -59,6 +57,7 @@ class CreateRocketActionSettingsDialog(
         val sortedAll = all.sortedBy { it.name() }
         sortedAll.forEach(Consumer { anObject: RocketActionConfiguration? -> comboBoxModel.addElement(anObject) })
         val panel = JPanel(BorderLayout())
+        comboBox.maximumRowCount = 20
         comboBox.renderer = object : DefaultListCellRenderer() {
             override fun getListCellRendererComponent(list: JList<*>?, value: Any, index: Int, isSelected: Boolean, cellHasFocus: Boolean): Component {
                 val label = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus) as JLabel
@@ -85,9 +84,9 @@ class CreateRocketActionSettingsDialog(
     private fun createTestAndSaveDialog(): JPanel {
         val panel = JPanel(BorderLayout())
         val panelCreateButton = JPanel()
-        val buttonCreate = JButton("Create")
+        val buttonCreate = JButton("Создать")
         panelCreateButton.add(buttonCreate)
-        buttonCreate.addActionListener { e: ActionEvent? ->
+        buttonCreate.addActionListener {
             val settings = actionSettingsPanel.create()
             currentCallback!!.create(settings)
             dialog.isVisible = false
@@ -100,52 +99,6 @@ class CreateRocketActionSettingsDialog(
     fun show(callback: CreatedRocketActionSettingsCallback?) {
         currentCallback = callback
         dialog.isVisible = true
-    }
-
-    private inner class TestPanel : JPanel(BorderLayout()) {
-        private var panelTest: JPanel? = null
-        fun createTest(settings: RocketActionSettings) {
-            val panel: JPanel =
-                    when (val actionUi = rocketActionUiRepository.by(settings.type())) {
-                        null -> {
-                            val p = JPanel(BorderLayout())
-                            p.add(JLabel("Not found rocket action for type '" + settings.type() + "'"))
-                            p
-                        }
-                        else -> {
-                            val p = JPanel(BorderLayout())
-                            val menuBar = JMenuBar()
-                            val component = actionUi.create(settings)?.component() ?: JLabel("Not created component")
-                            menuBar.add(component)
-                            p.add(menuBar, BorderLayout.CENTER)
-                            p
-
-                        }
-                    }
-            if (panelTest != null) {
-                clearTest()
-            }
-            panelTest = panel
-            add(panel, BorderLayout.CENTER)
-            revalidate()
-            repaint()
-        }
-
-        fun clearTest() {
-            if (panelTest != null) {
-                this.remove(panelTest)
-                revalidate()
-                this.repaint()
-            }
-        }
-
-        init {
-            val panel = JPanel()
-            val buttonTest = JButton("Test")
-            buttonTest.addActionListener { SwingUtilities.invokeLater { createTest(actionSettingsPanel.create()) } }
-            panel.add(buttonTest)
-            add(panel, BorderLayout.SOUTH)
-        }
     }
 
     private inner class RocketActionSettingsPanel : JPanel() {

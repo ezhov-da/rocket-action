@@ -1,26 +1,34 @@
 package ru.ezhov.rocket.action.api
 
 /**
- * Configuring actions
+ * Конфигурация действия
  */
 interface RocketActionConfiguration {
     /**
-     * @return configurable action type
+     * Уникальное значение в рамках всех загруженных действия
+     *
+     * @return тип действия
      */
-    fun type(): String
+    fun type(): RocketActionType
 
     /**
-     * @return configurable action name
+     * Название действия для отображения
+     *
+     * @return название
      */
     fun name(): String
 
     /**
-     * @return configurable action description
+     * Описание действия для отображения
+     *
+     * @return описание
      */
     fun description(): String
 
     /**
-     * @return list of action properties to configure
+     * Свойства действия для конфигурирования
+     *
+     * @return свойства действия
      */
     fun properties(): List<RocketActionConfigurationProperty>
 }

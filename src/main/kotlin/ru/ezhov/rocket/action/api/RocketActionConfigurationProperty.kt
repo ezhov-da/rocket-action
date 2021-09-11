@@ -1,26 +1,28 @@
 package ru.ezhov.rocket.action.api
 
 /**
- * Property awaiting action
+ * Свойство действия
  */
 interface RocketActionConfigurationProperty {
     /**
-     * @return property key
+     * Должен быть уникальный в разрезе действия
+     * @return ключ свойства
      */
     fun key(): String
 
     /**
-     * @return property key
+     * @return название свойства для отображения
      */
     fun name(): String
 
     /**
-     * @return property description
+     * @return описание свойства для отображения
      */
     fun description(): String
 
     /**
-     * @return mandatory property
+     * Это свойство подсказывает пользователю о необходимости заполнения, но не гарантирует заполненность.
+     * @return обязательность заполнения свойства.
      */
     val isRequired: Boolean
 }

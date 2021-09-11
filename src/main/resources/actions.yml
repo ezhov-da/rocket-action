@@ -156,4 +156,12 @@ actions:
     label: kubectl get all -n $ns 2323462346
     description: COPY_TO_CLIPBOARD_TEMPLATE
     text: kubectl get all -n $ns
+
+  - type: SHOW_TEXT_AS_MENU
+    _id: 26
+    label: Text as menu
+    description: Text as menu description
+    text: |
+      А вот и текст,
+      в нём очень много строк :)
 ...
