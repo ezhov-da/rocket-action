@@ -46,7 +46,7 @@ class YmlRocketActionSettingsRepository(private val uri: URI) : RocketActionSett
     private fun recursiveSettings(settings: List<RocketActionSettings>?, actions: MutableList<Map<String?, Any?>>) {
         for (data in settings!!) {
             val `object`: MutableMap<String?, Any?> = LinkedHashMap()
-            `object`[TYPE] = data.type()
+            `object`[TYPE] = data.type().value()
             `object`[ID] = data.id()
             data.settings().forEach { (key: String?, value: String?) -> `object`[key] = value }
             val actionsOriginal = data.actions()

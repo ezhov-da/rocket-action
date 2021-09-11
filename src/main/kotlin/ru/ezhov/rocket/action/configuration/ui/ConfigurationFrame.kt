@@ -242,7 +242,7 @@ class ConfigurationFrame(
         }
         try {
             rocketActionSettingsRepository!!.save(settings)
-            NotificationFactory.notification.show(NotificationType.INFO, "Сохранить действия")
+            NotificationFactory.notification.show(NotificationType.INFO, "Действия сохранены")
         } catch (e: RocketActionSettingsRepositoryException) {
             e.printStackTrace()
             NotificationFactory.notification.show(NotificationType.ERROR, "Ошибка сохранения действий")
