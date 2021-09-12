@@ -24,5 +24,15 @@ interface RocketActionConfigurationProperty {
      * Это свойство подсказывает пользователю о необходимости заполнения, но не гарантирует заполненность.
      * @return обязательность заполнения свойства.
      */
-    val isRequired: Boolean
+    fun isRequired(): Boolean
+
+    /**
+     * Тип свойства, по-умолчанию [PropertyType.STRING]
+     */
+    fun type(): PropertyType = PropertyType.STRING
+
+    /**
+     * Значение по-умолчанию
+     */
+    fun default(): String?
 }

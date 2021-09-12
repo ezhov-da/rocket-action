@@ -1,5 +1,6 @@
 package ru.ezhov.rocket.action.types
 
+import ru.ezhov.rocket.action.api.PropertyType
 import ru.ezhov.rocket.action.api.RocketActionConfiguration
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
 import ru.ezhov.rocket.action.api.RocketActionFactoryUi
@@ -12,15 +13,16 @@ abstract class AbstractRocketAction : RocketActionFactoryUi, RocketActionConfigu
             key: String,
             name: String,
             description: String,
-            required: Boolean
+            required: Boolean,
+            type: PropertyType = PropertyType.STRING,
+            default: String? = null
     ): RocketActionConfigurationProperty =
             object : RocketActionConfigurationProperty {
                 override fun key(): String = key
-
                 override fun name(): String = name
-
                 override fun description(): String = description
-
-                override val isRequired: Boolean = required
+                override fun isRequired(): Boolean = required
+                override fun type(): PropertyType = type
+                override fun default(): String? = default
             }
 }

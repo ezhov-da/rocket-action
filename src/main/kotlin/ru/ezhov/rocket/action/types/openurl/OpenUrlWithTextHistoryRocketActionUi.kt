@@ -1,5 +1,6 @@
-package ru.ezhov.rocket.action.types.openurlwithtexthistory
+package ru.ezhov.rocket.action.types.openurl
 
+import ru.ezhov.rocket.action.api.PropertyType
 import ru.ezhov.rocket.action.api.RocketAction
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
 import ru.ezhov.rocket.action.api.RocketActionSettings
@@ -10,11 +11,12 @@ import ru.ezhov.rocket.action.icon.IconService
 import ru.ezhov.rocket.action.notification.NotificationFactory
 import ru.ezhov.rocket.action.notification.NotificationType
 import ru.ezhov.rocket.action.types.AbstractRocketAction
-import ru.ezhov.rocket.action.types.openurl.OpenUrlRocketActionUi
 import ru.ezhov.rocket.action.ui.swing.common.TextFieldWithText
 import java.awt.Component
 import java.awt.Desktop
 import java.net.URI
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
 import javax.swing.JMenu
 import javax.swing.SwingUtilities
 
@@ -46,9 +48,11 @@ class OpenUrlWithTextHistoryRocketActionUi : AbstractRocketAction() {
                             ?.let { t ->
                                 if (Desktop.isDesktopSupported()) {
                                     try {
-                                        val uri = URI(
-                                                baseUrl.replace(placeholder.toRegex(), t)
-                                        )
+                                        val finalT = if (settings.settings()[IS_ENCODE].toBoolean())
+                                            URLEncoder.encode(t, StandardCharsets.UTF_8.toString())
+                                        else t
+
+                                        val uri = URI(baseUrl.replace(placeholder.toRegex(), finalT))
                                         Desktop.getDesktop().browse(uri)
                                         if (!addedToHistory.contains(t)) {
                                             SwingUtilities.invokeLater {
@@ -105,7 +109,15 @@ class OpenUrlWithTextHistoryRocketActionUi : AbstractRocketAction() {
                 createRocketActionProperty(PLACEHOLDER, PLACEHOLDER, "Строка подстановки", true),
                 createRocketActionProperty(LABEL, LABEL, "Заголовок", false),
                 createRocketActionProperty(DESCRIPTION, DESCRIPTION, "Описание", false),
-                createRocketActionProperty(ICON_URL, ICON_URL, "URL иконки", false)
+                createRocketActionProperty(ICON_URL, ICON_URL, "URL иконки", false),
+                createRocketActionProperty(
+                        IS_ENCODE,
+                        IS_ENCODE,
+                        "Кодировать для URL",
+                        false,
+                        default = "false",
+                        type = PropertyType.BOOLEAN
+                )
         )
     }
 
@@ -113,6 +125,7 @@ class OpenUrlWithTextHistoryRocketActionUi : AbstractRocketAction() {
 
     companion object {
         private const val LABEL = "label"
+        private const val IS_ENCODE = "isEncode"
         private const val DESCRIPTION = "description"
         private const val BASE_URL = "baseUrl"
         private const val ICON_URL = "iconUrl"

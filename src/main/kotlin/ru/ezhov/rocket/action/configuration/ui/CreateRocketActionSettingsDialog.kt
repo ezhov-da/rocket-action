@@ -1,5 +1,6 @@
 package ru.ezhov.rocket.action.configuration.ui
 
+import ru.ezhov.rocket.action.api.PropertyType
 import ru.ezhov.rocket.action.api.RocketActionConfiguration
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
 import ru.ezhov.rocket.action.api.RocketActionSettings
@@ -19,6 +20,7 @@ import javax.swing.BoxLayout
 import javax.swing.DefaultComboBoxModel
 import javax.swing.DefaultListCellRenderer
 import javax.swing.JButton
+import javax.swing.JCheckBox
 import javax.swing.JComboBox
 import javax.swing.JDialog
 import javax.swing.JLabel
@@ -116,7 +118,7 @@ class CreateRocketActionSettingsDialog(
             configuration
                     .properties()
                     .sortedWith(
-                            compareByDescending<RocketActionConfigurationProperty> { it.isRequired }
+                            compareByDescending<RocketActionConfigurationProperty> { it.isRequired() }
                                     .thenBy { it.name() }
                     )
                     .forEach { p: RocketActionConfigurationProperty ->
@@ -136,7 +138,7 @@ class CreateRocketActionSettingsDialog(
     }
 
     private class SettingPanel(private val property: RocketActionConfigurationProperty) : JPanel() {
-        private val value = JTextPane()
+        private val valueCallback: () -> String
 
         init {
             this.layout = BorderLayout()
@@ -149,16 +151,37 @@ class CreateRocketActionSettingsDialog(
             topPanel.layout = BoxLayout(topPanel, BoxLayout.X_AXIS)
             topPanel.border = BorderFactory.createEmptyBorder(0, 0, 1, 0)
             topPanel.add(labelName)
-            if (property.isRequired) {
+            if (property.isRequired()) {
                 topPanel.add(JLabel("*").apply { foreground = Color.RED })
             }
             topPanel.add(labelDescription)
+
             val centerPanel = JPanel(BorderLayout())
-            centerPanel.add(JScrollPane(value), BorderLayout.CENTER)
+            when (property.type()) {
+                PropertyType.STRING -> {
+                    centerPanel.add(
+                            JScrollPane(
+                                    JTextPane().also { tp ->
+                                        valueCallback = { tp.text }
+                                    }
+                            ),
+                            BorderLayout.CENTER
+                    )
+                }
+                PropertyType.BOOLEAN -> {
+                    centerPanel.add(JScrollPane(
+                            JCheckBox().also { cb ->
+                                cb.isSelected = property.default().toBoolean()
+                                valueCallback = { cb.isSelected.toString() }
+                            }
+                    ), BorderLayout.CENTER)
+                }
+            }
+
             this.add(topPanel, BorderLayout.NORTH)
             this.add(centerPanel, BorderLayout.CENTER)
         }
 
-        fun value(): Pair<String, String> = Pair(first = property.key(), value.text)
+        fun value(): Pair<String, String> = Pair(first = property.key(), valueCallback())
     }
 }

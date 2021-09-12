@@ -1,5 +1,6 @@
 package ru.ezhov.rocket.action.configuration.ui
 
+import ru.ezhov.rocket.action.api.PropertyType
 import ru.ezhov.rocket.action.api.RocketActionConfiguration
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
 import ru.ezhov.rocket.action.api.RocketActionSettings
@@ -16,6 +17,7 @@ import javax.swing.BorderFactory
 import javax.swing.Box
 import javax.swing.BoxLayout
 import javax.swing.JButton
+import javax.swing.JCheckBox
 import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.JScrollPane
@@ -64,22 +66,20 @@ class EditorRocketActionSettingsPanel(
             labelDescription.text = configuration.description()
         }
         val settingsFinal = settings.settings()
-        val values = settingsFinal.map { (k: String, v: String) ->
-            val (description, required, name) = configuration
-                    ?.let { conf ->
-                        conf
-                                .properties()
-                                .firstOrNull { p: RocketActionConfigurationProperty? -> p!!.key() == k }
-                                ?.let { Triple(first = it.description(), second = it.isRequired, third = it.name()) }
-                    } ?: Triple(first = "", second = false, third = "")
-            Value(
-                    key = k,
-                    name = name,
-                    value = v,
-                    description = description,
-                    required = required
-            )
-        }
+        val values = settingsFinal
+                .map { (k: String, v: String) ->
+                    val property = configuration
+                            ?.let { conf ->
+                                conf
+                                        .properties()
+                                        .firstOrNull { p: RocketActionConfigurationProperty? -> p!!.key() == k }
+                            }
+                    Value(
+                            key = k,
+                            value = v,
+                            property = property,
+                    )
+                }
                 .toMutableList() +
                 configuration
                         ?.properties()
@@ -87,10 +87,8 @@ class EditorRocketActionSettingsPanel(
                         ?.map { p: RocketActionConfigurationProperty? ->
                             Value(
                                     key = p!!.key(),
-                                    name = p.name(),
                                     value = "",
-                                    description = p.description(),
-                                    required = p.isRequired
+                                    property = p,
                             )
                         }.orEmpty()
 
@@ -99,18 +97,16 @@ class EditorRocketActionSettingsPanel(
                 .setRocketActionConfiguration(
                         values
                                 .sortedWith(
-                                        compareByDescending<Value> { it.required }
-                                                .thenBy { it.name }
+                                        compareByDescending<Value> { it.property?.isRequired() }
+                                                .thenBy { it.property?.name() }
                                 )
                 )
     }
 
     private data class Value(
             val key: String,
-            val name: String,
             val value: String,
-            val description: String,
-            val required: Boolean
+            val property: RocketActionConfigurationProperty?
     )
 
     private inner class RocketActionSettingsPanel : JPanel() {
@@ -147,31 +143,57 @@ class EditorRocketActionSettingsPanel(
     }
 
     private class SettingPanel(private val value: Value) : JPanel() {
-        private val valueTextArea = JTextPane()
+        private var valueCallback: () -> String = { "" }
 
         init {
             this.layout = BorderLayout()
             this.border = BorderFactory.createEmptyBorder(2, 2, 2, 2)
-            val labelName = JLabel(value.name)
-            val labelDescription = JLabel(IconRepositoryFactory.repository.by(AppIcon.INFO))
-            labelDescription.toolTipText = value.description
+            value.property?.let { property ->
+                val labelName = JLabel(property.name())
+                val labelDescription = JLabel(IconRepositoryFactory.repository.by(AppIcon.INFO))
+                labelDescription.toolTipText = property.description()
 
-            val topPanel = JPanel()
-            topPanel.layout = BoxLayout(topPanel, BoxLayout.X_AXIS)
-            topPanel.border = BorderFactory.createEmptyBorder(0, 0, 1, 0)
-            topPanel.add(labelName)
-            if (value.required) {
-                topPanel.add(JLabel("*").apply { foreground = Color.RED })
+                val topPanel = JPanel()
+                topPanel.layout = BoxLayout(topPanel, BoxLayout.X_AXIS)
+                topPanel.border = BorderFactory.createEmptyBorder(0, 0, 1, 0)
+                topPanel.add(labelName)
+                if (property.isRequired()) {
+                    topPanel.add(JLabel("*").apply { foreground = Color.RED })
+                }
+                topPanel.add(labelDescription)
+
+                val centerPanel = JPanel(BorderLayout())
+                when (property.type()) {
+                    PropertyType.STRING -> {
+                        centerPanel.add(
+                                JScrollPane(
+                                        JTextPane().also { tp ->
+                                            valueCallback = { tp.text }
+                                            tp.text = value.value
+                                        }
+                                ),
+                                BorderLayout.CENTER
+                        )
+                    }
+                    PropertyType.BOOLEAN -> {
+                        centerPanel.add(JScrollPane(
+                                JCheckBox().also { cb ->
+                                    cb.isSelected = value.value.toBoolean()
+                                    valueCallback = { cb.isSelected.toString() }
+                                }
+                        ), BorderLayout.CENTER)
+                    }
+                }
+
+                this.add(topPanel, BorderLayout.NORTH)
+                this.add(centerPanel, BorderLayout.CENTER)
+            } ?: run {
+                this.add(JLabel("Обнаружено незарегистрированное свойство '${value.key}:${value.value}'"), BorderLayout.CENTER)
+                valueCallback = { value.value }
             }
-            topPanel.add(labelDescription)
-            val centerPanel = JPanel(BorderLayout())
-            centerPanel.add(JScrollPane(valueTextArea), BorderLayout.CENTER)
-            valueTextArea.text = value.value
-            this.add(topPanel, BorderLayout.NORTH)
-            this.add(centerPanel, BorderLayout.CENTER)
         }
 
-        fun value(): Pair<String, String> = Pair(first = value.key, valueTextArea.text)
+        fun value(): Pair<String, String> = Pair(first = value.key, valueCallback())
     }
 
     init {
