@@ -1,5 +1,6 @@
 package ru.ezhov.rocket.action.configuration.ui
 
+import mu.KotlinLogging
 import ru.ezhov.rocket.action.api.RocketActionSettings
 import ru.ezhov.rocket.action.configuration.domain.RocketActionConfigurationRepository
 import ru.ezhov.rocket.action.domain.RocketActionSettingsRepository
@@ -32,12 +33,17 @@ import javax.swing.JScrollPane
 import javax.swing.JSplitPane
 import javax.swing.JTree
 import javax.swing.SwingUtilities
+import javax.swing.event.TreeExpansionEvent
+import javax.swing.event.TreeExpansionListener
 import javax.swing.event.TreeSelectionEvent
 import javax.swing.tree.DefaultMutableTreeNode
 import javax.swing.tree.DefaultTreeCellRenderer
 import javax.swing.tree.DefaultTreeModel
 import javax.swing.tree.MutableTreeNode
+import javax.swing.tree.TreePath
 import javax.swing.tree.TreeSelectionModel
+
+private val logger = KotlinLogging.logger { }
 
 class ConfigurationFrame(
         owner: Dialog,
@@ -108,6 +114,22 @@ class ConfigurationFrame(
         tree.dragEnabled = true
         tree.dropMode = DropMode.ON_OR_INSERT
         tree.transferHandler = TreeTransferHandler()
+        val expandedSet = mutableSetOf<TreePath>()
+        tree.addTreeExpansionListener(object : TreeExpansionListener {
+            override fun treeExpanded(event: TreeExpansionEvent?) {
+                event?.let {
+                    logger.debug { "Expanded tree path '${it.path.lastPathComponent}'" }
+                    expandedSet.add(it.path)
+                }
+            }
+
+            override fun treeCollapsed(event: TreeExpansionEvent?) {
+                event?.let {
+                    logger.debug { "Collapsed tree path '${it.path.lastPathComponent}'" }
+                    expandedSet.remove(it.path)
+                }
+            }
+        })
         tree.addMouseListener(object : MouseAdapter() {
             override fun mouseReleased(e: MouseEvent) {
                 if (e.button == MouseEvent.BUTTON3) {
@@ -204,8 +226,13 @@ class ConfigurationFrame(
                             object : AbstractAction() {
                                 override fun actionPerformed(e: ActionEvent) {
                                     SwingUtilities.invokeLater {
+                                        val parent = mutableTreeNode.parent
                                         mutableTreeNode.removeFromParent()
-                                        defaultTreeModel.reload()
+                                        defaultTreeModel.reload(parent)
+
+                                        expandedSet.forEach { path ->
+                                            tree.expandPath(path)
+                                        }
                                     }
                                 }
 
