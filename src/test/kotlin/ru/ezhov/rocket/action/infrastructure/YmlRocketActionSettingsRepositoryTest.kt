@@ -3,6 +3,7 @@ package ru.ezhov.rocket.action.infrastructure
 import org.junit.Assert
 import org.junit.Ignore
 import org.junit.Test
+import ru.ezhov.rocket.action.api.RocketActionConfigurationPropertyKey
 import ru.ezhov.rocket.action.api.RocketActionSettings
 import ru.ezhov.rocket.action.api.RocketActionType
 import ru.ezhov.rocket.action.domain.RocketActionSettingsRepositoryException
@@ -34,7 +35,9 @@ class YmlRocketActionSettingsRepositoryTest {
 
                     override fun type(): RocketActionType = RocketActionType { "test" }
 
-                    override fun settings(): Map<String, String> = mapOf("1" to "2")
+                    override fun settings(): Map<RocketActionConfigurationPropertyKey, String> = mapOf(
+                            RocketActionConfigurationPropertyKey("1") to "2"
+                    )
 
                     override fun actions(): List<RocketActionSettings> = emptyList()
                 },
@@ -43,7 +46,9 @@ class YmlRocketActionSettingsRepositoryTest {
 
                     override fun type(): RocketActionType = RocketActionType { "test" }
 
-                    override fun settings(): Map<String, String> = mapOf("1" to "2")
+                    override fun settings(): Map<RocketActionConfigurationPropertyKey, String> = mapOf(
+                            RocketActionConfigurationPropertyKey("1") to "2"
+                    )
 
                     override fun actions(): List<RocketActionSettings> {
                         return listOf(
@@ -52,7 +57,9 @@ class YmlRocketActionSettingsRepositoryTest {
 
                                     override fun type(): RocketActionType = RocketActionType { "test" }
 
-                                    override fun settings(): Map<String, String> = mapOf("1" to "2")
+                                    override fun settings(): Map<RocketActionConfigurationPropertyKey, String> = mapOf(
+                                            RocketActionConfigurationPropertyKey("1") to "2"
+                                    )
 
                                     override fun actions(): List<RocketActionSettings> = emptyList()
                                 },
@@ -61,7 +68,9 @@ class YmlRocketActionSettingsRepositoryTest {
 
                                     override fun type(): RocketActionType = RocketActionType { "test" }
 
-                                    override fun settings(): Map<String, String> = mapOf("1" to "2")
+                                    override fun settings(): Map<RocketActionConfigurationPropertyKey, String> = mapOf(
+                                            RocketActionConfigurationPropertyKey("1") to "2"
+                                    )
 
                                     override fun actions(): List<RocketActionSettings> = emptyList()
                                 }

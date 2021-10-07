@@ -1,11 +1,14 @@
 package ru.ezhov.rocket.action.configuration.infrastructure
 
+import mu.KotlinLogging
 import org.reflections.Reflections
 import org.reflections.scanners.SubTypesScanner
 import ru.ezhov.rocket.action.api.RocketActionConfiguration
 import ru.ezhov.rocket.action.api.RocketActionType
 import ru.ezhov.rocket.action.configuration.domain.RocketActionConfigurationRepository
 import java.lang.reflect.Modifier
+
+private val logger = KotlinLogging.logger {}
 
 class ReflectionRocketActionConfigurationRepository : RocketActionConfigurationRepository {
     private var list: MutableList<RocketActionConfiguration> = mutableListOf()
@@ -20,9 +23,11 @@ class ReflectionRocketActionConfigurationRepository : RocketActionConfigurationR
                     list.add(aClass.getConstructor().newInstance() as RocketActionConfiguration)
                 }
             } catch (e: InstantiationException) {
-                e.printStackTrace()
+                logger.warn(e) { "Error when load class ${aClass.name}" }
             } catch (e: IllegalAccessException) {
-                e.printStackTrace()
+                logger.warn(e) { "Error when load class ${aClass.name}" }
+            } catch (e: NoSuchMethodException) {
+                logger.warn(e) { "Error when load class ${aClass.name}" }
             }
         }
     }

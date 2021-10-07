@@ -3,7 +3,7 @@ package ru.ezhov.rocket.action.configuration.ui
 import ru.ezhov.rocket.action.api.PropertyType
 import ru.ezhov.rocket.action.api.RocketActionConfiguration
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
-import ru.ezhov.rocket.action.api.RocketActionSettings
+import ru.ezhov.rocket.action.api.RocketActionConfigurationPropertyKey
 import ru.ezhov.rocket.action.configuration.domain.RocketActionConfigurationRepository
 import ru.ezhov.rocket.action.domain.RocketActionUiRepository
 import ru.ezhov.rocket.action.icon.AppIcon
@@ -28,11 +28,12 @@ class EditorRocketActionSettingsPanel(
         rocketActionUiRepository: RocketActionUiRepository
 ) : JPanel(BorderLayout()) {
     private val rocketActionSettingsPanel = RocketActionSettingsPanel()
-    private var currentSettings: RocketActionSettings? = null
+    private var currentSettings: TreeRocketActionSettings? = null
     private var callback: SavedRocketActionSettingsPanelCallback? = null
     private val labelType = JLabel()
     private val labelDescription = JLabel()
-    private val testPanel: TestPanel = TestPanel(rocketActionUiRepository = rocketActionUiRepository) { rocketActionSettingsPanel.create() }
+    private val testPanel: TestPanel =
+            TestPanel(rocketActionUiRepository = rocketActionUiRepository) { rocketActionSettingsPanel.create()?.settings }
     private fun top(): JPanel {
         val panel = JPanel(BorderLayout())
         panel.add(labelType, BorderLayout.NORTH)
@@ -56,18 +57,18 @@ class EditorRocketActionSettingsPanel(
         return panel
     }
 
-    fun show(settings: RocketActionSettings, callback: SavedRocketActionSettingsPanelCallback) {
+    fun show(settings: TreeRocketActionSettings, callback: SavedRocketActionSettingsPanelCallback) {
         testPanel.clearTest()
         currentSettings = settings
-        labelType.text = settings.type().value()
+        labelType.text = settings.settings.type().value()
         this.callback = callback
-        val configuration: RocketActionConfiguration? = rocketActionConfigurationRepository.by(settings.type())
+        val configuration: RocketActionConfiguration? = rocketActionConfigurationRepository.by(settings.settings.type())
         configuration?.let {
             labelDescription.text = configuration.description()
         }
-        val settingsFinal = settings.settings()
+        val settingsFinal = settings.settings.settings()
         val values = settingsFinal
-                .map { (k: String, v: String) ->
+                .map { (k: RocketActionConfigurationPropertyKey, v: String) ->
                     val property = configuration
                             ?.let { conf ->
                                 conf
@@ -104,7 +105,7 @@ class EditorRocketActionSettingsPanel(
     }
 
     private data class Value(
-            val key: String,
+            val key: RocketActionConfigurationPropertyKey,
             val value: String,
             val property: RocketActionConfigurationProperty?
     )
@@ -132,12 +133,15 @@ class EditorRocketActionSettingsPanel(
             revalidate()
         }
 
-        fun create(): RocketActionSettings? = currentSettings?.let { rs ->
-            MutableRocketActionSettings(
-                    rs.id(),
-                    rs.type(),
-                    settingPanels.associate { panel -> panel.value() }.toMutableMap(),
-                    rs.actions().toMutableList()
+        fun create(): TreeRocketActionSettings? = currentSettings?.let { rs ->
+            TreeRocketActionSettings(
+                    configuration = rs.configuration,
+                    settings = MutableRocketActionSettings(
+                            rs.settings.id(),
+                            rs.settings.type(),
+                            settingPanels.associate { panel -> panel.value() }.toMutableMap(),
+                            rs.settings.actions().toMutableList()
+                    )
             )
         }
     }
@@ -193,7 +197,7 @@ class EditorRocketActionSettingsPanel(
             }
         }
 
-        fun value(): Pair<String, String> = Pair(first = value.key, valueCallback())
+        fun value(): Pair<RocketActionConfigurationPropertyKey, String> = Pair(first = value.key, valueCallback())
     }
 
     init {

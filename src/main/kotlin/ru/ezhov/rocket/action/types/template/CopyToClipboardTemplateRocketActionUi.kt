@@ -2,6 +2,7 @@ package ru.ezhov.rocket.action.types.template
 
 import ru.ezhov.rocket.action.api.RocketAction
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
+import ru.ezhov.rocket.action.api.RocketActionConfigurationPropertyKey
 import ru.ezhov.rocket.action.api.RocketActionSettings
 import ru.ezhov.rocket.action.api.RocketActionType
 import ru.ezhov.rocket.action.icon.AppIcon
@@ -45,15 +46,17 @@ class CopyToClipboardTemplateRocketActionUi : AbstractRocketAction() {
 
     override fun properties(): List<RocketActionConfigurationProperty> {
         return listOf(
-                createRocketActionProperty(LABEL, LABEL, "Заголовок", false),
-                createRocketActionProperty(DESCRIPTION, DESCRIPTION, "Описание", false),
-                createRocketActionProperty(TEXT, TEXT, "Шаблон для копирования", true)
+                createRocketActionProperty(LABEL, LABEL.value, "Заголовок", false),
+                createRocketActionProperty(DESCRIPTION, DESCRIPTION.value, "Описание", false),
+                createRocketActionProperty(TEXT, TEXT.value, "Шаблон для копирования", true)
         )
     }
 
+    override fun asString(): List<RocketActionConfigurationPropertyKey> = listOf(LABEL, TEXT)
+
     companion object {
-        private const val LABEL = "label"
-        private const val DESCRIPTION = "description"
-        private const val TEXT = "text"
+        private val LABEL = RocketActionConfigurationPropertyKey("label")
+        private val DESCRIPTION = RocketActionConfigurationPropertyKey("description")
+        private val TEXT = RocketActionConfigurationPropertyKey("text")
     }
 }

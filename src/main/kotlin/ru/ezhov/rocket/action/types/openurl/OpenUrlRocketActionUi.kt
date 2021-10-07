@@ -2,6 +2,7 @@ package ru.ezhov.rocket.action.types.openurl
 
 import ru.ezhov.rocket.action.api.RocketAction
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
+import ru.ezhov.rocket.action.api.RocketActionConfigurationPropertyKey
 import ru.ezhov.rocket.action.api.RocketActionSettings
 import ru.ezhov.rocket.action.api.RocketActionType
 import ru.ezhov.rocket.action.icon.AppIcon
@@ -14,10 +15,13 @@ import java.awt.Component
 import java.awt.Desktop
 import java.awt.Toolkit
 import java.awt.datatransfer.StringSelection
+import java.awt.event.KeyEvent
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import java.net.URI
 import javax.swing.JMenuItem
+import javax.swing.event.MenuKeyEvent
+import javax.swing.event.MenuKeyListener
 
 class OpenUrlRocketActionUi : AbstractRocketAction() {
     override fun create(settings: RocketActionSettings): RocketAction? =
@@ -41,11 +45,24 @@ class OpenUrlRocketActionUi : AbstractRocketAction() {
                                 IconRepositoryFactory.repository.by(AppIcon.LINK_INTACT)
                         )
                         toolTipText = description
-                        addActionListener { openUrl(url) }
+                        isFocusable = true
                         addMouseListener(object : MouseAdapter() {
                             override fun mouseReleased(e: MouseEvent) {
                                 when (e.button) {
+                                    MouseEvent.BUTTON1 -> openUrl(url)
                                     MouseEvent.BUTTON3 -> copyUrlToClipBoard(url)
+                                }
+                            }
+                        })
+
+                        addMenuKeyListener(object : MenuKeyListener {
+                            override fun menuKeyTyped(e: MenuKeyEvent) = Unit
+
+                            override fun menuKeyPressed(e: MenuKeyEvent) = Unit
+
+                            override fun menuKeyReleased(e: MenuKeyEvent) {
+                                when (e.keyCode) {
+                                    KeyEvent.VK_TAB -> openUrl(url)
                                 }
                             }
                         })
@@ -75,21 +92,23 @@ class OpenUrlRocketActionUi : AbstractRocketAction() {
 
     override fun description(): String = "Открытие ссылки"
 
+    override fun asString(): List<RocketActionConfigurationPropertyKey> = listOf(LABEL, URL)
+
     override fun properties(): List<RocketActionConfigurationProperty> {
         return listOf(
-                createRocketActionProperty(LABEL, LABEL, "Заголовок", false),
-                createRocketActionProperty(DESCRIPTION, DESCRIPTION, "Описание", false),
-                createRocketActionProperty(URL, URL, "URL", true),
-                createRocketActionProperty(ICON_URL, ICON_URL, "URL иконка", false)
+                createRocketActionProperty(LABEL, LABEL.value, "Заголовок", false),
+                createRocketActionProperty(DESCRIPTION, DESCRIPTION.value, "Описание", false),
+                createRocketActionProperty(URL, URL.value, "URL", true),
+                createRocketActionProperty(ICON_URL, ICON_URL.value, "URL иконка", false)
         )
     }
 
     override fun name(): String = "Открыть ссылку"
 
     companion object {
-        private const val LABEL = "label"
-        private const val DESCRIPTION = "description"
-        private const val URL = "url"
-        private const val ICON_URL = "iconUrl"
+        private val LABEL = RocketActionConfigurationPropertyKey("label")
+        private val DESCRIPTION = RocketActionConfigurationPropertyKey("description")
+        private val URL = RocketActionConfigurationPropertyKey("url")
+        private val ICON_URL = RocketActionConfigurationPropertyKey("iconUrl")
     }
 }

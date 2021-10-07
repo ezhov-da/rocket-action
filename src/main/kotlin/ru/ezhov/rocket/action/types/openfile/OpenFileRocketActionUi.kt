@@ -2,6 +2,7 @@ package ru.ezhov.rocket.action.types.openfile
 
 import ru.ezhov.rocket.action.api.RocketAction
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
+import ru.ezhov.rocket.action.api.RocketActionConfigurationPropertyKey
 import ru.ezhov.rocket.action.api.RocketActionSettings
 import ru.ezhov.rocket.action.api.RocketActionType
 import ru.ezhov.rocket.action.icon.AppIcon
@@ -56,6 +57,12 @@ class OpenFileRocketActionUi : AbstractRocketAction() {
 
     override fun description(): String = "Открыть файл"
 
+    override fun asString(): List<RocketActionConfigurationPropertyKey> = listOf(
+            LABEL,
+            PATH,
+            DESCRIPTION,
+    )
+
     override fun properties(): List<RocketActionConfigurationProperty> {
         return listOf(
                 createRocketActionProperty(
@@ -86,8 +93,8 @@ class OpenFileRocketActionUi : AbstractRocketAction() {
     override fun name(): String = "Открыть файл"
 
     companion object {
-        private const val LABEL = "label"
-        private const val DESCRIPTION = "description"
-        private const val PATH = "path"
+        private val LABEL = RocketActionConfigurationPropertyKey("label")
+        private val DESCRIPTION = RocketActionConfigurationPropertyKey("description")
+        private val PATH = RocketActionConfigurationPropertyKey("path")
     }
 }

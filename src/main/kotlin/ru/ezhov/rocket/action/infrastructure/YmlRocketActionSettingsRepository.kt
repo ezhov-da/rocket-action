@@ -1,6 +1,7 @@
 package ru.ezhov.rocket.action.infrastructure
 
 import org.yaml.snakeyaml.Yaml
+import ru.ezhov.rocket.action.api.RocketActionConfigurationPropertyKey
 import ru.ezhov.rocket.action.api.RocketActionSettings
 import ru.ezhov.rocket.action.domain.RocketActionSettingsRepository
 import ru.ezhov.rocket.action.domain.RocketActionSettingsRepositoryException
@@ -10,6 +11,7 @@ import java.io.OutputStreamWriter
 import java.net.URI
 import java.nio.charset.StandardCharsets
 import java.util.*
+import kotlin.collections.HashMap
 
 class YmlRocketActionSettingsRepository(private val uri: URI) : RocketActionSettingsRepository {
     override fun actions(): List<RocketActionSettings> {
@@ -45,17 +47,17 @@ class YmlRocketActionSettingsRepository(private val uri: URI) : RocketActionSett
 
     private fun recursiveSettings(settings: List<RocketActionSettings>?, actions: MutableList<Map<String?, Any?>>) {
         for (data in settings!!) {
-            val `object`: MutableMap<String?, Any?> = LinkedHashMap()
-            `object`[TYPE] = data.type().value()
-            `object`[ID] = data.id()
-            data.settings().forEach { (key: String?, value: String?) -> `object`[key] = value }
+            val objectYml: MutableMap<String?, Any?> = LinkedHashMap()
+            objectYml[TYPE] = data.type().value()
+            objectYml[ID] = data.id()
+            data.settings().forEach { (key: RocketActionConfigurationPropertyKey?, value: String?) -> objectYml[key.value] = value }
             val actionsOriginal = data.actions()
             if (actionsOriginal.isNotEmpty()) {
                 val actionsForWrite: MutableList<Map<String?, Any?>> = ArrayList()
                 recursiveSettings(actionsOriginal, actionsForWrite)
-                `object`[ACTIONS] = actionsForWrite
+                objectYml[ACTIONS] = actionsForWrite
             }
-            actions.add(`object`)
+            actions.add(objectYml)
         }
     }
 
@@ -69,7 +71,6 @@ class YmlRocketActionSettingsRepository(private val uri: URI) : RocketActionSett
     }
 
     private object QuickActionFactory {
-        @kotlin.jvm.JvmStatic
         @Throws(RocketActionSettingsRepositoryException::class)
         fun createAction(action: LinkedHashMap<String, Any>): RocketActionSettings {
             return create(
@@ -79,7 +80,6 @@ class YmlRocketActionSettingsRepository(private val uri: URI) : RocketActionSett
             )
         }
 
-        @kotlin.jvm.JvmStatic
         @Throws(RocketActionSettingsRepositoryException::class)
         fun create(id: String, actionType: String, action: LinkedHashMap<String, Any>): RocketActionSettings {
             val actions = action[ACTIONS] as ArrayList<LinkedHashMap<String, Any>>?
@@ -87,16 +87,16 @@ class YmlRocketActionSettingsRepository(private val uri: URI) : RocketActionSett
             action.remove(ID)
             action.remove(ACTIONS)
             return if (actions == null || actions.isEmpty()) {
-                val map: MutableMap<String, String> = TreeMap()
-                action.forEach { (k: String, v: Any?) -> map[k] = v?.toString().orEmpty() }
+                val map: MutableMap<RocketActionConfigurationPropertyKey, String> = HashMap()
+                action.forEach { (k: String, v: Any?) -> map[RocketActionConfigurationPropertyKey(k)] = v?.toString().orEmpty() }
                 MutableRocketActionSettings(id, { actionType }, map, mutableListOf())
             } else {
                 val settings: MutableList<RocketActionSettings> = ArrayList()
                 for (a in actions) {
                     settings.add(createAction(a))
                 }
-                val map: MutableMap<String, String> = TreeMap()
-                action.forEach { (k: String, v: Any) -> map[k] = v.toString() }
+                val map: MutableMap<RocketActionConfigurationPropertyKey, String> = HashMap()
+                action.forEach { (k: String, v: Any) -> map[RocketActionConfigurationPropertyKey(k)] = v.toString() }
                 MutableRocketActionSettings(id, { actionType }, map, settings)
             }
         }

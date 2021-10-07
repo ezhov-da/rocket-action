@@ -2,6 +2,7 @@ package ru.ezhov.rocket.action.types.copytoclipboard
 
 import ru.ezhov.rocket.action.api.RocketAction
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
+import ru.ezhov.rocket.action.api.RocketActionConfigurationPropertyKey
 import ru.ezhov.rocket.action.api.RocketActionSettings
 import ru.ezhov.rocket.action.api.RocketActionType
 import ru.ezhov.rocket.action.icon.AppIcon
@@ -17,9 +18,9 @@ import javax.swing.JMenuItem
 class CopyToClipboardRocketActionUi : AbstractRocketAction() {
 
     companion object {
-        private const val LABEL = "label"
-        private const val DESCRIPTION = "description"
-        private const val TEXT = "text"
+        private val LABEL = RocketActionConfigurationPropertyKey("label")
+        private val DESCRIPTION = RocketActionConfigurationPropertyKey("description")
+        private val TEXT = RocketActionConfigurationPropertyKey("text")
     }
 
     override fun create(settings: RocketActionSettings): RocketAction? =
@@ -56,13 +57,17 @@ class CopyToClipboardRocketActionUi : AbstractRocketAction() {
         return "Позволяет скопировать текст в буфер"
     }
 
+    override fun asString(): List<RocketActionConfigurationPropertyKey> = listOf(
+            LABEL, TEXT
+    )
+
     override fun name(): String = "Копировать в буфер"
 
     override fun properties(): List<RocketActionConfigurationProperty> {
         return listOf(
-                createRocketActionProperty(LABEL, LABEL, "Текст для отображения", false),
-                createRocketActionProperty(DESCRIPTION, DESCRIPTION, "Описание", false),
-                createRocketActionProperty(TEXT, TEXT, "Текст для копирования в буфер", true)
+                createRocketActionProperty(LABEL, LABEL.value, "Текст для отображения", false),
+                createRocketActionProperty(DESCRIPTION, DESCRIPTION.value, "Описание", false),
+                createRocketActionProperty(TEXT, TEXT.value, "Текст для копирования в буфер", true)
         )
     }
 

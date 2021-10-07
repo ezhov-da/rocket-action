@@ -87,13 +87,13 @@ class ConfigurationFrame(
             val node = path.lastPathComponent as DefaultMutableTreeNode
             val o = node.userObject
             if (o != null) {
-                val settings = o as RocketActionSettings
+                val settings = o as TreeRocketActionSettings
                 SwingUtilities.invokeLater {
                     rocketActionSettingsPanel.show(
-                            settings,
-                            object : SavedRocketActionSettingsPanelCallback {
-                                override fun saved(rocketActionSettings: RocketActionSettings) {
-                                    node.userObject = rocketActionSettings
+                            settings = settings,
+                            callback = object : SavedRocketActionSettingsPanelCallback {
+                                override fun saved(settings: TreeRocketActionSettings) {
+                                    node.userObject = settings
                                 }
                             }
                     )
@@ -249,13 +249,23 @@ class ConfigurationFrame(
         return panel
     }
 
-    private fun fillTreeNodes(actions: List<RocketActionSettings?>?, parent: DefaultMutableTreeNode) {
+    private fun fillTreeNodes(actions: List<RocketActionSettings>?, parent: DefaultMutableTreeNode) {
         for (rocketActionSettings in actions!!) {
-            val current = DefaultMutableTreeNode(rocketActionSettings, true)
-            parent.add(current)
-            if (rocketActionSettings!!.actions().isNotEmpty()) {
-                val childAction = rocketActionSettings.actions()
-                fillTreeNodes(childAction, current)
+            rocketActionConfigurationRepository.by(rocketActionSettings.type())?.let { config ->
+                val current = DefaultMutableTreeNode(
+                        TreeRocketActionSettings(
+                                config,
+                                rocketActionSettings,
+                        ),
+                        true
+                )
+                parent.add(current)
+                if (rocketActionSettings.actions().isNotEmpty()) {
+                    val childAction = rocketActionSettings.actions()
+                    fillTreeNodes(childAction, current)
+                }
+            } ?: run {
+                logger.warn { "Configuration for settings '${rocketActionSettings.type()}' not found and skipped" }
             }
         }
     }
@@ -298,14 +308,9 @@ class ConfigurationFrame(
         override fun getTreeCellRendererComponent(tree: JTree, value: Any, sel: Boolean, expanded: Boolean, leaf: Boolean, row: Int, hasFocus: Boolean): Component {
             val label = super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus) as JLabel
             val node = value as DefaultMutableTreeNode
-            if (node.userObject is RocketActionSettings) {
-                val settings = node.userObject as RocketActionSettings
-                val labelProperty = settings.settings()["label"]
-                if (labelProperty != null && "" != labelProperty) {
-                    label.text = labelProperty
-                } else {
-                    label.text = settings.type().value()
-                }
+            if (node.userObject is TreeRocketActionSettings) {
+                val settings = node.userObject as TreeRocketActionSettings
+                label.text = settings.asString()
             }
             return label
         }

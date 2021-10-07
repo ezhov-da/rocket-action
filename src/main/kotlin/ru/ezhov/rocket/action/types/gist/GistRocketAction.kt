@@ -3,6 +3,7 @@ package ru.ezhov.rocket.action.types.gist
 import org.eclipse.egit.github.core.Gist
 import ru.ezhov.rocket.action.api.RocketAction
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
+import ru.ezhov.rocket.action.api.RocketActionConfigurationPropertyKey
 import ru.ezhov.rocket.action.api.RocketActionSettings
 import ru.ezhov.rocket.action.api.RocketActionType
 import ru.ezhov.rocket.action.icon.AppIcon
@@ -38,21 +39,23 @@ class GistRocketAction : AbstractRocketAction() {
         return "Github gist loader"
     }
 
+    override fun asString(): List<RocketActionConfigurationPropertyKey> = listOf(LABEL)
+
     override fun name(): String = "Работа с Gists"
 
     override fun properties(): List<RocketActionConfigurationProperty> {
         return listOf(
-                createRocketActionProperty(LABEL, LABEL, "Label", true),
+                createRocketActionProperty(LABEL, LABEL.value, "Label", true),
                 createRocketActionProperty(
                         TOKEN,
-                        TOKEN,
+                        TOKEN.value,
                         "Используйте это свойство или свойство командной строки Java -D$TOKEN_PROPERTY",
                         false
                 ),
-                createRocketActionProperty(USERNAME, USERNAME, "", true),
+                createRocketActionProperty(USERNAME, USERNAME.value, "", true),
                 createRocketActionProperty(
                         BASE_GIST_URL,
-                        BASE_GIST_URL,
+                        BASE_GIST_URL.value,
                         "Url gists",
                         false
                 )
@@ -83,7 +86,7 @@ class GistRocketAction : AbstractRocketAction() {
 
     private fun geToken(settings: RocketActionSettings) =
             settings.settings()[TOKEN]?.takeIf { it.isNotEmpty() }
-                    ?: System.getProperty(TOKEN_PROPERTY, "").takeIf { it.isNotEmpty() }
+                    ?: System.getProperty(TOKEN_PROPERTY.value, "").takeIf { it.isNotEmpty() }
 
 
     override fun type(): RocketActionType = RocketActionType { "GIST" }
@@ -204,11 +207,10 @@ class GistRocketAction : AbstractRocketAction() {
     }
 
     companion object {
-        const val LABEL = "label"
-        const val TOKEN = "gistToken"
-        const val USERNAME = "username"
-        const val BASE_GIST_URL = "baseGistUrl"
-
-        const val TOKEN_PROPERTY = "rocket.action.gist.token"
+        private val LABEL = RocketActionConfigurationPropertyKey("label")
+        private val TOKEN = RocketActionConfigurationPropertyKey("gistToken")
+        private val USERNAME = RocketActionConfigurationPropertyKey("username")
+        private val BASE_GIST_URL = RocketActionConfigurationPropertyKey("baseGistUrl")
+        private val TOKEN_PROPERTY = RocketActionConfigurationPropertyKey("rocket.action.gist.token")
     }
 }

@@ -2,6 +2,7 @@ package ru.ezhov.rocket.action.types.text
 
 import ru.ezhov.rocket.action.api.RocketAction
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
+import ru.ezhov.rocket.action.api.RocketActionConfigurationPropertyKey
 import ru.ezhov.rocket.action.api.RocketActionSettings
 import ru.ezhov.rocket.action.api.RocketActionType
 import ru.ezhov.rocket.action.icon.AppIcon
@@ -23,9 +24,9 @@ class TextAsMenuRocketActionUi : AbstractRocketAction() {
 
     override fun properties(): List<RocketActionConfigurationProperty> =
             listOf(
-                    createRocketActionProperty(LABEL, LABEL, "Заголовок", true),
-                    createRocketActionProperty(TEXT, TEXT, "Текст", true),
-                    createRocketActionProperty(DESCRIPTION, DESCRIPTION, "Описание", false),
+                    createRocketActionProperty(LABEL, LABEL.value, "Заголовок", true),
+                    createRocketActionProperty(TEXT, TEXT.value, "Текст", true),
+                    createRocketActionProperty(DESCRIPTION, DESCRIPTION.value, "Описание", false),
             )
 
     override fun create(settings: RocketActionSettings): RocketAction? =
@@ -66,12 +67,14 @@ class TextAsMenuRocketActionUi : AbstractRocketAction() {
                 }
             }
 
+    override fun asString(): List<RocketActionConfigurationPropertyKey> = listOf(LABEL)
+
     override fun type(): RocketActionType = RocketActionType { "SHOW_TEXT_AS_MENU" }
 
     companion object {
-        private const val LABEL = "label"
-        private const val DESCRIPTION = "description"
-        private const val TEXT = "text"
+        private val LABEL = RocketActionConfigurationPropertyKey("label")
+        private val DESCRIPTION = RocketActionConfigurationPropertyKey("description")
+        private val TEXT = RocketActionConfigurationPropertyKey("text")
     }
 
     override fun name(): String = "Отобразить текст как подпункт меню"

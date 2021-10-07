@@ -4,6 +4,7 @@ import org.jdesktop.swingx.JXImageView
 import org.jdesktop.swingx.JXPanel
 import ru.ezhov.rocket.action.api.RocketAction
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
+import ru.ezhov.rocket.action.api.RocketActionConfigurationPropertyKey
 import ru.ezhov.rocket.action.api.RocketActionSettings
 import ru.ezhov.rocket.action.api.RocketActionType
 import ru.ezhov.rocket.action.caching.CacheFactory
@@ -66,11 +67,13 @@ class ShowImageRocketActionUi : AbstractRocketAction() {
 
     override fun description(): String = "Показать изображения *.png и *.jpg"
 
+    override fun asString(): List<RocketActionConfigurationPropertyKey> = listOf(LABEL, IMAGE_URL)
+
     override fun properties(): List<RocketActionConfigurationProperty> {
         return listOf(
-                createRocketActionProperty(LABEL, LABEL, "Заголовок", false),
-                createRocketActionProperty(DESCRIPTION, DESCRIPTION, "Описание", false),
-                createRocketActionProperty(IMAGE_URL, IMAGE_URL, "URL изображения", true)
+                createRocketActionProperty(LABEL, LABEL.value, "Заголовок", false),
+                createRocketActionProperty(DESCRIPTION, DESCRIPTION.value, "Описание", false),
+                createRocketActionProperty(IMAGE_URL, IMAGE_URL.value, "URL изображения", true)
         )
     }
 
@@ -185,8 +188,8 @@ class ShowImageRocketActionUi : AbstractRocketAction() {
     }
 
     companion object {
-        private const val LABEL = "label"
-        private const val DESCRIPTION = "description"
-        private const val IMAGE_URL = "imageUrl"
+        private val LABEL = RocketActionConfigurationPropertyKey("label")
+        private val DESCRIPTION = RocketActionConfigurationPropertyKey("description")
+        private val IMAGE_URL = RocketActionConfigurationPropertyKey("imageUrl")
     }
 }

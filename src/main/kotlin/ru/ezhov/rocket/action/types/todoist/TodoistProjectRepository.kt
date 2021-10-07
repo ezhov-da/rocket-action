@@ -5,6 +5,7 @@ import mu.KotlinLogging
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Request.Builder
+import ru.ezhov.rocket.action.api.RocketActionConfigurationPropertyKey
 import ru.ezhov.rocket.action.api.RocketActionSettings
 import ru.ezhov.rocket.action.types.todoist.model.Project
 import java.util.*
@@ -13,20 +14,16 @@ private val logger = KotlinLogging.logger { }
 
 class TodoistProjectRepository {
     @Throws(TodoistRepositoryException::class)
-    fun projects(settings: RocketActionSettings): List<Project> {
+    fun projects(token: String): List<Project> {
         val projects: MutableList<Project> = ArrayList()
-        var token = settings.settings()[TodoistRocketAction.TOKEN]
-        if (token == null || "" == token) {
-            token = System.getProperty(TOKEN_PROPERTY, "")
-        }
         var debugToken = ""
-        if (token!!.length > 5) {
+        if (token.length > 5) {
             debugToken = token.substring(0, 4)
         }
         logger.info { "method=projects todoistToken=$debugToken" }
         return try {
             val request: Request = Builder()
-                    .url(BASE_URL)
+                    .url(BASE_URL.value)
                     .header("Authorization", String.format("Bearer %s", token))
                     .build()
             val client = OkHttpClient()
@@ -53,7 +50,7 @@ class TodoistProjectRepository {
     }
 
     companion object {
-        const val TOKEN_PROPERTY = "rocket.action.toodoist.token"
-        private const val BASE_URL = "https://api.todoist.com/rest/v1/projects"
+        private val TOKEN_PROPERTY = RocketActionConfigurationPropertyKey("rocket.action.toodoist.token")
+        private val BASE_URL = RocketActionConfigurationPropertyKey("https://api.todoist.com/rest/v1/projects")
     }
 }

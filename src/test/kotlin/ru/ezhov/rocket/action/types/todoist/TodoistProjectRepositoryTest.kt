@@ -3,8 +3,6 @@ package ru.ezhov.rocket.action.types.todoist
 import org.junit.Assert
 import org.junit.Ignore
 import org.junit.Test
-import ru.ezhov.rocket.action.api.RocketActionSettings
-import ru.ezhov.rocket.action.api.RocketActionType
 import ru.ezhov.rocket.action.types.todoist.TodoistRepositoryException
 
 @Ignore
@@ -13,15 +11,7 @@ class TodoistProjectRepositoryTest {
     @Throws(TodoistRepositoryException::class)
     fun shouldGetAllProjects() {
         val repository = TodoistProjectRepository()
-        val projects = repository.projects(object : RocketActionSettings {
-            override fun id(): String = ""
-
-            override fun type(): RocketActionType = RocketActionType { "" }
-
-            override fun settings(): Map<String, String> = emptyMap()
-
-            override fun actions(): List<RocketActionSettings> = emptyList()
-        })
+        val projects = repository.projects("token")
         Assert.assertFalse(projects.isEmpty())
     }
 }

@@ -2,6 +2,7 @@ package ru.ezhov.rocket.action.types.todoist
 
 import ru.ezhov.rocket.action.api.RocketAction
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
+import ru.ezhov.rocket.action.api.RocketActionConfigurationPropertyKey
 import ru.ezhov.rocket.action.api.RocketActionSettings
 import ru.ezhov.rocket.action.api.RocketActionType
 import ru.ezhov.rocket.action.icon.AppIcon
@@ -39,15 +40,17 @@ class TodoistRocketAction : AbstractRocketAction() {
 
     override fun properties(): List<RocketActionConfigurationProperty> {
         return listOf(
-                createRocketActionProperty(LABEL, LABEL, "Заголовок", true),
+                createRocketActionProperty(LABEL, LABEL.value, "Заголовок", true),
                 createRocketActionProperty(
                         TOKEN,
-                        TOKEN,
-                        "Используйте это свойство или свойство Java из командной строки -D$TOKEN_PROPERTY",
+                        TOKEN.value,
+                        "Используйте это свойство или свойство Java из командной строки -D${TOKEN_PROPERTY.value}",
                         true
                 )
         )
     }
+
+    override fun asString(): List<RocketActionConfigurationPropertyKey> = listOf(LABEL)
 
     override fun name(): String = "Работа с Todois"
 
@@ -71,7 +74,7 @@ class TodoistRocketAction : AbstractRocketAction() {
 
     private fun getToken(settings: RocketActionSettings) =
             settings.settings()[TOKEN]?.takeIf { it.isNotEmpty() }
-                    ?: System.getProperty(TOKEN_PROPERTY, "").takeIf { it.isNotEmpty() }
+                    ?: System.getProperty(TOKEN_PROPERTY.value, "").takeIf { it.isNotEmpty() }
 
     override fun type(): RocketActionType = RocketActionType { "TODOIST" }
 
@@ -176,8 +179,8 @@ class TodoistRocketAction : AbstractRocketAction() {
     }
 
     companion object {
-        const val LABEL = "label"
-        const val TOKEN = "todoistToken"
-        const val TOKEN_PROPERTY = "rocket.action.toodoist.token"
+        private val LABEL = RocketActionConfigurationPropertyKey("label")
+        private val TOKEN = RocketActionConfigurationPropertyKey("todoistToken")
+        private val TOKEN_PROPERTY = RocketActionConfigurationPropertyKey("rocket.action.toodoist.token")
     }
 }

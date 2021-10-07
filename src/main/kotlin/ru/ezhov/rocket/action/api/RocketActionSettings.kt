@@ -17,7 +17,7 @@ interface RocketActionSettings {
     /**
      * @return настройки действия
      */
-    fun settings(): Map<String, String>
+    fun settings(): Map<RocketActionConfigurationPropertyKey, String>
 
     /**
      * Используется для групповых действий

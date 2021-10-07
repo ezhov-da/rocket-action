@@ -26,6 +26,12 @@ interface RocketActionConfiguration {
     fun description(): String
 
     /**
+     * @return список ключей значение первого из которых
+     * не пустое и не null будет использоваться для отображения настроек
+     */
+    fun asString(): List<RocketActionConfigurationPropertyKey>
+
+    /**
      * Свойства действия для конфигурирования
      *
      * @return свойства действия

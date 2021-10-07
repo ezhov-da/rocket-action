@@ -3,6 +3,7 @@ package ru.ezhov.rocket.action.configuration.ui
 import ru.ezhov.rocket.action.api.PropertyType
 import ru.ezhov.rocket.action.api.RocketActionConfiguration
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
+import ru.ezhov.rocket.action.api.RocketActionConfigurationPropertyKey
 import ru.ezhov.rocket.action.api.RocketActionSettings
 import ru.ezhov.rocket.action.configuration.domain.RocketActionConfigurationRepository
 import ru.ezhov.rocket.action.domain.RocketActionUiRepository
@@ -131,9 +132,10 @@ class CreateRocketActionSettingsDialog(
             revalidate()
         }
 
-        fun create(): RocketActionSettings = NewRocketActionSettings(
-                currentConfiguration!!.type(),
-                settingPanels.associate { panel -> panel.value() }
+        fun create(): NewRocketActionSettings = NewRocketActionSettings(
+                configuration = this.currentConfiguration!!,
+                type = currentConfiguration!!.type(),
+                settings = settingPanels.associate { panel -> panel.value() }
         )
     }
 
@@ -182,6 +184,6 @@ class CreateRocketActionSettingsDialog(
             this.add(centerPanel, BorderLayout.CENTER)
         }
 
-        fun value(): Pair<String, String> = Pair(first = property.key(), valueCallback())
+        fun value(): Pair<RocketActionConfigurationPropertyKey, String> = Pair(first = property.key(), second = valueCallback())
     }
 }

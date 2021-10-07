@@ -1,46 +1,25 @@
 package ru.ezhov.rocket.action.infrastructure
 
+import ru.ezhov.rocket.action.api.RocketActionConfigurationPropertyKey
 import ru.ezhov.rocket.action.api.RocketActionSettings
 import ru.ezhov.rocket.action.api.RocketActionType
 
-class MutableRocketActionSettings : RocketActionSettings {
-    private var id: String
-    private var type: RocketActionType
-    private var settings: MutableMap<String, String>
-    private var actions: MutableList<RocketActionSettings>
-
-    constructor(
-            id: String,
-            type: RocketActionType,
-            settings: MutableMap<String, String>,
-            actions: MutableList<RocketActionSettings>
-    ) {
-        this.id = id
-        this.type = type
-        this.settings = settings
-        this.actions = actions
-    }
-
-    constructor(
-            id: String,
-            type: RocketActionType,
-            settings: MutableMap<String, String>
-    ) {
-        this.id = id
-        this.type = type
-        this.settings = settings
-        actions = ArrayList()
-    }
+class MutableRocketActionSettings(
+        private val id: String,
+        private val type: RocketActionType,
+        private val settings: MutableMap<RocketActionConfigurationPropertyKey, String>,
+        private val actions: MutableList<RocketActionSettings> = ArrayList()
+) : RocketActionSettings {
 
     override fun id(): String = id
 
     override fun type(): RocketActionType = type
 
-    override fun settings(): MutableMap<String, String> = settings
+    override fun settings(): MutableMap<RocketActionConfigurationPropertyKey, String> = settings
 
     override fun actions(): List<RocketActionSettings> = actions
 
-    fun add(key: String, value: String) {
+    fun add(key: RocketActionConfigurationPropertyKey, value: String) {
         settings[key] = value
     }
 

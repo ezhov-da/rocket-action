@@ -2,6 +2,7 @@ package ru.ezhov.rocket.action.types.text
 
 import ru.ezhov.rocket.action.api.RocketAction
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
+import ru.ezhov.rocket.action.api.RocketActionConfigurationPropertyKey
 import ru.ezhov.rocket.action.api.RocketActionSettings
 import ru.ezhov.rocket.action.api.RocketActionType
 import ru.ezhov.rocket.action.notification.NotificationFactory
@@ -20,8 +21,8 @@ class TextRocketActionUi : AbstractRocketAction() {
 
     override fun properties(): List<RocketActionConfigurationProperty> =
             listOf(
-                    createRocketActionProperty(LABEL, LABEL, "Текст для отображения", true),
-                    createRocketActionProperty(DESCRIPTION, DESCRIPTION, "Описание", false)
+                    createRocketActionProperty(LABEL, LABEL.value, "Текст для отображения", true),
+                    createRocketActionProperty(DESCRIPTION, DESCRIPTION.value, "Описание", false)
             )
 
     override fun create(settings: RocketActionSettings): RocketAction? =
@@ -60,9 +61,11 @@ class TextRocketActionUi : AbstractRocketAction() {
 
     override fun type(): RocketActionType = RocketActionType { "SHOW_TEXT" }
 
+    override fun asString(): List<RocketActionConfigurationPropertyKey> = listOf(LABEL)
+
     companion object {
-        private const val LABEL = "label"
-        private const val DESCRIPTION = "description"
+        private val LABEL = RocketActionConfigurationPropertyKey("label")
+        private val DESCRIPTION = RocketActionConfigurationPropertyKey("description")
     }
 
     override fun name(): String = "Отобразить текст"

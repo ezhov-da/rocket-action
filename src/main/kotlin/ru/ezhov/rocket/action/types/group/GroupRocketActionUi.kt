@@ -2,6 +2,7 @@ package ru.ezhov.rocket.action.types.group
 
 import ru.ezhov.rocket.action.api.RocketAction
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
+import ru.ezhov.rocket.action.api.RocketActionConfigurationPropertyKey
 import ru.ezhov.rocket.action.api.RocketActionSettings
 import ru.ezhov.rocket.action.api.RocketActionType
 import ru.ezhov.rocket.action.icon.AppIcon
@@ -40,11 +41,13 @@ class GroupRocketActionUi : AbstractRocketAction() {
 
     override fun description(): String = "Позволяет создать иерархию действий"
 
+    override fun asString(): List<RocketActionConfigurationPropertyKey> = listOf(LABEL)
+
     override fun properties(): List<RocketActionConfigurationProperty> {
         return listOf(
-                createRocketActionProperty(LABEL, LABEL, "Заголовок", true),
-                createRocketActionProperty(DESCRIPTION, DESCRIPTION, "Описание", false),
-                createRocketActionProperty(ICON_URL, ICON_URL, "URL иконки", false)
+                createRocketActionProperty(LABEL, LABEL.value, "Заголовок", true),
+                createRocketActionProperty(DESCRIPTION, DESCRIPTION.value, "Описание", false),
+                createRocketActionProperty(ICON_URL, ICON_URL.value, "URL иконки", false)
         )
     }
 
@@ -104,8 +107,8 @@ class GroupRocketActionUi : AbstractRocketAction() {
 
     companion object {
         const val TYPE = "GROUP"
-        private const val LABEL = "label"
-        private const val ICON_URL = "iconUrl"
-        private const val DESCRIPTION = "description"
+        private val LABEL = RocketActionConfigurationPropertyKey("label")
+        private val ICON_URL = RocketActionConfigurationPropertyKey("iconUrl")
+        private val DESCRIPTION = RocketActionConfigurationPropertyKey("description")
     }
 }

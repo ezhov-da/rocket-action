@@ -5,6 +5,7 @@ import org.apache.batik.swing.JSVGScrollPane
 import org.apache.batik.swing.svg.JSVGComponent
 import ru.ezhov.rocket.action.api.RocketAction
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
+import ru.ezhov.rocket.action.api.RocketActionConfigurationPropertyKey
 import ru.ezhov.rocket.action.api.RocketActionSettings
 import ru.ezhov.rocket.action.api.RocketActionType
 import ru.ezhov.rocket.action.caching.CacheFactory
@@ -70,9 +71,9 @@ class ShowSvgImageRocketActionUi : AbstractRocketAction() {
 
     override fun properties(): List<RocketActionConfigurationProperty> {
         return listOf(
-                createRocketActionProperty(IMAGE_URL, IMAGE_URL, "URL изображения", true),
-                createRocketActionProperty(LABEL, LABEL, "Заголовок", false),
-                createRocketActionProperty(DESCRIPTION, DESCRIPTION, "Описание", false),
+                createRocketActionProperty(IMAGE_URL, IMAGE_URL.value, "URL изображения", true),
+                createRocketActionProperty(LABEL, LABEL.value, "Заголовок", false),
+                createRocketActionProperty(DESCRIPTION, DESCRIPTION.value, "Описание", false),
         )
     }
 
@@ -186,11 +187,13 @@ class ShowSvgImageRocketActionUi : AbstractRocketAction() {
         }
     }
 
+    override fun asString(): List<RocketActionConfigurationPropertyKey> = listOf(LABEL, IMAGE_URL)
+
     override fun name(): String = "Показать изображение *.svg (beta)"
 
     companion object {
-        private const val LABEL = "label"
-        private const val DESCRIPTION = "description"
-        private const val IMAGE_URL = "imageUrl"
+        private val LABEL = RocketActionConfigurationPropertyKey("label")
+        private val DESCRIPTION = RocketActionConfigurationPropertyKey("description")
+        private val IMAGE_URL = RocketActionConfigurationPropertyKey("imageUrl")
     }
 }
