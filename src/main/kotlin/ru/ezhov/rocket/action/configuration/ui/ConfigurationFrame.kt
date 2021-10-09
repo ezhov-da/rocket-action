@@ -140,16 +140,10 @@ class ConfigurationFrame(
                     popupMenu.add(JMenuItem(object : AbstractAction() {
                         override fun actionPerformed(e: ActionEvent) {
                             createRocketActionSettingsDialog.show(object : CreatedRocketActionSettingsCallback {
-                                override fun create(rocketActionSettings: RocketActionSettings) {
+                                override fun create(settings: TreeRocketActionSettings) {
                                     SwingUtilities.invokeLater {
-                                        val newActionSettings = MutableRocketActionSettings(
-                                                rocketActionSettings.id(),
-                                                rocketActionSettings.type(),
-                                                rocketActionSettings.settings().toMutableMap(),
-                                                rocketActionSettings.actions().toMutableList()
-                                        )
                                         defaultTreeModel.insertNodeInto(
-                                                DefaultMutableTreeNode(newActionSettings, true),
+                                                DefaultMutableTreeNode(settings, true),
                                                 mutableTreeNode.parent as MutableTreeNode,
                                                 mutableTreeNode.parent.getIndex(mutableTreeNode)
                                         )
@@ -166,18 +160,10 @@ class ConfigurationFrame(
                             object : AbstractAction() {
                                 override fun actionPerformed(e: ActionEvent) {
                                     createRocketActionSettingsDialog.show(object : CreatedRocketActionSettingsCallback {
-                                        override fun create(rocketActionSettings: RocketActionSettings) {
+                                        override fun create(settings: TreeRocketActionSettings) {
                                             SwingUtilities.invokeLater {
                                                 defaultTreeModel.insertNodeInto(
-                                                        DefaultMutableTreeNode(
-                                                                MutableRocketActionSettings(
-                                                                        rocketActionSettings.id(),
-                                                                        rocketActionSettings.type(),
-                                                                        rocketActionSettings.settings().toMutableMap(),
-                                                                        rocketActionSettings.actions().toMutableList()
-                                                                ),
-                                                                true
-                                                        ),
+                                                        DefaultMutableTreeNode(settings, true),
                                                         mutableTreeNode.parent as MutableTreeNode,
                                                         mutableTreeNode.parent.getIndex(mutableTreeNode) + 1
                                                 )
@@ -197,19 +183,10 @@ class ConfigurationFrame(
                                 object : AbstractAction() {
                                     override fun actionPerformed(e: ActionEvent) {
                                         createRocketActionSettingsDialog.show(object : CreatedRocketActionSettingsCallback {
-                                            override fun create(rocketActionSettings: RocketActionSettings) {
+                                            override fun create(settings: TreeRocketActionSettings) {
                                                 SwingUtilities.invokeLater {
                                                     mutableTreeNode.add(
-                                                            DefaultMutableTreeNode(
-                                                                    MutableRocketActionSettings(
-                                                                            rocketActionSettings.id(),
-                                                                            rocketActionSettings.type(),
-                                                                            rocketActionSettings.settings().toMutableMap(),
-                                                                            rocketActionSettings.actions().toMutableList()
-                                                                    ),
-                                                                    true
-                                                            )
-                                                    )
+                                                            DefaultMutableTreeNode(settings, true))
                                                     defaultTreeModel.reload(mutableTreeNode)
                                                 }
                                             }
@@ -287,11 +264,11 @@ class ConfigurationFrame(
     }
 
     private fun recursiveGetSettings(node: DefaultMutableTreeNode, settings: MutableList<RocketActionSettings>, parent: MutableRocketActionSettings?) {
-        val originalActionSettings = node.userObject as MutableRocketActionSettings
+        val originalActionSettings = node.userObject as TreeRocketActionSettings
         val finalActionSettings = MutableRocketActionSettings(
-                originalActionSettings.id(),
-                originalActionSettings.type(),
-                originalActionSettings.settings()
+                id = originalActionSettings.settings.id(),
+                type = originalActionSettings.settings.type(),
+                settings = originalActionSettings.settings.settings().toMutableMap()
         )
         parent?.add(finalActionSettings) ?: settings.add(finalActionSettings)
         val childCount = node.childCount

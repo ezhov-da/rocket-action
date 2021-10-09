@@ -4,11 +4,11 @@ import ru.ezhov.rocket.action.api.PropertyType
 import ru.ezhov.rocket.action.api.RocketActionConfiguration
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
 import ru.ezhov.rocket.action.api.RocketActionConfigurationPropertyKey
-import ru.ezhov.rocket.action.api.RocketActionSettings
 import ru.ezhov.rocket.action.configuration.domain.RocketActionConfigurationRepository
 import ru.ezhov.rocket.action.domain.RocketActionUiRepository
 import ru.ezhov.rocket.action.icon.AppIcon
 import ru.ezhov.rocket.action.icon.IconRepositoryFactory
+import ru.ezhov.rocket.action.infrastructure.MutableRocketActionSettings
 import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Component
@@ -91,7 +91,17 @@ class CreateRocketActionSettingsDialog(
         panelCreateButton.add(buttonCreate)
         buttonCreate.addActionListener {
             val settings = actionSettingsPanel.create()
-            currentCallback!!.create(settings)
+            currentCallback!!.create(
+                    TreeRocketActionSettings(
+                            configuration = settings.configuration,
+                            settings = MutableRocketActionSettings(
+                                    settings.id(),
+                                    settings.type(),
+                                    settings.settings().toMutableMap(),
+                                    settings.actions().toMutableList()
+                            )
+                    )
+            )
             dialog.isVisible = false
         }
         panel.add(testPanel, BorderLayout.NORTH)

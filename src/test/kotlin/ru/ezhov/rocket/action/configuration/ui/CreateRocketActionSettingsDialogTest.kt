@@ -1,6 +1,5 @@
 package ru.ezhov.rocket.action.configuration.ui
 
-import ru.ezhov.rocket.action.api.RocketActionSettings
 import ru.ezhov.rocket.action.configuration.infrastructure.ReflectionRocketActionConfigurationRepository
 import ru.ezhov.rocket.action.infrastructure.ReflectionRocketActionUiRepository
 import javax.swing.JDialog
@@ -23,7 +22,7 @@ object CreateRocketActionSettingsDialogTest {
                         reflectionRocketActionUiRepository
                 )
                         .show(object : CreatedRocketActionSettingsCallback {
-                            override fun create(rocketActionSettings: RocketActionSettings) {
+                            override fun create(settings: TreeRocketActionSettings) {
 
                             }
                         })
