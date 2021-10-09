@@ -135,7 +135,7 @@ class ConfigurationFrame(
                 if (e.button == MouseEvent.BUTTON3) {
                     val treePath = tree.getClosestPathForLocation(e.x, e.y) ?: return
                     val mutableTreeNode = treePath.lastPathComponent as DefaultMutableTreeNode
-                    val userObject = mutableTreeNode.userObject as? RocketActionSettings
+                    val userObject = mutableTreeNode.userObject as? TreeRocketActionSettings
                     val popupMenu = JPopupMenu()
                     popupMenu.add(JMenuItem(object : AbstractAction() {
                         override fun actionPerformed(e: ActionEvent) {
@@ -178,7 +178,7 @@ class ConfigurationFrame(
                                 }
                             }
                     ))
-                    if (userObject?.type()?.value() == GroupRocketActionUi.TYPE) {
+                    if (userObject?.settings?.type()?.value() == GroupRocketActionUi.TYPE) {
                         popupMenu.add(JMenuItem(
                                 object : AbstractAction() {
                                     override fun actionPerformed(e: ActionEvent) {

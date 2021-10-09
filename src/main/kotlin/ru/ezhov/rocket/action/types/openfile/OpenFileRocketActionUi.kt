@@ -1,5 +1,6 @@
 package ru.ezhov.rocket.action.types.openfile
 
+import mu.KotlinLogging
 import ru.ezhov.rocket.action.api.RocketAction
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
 import ru.ezhov.rocket.action.api.RocketActionConfigurationPropertyKey
@@ -14,6 +15,8 @@ import java.awt.Component
 import java.awt.Desktop
 import java.io.File
 import javax.swing.JMenuItem
+
+private val logger = KotlinLogging.logger {}
 
 class OpenFileRocketActionUi : AbstractRocketAction() {
 
@@ -33,7 +36,7 @@ class OpenFileRocketActionUi : AbstractRocketAction() {
                                 try {
                                     Desktop.getDesktop().open(File(path))
                                 } catch (ex: Exception) {
-                                    ex.printStackTrace()
+                                    logger.warn(ex) { "Error when open file '$path'" }
                                     NotificationFactory.notification.show(NotificationType.ERROR, "Ошибка открытия файла")
                                 }
                             }

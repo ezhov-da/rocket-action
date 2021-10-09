@@ -175,6 +175,7 @@ class CreateRocketActionSettingsDialog(
                             JScrollPane(
                                     JTextPane().also { tp ->
                                         valueCallback = { tp.text }
+                                        tp.text = property.default().orEmpty()
                                     }
                             ),
                             BorderLayout.CENTER
