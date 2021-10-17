@@ -2,7 +2,9 @@ package ru.ezhov.rocket.action.configuration.infrastructure
 
 import mu.KotlinLogging
 import org.reflections.Reflections
-import org.reflections.scanners.SubTypesScanner
+import org.reflections.scanners.Scanners
+import org.reflections.util.ClasspathHelper
+import org.reflections.util.ConfigurationBuilder
 import ru.ezhov.rocket.action.api.RocketActionConfiguration
 import ru.ezhov.rocket.action.api.RocketActionType
 import ru.ezhov.rocket.action.configuration.domain.RocketActionConfigurationRepository
@@ -15,7 +17,11 @@ class ReflectionRocketActionConfigurationRepository : RocketActionConfigurationR
 
     fun load() {
         list = mutableListOf()
-        val reflections = Reflections("", SubTypesScanner(true))
+        val reflections = Reflections(
+                ConfigurationBuilder()
+                        .addUrls(ClasspathHelper.forPackage("ru.ezhov.rocket.action"))
+                        .setScanners(Scanners.SubTypes)
+        )
         val classes = reflections.getSubTypesOf(RocketActionConfiguration::class.java)
         for (aClass in classes) {
             try {

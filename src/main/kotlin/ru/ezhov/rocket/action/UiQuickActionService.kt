@@ -15,12 +15,12 @@ import ru.ezhov.rocket.action.notification.NotificationType
 import ru.ezhov.rocket.action.properties.GeneralPropertiesRepository
 import ru.ezhov.rocket.action.properties.ResourceGeneralPropertiesRepository
 import ru.ezhov.rocket.action.types.group.GroupRocketActionUi
+import ru.ezhov.rocket.action.ui.swing.common.MoveUtil
 import ru.ezhov.rocket.action.ui.swing.common.TextFieldWithText
 import java.awt.Color
 import java.awt.Component
 import java.awt.Desktop
 import java.awt.FlowLayout
-import java.awt.Point
 import java.awt.datatransfer.DataFlavor
 import java.awt.datatransfer.UnsupportedFlavorException
 import java.awt.dnd.DnDConstants
@@ -79,7 +79,9 @@ class UiQuickActionService(
             //menuBar.add(createFavoriteComponent());
 
             menuBar.add(createSearchField(dialog, menu))
-            menuBar.add(createMoveComponent(dialog))
+            val moveLabel = JLabel(IconRepositoryFactory.repository.by(AppIcon.MOVE))
+            MoveUtil.addMoveAction(movableComponent = dialog, grabbedComponent = moveLabel)
+            menuBar.add(moveLabel)
             CreateMenuWorker(menu).execute()
             menuBar
         } catch (e: Exception) {
@@ -211,60 +213,6 @@ class UiQuickActionService(
             addActionListener { SwingUtilities.invokeLater { dialog.dispose() } }
         })
         return menuTools
-    }
-
-    private fun createMoveComponent(dialog: JDialog?): Component {
-        val label = JLabel(IconRepositoryFactory.repository.by(AppIcon.MOVE))
-        val mouseAdapter: MouseAdapter = object : MouseAdapter() {
-            var pressed = false
-            var x = 0
-            var y = 0
-            override fun mousePressed(e: MouseEvent) {
-                pressed = true
-                val mousePoint = e.point
-                SwingUtilities.convertPointToScreen(mousePoint, label)
-                val framePoint = dialog!!.location
-                x = mousePoint.x - framePoint.x
-                y = mousePoint.y - framePoint.y
-            }
-
-            override fun mouseReleased(e: MouseEvent) {
-                pressed = false
-            }
-
-            override fun mouseDragged(e: MouseEvent) {
-                if (pressed) {
-                    val mousePoint = e.point
-                    SwingUtilities.convertPointToScreen(mousePoint, label)
-                    dialog!!.location = Point(mousePoint.x - x, mousePoint.y - y)
-                }
-            }
-        }
-        label.addMouseListener(mouseAdapter)
-        label.addMouseMotionListener(mouseAdapter)
-        return label
-    }
-
-    private fun createFavoriteComponent(): Component {
-        val menu = JMenu()
-        menu.icon = IconRepositoryFactory.repository.by(AppIcon.STAR)
-        menu.dropTarget = DropTarget(
-                menu,
-                object : DropTargetAdapter() {
-                    override fun drop(dtde: DropTargetDropEvent) {
-                        try {
-                            dtde.acceptDrop(DnDConstants.ACTION_COPY)
-                            val text = dtde.transferable.getTransferData(DataFlavor.stringFlavor) as String
-                            menu.add(JLabel(text))
-                        } catch (e: UnsupportedFlavorException) {
-                            e.printStackTrace()
-                        } catch (e: IOException) {
-                            e.printStackTrace()
-                        }
-                    }
-                }
-        )
-        return menu
     }
 
     private inner class CreateMenuWorker(private val menu: JMenu) : SwingWorker<List<Component>, String?>() {

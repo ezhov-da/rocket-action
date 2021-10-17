@@ -8,6 +8,6 @@ class ReflectionRocketActionUiRepositoryTest {
     fun test() {
         val repository = ReflectionRocketActionUiRepository()
         repository.load()
-        Assert.assertEquals(16, repository.all().size.toLong())
+        Assert.assertEquals(17, repository.all().size.toLong())
     }
 }

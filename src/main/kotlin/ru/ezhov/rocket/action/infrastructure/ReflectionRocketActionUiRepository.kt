@@ -1,16 +1,25 @@
 package ru.ezhov.rocket.action.infrastructure
 
+import mu.KotlinLogging
 import org.reflections.Reflections
-import org.reflections.scanners.SubTypesScanner
+import org.reflections.scanners.Scanners
+import org.reflections.util.ClasspathHelper
+import org.reflections.util.ConfigurationBuilder
 import ru.ezhov.rocket.action.api.RocketActionFactoryUi
 import ru.ezhov.rocket.action.api.RocketActionType
 import ru.ezhov.rocket.action.domain.RocketActionUiRepository
 import java.lang.reflect.Modifier
 
+private val logger = KotlinLogging.logger {}
+
 class ReflectionRocketActionUiRepository : RocketActionUiRepository {
     private var list: MutableList<RocketActionFactoryUi> = mutableListOf()
     fun load() {
-        val reflections = Reflections("", SubTypesScanner(true))
+        val reflections = Reflections(
+                ConfigurationBuilder()
+                        .addUrls(ClasspathHelper.forPackage("ru.ezhov.rocket.action"))
+                        .setScanners(Scanners.SubTypes)
+        )
         val classes = reflections.getSubTypesOf(RocketActionFactoryUi::class.java)
         for (aClass in classes) {
             try {
@@ -18,9 +27,9 @@ class ReflectionRocketActionUiRepository : RocketActionUiRepository {
                     list.add(aClass.getConstructor().newInstance() as RocketActionFactoryUi)
                 }
             } catch (e: InstantiationException) {
-                e.printStackTrace()
+                logger.error(e) { "Error when load ui" }
             } catch (e: IllegalAccessException) {
-                e.printStackTrace()
+                logger.error(e) { "Error when load ui" }
             }
         }
     }

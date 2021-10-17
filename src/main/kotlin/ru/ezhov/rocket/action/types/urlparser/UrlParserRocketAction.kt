@@ -1,8 +1,6 @@
 package ru.ezhov.rocket.action.types.urlparser
 
 import mu.KotlinLogging
-import org.jsoup.Jsoup
-import org.jsoup.nodes.Document
 import ru.ezhov.rocket.action.api.RocketAction
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
 import ru.ezhov.rocket.action.api.RocketActionConfigurationPropertyKey
@@ -14,6 +12,7 @@ import ru.ezhov.rocket.action.notification.NotificationFactory
 import ru.ezhov.rocket.action.notification.NotificationType
 import ru.ezhov.rocket.action.types.AbstractRocketAction
 import ru.ezhov.rocket.action.ui.swing.common.TextFieldWithText
+import ru.ezhov.rocket.action.url.parser.UrlParser
 import java.awt.BorderLayout
 import java.awt.Component
 import java.awt.Dimension
@@ -30,7 +29,7 @@ import javax.swing.SwingWorker
 
 private val logger = KotlinLogging.logger {}
 
-class UrlParser : AbstractRocketAction() {
+class UrlParserRocketAction : AbstractRocketAction() {
     override fun create(settings: RocketActionSettings): RocketAction? =
             settings.settings()[LABEL]
                     ?.takeIf { it.isNotEmpty() && settings.type().value() == this.type().value() }
@@ -144,23 +143,7 @@ class UrlParser : AbstractRocketAction() {
                 button.icon = ImageIcon(this.javaClass.getResource("/load_16x16.gif"))
             }
 
-            override fun doInBackground(): String {
-                val doc: Document =
-                        Jsoup
-                                .connect(url)
-                                .headers(headers)
-                                .get()
-                val title = doc.title()
-                val elementsMeta = doc.getElementsByTag("meta")
-                val description = elementsMeta
-                        .firstOrNull { e -> e.attr("name") == "description" }
-                        ?.attr("content")
-
-                return """
-                    ${title.orEmpty()}
-                    ${description.orEmpty()}
-                """.trimIndent()
-            }
+            override fun doInBackground(): String = UrlParser(url, headers).parse()
 
             override fun done() {
                 try {

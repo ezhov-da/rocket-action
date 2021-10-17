@@ -3,7 +3,6 @@ package ru.ezhov.rocket.action
 import com.formdev.flatlaf.FlatLightLaf
 import ru.ezhov.rocket.action.configuration.infrastructure.RocketActionConfigurationRepositoryFactory
 import ru.ezhov.rocket.action.infrastructure.RocketActionUiRepositoryFactory
-import javax.swing.JDialog
 import javax.swing.SwingUtilities
 
 fun main(args: Array<String>) {
@@ -20,7 +19,7 @@ fun main(args: Array<String>) {
                     RocketActionConfigurationRepositoryFactory.repository,
                     RocketActionUiRepositoryFactory.repository
             )
-            JDialog().apply {
+            BaseDialog.dialog.apply {
                 jMenuBar = actionService.createMenu(this)
                 isUndecorated = true
                 pack()
