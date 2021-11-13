@@ -20,4 +20,6 @@ enum class AppIcon(val iconName: String) {
     CLEAR("circle-x-2x"),
     TEXT("text-2x"),
     FLASH("flash-2x"),
+    BOLT("bolt-2x"),
+    LOADER("/load_16x16.gif"),
 }

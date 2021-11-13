@@ -6,7 +6,7 @@
 
     <groupId>ru.ezhov</groupId>
     <artifactId>rocket-action</artifactId>
-    <version>0.16.4</version>
+    <version>0.16.5</version>
 
     <name>rocket-action</name>
 
@@ -161,6 +161,12 @@
             <groupId>com.mchange</groupId>
             <artifactId>c3p0</artifactId>
             <version>0.9.5.5</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jetbrains.kotlin</groupId>
+            <artifactId>kotlin-scripting-jsr223</artifactId>
+            <version>${kotlin.version}</version>
         </dependency>
 
     </dependencies>
