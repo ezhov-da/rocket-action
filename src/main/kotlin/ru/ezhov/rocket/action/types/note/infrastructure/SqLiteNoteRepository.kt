@@ -22,9 +22,9 @@ class SqLiteNoteRepository(private val fileDb: File) : NoteRepository {
         Class.forName("org.sqlite.JDBC")
         val cpds = ComboPooledDataSource()
         cpds.jdbcUrl = "jdbc:sqlite:${fileDb.absolutePath.replace(oldValue = "\\", newValue = "/")}"
-                .let {
-                    logger.debug { "SqlLite jdbcUrl '$it'" }; it
-                }
+            .let {
+                logger.debug { "SqlLite jdbcUrl '$it'" }; it
+            }
 
         // Optional Settings
         cpds.initialPoolSize = 2
@@ -78,11 +78,11 @@ class SqLiteNoteRepository(private val fileDb: File) : NoteRepository {
                         }
                         if (id != currentId) {
                             notes.add(
-                                    Note.of(
-                                            id = id!!,
-                                            text = mapValues[PROPERTY_TEXT],
-                                            description = mapValues[PROPERTY_DESCRIPTION],
-                                    )
+                                Note.of(
+                                    id = id!!,
+                                    text = mapValues[PROPERTY_TEXT],
+                                    description = mapValues[PROPERTY_DESCRIPTION],
+                                )
                             )
 
                             mapValues = mutableMapOf()

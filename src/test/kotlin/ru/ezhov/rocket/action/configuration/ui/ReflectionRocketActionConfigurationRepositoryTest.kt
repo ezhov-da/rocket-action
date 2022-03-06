@@ -8,7 +8,6 @@ class ReflectionRocketActionConfigurationRepositoryTest {
     @Test
     fun shouldCreateConfigurationList() {
         val repository = ReflectionRocketActionConfigurationRepository()
-        repository.load()
         val all = repository.all()
         Assert.assertFalse(all.isEmpty())
     }

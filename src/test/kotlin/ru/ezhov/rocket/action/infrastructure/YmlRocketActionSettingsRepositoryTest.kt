@@ -15,7 +15,7 @@ class YmlRocketActionSettingsRepositoryTest {
     @Throws(URISyntaxException::class, RocketActionSettingsRepositoryException::class)
     fun actions() {
         val repository = YmlRocketActionSettingsRepository(
-                this.javaClass.getResource("/actions.yml")!!.toURI()
+                this.javaClass.getResource("/test-actions.yml")!!.toURI()
         )
         val actions = repository.actions()
         Assert.assertEquals(24, actions.size.toLong())

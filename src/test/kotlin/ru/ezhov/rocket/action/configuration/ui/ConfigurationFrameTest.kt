@@ -14,10 +14,12 @@ object ConfigurationFrameTest {
             try {
                 val dialog = JDialog()
                 ConfigurationFrame(
-                        dialog,
-                        ReflectionRocketActionConfigurationRepository(),
-                        ReflectionRocketActionUiRepository(),
-                        YmlRocketActionSettingsRepository(ConfigurationFrameTest::class.java.getResource("/actions.yml").toURI())
+                    owner = dialog,
+                    rocketActionConfigurationRepository = ReflectionRocketActionConfigurationRepository(),
+                    rocketActionUiRepository = ReflectionRocketActionUiRepository(),
+                    rocketActionSettingsRepository = YmlRocketActionSettingsRepository(
+                        uri = ConfigurationFrameTest::class.java.getResource("/test-actions.yml").toURI()
+                    )
                 ) { e: ActionEvent? -> }.setVisible(true)
             } catch (e: Exception) {
                 e.printStackTrace()

@@ -10,28 +10,28 @@ import javax.swing.JPanel
 import javax.swing.SwingUtilities
 
 class TestPanel(
-        private val rocketActionUiRepository: RocketActionUiRepository,
-        private val callback: CreateTestCallback
+    private val rocketActionUiRepository: RocketActionUiRepository,
+    private val callback: CreateTestCallback
 ) : JPanel(BorderLayout()) {
     private var panelTest: JPanel? = null
     private fun createTest(settings: RocketActionSettings) {
         val panel: JPanel =
-                when (val actionUi = rocketActionUiRepository.by(settings.type())) {
-                    null -> {
-                        val p = JPanel(BorderLayout())
-                        p.add(JLabel("Не найдено действие для типа '${settings.type()}'"))
-                        p
-                    }
-                    else -> {
-                        val p = JPanel(BorderLayout())
-                        val menuBar = JMenuBar()
-                        val component = actionUi.create(settings)?.component() ?: JLabel("Компонент не создан")
-                        menuBar.add(component)
-                        p.add(menuBar, BorderLayout.CENTER)
-                        p
-
-                    }
+            when (val actionUi = rocketActionUiRepository.by(settings.type())) {
+                null -> {
+                    val p = JPanel(BorderLayout())
+                    p.add(JLabel("Не найдено действие для типа '${settings.type()}'"))
+                    p
                 }
+                else -> {
+                    val p = JPanel(BorderLayout())
+                    val menuBar = JMenuBar()
+                    val component = actionUi.create(settings)?.component() ?: JLabel("Компонент не создан")
+                    menuBar.add(component)
+                    p.add(menuBar, BorderLayout.CENTER)
+                    p
+
+                }
+            }
         if (panelTest != null) {
             clearTest()
         }

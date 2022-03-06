@@ -27,42 +27,42 @@ private val logger = KotlinLogging.logger { }
 class ExecRocketActionUi : AbstractRocketAction() {
 
     override fun create(settings: RocketActionSettings): RocketAction? =
-            settings.settings()[COMMAND]?.takeIf { it.isNotEmpty() }?.let { command ->
-                val workingDir = settings.settings()[WORKING_DIR]?.takeIf { it.isNotEmpty() }
-                        ?: File(".").absoluteFile.parent
-                val label = settings.settings()[LABEL]?.takeIf { it.isNotEmpty() } ?: command
-                val description = settings.settings()[DESCRIPTION]?.takeIf { it.isNotEmpty() } ?: command
-                val iconUrl = settings.settings()[ICON_URL].orEmpty()
-                val menuIcon = icon(iconUrl, command)
+        settings.settings()[COMMAND]?.takeIf { it.isNotEmpty() }?.let { command ->
+            val workingDir = settings.settings()[WORKING_DIR]?.takeIf { it.isNotEmpty() }
+                ?: File(".").absoluteFile.parent
+            val label = settings.settings()[LABEL]?.takeIf { it.isNotEmpty() } ?: command
+            val description = settings.settings()[DESCRIPTION]?.takeIf { it.isNotEmpty() } ?: command
+            val iconUrl = settings.settings()[ICON_URL].orEmpty()
+            val menuIcon = icon(iconUrl, command)
 
-                object : RocketAction {
-                    override fun contains(search: String): Boolean =
-                            label.contains(search, ignoreCase = true)
-                                    .or(command.contains(search, ignoreCase = true))
+            object : RocketAction {
+                override fun contains(search: String): Boolean =
+                    label.contains(search, ignoreCase = true)
+                        .or(command.contains(search, ignoreCase = true))
 
-                    override fun isChanged(actionSettings: RocketActionSettings): Boolean =
-                            !(settings.id() == actionSettings.id() &&
-                                    settings.settings() == actionSettings.settings())
+                override fun isChanged(actionSettings: RocketActionSettings): Boolean =
+                    !(settings.id() == actionSettings.id() &&
+                        settings.settings() == actionSettings.settings())
 
-                    override fun component(): Component = JMenuItem(label).apply {
-                        icon = menuIcon
-                        toolTipText = description
-                        addActionListener { executeCommand(workingDir, command) }
-                        addMouseListener(object : MouseAdapter() {
-                            override fun mouseReleased(e: MouseEvent) {
-                                if (e.button == MouseEvent.BUTTON3) {
-                                    copyToClipboard(command)
-                                }
+                override fun component(): Component = JMenuItem(label).apply {
+                    icon = menuIcon
+                    toolTipText = description
+                    addActionListener { executeCommand(workingDir, command) }
+                    addMouseListener(object : MouseAdapter() {
+                        override fun mouseReleased(e: MouseEvent) {
+                            if (e.button == MouseEvent.BUTTON3) {
+                                copyToClipboard(command)
                             }
-                        })
-                    }
+                        }
+                    })
                 }
             }
+        }
 
     private fun icon(iconUrl: String, command: String): Icon {
         var menuIcon = IconService().load(
-                iconUrl,
-                IconRepositoryFactory.repository.by(AppIcon.FIRE)
+            iconUrl,
+            IconRepositoryFactory.repository.by(AppIcon.FIRE)
         )
         try {
             val file = File(command)
@@ -88,9 +88,9 @@ class ExecRocketActionUi : AbstractRocketAction() {
                 Runtime.getRuntime().exec(command)
             } else {
                 Runtime.getRuntime().exec(
-                        command,
-                        null,
-                        File(workingDir)
+                    command,
+                    null,
+                    File(workingDir)
                 )
             }
         } catch (ex: Exception) {
@@ -107,16 +107,16 @@ class ExecRocketActionUi : AbstractRocketAction() {
     override fun description(): String = "Выполнение команды"
 
     override fun asString(): List<RocketActionConfigurationPropertyKey> = listOf(
-            LABEL, COMMAND
+        LABEL, COMMAND
     )
 
     override fun properties(): List<RocketActionConfigurationProperty> {
         return listOf(
-                createRocketActionProperty(COMMAND, COMMAND.value, "Команда", true),
-                createRocketActionProperty(LABEL, LABEL.value, "Заголовок", false),
-                createRocketActionProperty(WORKING_DIR, WORKING_DIR.value, "Рабочий каталог", false),
-                createRocketActionProperty(DESCRIPTION, DESCRIPTION.value, "Описание", false),
-                createRocketActionProperty(ICON_URL, ICON_URL.value, "URL иконки", false)
+            createRocketActionProperty(COMMAND, COMMAND.value, "Команда", true),
+            createRocketActionProperty(LABEL, LABEL.value, "Заголовок", false),
+            createRocketActionProperty(WORKING_DIR, WORKING_DIR.value, "Рабочий каталог", false),
+            createRocketActionProperty(DESCRIPTION, DESCRIPTION.value, "Описание", false),
+            createRocketActionProperty(ICON_URL, ICON_URL.value, "URL иконки", false)
         )
     }
 

@@ -45,57 +45,57 @@ class GistRocketAction : AbstractRocketAction() {
 
     override fun properties(): List<RocketActionConfigurationProperty> {
         return listOf(
-                createRocketActionProperty(LABEL, LABEL.value, "Label", true),
-                createRocketActionProperty(
-                        TOKEN,
-                        TOKEN.value,
-                        "Используйте это свойство или свойство командной строки Java -D$TOKEN_PROPERTY",
-                        false
-                ),
-                createRocketActionProperty(USERNAME, USERNAME.value, "", true),
-                createRocketActionProperty(
-                        BASE_GIST_URL,
-                        BASE_GIST_URL.value,
-                        "Url gists",
-                        false
-                )
+            createRocketActionProperty(LABEL, LABEL.value, "Label", true),
+            createRocketActionProperty(
+                TOKEN,
+                TOKEN.value,
+                "Используйте это свойство или свойство командной строки Java -D$TOKEN_PROPERTY",
+                false
+            ),
+            createRocketActionProperty(USERNAME, USERNAME.value, "", true),
+            createRocketActionProperty(
+                BASE_GIST_URL,
+                BASE_GIST_URL.value,
+                "Url gists",
+                false
+            )
         )
     }
 
     override fun create(settings: RocketActionSettings): RocketAction? =
-            settings.settings()[LABEL]?.takeIf { it.isNotEmpty() }?.let { label ->
-                geToken(settings)?.takeIf { it.isNotEmpty() }?.let { token ->
-                    settings.settings()[USERNAME]?.takeIf { it.isNotEmpty() }?.let { username ->
-                        settings.settings()[BASE_GIST_URL]?.let { url ->
-                            val menu = JMenu(label)
-                            GistWorker(menu, gistUrl = url, token = token, username = username).execute()
+        settings.settings()[LABEL]?.takeIf { it.isNotEmpty() }?.let { label ->
+            geToken(settings)?.takeIf { it.isNotEmpty() }?.let { token ->
+                settings.settings()[USERNAME]?.takeIf { it.isNotEmpty() }?.let { username ->
+                    settings.settings()[BASE_GIST_URL]?.let { url ->
+                        val menu = JMenu(label)
+                        GistWorker(menu, gistUrl = url, token = token, username = username).execute()
 
-                            object : RocketAction {
-                                override fun contains(search: String): Boolean = false
+                        object : RocketAction {
+                            override fun contains(search: String): Boolean = false
 
-                                override fun isChanged(actionSettings: RocketActionSettings): Boolean =
-                                        !(settings.id() == actionSettings.id() &&
-                                                settings.settings() == actionSettings.settings())
+                            override fun isChanged(actionSettings: RocketActionSettings): Boolean =
+                                !(settings.id() == actionSettings.id() &&
+                                    settings.settings() == actionSettings.settings())
 
-                                override fun component(): Component = menu
-                            }
+                            override fun component(): Component = menu
                         }
                     }
                 }
             }
+        }
 
     private fun geToken(settings: RocketActionSettings) =
-            settings.settings()[TOKEN]?.takeIf { it.isNotEmpty() }
-                    ?: System.getProperty(TOKEN_PROPERTY.value, "").takeIf { it.isNotEmpty() }
+        settings.settings()[TOKEN]?.takeIf { it.isNotEmpty() }
+            ?: System.getProperty(TOKEN_PROPERTY.value, "").takeIf { it.isNotEmpty() }
 
 
     override fun type(): RocketActionType = RocketActionType { "GIST" }
 
     private inner class GistWorker(
-            private val menu: JMenu,
-            private val gistUrl: String,
-            private val token: String,
-            private val username: String
+        private val menu: JMenu,
+        private val gistUrl: String,
+        private val token: String,
+        private val username: String
     ) : SwingWorker<GistPanel, String?>() {
 
         @Throws(Exception::class)
@@ -125,11 +125,11 @@ class GistRocketAction : AbstractRocketAction() {
     }
 
     private inner class GistPanel(
-            menu: JMenu,
-            gists: List<Gist>,
-            gistUrl: String,
-            token: String,
-            username: String,
+        menu: JMenu,
+        gists: List<Gist>,
+        gistUrl: String,
+        token: String,
+        username: String,
     ) : JPanel(BorderLayout()) {
         private val gistItems: MutableList<GistListItem>
         private val textFieldSearch = JTextField()

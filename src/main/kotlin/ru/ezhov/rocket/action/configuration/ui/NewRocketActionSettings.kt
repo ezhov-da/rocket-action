@@ -4,13 +4,13 @@ import ru.ezhov.rocket.action.api.RocketActionConfiguration
 import ru.ezhov.rocket.action.api.RocketActionConfigurationPropertyKey
 import ru.ezhov.rocket.action.api.RocketActionSettings
 import ru.ezhov.rocket.action.api.RocketActionType
-import java.util.*
+import java.util.UUID
 
 class NewRocketActionSettings(
-        val configuration: RocketActionConfiguration,
-        private val type: RocketActionType,
-        private val settings: Map<RocketActionConfigurationPropertyKey, String>,
-        private val actions: List<RocketActionSettings> = emptyList()
+    val configuration: RocketActionConfiguration,
+    private val type: RocketActionType,
+    private val settings: Map<RocketActionConfigurationPropertyKey, String>,
+    private val actions: List<RocketActionSettings> = emptyList()
 ) : RocketActionSettings {
     private val id: String = UUID.randomUUID().toString()
 

@@ -12,9 +12,7 @@ object CreateRocketActionSettingsDialogTest {
             val dialog = JDialog()
             dialog.setSize(1000, 900)
             val reflectionRocketActionConfigurationRepository = ReflectionRocketActionConfigurationRepository()
-            reflectionRocketActionConfigurationRepository.load()
             val reflectionRocketActionUiRepository = ReflectionRocketActionUiRepository()
-            reflectionRocketActionUiRepository.load()
             try {
                 CreateRocketActionSettingsDialog(
                         dialog,

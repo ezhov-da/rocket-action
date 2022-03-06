@@ -1,6 +1,8 @@
 package ru.ezhov.rocket.action.caching
 
 import com.google.common.hash.Hashing
+import ru.ezhov.rocket.action.properties.GeneralPropertiesRepositoryFactory
+import ru.ezhov.rocket.action.properties.UsedPropertiesName
 import java.io.File
 import java.io.FileOutputStream
 import java.net.URL
@@ -13,16 +15,21 @@ import javax.net.ssl.SSLSession
 import javax.net.ssl.X509TrustManager
 
 class DiskCache : Cache {
-    private val cacheFolder = File("./cache")
+    private val cacheFolder = File(
+        GeneralPropertiesRepositoryFactory.repository.asString(
+            name = UsedPropertiesName.CACHE_FOLDER, default = "./cache"
+        )
+    )
+
     override fun get(url: URL): File? {
         if (!cacheFolder.exists()) {
             cacheFolder.mkdirs()
         }
         checkQuietly()
         val sha256hexUrl = Hashing
-                .sha256()
-                .hashString(url.toString(), StandardCharsets.UTF_8)
-                .toString()
+            .sha256()
+            .hashString(url.toString(), StandardCharsets.UTF_8)
+            .toString()
         val file = File(cacheFolder, sha256hexUrl)
         return if (file.exists()) {
             file
@@ -51,16 +58,16 @@ class DiskCache : Cache {
         fun checkQuietly() {
             try {
                 HttpsURLConnection
-                        .setDefaultHostnameVerifier { _: String?, _: SSLSession? -> true }
+                    .setDefaultHostnameVerifier { _: String?, _: SSLSession? -> true }
                 val context = SSLContext.getInstance("TLS")
                 context.init(
-                        null,
-                        arrayOf<X509TrustManager>(object : X509TrustManager {
-                            override fun checkClientTrusted(chain: Array<X509Certificate>, authType: String) = Unit
-                            override fun checkServerTrusted(chain: Array<X509Certificate>, authType: String) = Unit
-                            override fun getAcceptedIssuers(): Array<X509Certificate> = emptyArray()
-                        }),
-                        SecureRandom()
+                    null,
+                    arrayOf<X509TrustManager>(object : X509TrustManager {
+                        override fun checkClientTrusted(chain: Array<X509Certificate>, authType: String) = Unit
+                        override fun checkServerTrusted(chain: Array<X509Certificate>, authType: String) = Unit
+                        override fun getAcceptedIssuers(): Array<X509Certificate> = emptyArray()
+                    }),
+                    SecureRandom()
                 )
                 HttpsURLConnection.setDefaultSSLSocketFactory(context.socketFactory)
             } catch (e: Exception) {

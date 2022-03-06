@@ -6,7 +6,6 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Request.Builder
 import ru.ezhov.rocket.action.api.RocketActionConfigurationPropertyKey
-import ru.ezhov.rocket.action.api.RocketActionSettings
 import ru.ezhov.rocket.action.types.todoist.model.Project
 import java.util.*
 
@@ -23,9 +22,9 @@ class TodoistProjectRepository {
         logger.info { "method=projects todoistToken=$debugToken" }
         return try {
             val request: Request = Builder()
-                    .url(BASE_URL.value)
-                    .header("Authorization", String.format("Bearer %s", token))
-                    .build()
+                .url(BASE_URL.value)
+                .header("Authorization", String.format("Bearer %s", token))
+                .build()
             val client = OkHttpClient()
             val call = client.newCall(request)
             val response = call.execute()
@@ -40,7 +39,7 @@ class TodoistProjectRepository {
                     }
                 } else {
                     throw TodoistRepositoryException(
-                            "Exception when get todoist projects with code=$code and text=$text")
+                        "Exception when get todoist projects with code=$code and text=$text")
                 }
             }
             projects

@@ -15,12 +15,14 @@ private val logger = KotlinLogging.logger {}
 class ReflectionRocketActionConfigurationRepository : RocketActionConfigurationRepository {
     private var list: MutableList<RocketActionConfiguration> = mutableListOf()
 
-    fun load() {
+    private fun load() {
+        logger.info { "Initialise rocket action repository" }
+
         list = mutableListOf()
         val reflections = Reflections(
-                ConfigurationBuilder()
-                        .addUrls(ClasspathHelper.forPackage("ru.ezhov.rocket.action"))
-                        .setScanners(Scanners.SubTypes)
+            ConfigurationBuilder()
+                .addUrls(ClasspathHelper.forPackage("ru.ezhov.rocket.action.types"))
+                .setScanners(Scanners.SubTypes)
         )
         val classes = reflections.getSubTypesOf(RocketActionConfiguration::class.java)
         for (aClass in classes) {
@@ -36,10 +38,17 @@ class ReflectionRocketActionConfigurationRepository : RocketActionConfigurationR
                 logger.warn(e) { "Error when load class ${aClass.name}" }
             }
         }
+
+        logger.info { "Rocket action repository initialize successful" }
     }
 
-    override fun all(): List<RocketActionConfiguration> = list
+    override fun all(): List<RocketActionConfiguration> {
+        if (list.isEmpty()) {
+            load();
+        }
+        return list
+    }
 
     override fun by(type: RocketActionType): RocketActionConfiguration? =
-            all().firstOrNull { r: RocketActionConfiguration -> r.type().value() == type.value() }
+        all().firstOrNull { r: RocketActionConfiguration -> r.type().value() == type.value() }
 }

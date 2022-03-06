@@ -25,39 +25,39 @@ private val logger = KotlinLogging.logger {}
 class KotlinScriptRocketActionUi : AbstractRocketAction() {
     override fun create(settings: RocketActionSettings): RocketAction? = run {
         settings.settings()[SCRIPT]
-                ?.takeIf { it.isNotEmpty() }
-                ?.let { script ->
-                    settings.settings()[LABEL]
-                            ?.takeIf { it.isNotEmpty() }
-                            ?.let { label ->
-                                val description = settings.settings()[DESCRIPTION]?.takeIf { it.isNotEmpty() } ?: script
-                                val menu = JMenu(label).apply {
-                                    toolTipText = description
-                                }
-                                val panelExecute = PanelExecute(menu, script)
-                                menu.add(panelExecute)
+            ?.takeIf { it.isNotEmpty() }
+            ?.let { script ->
+                settings.settings()[LABEL]
+                    ?.takeIf { it.isNotEmpty() }
+                    ?.let { label ->
+                        val description = settings.settings()[DESCRIPTION]?.takeIf { it.isNotEmpty() } ?: script
+                        val menu = JMenu(label).apply {
+                            toolTipText = description
+                        }
+                        val panelExecute = PanelExecute(menu, script)
+                        menu.add(panelExecute)
 
-                                ScriptLoader(menu = menu, script = script, panelExecute = panelExecute).execute()
+                        ScriptLoader(menu = menu, script = script, panelExecute = panelExecute).execute()
 
-                                object : RocketAction {
-                                    override fun contains(search: String): Boolean =
-                                            label.contains(search, ignoreCase = true)
-                                                    .or(description.contains(search, ignoreCase = true))
+                        object : RocketAction {
+                            override fun contains(search: String): Boolean =
+                                label.contains(search, ignoreCase = true)
+                                    .or(description.contains(search, ignoreCase = true))
 
-                                    override fun isChanged(actionSettings: RocketActionSettings): Boolean =
-                                            !(settings.id() == actionSettings.id() &&
-                                                    settings.settings() == actionSettings.settings())
+                            override fun isChanged(actionSettings: RocketActionSettings): Boolean =
+                                !(settings.id() == actionSettings.id() &&
+                                    settings.settings() == actionSettings.settings())
 
-                                    override fun component(): Component = menu
-                                }
-                            }
-                }
+                            override fun component(): Component = menu
+                        }
+                    }
+            }
     }
 
     private class ScriptLoader(
-            private val menu: JMenu,
-            private val panelExecute: PanelExecute,
-            private val script: String,
+        private val menu: JMenu,
+        private val panelExecute: PanelExecute,
+        private val script: String,
     ) : SwingWorker<Any, Any>() {
         init {
             menu.icon = IconRepositoryFactory.repository.by(AppIcon.LOADER)
@@ -108,9 +108,9 @@ class KotlinScriptRocketActionUi : AbstractRocketAction() {
 
     override fun properties(): List<RocketActionConfigurationProperty> {
         return listOf(
-                createRocketActionProperty(key = SCRIPT, name = SCRIPT.value, description = "Скрипт для выполнения", required = true),
-                createRocketActionProperty(key = LABEL, name = LABEL.value, description = "Заголовок", required = true),
-                createRocketActionProperty(key = DESCRIPTION, name = DESCRIPTION.value, description = "Описание", required = false),
+            createRocketActionProperty(key = SCRIPT, name = SCRIPT.value, description = "Скрипт для выполнения", required = true),
+            createRocketActionProperty(key = LABEL, name = LABEL.value, description = "Заголовок", required = true),
+            createRocketActionProperty(key = DESCRIPTION, name = DESCRIPTION.value, description = "Описание", required = false),
         )
     }
 

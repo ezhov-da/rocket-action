@@ -24,32 +24,32 @@ class CopyToClipboardRocketActionUi : AbstractRocketAction() {
     }
 
     override fun create(settings: RocketActionSettings): RocketAction? =
-            settings.settings()[TEXT]?.takeIf { it.isNotEmpty() }?.let { text ->
-                val label = settings.settings()[LABEL]?.takeIf { it.isNotEmpty() } ?: text
-                val description = settings.settings()[DESCRIPTION]?.takeIf { it.isNotEmpty() } ?: text
-                val menuItem = JMenuItem(label)
-                menuItem.icon = IconRepositoryFactory.repository.by(AppIcon.CLIPBOARD)
-                menuItem.toolTipText = description
-                menuItem.addActionListener {
-                    val defaultToolkit = Toolkit.getDefaultToolkit()
-                    val clipboard = defaultToolkit.systemClipboard
-                    clipboard.setContents(StringSelection(text), null)
-                    NotificationFactory.notification.show(NotificationType.INFO, "Текст скопирован в буфер")
-                }
-
-                object : RocketAction {
-                    override fun contains(search: String): Boolean =
-                            text.contains(search, ignoreCase = true)
-                                    .or(label.contains(search, ignoreCase = true))
-                                    .or(description.contains(search, ignoreCase = true))
-
-                    override fun isChanged(actionSettings: RocketActionSettings): Boolean =
-                            !(settings.id() == actionSettings.id() &&
-                                    settings.settings() == actionSettings.settings())
-
-                    override fun component(): Component = menuItem
-                }
+        settings.settings()[TEXT]?.takeIf { it.isNotEmpty() }?.let { text ->
+            val label = settings.settings()[LABEL]?.takeIf { it.isNotEmpty() } ?: text
+            val description = settings.settings()[DESCRIPTION]?.takeIf { it.isNotEmpty() } ?: text
+            val menuItem = JMenuItem(label)
+            menuItem.icon = IconRepositoryFactory.repository.by(AppIcon.CLIPBOARD)
+            menuItem.toolTipText = description
+            menuItem.addActionListener {
+                val defaultToolkit = Toolkit.getDefaultToolkit()
+                val clipboard = defaultToolkit.systemClipboard
+                clipboard.setContents(StringSelection(text), null)
+                NotificationFactory.notification.show(NotificationType.INFO, "Текст скопирован в буфер")
             }
+
+            object : RocketAction {
+                override fun contains(search: String): Boolean =
+                    text.contains(search, ignoreCase = true)
+                        .or(label.contains(search, ignoreCase = true))
+                        .or(description.contains(search, ignoreCase = true))
+
+                override fun isChanged(actionSettings: RocketActionSettings): Boolean =
+                    !(settings.id() == actionSettings.id() &&
+                        settings.settings() == actionSettings.settings())
+
+                override fun component(): Component = menuItem
+            }
+        }
 
     override fun type(): RocketActionType = RocketActionType { "COPY_TO_CLIPBOARD" }
 
@@ -58,16 +58,16 @@ class CopyToClipboardRocketActionUi : AbstractRocketAction() {
     }
 
     override fun asString(): List<RocketActionConfigurationPropertyKey> = listOf(
-            LABEL, TEXT
+        LABEL, TEXT
     )
 
     override fun name(): String = "Копировать в буфер"
 
     override fun properties(): List<RocketActionConfigurationProperty> {
         return listOf(
-                createRocketActionProperty(LABEL, LABEL.value, "Текст для отображения", false),
-                createRocketActionProperty(DESCRIPTION, DESCRIPTION.value, "Описание", false),
-                createRocketActionProperty(TEXT, TEXT.value, "Текст для копирования в буфер", true)
+            createRocketActionProperty(LABEL, LABEL.value, "Текст для отображения", false),
+            createRocketActionProperty(DESCRIPTION, DESCRIPTION.value, "Описание", false),
+            createRocketActionProperty(TEXT, TEXT.value, "Текст для копирования в буфер", true)
         )
     }
 

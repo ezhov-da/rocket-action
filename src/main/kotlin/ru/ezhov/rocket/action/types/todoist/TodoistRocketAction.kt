@@ -40,13 +40,13 @@ class TodoistRocketAction : AbstractRocketAction() {
 
     override fun properties(): List<RocketActionConfigurationProperty> {
         return listOf(
-                createRocketActionProperty(LABEL, LABEL.value, "Заголовок", true),
-                createRocketActionProperty(
-                        TOKEN,
-                        TOKEN.value,
-                        "Используйте это свойство или свойство Java из командной строки -D${TOKEN_PROPERTY.value}",
-                        true
-                )
+            createRocketActionProperty(LABEL, LABEL.value, "Заголовок", true),
+            createRocketActionProperty(
+                TOKEN,
+                TOKEN.value,
+                "Используйте это свойство или свойство Java из командной строки -D${TOKEN_PROPERTY.value}",
+                true
+            )
         )
     }
 
@@ -55,32 +55,32 @@ class TodoistRocketAction : AbstractRocketAction() {
     override fun name(): String = "Работа с Todois"
 
     override fun create(settings: RocketActionSettings): RocketAction? =
-            getToken(settings)?.takeIf { it.isNotEmpty() }?.let { token ->
-                settings.settings()[LABEL]?.takeIf { it.isNotEmpty() }?.let { label ->
-                    val menu = JMenu(label)
-                    TodoistWorker(menu, token = token).execute()
+        getToken(settings)?.takeIf { it.isNotEmpty() }?.let { token ->
+            settings.settings()[LABEL]?.takeIf { it.isNotEmpty() }?.let { label ->
+                val menu = JMenu(label)
+                TodoistWorker(menu, token = token).execute()
 
-                    object : RocketAction {
-                        override fun contains(search: String): Boolean = false
+                object : RocketAction {
+                    override fun contains(search: String): Boolean = false
 
-                        override fun isChanged(actionSettings: RocketActionSettings): Boolean =
-                                !(settings.id() == actionSettings.id() &&
-                                        settings.settings() == actionSettings.settings())
+                    override fun isChanged(actionSettings: RocketActionSettings): Boolean =
+                        !(settings.id() == actionSettings.id() &&
+                            settings.settings() == actionSettings.settings())
 
-                        override fun component(): Component = menu
-                    }
+                    override fun component(): Component = menu
                 }
             }
+        }
 
     private fun getToken(settings: RocketActionSettings) =
-            settings.settings()[TOKEN]?.takeIf { it.isNotEmpty() }
-                    ?: System.getProperty(TOKEN_PROPERTY.value, "").takeIf { it.isNotEmpty() }
+        settings.settings()[TOKEN]?.takeIf { it.isNotEmpty() }
+            ?: System.getProperty(TOKEN_PROPERTY.value, "").takeIf { it.isNotEmpty() }
 
     override fun type(): RocketActionType = RocketActionType { "TODOIST" }
 
     private inner class TodoistWorker(
-            private val menu: JMenu,
-            private val token: String,
+        private val menu: JMenu,
+        private val token: String,
     ) : SwingWorker<TodoistPanel, String?>() {
 
         @Throws(Exception::class)
@@ -108,8 +108,8 @@ class TodoistRocketAction : AbstractRocketAction() {
     }
 
     private inner class TodoistPanel(
-            projects: List<Project> = emptyList(),
-            token: String,
+        projects: List<Project> = emptyList(),
+        token: String,
     ) : JPanel(BorderLayout()) {
         private val todoistTaskRepository = TodoistTaskRepository()
         private val projectListModel = DefaultListModel<Project>()

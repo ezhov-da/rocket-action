@@ -33,9 +33,9 @@ import javax.swing.SwingUtilities
 import javax.swing.WindowConstants
 
 class CreateRocketActionSettingsDialog(
-        owner: Dialog,
-        private val rocketActionConfigurationRepository: RocketActionConfigurationRepository,
-        rocketActionUiRepository: RocketActionUiRepository
+    owner: Dialog,
+    private val rocketActionConfigurationRepository: RocketActionConfigurationRepository,
+    rocketActionUiRepository: RocketActionUiRepository
 ) {
     private val comboBoxModel = DefaultComboBoxModel<RocketActionConfiguration>()
     private var comboBox: JComboBox<RocketActionConfiguration> = JComboBox(comboBoxModel)
@@ -92,15 +92,15 @@ class CreateRocketActionSettingsDialog(
         buttonCreate.addActionListener {
             val settings = actionSettingsPanel.create()
             currentCallback!!.create(
-                    TreeRocketActionSettings(
-                            configuration = settings.configuration,
-                            settings = MutableRocketActionSettings(
-                                    settings.id(),
-                                    settings.type(),
-                                    settings.settings().toMutableMap(),
-                                    settings.actions().toMutableList()
-                            )
+                TreeRocketActionSettings(
+                    configuration = settings.configuration,
+                    settings = MutableRocketActionSettings(
+                        settings.id(),
+                        settings.type(),
+                        settings.settings().toMutableMap(),
+                        settings.actions().toMutableList()
                     )
+                )
             )
             dialog.isVisible = false
         }
@@ -127,25 +127,25 @@ class CreateRocketActionSettingsDialog(
             settingPanels.clear()
             this.currentConfiguration = configuration
             configuration
-                    .properties()
-                    .sortedWith(
-                            compareByDescending<RocketActionConfigurationProperty> { it.isRequired() }
-                                    .thenBy { it.name() }
-                    )
-                    .forEach { p: RocketActionConfigurationProperty ->
-                        val panel = SettingPanel(p)
-                        this.add(panel)
-                        settingPanels.add(panel)
-                    }
+                .properties()
+                .sortedWith(
+                    compareByDescending<RocketActionConfigurationProperty> { it.isRequired() }
+                        .thenBy { it.name() }
+                )
+                .forEach { p: RocketActionConfigurationProperty ->
+                    val panel = SettingPanel(p)
+                    this.add(panel)
+                    settingPanels.add(panel)
+                }
             this.add(Box.createVerticalBox())
             repaint()
             revalidate()
         }
 
         fun create(): NewRocketActionSettings = NewRocketActionSettings(
-                configuration = this.currentConfiguration!!,
-                type = currentConfiguration!!.type(),
-                settings = settingPanels.associate { panel -> panel.value() }
+            configuration = this.currentConfiguration!!,
+            type = currentConfiguration!!.type(),
+            settings = settingPanels.associate { panel -> panel.value() }
         )
     }
 
@@ -172,21 +172,21 @@ class CreateRocketActionSettingsDialog(
             when (property.type()) {
                 PropertyType.STRING -> {
                     centerPanel.add(
-                            JScrollPane(
-                                    JTextPane().also { tp ->
-                                        valueCallback = { tp.text }
-                                        tp.text = property.default().orEmpty()
-                                    }
-                            ),
-                            BorderLayout.CENTER
+                        JScrollPane(
+                            JTextPane().also { tp ->
+                                valueCallback = { tp.text }
+                                tp.text = property.default().orEmpty()
+                            }
+                        ),
+                        BorderLayout.CENTER
                     )
                 }
                 PropertyType.BOOLEAN -> {
                     centerPanel.add(JScrollPane(
-                            JCheckBox().also { cb ->
-                                cb.isSelected = property.default().toBoolean()
-                                valueCallback = { cb.isSelected.toString() }
-                            }
+                        JCheckBox().also { cb ->
+                            cb.isSelected = property.default().toBoolean()
+                            valueCallback = { cb.isSelected.toString() }
+                        }
                     ), BorderLayout.CENTER)
                 }
             }

@@ -9,11 +9,10 @@ import ru.ezhov.rocket.action.domain.RocketActionUiRepository
 import ru.ezhov.rocket.action.icon.AppIcon
 import ru.ezhov.rocket.action.icon.IconRepositoryFactory
 import ru.ezhov.rocket.action.infrastructure.RocketActionComponentCacheFactory
-import ru.ezhov.rocket.action.infrastructure.YmlRocketActionSettingsRepository
 import ru.ezhov.rocket.action.notification.NotificationFactory
 import ru.ezhov.rocket.action.notification.NotificationType
 import ru.ezhov.rocket.action.properties.GeneralPropertiesRepository
-import ru.ezhov.rocket.action.properties.ResourceGeneralPropertiesRepository
+import ru.ezhov.rocket.action.properties.UsedPropertiesName
 import ru.ezhov.rocket.action.types.group.GroupRocketActionUi
 import ru.ezhov.rocket.action.ui.swing.common.MoveUtil
 import ru.ezhov.rocket.action.ui.swing.common.TextFieldWithText
@@ -21,19 +20,11 @@ import java.awt.Color
 import java.awt.Component
 import java.awt.Desktop
 import java.awt.FlowLayout
-import java.awt.datatransfer.DataFlavor
-import java.awt.datatransfer.UnsupportedFlavorException
-import java.awt.dnd.DnDConstants
-import java.awt.dnd.DropTarget
-import java.awt.dnd.DropTargetAdapter
-import java.awt.dnd.DropTargetDropEvent
 import java.awt.event.ActionListener
 import java.awt.event.KeyAdapter
 import java.awt.event.KeyEvent
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
-import java.io.File
-import java.io.IOException
 import java.net.URI
 import javax.swing.BorderFactory
 import javax.swing.ImageIcon
@@ -43,30 +34,20 @@ import javax.swing.JMenu
 import javax.swing.JMenuBar
 import javax.swing.JMenuItem
 import javax.swing.JPanel
+import javax.swing.JTextArea
 import javax.swing.SwingUtilities
 import javax.swing.SwingWorker
 
 private val logger = KotlinLogging.logger { }
 
 class UiQuickActionService(
-        userPathToAction: String?,
-        private val rocketActionConfigurationRepository: RocketActionConfigurationRepository,
-        private val rocketActionUiRepository: RocketActionUiRepository
+    private val rocketActionSettingsRepository: RocketActionSettingsRepository,
+    private val rocketActionConfigurationRepository: RocketActionConfigurationRepository,
+    private val rocketActionUiRepository: RocketActionUiRepository,
+    private val generalPropertiesRepository: GeneralPropertiesRepository,
 ) {
-
-    private val rocketActionSettingsRepository: RocketActionSettingsRepository
     private var configurationFrame: ConfigurationFrame? = null
     private var dialog: JDialog? = null
-
-    init {
-        val uri = if (userPathToAction != null) {
-            File(userPathToAction).toURI()
-        } else {
-            logger.info { "Use absolute path to `action.xml` file as argument" }
-            UiQuickActionService::class.java.getResource("/actions.yml").toURI()
-        }
-        rocketActionSettingsRepository = YmlRocketActionSettingsRepository(uri)
-    }
 
     @Throws(UiQuickActionServiceException::class)
     fun createMenu(dialog: JDialog): JMenuBar {
@@ -93,55 +74,55 @@ class UiQuickActionService(
     private fun rocketActionSettings(): List<RocketActionSettings> = rocketActionSettingsRepository.actions()
 
     private fun createSearchField(dialog: JDialog, menu: JMenu): Component =
-            JPanel(FlowLayout(FlowLayout.LEFT, 0, 0)).apply {
-                border = BorderFactory.createEmptyBorder()
-                val textField =
-                        TextFieldWithText("Поиск").apply { ->
-                            val tf = this
-                            columns = 5
-                            addKeyListener(object : KeyAdapter() {
-                                override fun keyPressed(e: KeyEvent?) {
-                                    e?.takeIf { it.keyCode == KeyEvent.VK_ENTER }?.let {
-                                        val cache = RocketActionComponentCacheFactory.cache
+        JPanel(FlowLayout(FlowLayout.LEFT, 0, 0)).apply {
+            border = BorderFactory.createEmptyBorder()
+            val textField =
+                TextFieldWithText("Поиск").apply { ->
+                    val tf = this
+                    columns = 5
+                    addKeyListener(object : KeyAdapter() {
+                        override fun keyPressed(e: KeyEvent?) {
+                            e?.takeIf { it.keyCode == KeyEvent.VK_ENTER }?.let {
+                                val cache = RocketActionComponentCacheFactory.cache
 
-                                        if (text.isNotEmpty()) {
-                                            cache
-                                                    .all()
-                                                    .filter { it.contains(text) }
-                                                    .takeIf { it.isNotEmpty() }
-                                                    ?.let { ccl ->
-                                                        logger.info { "found by search '$text': ${ccl.size}" }
+                                if (text.isNotEmpty()) {
+                                    cache
+                                        .all()
+                                        .filter { it.contains(text) }
+                                        .takeIf { it.isNotEmpty() }
+                                        ?.let { ccl ->
+                                            logger.info { "found by search '$text': ${ccl.size}" }
 
-                                                        SwingUtilities.invokeLater {
-                                                            tf.background = Color.GREEN
-                                                            menu.removeAll()
-                                                            ccl.forEach { menu.add(it.component()) }
-                                                            menu.add(createTools(dialog))
-                                                            menu.doClick()
-                                                        }
-                                                    }
-                                        } else {
-                                            SwingUtilities.invokeLater { tf.background = Color.WHITE }
-                                            CreateMenuWorker(menu).execute()
+                                            SwingUtilities.invokeLater {
+                                                tf.background = Color.GREEN
+                                                menu.removeAll()
+                                                ccl.forEach { menu.add(it.component()) }
+                                                menu.add(createTools(dialog))
+                                                menu.doClick()
+                                            }
                                         }
-                                    }
+                                } else {
+                                    SwingUtilities.invokeLater { tf.background = Color.WHITE }
+                                    CreateMenuWorker(menu).execute()
                                 }
-                            })
+                            }
                         }
-                add(textField)
-                add(
-                        JLabel(IconRepositoryFactory.repository.by(AppIcon.CLEAR))
-                                .apply {
-                                    addMouseListener(object : MouseAdapter() {
-                                        override fun mouseReleased(e: MouseEvent?) {
-                                            textField.text = ""
-                                            SwingUtilities.invokeLater { textField.background = Color.WHITE }
-                                            CreateMenuWorker(menu).execute()
-                                        }
-                                    })
-                                }
-                )
-            }
+                    })
+                }
+            add(textField)
+            add(
+                JLabel(IconRepositoryFactory.repository.by(AppIcon.CLEAR))
+                    .apply {
+                        addMouseListener(object : MouseAdapter() {
+                            override fun mouseReleased(e: MouseEvent?) {
+                                textField.text = ""
+                                SwingUtilities.invokeLater { textField.background = Color.WHITE }
+                                CreateMenuWorker(menu).execute()
+                            }
+                        })
+                    }
+            )
+        }
 
     private fun createTools(dialog: JDialog): JMenu {
         val menuTools = JMenu("Инструменты")
@@ -175,11 +156,11 @@ class UiQuickActionService(
                 if (configurationFrame == null) {
                     try {
                         configurationFrame = ConfigurationFrame(
-                                dialog,
-                                rocketActionConfigurationRepository,
-                                rocketActionUiRepository,
-                                rocketActionSettingsRepository,
-                                updateActionListener
+                            dialog,
+                            rocketActionConfigurationRepository,
+                            rocketActionUiRepository,
+                            rocketActionSettingsRepository,
+                            updateActionListener
                         )
                     } catch (ex: Exception) {
                         ex.printStackTrace()
@@ -194,11 +175,16 @@ class UiQuickActionService(
         menuTools.add(menuItemEditor)
         val menuInfo = JMenu("Информация")
         menuInfo.icon = IconRepositoryFactory.repository.by(AppIcon.INFO)
-        val repository: GeneralPropertiesRepository = ResourceGeneralPropertiesRepository()
         val notFound = { key: String -> "Информация по полю '$key' не найдена" }
-        menuInfo.add(JMenuItem(repository.all().getProperty("version", notFound("версия"))))
-        menuInfo.add(JMenuItem(repository.all().getProperty("info", notFound("информация"))))
-        menuInfo.add(JMenuItem(repository.all().getProperty("repository", notFound("ссылка на репозиторий")))
+        menuInfo.add(
+            JMenuItem(generalPropertiesRepository
+                .asString(UsedPropertiesName.VERSION, notFound("версия"))))
+        menuInfo.add(
+            JMenuItem(generalPropertiesRepository
+                .asString(UsedPropertiesName.INFO, notFound("информация"))))
+        menuInfo.add(
+            JMenuItem(generalPropertiesRepository
+                .asString(UsedPropertiesName.REPOSITORY, notFound("ссылка на репозиторий")))
                 .apply {
                     addActionListener {
                         if (Desktop.isDesktopSupported()) {
@@ -206,6 +192,7 @@ class UiQuickActionService(
                         }
                     }
                 })
+        menuInfo.add(createPropertyMenu())
         menuTools.add(menuInfo)
 
         menuTools.add(JMenuItem("Выход").apply {
@@ -214,6 +201,13 @@ class UiQuickActionService(
         })
         return menuTools
     }
+
+    private fun createPropertyMenu(): JMenu =
+        JMenu("Доступные свойства из командной строки").apply {
+            UsedPropertiesName.values().forEach { pn ->
+                this.add(JTextArea("${pn.propertyName}\n${pn.description}").apply { isEditable = false })
+            }
+        }
 
     private inner class CreateMenuWorker(private val menu: JMenu) : SwingWorker<List<Component>, String?>() {
         init {
@@ -230,27 +224,27 @@ class UiQuickActionService(
             for (rocketActionSettings in actionSettings) {
                 rocketActionUiRepository.by(rocketActionSettings.type())?.let {
                     (
-                            cache
-                                    .by(rocketActionSettings.id())?.let {
-                                        logger.debug {
-                                            "found in cache type='${rocketActionSettings.type().value()}'" +
-                                                    "id='${rocketActionSettings.id()}"
-                                        }
+                        cache
+                            .by(rocketActionSettings.id())?.let {
+                                logger.debug {
+                                    "found in cache type='${rocketActionSettings.type().value()}'" +
+                                        "id='${rocketActionSettings.id()}"
+                                }
 
-                                        it.component()
-                                    }
-                                    ?: run {
-                                        logger.debug {
-                                            "not found in cache type='${rocketActionSettings.type().value()}'" +
-                                                    "id='${rocketActionSettings.id()}. Create component"
-                                        }
-
-                                        it.create(rocketActionSettings)?.component()
-                                    }
-                            )
-                            ?.let { component ->
-                                components.add(component)
+                                it.component()
                             }
+                            ?: run {
+                                logger.debug {
+                                    "not found in cache type='${rocketActionSettings.type().value()}'" +
+                                        "id='${rocketActionSettings.id()}. Create component"
+                                }
+
+                                it.create(rocketActionSettings)?.component()
+                            }
+                        )
+                        ?.let { component ->
+                            components.add(component)
+                        }
                 }
             }
             components.add(createTools(dialog!!))
@@ -259,43 +253,43 @@ class UiQuickActionService(
 
         private fun fillCache(actionSettings: List<RocketActionSettings>) {
             RocketActionComponentCacheFactory
-                    .cache
-                    .let { cache ->
-                        for (rocketActionSettings in actionSettings) {
-                            val rau = rocketActionUiRepository.by(rocketActionSettings.type())
-                            if (rau != null) {
-                                if (rocketActionSettings.type().value() != GroupRocketActionUi.TYPE) {
-                                    val mustBeCreate = cache
-                                            .by(rocketActionSettings.id())
-                                            ?.isChanged(rocketActionSettings) ?: true
+                .cache
+                .let { cache ->
+                    for (rocketActionSettings in actionSettings) {
+                        val rau = rocketActionUiRepository.by(rocketActionSettings.type())
+                        if (rau != null) {
+                            if (rocketActionSettings.type().value() != GroupRocketActionUi.TYPE) {
+                                val mustBeCreate = cache
+                                    .by(rocketActionSettings.id())
+                                    ?.isChanged(rocketActionSettings) ?: true
 
-                                    logger.debug {
-                                        "must be create '$mustBeCreate' type='${rocketActionSettings.type().value()}'" +
-                                                "id='${rocketActionSettings.id()}"
-                                    }
+                                logger.debug {
+                                    "must be create '$mustBeCreate' type='${rocketActionSettings.type().value()}'" +
+                                        "id='${rocketActionSettings.id()}"
+                                }
 
-                                    if (mustBeCreate) {
-                                        rau.create(rocketActionSettings)
-                                                ?.let { action ->
-                                                    logger.debug {
-                                                        "added to cache type='${rocketActionSettings.type().value()}'" +
-                                                                "id='${rocketActionSettings.id()}"
-                                                    }
+                                if (mustBeCreate) {
+                                    rau.create(rocketActionSettings)
+                                        ?.let { action ->
+                                            logger.debug {
+                                                "added to cache type='${rocketActionSettings.type().value()}'" +
+                                                    "id='${rocketActionSettings.id()}"
+                                            }
 
-                                                    cache.add(
-                                                            rocketActionSettings.id(),
-                                                            action
-                                                    )
-                                                }
-                                    }
-                                } else {
-                                    if (rocketActionSettings.actions().isNotEmpty()) {
-                                        fillCache(rocketActionSettings.actions())
-                                    }
+                                            cache.add(
+                                                rocketActionSettings.id(),
+                                                action
+                                            )
+                                        }
+                                }
+                            } else {
+                                if (rocketActionSettings.actions().isNotEmpty()) {
+                                    fillCache(rocketActionSettings.actions())
                                 }
                             }
                         }
                     }
+                }
         }
 
         override fun done() {

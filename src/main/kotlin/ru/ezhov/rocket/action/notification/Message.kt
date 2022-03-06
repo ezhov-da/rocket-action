@@ -11,9 +11,9 @@ import javax.swing.JWindow
 import javax.swing.Timer
 
 internal class Message(
-        type: NotificationType,
-        private val delay: Int,
-        text: String
+    type: NotificationType,
+    private val delay: Int,
+    text: String
 ) : JWindow() {
     private var messageOpacity = 1f
     fun showMessage(location: Point, size: Dimension?) {

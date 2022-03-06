@@ -16,9 +16,9 @@ class TodoistTaskRepository {
         val projects: MutableList<Task> = ArrayList()
         return try {
             val request: Request = Builder()
-                    .url(URL_ALL_TASKS_GET)
-                    .header("Authorization", "Bearer $token")
-                    .build()
+                .url(URL_ALL_TASKS_GET)
+                .header("Authorization", "Bearer $token")
+                .build()
             val client = OkHttpClient()
             val call = client.newCall(request)
             val response = call.execute()
@@ -33,7 +33,7 @@ class TodoistTaskRepository {
                     }
                 } else {
                     throw TodoistRepositoryException(
-                            "Exception when get todoist tasks with code=$code and text=$text")
+                        "Exception when get todoist tasks with code=$code and text=$text")
                 }
             }
             projects
@@ -46,13 +46,13 @@ class TodoistTaskRepository {
     fun change(token: String, taskId: String?, content: String) {
         try {
             val requestBody: RequestBody =
-                    Gson().toJson(Content(content)).toRequestBody("application/json".toMediaType())
+                Gson().toJson(Content(content)).toRequestBody("application/json".toMediaType())
             val request: Request = Builder()
-                    .url(String.format(URL_CHANGE_TASK_POST, taskId))
-                    .post(requestBody)
-                    .header("Authorization", String.format("Bearer %s", token))
-                    .header("X-Request-Id", UUID.randomUUID().toString())
-                    .build()
+                .url(String.format(URL_CHANGE_TASK_POST, taskId))
+                .post(requestBody)
+                .header("Authorization", String.format("Bearer %s", token))
+                .header("X-Request-Id", UUID.randomUUID().toString())
+                .build()
             val client = OkHttpClient()
             val call = client.newCall(request)
             val response = call.execute()
@@ -61,7 +61,7 @@ class TodoistTaskRepository {
                 response.body.use { body ->
                     val text = body!!.string()
                     throw TodoistRepositoryException(
-                            "Exception when change todoist task with code=$code and text=$text"
+                        "Exception when change todoist task with code=$code and text=$text"
                     )
                 }
             }
@@ -74,10 +74,10 @@ class TodoistTaskRepository {
     fun close(token: String, taskId: String?) {
         try {
             val request: Request = Builder()
-                    .url(String.format(URL_CLOSE_TASK_POST, taskId))
-                    .post(byteArrayOf().toRequestBody("application/json".toMediaType()))
-                    .header("Authorization", String.format("Bearer %s", token))
-                    .build()
+                .url(String.format(URL_CLOSE_TASK_POST, taskId))
+                .post(byteArrayOf().toRequestBody("application/json".toMediaType()))
+                .header("Authorization", String.format("Bearer %s", token))
+                .build()
             val client = OkHttpClient()
             val call = client.newCall(request)
             val response = call.execute()
@@ -86,7 +86,7 @@ class TodoistTaskRepository {
                 response.body.use { body ->
                     val text = body!!.string()
                     throw TodoistRepositoryException(
-                            "Exception when close todoist task with code=$code and text=$text"
+                        "Exception when close todoist task with code=$code and text=$text"
                     )
                 }
             }
@@ -99,10 +99,10 @@ class TodoistTaskRepository {
     fun delete(token: String, taskId: String?) {
         try {
             val request: Request = Builder()
-                    .url(String.format(URL_DELETE_TASK_DELETE, taskId))
-                    .delete()
-                    .header("Authorization", String.format("Bearer %s", token))
-                    .build()
+                .url(String.format(URL_DELETE_TASK_DELETE, taskId))
+                .delete()
+                .header("Authorization", String.format("Bearer %s", token))
+                .build()
             val client = OkHttpClient()
             val call = client.newCall(request)
             val response = call.execute()
@@ -111,7 +111,7 @@ class TodoistTaskRepository {
                 response.body.use { body ->
                     val text = body!!.string()
                     throw TodoistRepositoryException(
-                            "Exception when delete todoist task with code=$code and text=$text"
+                        "Exception when delete todoist task with code=$code and text=$text"
                     )
                 }
             }

@@ -1,14 +1,19 @@
 # Used
+
 ## useiconic
-https://useiconic.com/open  
+
+https://useiconic.com/open
 
 ## image4j
+
 https://github.com/imcdonagh/image4j
 
 ## batik
-https://xmlgraphics.apache.org/batik/download.html  
+
+https://xmlgraphics.apache.org/batik/download.html
 
 ## FlatLaf
+
 https://github.com/JFormDesigner/FlatLaf
 https://www.formdev.com/flatlaf/themes/
 https://www.formdev.com/flatlaf/customizing/
@@ -20,8 +25,14 @@ mvn clean package
 
 # Infrastructure
 
-|class|action|
-|-----|------|
-|ru.ezhov.rocket.action.notification.NotificationService|notifications|
-|ru.ezhov.rocket.action.icon.IconRepository|icons|
+|class| description                         |
+|-----|-------------------------------------|
+|ru.ezhov.rocket.action.notification.NotificationService| Сервис уведомлений                  |
+|ru.ezhov.rocket.action.icon.IconRepository| Хранилище иконок                    |
+| ru.ezhov.rocket.action.caching.Cache | Кеширование файлов по URL           |
+|ru.ezhov.rocket.action.properties.UsedPropertiesName| Доступные свойства для конфигурации |
+
+# Run
+
+First argument is file with actions.
 

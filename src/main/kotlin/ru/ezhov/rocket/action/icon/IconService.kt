@@ -17,26 +17,26 @@ private val logger = KotlinLogging.logger { }
 
 class IconService {
     fun load(iconUrl: String, defaultIcon: Icon): Icon =
-            iconUrl
-                    .takeIf { it.isNotEmpty() }
-                    ?.let { url ->
-                        try {
-                            CacheFactory.cache.get(URL(url))?.let { file ->
-                                val image: BufferedImage =
-                                        if (url.endsWith("ico")) {
-                                            val bufferedImages = ICODecoder.readExt(file)
-                                            bufferedImages[bufferedImages.size - 1].image
-                                        } else {
-                                            ImageIO.read(file)
-                                        }
-                                ImageIcon(handleICOImage(image))
+        iconUrl
+            .takeIf { it.isNotEmpty() }
+            ?.let { url ->
+                try {
+                    CacheFactory.cache.get(URL(url))?.let { file ->
+                        val image: BufferedImage =
+                            if (url.endsWith("ico")) {
+                                val bufferedImages = ICODecoder.readExt(file)
+                                bufferedImages[bufferedImages.size - 1].image
+                            } else {
+                                ImageIO.read(file)
                             }
-                        } catch (e: Exception) {
-                            logger.warn("Exception when load icon url='$iconUrl'", e)
-                            NotificationFactory.notification.show(NotificationType.ERROR, "Error icon loading")
-                            defaultIcon
-                        }
-                    } ?: defaultIcon
+                        ImageIcon(handleICOImage(image))
+                    }
+                } catch (e: Exception) {
+                    logger.warn("Exception when load icon url='$iconUrl'", e)
+                    NotificationFactory.notification.show(NotificationType.ERROR, "Error icon loading")
+                    defaultIcon
+                }
+            } ?: defaultIcon
 
     private fun handleICOImage(icoImage: BufferedImage): BufferedImage {
         val resampleOp = ResampleOp(16, 16)

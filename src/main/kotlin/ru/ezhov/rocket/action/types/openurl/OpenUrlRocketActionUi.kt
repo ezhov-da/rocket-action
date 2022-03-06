@@ -25,50 +25,50 @@ import javax.swing.event.MenuKeyListener
 
 class OpenUrlRocketActionUi : AbstractRocketAction() {
     override fun create(settings: RocketActionSettings): RocketAction? =
-            settings.settings()[URL]?.takeIf { it.isNotEmpty() }?.let { url ->
-                val label = settings.settings()[LABEL]?.takeIf { it.isNotEmpty() } ?: url
-                val description = settings.settings()[DESCRIPTION]?.takeIf { it.isNotEmpty() } ?: url
-                val iconUrl = settings.settings()[ICON_URL].orEmpty()
+        settings.settings()[URL]?.takeIf { it.isNotEmpty() }?.let { url ->
+            val label = settings.settings()[LABEL]?.takeIf { it.isNotEmpty() } ?: url
+            val description = settings.settings()[DESCRIPTION]?.takeIf { it.isNotEmpty() } ?: url
+            val iconUrl = settings.settings()[ICON_URL].orEmpty()
 
-                object : RocketAction {
-                    override fun contains(search: String): Boolean =
-                            label.contains(search, ignoreCase = true)
-                                    .or(description.contains(search, ignoreCase = true))
+            object : RocketAction {
+                override fun contains(search: String): Boolean =
+                    label.contains(search, ignoreCase = true)
+                        .or(description.contains(search, ignoreCase = true))
 
-                    override fun isChanged(actionSettings: RocketActionSettings): Boolean =
-                            !(settings.id() == actionSettings.id() &&
-                                    settings.settings() == actionSettings.settings())
+                override fun isChanged(actionSettings: RocketActionSettings): Boolean =
+                    !(settings.id() == actionSettings.id() &&
+                        settings.settings() == actionSettings.settings())
 
-                    override fun component(): Component = JMenuItem(label).apply {
-                        icon = IconService().load(
-                                iconUrl,
-                                IconRepositoryFactory.repository.by(AppIcon.LINK_INTACT)
-                        )
-                        toolTipText = description
-                        isFocusable = true
-                        addMouseListener(object : MouseAdapter() {
-                            override fun mouseReleased(e: MouseEvent) {
-                                when (e.button) {
-                                    MouseEvent.BUTTON1 -> openUrl(url)
-                                    MouseEvent.BUTTON3 -> copyUrlToClipBoard(url)
-                                }
+                override fun component(): Component = JMenuItem(label).apply {
+                    icon = IconService().load(
+                        iconUrl,
+                        IconRepositoryFactory.repository.by(AppIcon.LINK_INTACT)
+                    )
+                    toolTipText = description
+                    isFocusable = true
+                    addMouseListener(object : MouseAdapter() {
+                        override fun mouseReleased(e: MouseEvent) {
+                            when (e.button) {
+                                MouseEvent.BUTTON1 -> openUrl(url)
+                                MouseEvent.BUTTON3 -> copyUrlToClipBoard(url)
                             }
-                        })
+                        }
+                    })
 
-                        addMenuKeyListener(object : MenuKeyListener {
-                            override fun menuKeyTyped(e: MenuKeyEvent) = Unit
+                    addMenuKeyListener(object : MenuKeyListener {
+                        override fun menuKeyTyped(e: MenuKeyEvent) = Unit
 
-                            override fun menuKeyPressed(e: MenuKeyEvent) = Unit
+                        override fun menuKeyPressed(e: MenuKeyEvent) = Unit
 
-                            override fun menuKeyReleased(e: MenuKeyEvent) {
-                                when (e.keyCode) {
-                                    KeyEvent.VK_TAB -> openUrl(url)
-                                }
+                        override fun menuKeyReleased(e: MenuKeyEvent) {
+                            when (e.keyCode) {
+                                KeyEvent.VK_TAB -> openUrl(url)
                             }
-                        })
-                    }
+                        }
+                    })
                 }
             }
+        }
 
     private fun copyUrlToClipBoard(url: String) {
         val defaultToolkit = Toolkit.getDefaultToolkit()
@@ -96,10 +96,10 @@ class OpenUrlRocketActionUi : AbstractRocketAction() {
 
     override fun properties(): List<RocketActionConfigurationProperty> {
         return listOf(
-                createRocketActionProperty(LABEL, LABEL.value, "Заголовок", false),
-                createRocketActionProperty(DESCRIPTION, DESCRIPTION.value, "Описание", false),
-                createRocketActionProperty(URL, URL.value, "URL", true),
-                createRocketActionProperty(ICON_URL, ICON_URL.value, "URL иконка", false)
+            createRocketActionProperty(LABEL, LABEL.value, "Заголовок", false),
+            createRocketActionProperty(DESCRIPTION, DESCRIPTION.value, "Описание", false),
+            createRocketActionProperty(URL, URL.value, "URL", true),
+            createRocketActionProperty(ICON_URL, ICON_URL.value, "URL иконка", false)
         )
     }
 

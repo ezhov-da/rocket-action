@@ -20,7 +20,9 @@ interface RocketAction {
     fun isChanged(actionSettings: RocketActionSettings): Boolean
 
     /**
-     * Компонент действия для отображения
+     * Компонент действия для отображения.
+     * Важно.
+     * Необходимо "тяжёлые" действия по созданию компонента производить в другом потоке и не блокировать UI
      */
     fun component(): Component
 }

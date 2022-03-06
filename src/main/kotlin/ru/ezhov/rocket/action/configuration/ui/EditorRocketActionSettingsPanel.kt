@@ -24,8 +24,8 @@ import javax.swing.JScrollPane
 import javax.swing.JTextPane
 
 class EditorRocketActionSettingsPanel(
-        private val rocketActionConfigurationRepository: RocketActionConfigurationRepository,
-        rocketActionUiRepository: RocketActionUiRepository
+    private val rocketActionConfigurationRepository: RocketActionConfigurationRepository,
+    rocketActionUiRepository: RocketActionUiRepository
 ) : JPanel(BorderLayout()) {
     private val rocketActionSettingsPanel = RocketActionSettingsPanel()
     private var currentSettings: TreeRocketActionSettings? = null
@@ -33,7 +33,8 @@ class EditorRocketActionSettingsPanel(
     private val labelType = JLabel()
     private val labelDescription = JLabel()
     private val testPanel: TestPanel =
-            TestPanel(rocketActionUiRepository = rocketActionUiRepository) { rocketActionSettingsPanel.create()?.settings }
+        TestPanel(rocketActionUiRepository = rocketActionUiRepository) { rocketActionSettingsPanel.create()?.settings }
+
     private fun top(): JPanel {
         val panel = JPanel(BorderLayout())
         panel.add(labelType, BorderLayout.NORTH)
@@ -68,46 +69,46 @@ class EditorRocketActionSettingsPanel(
         }
         val settingsFinal = settings.settings.settings()
         val values = settingsFinal
-                .map { (k: RocketActionConfigurationPropertyKey, v: String) ->
-                    val property = configuration
-                            ?.let { conf ->
-                                conf
-                                        .properties()
-                                        .firstOrNull { p: RocketActionConfigurationProperty? -> p!!.key() == k }
-                            }
+            .map { (k: RocketActionConfigurationPropertyKey, v: String) ->
+                val property = configuration
+                    ?.let { conf ->
+                        conf
+                            .properties()
+                            .firstOrNull { p: RocketActionConfigurationProperty? -> p!!.key() == k }
+                    }
+                Value(
+                    key = k,
+                    value = v,
+                    property = property,
+                )
+            }
+            .toMutableList() +
+            configuration
+                ?.properties()
+                ?.filter { p: RocketActionConfigurationProperty -> !settingsFinal.containsKey(p.key()) }
+                ?.map { p: RocketActionConfigurationProperty? ->
                     Value(
-                            key = k,
-                            value = v,
-                            property = property,
+                        key = p!!.key(),
+                        value = "",
+                        property = p,
                     )
-                }
-                .toMutableList() +
-                configuration
-                        ?.properties()
-                        ?.filter { p: RocketActionConfigurationProperty -> !settingsFinal.containsKey(p.key()) }
-                        ?.map { p: RocketActionConfigurationProperty? ->
-                            Value(
-                                    key = p!!.key(),
-                                    value = "",
-                                    property = p,
-                            )
-                        }.orEmpty()
+                }.orEmpty()
 
 
         rocketActionSettingsPanel
-                .setRocketActionConfiguration(
-                        values
-                                .sortedWith(
-                                        compareByDescending<Value> { it.property?.isRequired() }
-                                                .thenBy { it.property?.name() }
-                                )
-                )
+            .setRocketActionConfiguration(
+                values
+                    .sortedWith(
+                        compareByDescending<Value> { it.property?.isRequired() }
+                            .thenBy { it.property?.name() }
+                    )
+            )
     }
 
     private data class Value(
-            val key: RocketActionConfigurationPropertyKey,
-            val value: String,
-            val property: RocketActionConfigurationProperty?
+        val key: RocketActionConfigurationPropertyKey,
+        val value: String,
+        val property: RocketActionConfigurationProperty?
     )
 
     private inner class RocketActionSettingsPanel : JPanel() {
@@ -123,11 +124,11 @@ class EditorRocketActionSettingsPanel(
             settingPanels.clear()
             this.values = list
             list
-                    .forEach { v: Value ->
-                        val panel = SettingPanel(v)
-                        this.add(panel)
-                        settingPanels.add(panel)
-                    }
+                .forEach { v: Value ->
+                    val panel = SettingPanel(v)
+                    this.add(panel)
+                    settingPanels.add(panel)
+                }
             this.add(Box.createVerticalBox())
             repaint()
             revalidate()
@@ -135,13 +136,13 @@ class EditorRocketActionSettingsPanel(
 
         fun create(): TreeRocketActionSettings? = currentSettings?.let { rs ->
             TreeRocketActionSettings(
-                    configuration = rs.configuration,
-                    settings = MutableRocketActionSettings(
-                            rs.settings.id(),
-                            rs.settings.type(),
-                            settingPanels.associate { panel -> panel.value() }.toMutableMap(),
-                            rs.settings.actions().toMutableList()
-                    )
+                configuration = rs.configuration,
+                settings = MutableRocketActionSettings(
+                    rs.settings.id(),
+                    rs.settings.type(),
+                    settingPanels.associate { panel -> panel.value() }.toMutableMap(),
+                    rs.settings.actions().toMutableList()
+                )
             )
         }
     }
@@ -170,21 +171,21 @@ class EditorRocketActionSettingsPanel(
                 when (property.type()) {
                     PropertyType.STRING -> {
                         centerPanel.add(
-                                JScrollPane(
-                                        JTextPane().also { tp ->
-                                            valueCallback = { tp.text }
-                                            tp.text = value.value
-                                        }
-                                ),
-                                BorderLayout.CENTER
+                            JScrollPane(
+                                JTextPane().also { tp ->
+                                    valueCallback = { tp.text }
+                                    tp.text = value.value
+                                }
+                            ),
+                            BorderLayout.CENTER
                         )
                     }
                     PropertyType.BOOLEAN -> {
                         centerPanel.add(JScrollPane(
-                                JCheckBox().also { cb ->
-                                    cb.isSelected = value.value.toBoolean()
-                                    valueCallback = { cb.isSelected.toString() }
-                                }
+                            JCheckBox().also { cb ->
+                                cb.isSelected = value.value.toBoolean()
+                                valueCallback = { cb.isSelected.toString() }
+                            }
                         ), BorderLayout.CENTER)
                     }
                 }

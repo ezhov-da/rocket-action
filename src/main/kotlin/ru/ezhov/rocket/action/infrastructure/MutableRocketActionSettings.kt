@@ -5,10 +5,10 @@ import ru.ezhov.rocket.action.api.RocketActionSettings
 import ru.ezhov.rocket.action.api.RocketActionType
 
 class MutableRocketActionSettings(
-        private val id: String,
-        private val type: RocketActionType,
-        private val settings: MutableMap<RocketActionConfigurationPropertyKey, String>,
-        private val actions: MutableList<RocketActionSettings> = ArrayList()
+    private val id: String,
+    private val type: RocketActionType,
+    private val settings: MutableMap<RocketActionConfigurationPropertyKey, String>,
+    private val actions: MutableList<RocketActionSettings> = ArrayList()
 ) : RocketActionSettings {
 
     override fun id(): String = id

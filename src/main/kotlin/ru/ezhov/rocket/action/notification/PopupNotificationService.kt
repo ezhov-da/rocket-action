@@ -1,17 +1,23 @@
 package ru.ezhov.rocket.action.notification
 
+import mu.KotlinLogging
 import java.awt.Dimension
 import java.awt.Point
 import java.awt.Toolkit
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
-import java.util.*
+import java.util.LinkedList
 import javax.swing.SwingUtilities
+
+private val logger = KotlinLogging.logger { }
 
 internal class PopupNotificationService : NotificationService {
     private val messages = LinkedList<Message>()
     override fun show(type: NotificationType, text: String) {
-        SwingUtilities.invokeLater { createAndShowMessage(type, text) }
+        SwingUtilities.invokeLater {
+            createAndShowMessage(type, text)
+            logger.info { "Notification with type='$type' showed" }
+        }
     }
 
     private fun createAndShowMessage(type: NotificationType, text: String) {
@@ -20,12 +26,12 @@ internal class PopupNotificationService : NotificationService {
         val message = Message(type, 3000, text)
         val point = if (messages.isEmpty()) {
             Point(screenSize.width - SPACE_BETWEEN_MESSAGES - messageDimension.width,
-                    screenSize.height - SPACE_BETWEEN_MESSAGES - messageDimension.height
+                screenSize.height - SPACE_BETWEEN_MESSAGES - messageDimension.height
             )
         } else {
             val messageLast = messages.last
             Point(screenSize.width - SPACE_BETWEEN_MESSAGES - messageDimension.width,
-                    messageLast.y - SPACE_BETWEEN_MESSAGES - messageDimension.height
+                messageLast.y - SPACE_BETWEEN_MESSAGES - messageDimension.height
             )
         }
         message.addWindowListener(object : WindowAdapter() {

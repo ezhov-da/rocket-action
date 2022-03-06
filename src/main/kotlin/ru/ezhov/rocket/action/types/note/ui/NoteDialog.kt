@@ -42,8 +42,8 @@ import javax.swing.WindowConstants
 private val logger = KotlinLogging.logger {}
 
 class NoteDialog(
-        noteApplicationService: NoteApplicationService,
-        owner: JDialog
+    noteApplicationService: NoteApplicationService,
+    owner: JDialog
 ) : JDialog(owner) {
     companion object {
         private const val TEXT = "вставьте сюда"
@@ -78,36 +78,36 @@ class NoteDialog(
 
     private fun addDropTargetTo(component: JComponent) {
         component.dropTarget = DropTarget(
-                component,
-                object : DropTargetAdapter() {
-                    private val defaultBorder = component.border
+            component,
+            object : DropTargetAdapter() {
+                private val defaultBorder = component.border
 
-                    override fun drop(dtde: DropTargetDropEvent) {
-                        try {
-                            dtde.acceptDrop(DnDConstants.ACTION_COPY)
-                            val text = dtde.transferable.getTransferData(DataFlavor.stringFlavor) as String
+                override fun drop(dtde: DropTargetDropEvent) {
+                    try {
+                        dtde.acceptDrop(DnDConstants.ACTION_COPY)
+                        val text = dtde.transferable.getTransferData(DataFlavor.stringFlavor) as String
 
-                            showDialogSave(text)
-                        } catch (e: UnsupportedFlavorException) {
-                            e.printStackTrace()
-                        } catch (e: IOException) {
-                            e.printStackTrace()
-                        }
-
-                        component.border = defaultBorder
+                        showDialogSave(text)
+                    } catch (e: UnsupportedFlavorException) {
+                        e.printStackTrace()
+                    } catch (e: IOException) {
+                        e.printStackTrace()
                     }
 
-                    override fun dragEnter(dtde: DropTargetDragEvent?) {
-                        component.border = BorderFactory.createCompoundBorder(
-                                BorderFactory.createEmptyBorder(5, 5, 5, 5),
-                                BorderFactory.createDashedBorder(null, 5F, 5F)
-                        )
-                    }
-
-                    override fun dragExit(dte: DropTargetEvent?) {
-                        component.border = defaultBorder
-                    }
+                    component.border = defaultBorder
                 }
+
+                override fun dragEnter(dtde: DropTargetDragEvent?) {
+                    component.border = BorderFactory.createCompoundBorder(
+                        BorderFactory.createEmptyBorder(5, 5, 5, 5),
+                        BorderFactory.createDashedBorder(null, 5F, 5F)
+                    )
+                }
+
+                override fun dragExit(dte: DropTargetEvent?) {
+                    component.border = defaultBorder
+                }
+            }
         )
     }
 
@@ -135,7 +135,7 @@ class NoteDialog(
         try {
             val contents: Transferable? = clipboard.getContents(null)
             if ((contents != null) &&
-                    contents.isDataFlavorSupported(DataFlavor.stringFlavor)) {
+                contents.isDataFlavorSupported(DataFlavor.stringFlavor)) {
                 result = contents.getTransferData(DataFlavor.stringFlavor) as String?
             }
         } catch (ex: Exception) {
@@ -145,9 +145,9 @@ class NoteDialog(
     }
 
     private class CreateDialog(
-            private val noteApplicationService: NoteApplicationService,
-            owner: Dialog,
-            modal: Boolean
+        private val noteApplicationService: NoteApplicationService,
+        owner: Dialog,
+        modal: Boolean
     ) : JDialog(owner, modal) {
         private val textPaneText = JTextPane()
         private val textPaneDescription = JTextPane()
@@ -168,24 +168,24 @@ class NoteDialog(
             buttonSave.addActionListener {
                 object : SwingWorker<Note, Any>() {
                     override fun doInBackground(): Note =
-                            createNote(
-                                    text = textPaneText.text,
-                                    description = textPaneDescription.text,
-                            )
+                        createNote(
+                            text = textPaneText.text,
+                            description = textPaneDescription.text,
+                        )
 
                     override fun done() {
                         try {
                             val note = get()
                             NotificationFactory
-                                    .notification
-                                    .show(type = NotificationType.INFO, text = "Заметка сохранена. $note")
+                                .notification
+                                .show(type = NotificationType.INFO, text = "Заметка сохранена. $note")
                             dialog.isVisible = false
                         } catch (ex: Exception) {
                             logger.warn(ex) { "Error when save note ${textPaneText.text} ${textPaneDescription.text}" }
 
                             NotificationFactory
-                                    .notification
-                                    .show(type = NotificationType.WARN, text = "Ошибка сохранения заметки")
+                                .notification
+                                .show(type = NotificationType.WARN, text = "Ошибка сохранения заметки")
                         }
                     }
                 }.execute()
@@ -193,7 +193,7 @@ class NoteDialog(
         }
 
         private fun createNote(text: String, description: String): Note =
-                noteApplicationService.create(text = text, description = description)
+            noteApplicationService.create(text = text, description = description)
 
         fun showDialog(text: String) {
             title = text.takeIf { it.length >= 60 }?.substring(0, 60) ?: text
@@ -203,11 +203,11 @@ class NoteDialog(
                 buttonSave.isEnabled = false
                 try {
                     UrlLoader(
-                            url = text,
-                            executeOnDone = { value ->
-                                textPaneText.text = text
-                                textPaneDescription.text = value
-                            }
+                        url = text,
+                        executeOnDone = { value ->
+                            textPaneText.text = text
+                            textPaneDescription.text = value
+                        }
                     ).execute()
                 } finally {
                     buttonSave.isEnabled = true
@@ -219,8 +219,8 @@ class NoteDialog(
         }
 
         private class UrlLoader(
-                private val url: String,
-                private val executeOnDone: (value: String) -> Unit
+            private val url: String,
+            private val executeOnDone: (value: String) -> Unit
         ) : SwingWorker<String, String>() {
             override fun doInBackground(): String = UrlParser(url = url, headers = emptyMap()).parse()
 

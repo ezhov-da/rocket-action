@@ -3,4 +3,6 @@
 target
 cache
 
+actions.yml
+
 *.s3db

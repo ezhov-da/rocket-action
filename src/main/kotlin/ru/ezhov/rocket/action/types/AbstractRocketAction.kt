@@ -11,19 +11,19 @@ import ru.ezhov.rocket.action.api.RocketActionFactoryUi
  */
 abstract class AbstractRocketAction : RocketActionFactoryUi, RocketActionConfiguration {
     protected fun createRocketActionProperty(
-            key: RocketActionConfigurationPropertyKey,
-            name: String,
-            description: String,
-            required: Boolean,
-            type: PropertyType = PropertyType.STRING,
-            default: String? = null
+        key: RocketActionConfigurationPropertyKey,
+        name: String,
+        description: String,
+        required: Boolean,
+        type: PropertyType = PropertyType.STRING,
+        default: String? = null
     ): RocketActionConfigurationProperty =
-            object : RocketActionConfigurationProperty {
-                override fun key(): RocketActionConfigurationPropertyKey = key
-                override fun name(): String = name
-                override fun description(): String = description
-                override fun isRequired(): Boolean = required
-                override fun type(): PropertyType = type
-                override fun default(): String? = default
-            }
+        object : RocketActionConfigurationProperty {
+            override fun key(): RocketActionConfigurationPropertyKey = key
+            override fun name(): String = name
+            override fun description(): String = description
+            override fun isRequired(): Boolean = required
+            override fun type(): PropertyType = type
+            override fun default(): String? = default
+        }
 }

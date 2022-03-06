@@ -20,20 +20,20 @@ internal class PanelEngine(words: List<String>, keyListenerForAllTextFields: Key
     private val map: MutableMap<String?, JTextField> = HashMap()
     fun apply(): Map<String, String> {
         return map
-                .entries
-                .stream()
-                .collect(
-                        Collectors.toMap<Map.Entry<String?, JTextField>, String, String>(
-                                { (key): Map.Entry<String?, JTextField> -> key!!.replace("\\$".toRegex(), "") },
-                                { (key, value): Map.Entry<String?, JTextField> ->
-                                    if ("" == value.text) {
-                                        key
-                                    } else {
-                                        value.text
-                                    }
-                                }
-                        )
+            .entries
+            .stream()
+            .collect(
+                Collectors.toMap<Map.Entry<String?, JTextField>, String, String>(
+                    { (key): Map.Entry<String?, JTextField> -> key!!.replace("\\$".toRegex(), "") },
+                    { (key, value): Map.Entry<String?, JTextField> ->
+                        if ("" == value.text) {
+                            key
+                        } else {
+                            value.text
+                        }
+                    }
                 )
+            )
     }
 
     fun initVariables(map: Map<String, String?>) {

@@ -15,28 +15,28 @@ import javax.swing.JMenu
 class CopyToClipboardTemplateRocketActionUi : AbstractRocketAction() {
 
     override fun create(settings: RocketActionSettings): RocketAction? =
-            settings.settings()[TEXT]?.takeIf { it.isNotEmpty() }?.let { text ->
-                val label = settings.settings()[LABEL]?.takeIf { it.isNotEmpty() } ?: text
-                val description = settings.settings()[DESCRIPTION]?.takeIf { it.isNotEmpty() } ?: text
+        settings.settings()[TEXT]?.takeIf { it.isNotEmpty() }?.let { text ->
+            val label = settings.settings()[LABEL]?.takeIf { it.isNotEmpty() } ?: text
+            val description = settings.settings()[DESCRIPTION]?.takeIf { it.isNotEmpty() } ?: text
 
-                val notePanelEngine = NotePanelEngine(text, VelocityEngineImpl())
-                val menu = JMenu(label)
-                menu.icon = IconRepositoryFactory.repository.by(AppIcon.CLIPBOARD)
-                menu.toolTipText = description
-                menu.add(notePanelEngine)
+            val notePanelEngine = NotePanelEngine(text, VelocityEngineImpl())
+            val menu = JMenu(label)
+            menu.icon = IconRepositoryFactory.repository.by(AppIcon.CLIPBOARD)
+            menu.toolTipText = description
+            menu.add(notePanelEngine)
 
-                object : RocketAction {
-                    override fun contains(search: String): Boolean =
-                            label.contains(search, ignoreCase = true)
-                                    .or(description.contains(search, ignoreCase = true))
+            object : RocketAction {
+                override fun contains(search: String): Boolean =
+                    label.contains(search, ignoreCase = true)
+                        .or(description.contains(search, ignoreCase = true))
 
-                    override fun isChanged(actionSettings: RocketActionSettings): Boolean =
-                            !(settings.id() == actionSettings.id() &&
-                                    settings.settings() == actionSettings.settings())
+                override fun isChanged(actionSettings: RocketActionSettings): Boolean =
+                    !(settings.id() == actionSettings.id() &&
+                        settings.settings() == actionSettings.settings())
 
-                    override fun component(): Component = menu
-                }
+                override fun component(): Component = menu
             }
+        }
 
     override fun name(): String = "Копировать в буфер по шаблону"
 
@@ -46,9 +46,9 @@ class CopyToClipboardTemplateRocketActionUi : AbstractRocketAction() {
 
     override fun properties(): List<RocketActionConfigurationProperty> {
         return listOf(
-                createRocketActionProperty(LABEL, LABEL.value, "Заголовок", false),
-                createRocketActionProperty(DESCRIPTION, DESCRIPTION.value, "Описание", false),
-                createRocketActionProperty(TEXT, TEXT.value, "Шаблон для копирования", true)
+            createRocketActionProperty(LABEL, LABEL.value, "Заголовок", false),
+            createRocketActionProperty(DESCRIPTION, DESCRIPTION.value, "Описание", false),
+            createRocketActionProperty(TEXT, TEXT.value, "Шаблон для копирования", true)
         )
     }
 

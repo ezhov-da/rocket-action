@@ -10,62 +10,114 @@ import ru.ezhov.rocket.action.icon.IconRepositoryFactory
 import ru.ezhov.rocket.action.notification.NotificationFactory
 import ru.ezhov.rocket.action.notification.NotificationType
 import ru.ezhov.rocket.action.types.AbstractRocketAction
+import java.awt.BorderLayout
 import java.awt.Component
 import java.awt.Toolkit
 import java.awt.datatransfer.StringSelection
-import java.awt.event.MouseAdapter
-import java.awt.event.MouseEvent
+import java.awt.event.ActionEvent
+import javax.swing.AbstractAction
+import javax.swing.JButton
+import javax.swing.JFrame
 import javax.swing.JLabel
 import javax.swing.JMenu
+import javax.swing.JPanel
+import javax.swing.JScrollPane
 import javax.swing.JTextPane
+import javax.swing.JToolBar
+import javax.swing.SwingUtilities
+import javax.swing.WindowConstants
 
 class TextAsMenuRocketActionUi : AbstractRocketAction() {
     override fun description(): String = "Show text"
 
     override fun properties(): List<RocketActionConfigurationProperty> =
-            listOf(
-                    createRocketActionProperty(LABEL, LABEL.value, "Заголовок", true),
-                    createRocketActionProperty(TEXT, TEXT.value, "Текст", true),
-                    createRocketActionProperty(DESCRIPTION, DESCRIPTION.value, "Описание", false),
-            )
+        listOf(
+            createRocketActionProperty(LABEL, LABEL.value, "Заголовок", true),
+            createRocketActionProperty(TEXT, TEXT.value, "Текст", true),
+            createRocketActionProperty(DESCRIPTION, DESCRIPTION.value, "Описание", false),
+        )
 
     override fun create(settings: RocketActionSettings): RocketAction? =
-            settings.settings()[LABEL]?.takeIf { it.isNotEmpty() }?.let { label ->
-                settings.settings()[TEXT]?.takeIf { it.isNotEmpty() }?.let { text ->
-                    val description = settings.settings()[DESCRIPTION]
-                    object : RocketAction {
-                        override fun contains(search: String): Boolean =
-                                label.contains(search, ignoreCase = true)
-                                        .or(text.contains(search, ignoreCase = true))
-                                        .or(description?.contains(search, ignoreCase = true) ?: false)
+        settings.settings()[LABEL]?.takeIf { it.isNotEmpty() }?.let { label ->
+            settings.settings()[TEXT]?.takeIf { it.isNotEmpty() }?.let { text ->
+                val description = settings.settings()[DESCRIPTION]
+                object : RocketAction {
+                    override fun contains(search: String): Boolean =
+                        label.contains(search, ignoreCase = true)
+                            .or(text.contains(search, ignoreCase = true))
+                            .or(description?.contains(search, ignoreCase = true) ?: false)
 
-                        override fun isChanged(actionSettings: RocketActionSettings): Boolean =
-                                !(settings.id() == actionSettings.id() &&
-                                        settings.settings() == actionSettings.settings())
+                    override fun isChanged(actionSettings: RocketActionSettings): Boolean =
+                        !(settings.id() == actionSettings.id() &&
+                            settings.settings() == actionSettings.settings())
 
-                        override fun component(): Component = JMenu(label).apply {
-                            this.icon = IconRepositoryFactory.repository.by(AppIcon.TEXT)
-                            this.add(
-                                    JTextPane().apply {
-                                        this.text = text
-                                        isEditable = false
-                                        background = JLabel().background
-                                        addMouseListener(object : MouseAdapter() {
-                                            override fun mouseReleased(e: MouseEvent) {
-                                                if (e.button == MouseEvent.BUTTON3) {
-                                                    val defaultToolkit = Toolkit.getDefaultToolkit()
-                                                    val clipboard = defaultToolkit.systemClipboard
-                                                    clipboard.setContents(StringSelection(text), null)
-                                                    NotificationFactory.notification.show(NotificationType.INFO, "Текст скопирован в буфер")
-                                                }
-                                            }
-                                        })
+                    override fun component(): Component = JMenu(label).apply {
+                        this.icon = IconRepositoryFactory.repository.by(AppIcon.TEXT)
+                        val panel = JPanel(BorderLayout())
+                        panel.add(
+                            JToolBar().apply {
+                                add(JButton(
+                                    object : AbstractAction() {
+                                        init {
+                                            putValue(SHORT_DESCRIPTION, "Скопировать текст в буфер")
+                                            putValue(SMALL_ICON, IconRepositoryFactory.repository.by(AppIcon.COPY_WRITING))
+                                        }
+
+                                        override fun actionPerformed(e: ActionEvent?) {
+                                            val defaultToolkit = Toolkit.getDefaultToolkit()
+                                            val clipboard = defaultToolkit.systemClipboard
+                                            clipboard.setContents(StringSelection(text), null)
+                                            NotificationFactory.notification.show(
+                                                type = NotificationType.INFO,
+                                                text = "Текст скопирован в буфер"
+                                            )
+                                        }
                                     }
-                            )
-                        }
+                                ))
+                                add(JButton(
+                                    object : AbstractAction() {
+                                        init {
+                                            putValue(SHORT_DESCRIPTION, "Открыть в отдельном окне")
+                                            putValue(SMALL_ICON, IconRepositoryFactory.repository.by(AppIcon.ARROW_TOP))
+                                        }
+
+                                        override fun actionPerformed(e: ActionEvent?) {
+                                            SwingUtilities.invokeLater {
+                                                val dimension = Toolkit.getDefaultToolkit().screenSize
+                                                val frame = JFrame(label)
+                                                frame.add(JScrollPane(JTextPane().apply {
+                                                    this.text = text
+                                                    isEditable = false
+                                                }))
+                                                frame.defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
+                                                frame.setSize(
+                                                    (dimension.width * 0.8).toInt(),
+                                                    (dimension.height * 0.8).toInt()
+                                                )
+                                                frame.setLocationRelativeTo(null)
+                                                frame.isVisible = true
+                                            }
+                                        }
+                                    }
+                                ))
+                            },
+                            BorderLayout.NORTH
+                        )
+                        panel.add(
+                            JTextPane().apply {
+                                val textPane = this
+                                textPane.text = text
+                                isEditable = false
+                                background = JLabel().background
+                            },
+                            BorderLayout.CENTER
+                        )
+
+                        this.add(panel)
                     }
                 }
             }
+        }
 
     override fun asString(): List<RocketActionConfigurationPropertyKey> = listOf(LABEL)
 

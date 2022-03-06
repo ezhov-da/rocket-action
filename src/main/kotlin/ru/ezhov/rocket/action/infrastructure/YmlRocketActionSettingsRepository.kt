@@ -1,5 +1,6 @@
 package ru.ezhov.rocket.action.infrastructure
 
+import mu.KotlinLogging
 import org.yaml.snakeyaml.Yaml
 import ru.ezhov.rocket.action.api.RocketActionConfigurationPropertyKey
 import ru.ezhov.rocket.action.api.RocketActionSettings
@@ -10,11 +11,14 @@ import java.io.FileOutputStream
 import java.io.OutputStreamWriter
 import java.net.URI
 import java.nio.charset.StandardCharsets
-import java.util.*
-import kotlin.collections.HashMap
+import java.util.UUID
+
+private val logger = KotlinLogging.logger {}
 
 class YmlRocketActionSettingsRepository(private val uri: URI) : RocketActionSettingsRepository {
     override fun actions(): List<RocketActionSettings> {
+        logger.debug { "Get actions by uri='$uri'" }
+
         uri.toURL().openStream().use { inputStream ->
             val actions: MutableList<RocketActionSettings> = ArrayList()
             val yaml = Yaml()
@@ -27,15 +31,20 @@ class YmlRocketActionSettingsRepository(private val uri: URI) : RocketActionSett
                     }
                 }
             }
+
+            logger.info { "Actions count ${actions.size}" }
+
             return actions
         }
     }
 
     override fun save(settings: List<RocketActionSettings>) {
+        logger.debug { "Actions settings saving started. count=${settings.size}" }
+
         val file = File(uri.path)
         OutputStreamWriter(
-                FileOutputStream(file),
-                StandardCharsets.UTF_8).use { outputStreamWriter ->
+            FileOutputStream(file),
+            StandardCharsets.UTF_8).use { outputStreamWriter ->
             val yaml = Yaml()
             val all: MutableList<Map<String?, Any?>> = ArrayList()
             recursiveSettings(settings, all)
@@ -43,6 +52,8 @@ class YmlRocketActionSettingsRepository(private val uri: URI) : RocketActionSett
             map[ACTIONS] = all
             yaml.dump(map, outputStreamWriter)
         }
+
+        logger.info { "Actions settings saving completed. count=${settings.size}" }
     }
 
     private fun recursiveSettings(settings: List<RocketActionSettings>?, actions: MutableList<Map<String?, Any?>>) {
@@ -64,9 +75,9 @@ class YmlRocketActionSettingsRepository(private val uri: URI) : RocketActionSett
     @Throws(RocketActionSettingsRepositoryException::class)
     private fun createAction(action: LinkedHashMap<String, Any>): RocketActionSettings {
         return QuickActionFactory.create(
-                getOrGenerateId(action),
-                action[TYPE].toString(),
-                action
+            getOrGenerateId(action),
+            action[TYPE].toString(),
+            action
         )
     }
 
@@ -74,9 +85,9 @@ class YmlRocketActionSettingsRepository(private val uri: URI) : RocketActionSett
         @Throws(RocketActionSettingsRepositoryException::class)
         fun createAction(action: LinkedHashMap<String, Any>): RocketActionSettings {
             return create(
-                    getOrGenerateId(action),
-                    action[TYPE].toString(),
-                    action
+                getOrGenerateId(action),
+                action[TYPE].toString(),
+                action
             )
         }
 

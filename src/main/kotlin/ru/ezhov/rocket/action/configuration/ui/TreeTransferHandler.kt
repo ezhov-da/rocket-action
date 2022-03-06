@@ -203,9 +203,9 @@ internal class TreeTransferHandler : TransferHandler() {
     init {
         try {
             val mimeType = DataFlavor.javaJVMLocalObjectMimeType +
-                    ";class=\"" +
-                    Array<DefaultMutableTreeNode>::class.java.name +
-                    "\""
+                ";class=\"" +
+                Array<DefaultMutableTreeNode>::class.java.name +
+                "\""
             nodesFlavor = DataFlavor(mimeType)
             flavors[0] = nodesFlavor
         } catch (e: ClassNotFoundException) {

@@ -11,13 +11,13 @@ import javax.swing.JSeparator
 
 class SeparatorRocketActionUi : AbstractRocketAction() {
     override fun create(settings: RocketActionSettings): RocketAction =
-            object : RocketAction {
-                override fun contains(search: String): Boolean = false
+        object : RocketAction {
+            override fun contains(search: String): Boolean = false
 
-                override fun isChanged(actionSettings: RocketActionSettings): Boolean = false
+            override fun isChanged(actionSettings: RocketActionSettings): Boolean = false
 
-                override fun component(): Component = JSeparator()
-            }
+            override fun component(): Component = JSeparator()
+        }
 
     override fun asString(): List<RocketActionConfigurationPropertyKey> = emptyList()
 

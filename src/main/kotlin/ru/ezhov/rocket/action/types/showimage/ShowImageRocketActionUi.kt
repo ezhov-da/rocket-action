@@ -41,27 +41,27 @@ import javax.swing.WindowConstants
 class ShowImageRocketActionUi : AbstractRocketAction() {
 
     override fun create(settings: RocketActionSettings): RocketAction? =
-            settings.settings()[IMAGE_URL]?.takeIf { it.isNotEmpty() }?.let { imageUrl ->
-                val label = settings.settings()[LABEL]?.takeIf { it.isNotEmpty() } ?: imageUrl
-                val description = settings.settings()[DESCRIPTION]?.takeIf { it.isNotEmpty() } ?: imageUrl
+        settings.settings()[IMAGE_URL]?.takeIf { it.isNotEmpty() }?.let { imageUrl ->
+            val label = settings.settings()[LABEL]?.takeIf { it.isNotEmpty() } ?: imageUrl
+            val description = settings.settings()[DESCRIPTION]?.takeIf { it.isNotEmpty() } ?: imageUrl
 
-                val menu = JMenu(label)
-                menu.toolTipText = description
-                menu.icon = ImageIcon(this.javaClass.getResource("/load_16x16.gif"))
-                LoadImageWorker(imageUrl, menu, settings).execute()
+            val menu = JMenu(label)
+            menu.toolTipText = description
+            menu.icon = ImageIcon(this.javaClass.getResource("/load_16x16.gif"))
+            LoadImageWorker(imageUrl, menu, settings).execute()
 
-                object : RocketAction {
-                    override fun contains(search: String): Boolean =
-                            label.contains(search, ignoreCase = true)
-                                    .or(description.contains(search, ignoreCase = true))
+            object : RocketAction {
+                override fun contains(search: String): Boolean =
+                    label.contains(search, ignoreCase = true)
+                        .or(description.contains(search, ignoreCase = true))
 
-                    override fun isChanged(actionSettings: RocketActionSettings): Boolean =
-                            !(settings.id() == actionSettings.id() &&
-                                    settings.settings() == actionSettings.settings())
+                override fun isChanged(actionSettings: RocketActionSettings): Boolean =
+                    !(settings.id() == actionSettings.id() &&
+                        settings.settings() == actionSettings.settings())
 
-                    override fun component(): Component = menu
-                }
+                override fun component(): Component = menu
             }
+        }
 
     override fun type(): RocketActionType = RocketActionType { "SHOW_IMAGE" }
 
@@ -71,17 +71,17 @@ class ShowImageRocketActionUi : AbstractRocketAction() {
 
     override fun properties(): List<RocketActionConfigurationProperty> {
         return listOf(
-                createRocketActionProperty(LABEL, LABEL.value, "Заголовок", false),
-                createRocketActionProperty(DESCRIPTION, DESCRIPTION.value, "Описание", false),
-                createRocketActionProperty(IMAGE_URL, IMAGE_URL.value, "URL изображения", true)
+            createRocketActionProperty(LABEL, LABEL.value, "Заголовок", false),
+            createRocketActionProperty(DESCRIPTION, DESCRIPTION.value, "Описание", false),
+            createRocketActionProperty(IMAGE_URL, IMAGE_URL.value, "URL изображения", true)
         )
     }
 
     override fun name(): String = "Показать изображение *.png и *.jpg"
 
     private inner class LoadImageWorker(
-            private val imageUrl: String,
-            private val menu: JMenu, private val settings: RocketActionSettings
+        private val imageUrl: String,
+        private val menu: JMenu, private val settings: RocketActionSettings
     ) : SwingWorker<Image?, String?>() {
         private var cachedImage: File? = null
 
@@ -144,16 +144,16 @@ class ShowImageRocketActionUi : AbstractRocketAction() {
             imageView.image = image
             imageView.autoscrolls = true
             panelImage.add(
-                    imageView,
-                    BorderLayout.CENTER
+                imageView,
+                BorderLayout.CENTER
             )
             add(
-                    toolBar,
-                    BorderLayout.NORTH
+                toolBar,
+                BorderLayout.NORTH
             )
             add(
-                    panelImage,
-                    BorderLayout.CENTER
+                panelImage,
+                BorderLayout.CENTER
             )
             val slider = JSlider(1, 100, 100)
             toolBar.add(slider)
@@ -181,8 +181,8 @@ class ShowImageRocketActionUi : AbstractRocketAction() {
                 }
             })
             add(
-                    cachedLabel,
-                    BorderLayout.SOUTH
+                cachedLabel,
+                BorderLayout.SOUTH
             )
         }
     }

@@ -7,12 +7,12 @@ class ResourceIconRepository : IconRepository {
     private val defaultIcon = this.javaClass.getResource("/default_16x16.png")
     override fun by(icon: AppIcon): Icon = when (icon) {
         AppIcon.LOADER -> ImageIcon(
-                this.javaClass.getResource(icon.iconName)
-                        ?: defaultIcon
+            this.javaClass.getResource(icon.iconName)
+                ?: defaultIcon
         )
         else -> ImageIcon(
-                this.javaClass.getResource("/open-iconic/png/" + icon.iconName + ".png")
-                        ?: defaultIcon
+            this.javaClass.getResource("/open-iconic/png/" + icon.iconName + ".png")
+                ?: defaultIcon
         )
     }
 }

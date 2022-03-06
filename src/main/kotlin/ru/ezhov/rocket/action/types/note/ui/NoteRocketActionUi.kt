@@ -29,34 +29,34 @@ class NoteRocketActionUi : AbstractRocketAction() {
     override fun create(settings: RocketActionSettings): RocketAction? = run {
 
         settings.settings()[LABEL]
-                ?.takeIf { it.isNotEmpty() }
-                ?.let { label ->
-                    settings.settings()[PATH]
-                            ?.let { pathConfig ->
-                                val path = pathConfig.ifEmpty { File("").absolutePath }
-                                val description = settings.settings()[DESCRIPTION]?.takeIf { it.isNotEmpty() } ?: label
-                                val menu = JMenu(label)
-                                settings.settings()[ICON_URL].let { icon ->
-                                    menu.icon = IconService().load(
-                                            iconUrl = icon ?: "",
-                                            defaultIcon = IconRepositoryFactory.repository.by(AppIcon.CLIPBOARD)
-                                    )
-                                }
-                                menu.toolTipText = description
+            ?.takeIf { it.isNotEmpty() }
+            ?.let { label ->
+                settings.settings()[PATH]
+                    ?.let { pathConfig ->
+                        val path = pathConfig.ifEmpty { File("").absolutePath }
+                        val description = settings.settings()[DESCRIPTION]?.takeIf { it.isNotEmpty() } ?: label
+                        val menu = JMenu(label)
+                        settings.settings()[ICON_URL].let { icon ->
+                            menu.icon = IconService().load(
+                                iconUrl = icon ?: "",
+                                defaultIcon = IconRepositoryFactory.repository.by(AppIcon.CLIPBOARD)
+                            )
+                        }
+                        menu.toolTipText = description
 
-                                runDialog(Path(path))
+                        runDialog(Path(path))
 
-                                object : RocketAction {
-                                    override fun contains(search: String): Boolean = false
+                        object : RocketAction {
+                            override fun contains(search: String): Boolean = false
 
-                                    override fun isChanged(actionSettings: RocketActionSettings): Boolean =
-                                            !(settings.id() == actionSettings.id() &&
-                                                    settings.settings() == actionSettings.settings())
+                            override fun isChanged(actionSettings: RocketActionSettings): Boolean =
+                                !(settings.id() == actionSettings.id() &&
+                                    settings.settings() == actionSettings.settings())
 
-                                    override fun component(): Component = menu
-                                }
-                            }
-                }
+                            override fun component(): Component = menu
+                        }
+                    }
+            }
     }
 
     private fun checkAndCopyDb(path: String): File {
@@ -81,21 +81,21 @@ class NoteRocketActionUi : AbstractRocketAction() {
                 val dbFile = checkAndCopyDb(pathToDb.absolutePathString())
 
                 NoteApplicationService(
-                        NoteRepositoryFactory.sqLiteNoteRepository(dbFile)
+                    NoteRepositoryFactory.sqLiteNoteRepository(dbFile)
                 )
             }
 
             override fun done() {
                 try {
                     NoteDialog(
-                            noteApplicationService = this.get(),
-                            owner = BaseDialog.dialog
+                        noteApplicationService = this.get(),
+                        owner = BaseDialog.dialog
                     ).isVisible = true
                 } catch (ex: Exception) {
                     logger.warn(ex) { "Error when load notes by DB path '${pathToDb.absolutePathString()}'" }
                     NotificationFactory.notification.show(
-                            NotificationType.WARN,
-                            "Ошибка создания \"Заметок\""
+                        NotificationType.WARN,
+                        "Ошибка создания \"Заметок\""
                     )
                 }
             }
@@ -110,15 +110,15 @@ class NoteRocketActionUi : AbstractRocketAction() {
 
     override fun properties(): List<RocketActionConfigurationProperty> {
         return listOf(
-                createRocketActionProperty(key = LABEL, name = LABEL.value, description = "Заголовок", required = true, default = "Заметки"),
-                createRocketActionProperty(key = DESCRIPTION, name = DESCRIPTION.value, description = "Описание", required = false),
-                createRocketActionProperty(key = ICON_URL, name = ICON_URL.value, description = "URL иконки", required = false),
-                createRocketActionProperty(
-                        key = PATH,
-                        name = PATH.value,
-                        description = "Путь хранения сохраняемых данных",
-                        required = true,
-                        default = File("").absolutePath),
+            createRocketActionProperty(key = LABEL, name = LABEL.value, description = "Заголовок", required = true, default = "Заметки"),
+            createRocketActionProperty(key = DESCRIPTION, name = DESCRIPTION.value, description = "Описание", required = false),
+            createRocketActionProperty(key = ICON_URL, name = ICON_URL.value, description = "URL иконки", required = false),
+            createRocketActionProperty(
+                key = PATH,
+                name = PATH.value,
+                description = "Путь хранения сохраняемых данных",
+                required = true,
+                default = File("").absolutePath),
         )
     }
 
