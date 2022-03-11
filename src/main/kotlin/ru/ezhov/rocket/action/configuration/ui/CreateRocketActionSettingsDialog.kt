@@ -9,6 +9,7 @@ import ru.ezhov.rocket.action.domain.RocketActionUiRepository
 import ru.ezhov.rocket.action.icon.AppIcon
 import ru.ezhov.rocket.action.icon.IconRepositoryFactory
 import ru.ezhov.rocket.action.infrastructure.MutableRocketActionSettings
+import ru.ezhov.rocket.action.ui.swing.common.toImage
 import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Component
@@ -44,6 +45,7 @@ class CreateRocketActionSettingsDialog(
     private val testPanel: TestPanel = TestPanel(rocketActionUiRepository) { actionSettingsPanel.create() }
 
     private val dialog: JDialog = JDialog(owner, "Создать действие").apply {
+        this.setIconImage(IconRepositoryFactory.repository.by(AppIcon.ROCKET_APP).toImage())
         val ownerSize = owner.size
         setSize((ownerSize.width * 0.7).toInt(), (ownerSize.height * 0.7).toInt())
         add(panelComboBox(), BorderLayout.NORTH)

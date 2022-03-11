@@ -14,6 +14,7 @@ import ru.ezhov.rocket.action.notification.NotificationType
 import ru.ezhov.rocket.action.properties.GeneralPropertiesRepositoryFactory
 import ru.ezhov.rocket.action.properties.UsedPropertiesName
 import ru.ezhov.rocket.action.types.group.GroupRocketActionUi
+import ru.ezhov.rocket.action.ui.swing.common.toImage
 import java.awt.BorderLayout
 import java.awt.Component
 import java.awt.Dialog
@@ -299,6 +300,7 @@ class ConfigurationFrame(
 
     init {
         dialog = JDialog(owner, "Конфигурирование действий")
+        dialog.setIconImage(IconRepositoryFactory.repository.by(AppIcon.ROCKET_APP).toImage())
         this.updateActionListener = updateActionListener
         this.rocketActionConfigurationRepository = rocketActionConfigurationRepository
         this.rocketActionUiRepository = rocketActionUiRepository

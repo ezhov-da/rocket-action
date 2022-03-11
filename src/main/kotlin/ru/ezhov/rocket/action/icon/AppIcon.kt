@@ -1,6 +1,7 @@
 package ru.ezhov.rocket.action.icon
 
 enum class AppIcon(val iconName: String) {
+    ROCKET_APP("/rocket_16x16.png"),
     WRENCH("wrench-2x"),
     RELOAD("reload-2x"),
     PENCIL("pencil-2x"),

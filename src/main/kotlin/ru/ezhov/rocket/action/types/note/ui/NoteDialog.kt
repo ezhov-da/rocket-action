@@ -1,11 +1,14 @@
 package ru.ezhov.rocket.action.types.note.ui
 
 import mu.KotlinLogging
+import ru.ezhov.rocket.action.icon.AppIcon
+import ru.ezhov.rocket.action.icon.IconRepositoryFactory
 import ru.ezhov.rocket.action.notification.NotificationFactory
 import ru.ezhov.rocket.action.notification.NotificationType
 import ru.ezhov.rocket.action.types.note.application.NoteApplicationService
 import ru.ezhov.rocket.action.types.note.domain.model.Note
 import ru.ezhov.rocket.action.ui.swing.common.MoveUtil
+import ru.ezhov.rocket.action.ui.swing.common.toImage
 import ru.ezhov.rocket.action.url.parser.UrlParser
 import java.awt.BorderLayout
 import java.awt.Color
@@ -157,6 +160,8 @@ class NoteDialog(
             layout = BorderLayout()
 
             val dialog = this
+
+            dialog.setIconImage(IconRepositoryFactory.repository.by(AppIcon.ROCKET_APP).toImage())
 
             add(JScrollPane(textPaneText), BorderLayout.NORTH)
             add(JScrollPane(textPaneDescription), BorderLayout.CENTER)

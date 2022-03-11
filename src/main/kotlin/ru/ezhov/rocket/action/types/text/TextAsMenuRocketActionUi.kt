@@ -10,6 +10,7 @@ import ru.ezhov.rocket.action.icon.IconRepositoryFactory
 import ru.ezhov.rocket.action.notification.NotificationFactory
 import ru.ezhov.rocket.action.notification.NotificationType
 import ru.ezhov.rocket.action.types.AbstractRocketAction
+import ru.ezhov.rocket.action.ui.swing.common.toImage
 import java.awt.BorderLayout
 import java.awt.Component
 import java.awt.Toolkit
@@ -85,6 +86,9 @@ class TextAsMenuRocketActionUi : AbstractRocketAction() {
                                             SwingUtilities.invokeLater {
                                                 val dimension = Toolkit.getDefaultToolkit().screenSize
                                                 val frame = JFrame(label)
+                                                frame.iconImage = IconRepositoryFactory
+                                                    .repository.by(AppIcon.ROCKET_APP)
+                                                    .toImage()
                                                 frame.add(JScrollPane(JTextPane().apply {
                                                     this.text = text
                                                     isEditable = false

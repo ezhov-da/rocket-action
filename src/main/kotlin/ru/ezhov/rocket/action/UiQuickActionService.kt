@@ -27,7 +27,6 @@ import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import java.net.URI
 import javax.swing.BorderFactory
-import javax.swing.ImageIcon
 import javax.swing.JDialog
 import javax.swing.JLabel
 import javax.swing.JMenu
@@ -211,7 +210,7 @@ class UiQuickActionService(
 
     private inner class CreateMenuWorker(private val menu: JMenu) : SwingWorker<List<Component>, String?>() {
         init {
-            menu.icon = ImageIcon(this::class.java.getResource("/load_16x16.gif"))
+            menu.icon = IconRepositoryFactory.repository.by(AppIcon.LOADER)
             menu.removeAll()
         }
 
@@ -295,7 +294,7 @@ class UiQuickActionService(
         override fun done() {
             val components = this.get()
             components.forEach { menu.add(it) }
-            menu.icon = ImageIcon(this::class.java.getResource("/rocket_16x16.png"))
+            menu.icon = IconRepositoryFactory.repository.by(AppIcon.ROCKET_APP)
         }
     }
 }

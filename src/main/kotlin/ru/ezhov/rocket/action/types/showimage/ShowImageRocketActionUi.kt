@@ -11,6 +11,7 @@ import ru.ezhov.rocket.action.caching.CacheFactory
 import ru.ezhov.rocket.action.icon.AppIcon
 import ru.ezhov.rocket.action.icon.IconRepositoryFactory
 import ru.ezhov.rocket.action.types.AbstractRocketAction
+import ru.ezhov.rocket.action.ui.swing.common.toImage
 import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Component
@@ -124,6 +125,7 @@ class ShowImageRocketActionUi : AbstractRocketAction() {
                 override fun actionPerformed(e: ActionEvent) {
                     SwingUtilities.invokeLater {
                         val frame = JFrame(cachedImage.absolutePath)
+                        frame.iconImage = IconRepositoryFactory.repository.by(AppIcon.ROCKET_APP).toImage()
                         frame.add(ImagePanel(image, cachedImage))
                         frame.defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
                         frame.setSize((dimension.width * 0.8).toInt(), (dimension.height * 0.8).toInt())
