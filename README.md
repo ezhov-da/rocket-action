@@ -32,6 +32,10 @@ mvn clean package
 | ru.ezhov.rocket.action.caching.Cache | Кеширование файлов по URL           |
 |ru.ezhov.rocket.action.properties.UsedPropertiesName| Доступные свойства для конфигурации |
 
+# Environment
+
+Java 8
+
 # Run
 
 First argument is file with actions.

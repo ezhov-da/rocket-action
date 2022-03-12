@@ -64,7 +64,7 @@ class NoteRocketActionUi : AbstractRocketAction() {
         val fileDb = File(path, fileName)
         if (!fileDb.exists()) {
             this.javaClass.getResourceAsStream("/$fileName")?.use { ins ->
-                fileDb.writeBytes(ins.readAllBytes())
+                fileDb.writeBytes(ins.readBytes())
 
                 logger.debug { "Notes DB coped to '${fileDb.absolutePath}'" }
             }
