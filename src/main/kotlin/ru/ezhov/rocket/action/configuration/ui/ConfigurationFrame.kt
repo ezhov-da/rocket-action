@@ -107,6 +107,7 @@ class ConfigurationFrame(
         tree.cellRenderer = RocketActionSettingsCellRender()
         tree.isRootVisible = false
         val panelTree = JPanel(BorderLayout())
+        panelTree.add(SearchInTreePanel(root = root, treeModel = defaultTreeModel, tree = tree), BorderLayout.NORTH)
         panelTree.add(JScrollPane(tree), BorderLayout.CENTER)
         val panelSaveTree = JPanel()
         val buttonSaveTree = JButton("Сохранить всю конфигурацию")

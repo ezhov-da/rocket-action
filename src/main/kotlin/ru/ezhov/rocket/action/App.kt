@@ -10,6 +10,7 @@ import ru.ezhov.rocket.action.properties.GeneralPropertiesRepositoryFactory
 import ru.ezhov.rocket.action.properties.UsedPropertiesName
 import java.io.File
 import java.util.Enumeration
+import javax.swing.LookAndFeel
 import javax.swing.SwingUtilities
 import javax.swing.UIManager
 import javax.swing.plaf.FontUIResource
@@ -18,7 +19,7 @@ private val logger = KotlinLogging.logger { }
 
 fun main(args: Array<String>) {
     SwingUtilities.invokeLater {
-        FlatLightLaf.setup()
+        FlatLightLaf.setup(lookAndFeel())
         try {
             getFont()?.let { font -> setUIFont(font) }
 
@@ -70,6 +71,14 @@ private fun rockerActionRepository(args: Array<String>): RocketActionSettingsRep
         }
         repository
     }
+
+private fun lookAndFeel(): LookAndFeel {
+    val className = GeneralPropertiesRepositoryFactory.repository
+        .asString(name = UsedPropertiesName.UI_CONFIGURATION_LOOK_AND_FEEL_CLASS,
+            default = "com.formdev.flatlaf.FlatLightLaf")
+
+    return Class.forName(className).newInstance() as LookAndFeel
+}
 
 private fun getFont(): FontUIResource? {
     val name = GeneralPropertiesRepositoryFactory.repository.asStringOrNull(UsedPropertiesName.FONT_NAME)
