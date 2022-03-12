@@ -18,7 +18,7 @@ class YmlRocketActionSettingsRepositoryTest {
                 this.javaClass.getResource("/test-actions.yml")!!.toURI()
         )
         val actions = repository.actions()
-        Assert.assertEquals(24, actions.size.toLong())
+        Assert.assertEquals(25, actions.size.toLong())
         println(actions)
     }
 

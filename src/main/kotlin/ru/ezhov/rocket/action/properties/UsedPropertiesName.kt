@@ -2,7 +2,7 @@ package ru.ezhov.rocket.action.properties
 
 private const val PREFIX = "rocket.action"
 
-enum class UsedPropertiesName(val propertyName: String, val description: String,) {
+enum class UsedPropertiesName(val propertyName: String, val description: String) {
     VERSION("$PREFIX.version", "Версия приложения. Пример: 0.16.6"),
     INFO("$PREFIX.info", "Информация о приложении"),
     REPOSITORY("$PREFIX.repository", "Ссылка на репозиторий приложения"),
@@ -40,6 +40,14 @@ enum class UsedPropertiesName(val propertyName: String, val description: String,
             Link: https://www.formdev.com/flatlaf/themes/
             
             Пример: com.formdev.flatlaf.FlatLightLaf
+        """.trimIndent()
+    ),
+
+    UI_CONFIGURATION_FRAME_ALWAYS_ON_TOP(
+        "$PREFIX.ui.configuration.frame.always_on_top",
+        """
+            Отображать окно редактора конфигурации всегда поверх окон
+            Пример: false
         """.trimIndent()
     ),
 }

@@ -25,5 +25,6 @@ enum class AppIcon(val iconName: String) {
     ARROW_TOP("arrow-top-2x"),
     ARROW_BOTTOM("arrow-bottom-2x"),
     COPY_WRITING("copywriting-2x"),
+    BROWSER("browser-2x"),
     LOADER("/load_16x16.gif"),
 }

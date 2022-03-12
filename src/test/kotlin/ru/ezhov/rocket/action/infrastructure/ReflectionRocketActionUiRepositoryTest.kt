@@ -7,6 +7,6 @@ class ReflectionRocketActionUiRepositoryTest {
     @Test
     fun test() {
         val repository = ReflectionRocketActionUiRepository()
-        Assert.assertEquals(18, repository.all().size.toLong())
+        Assert.assertEquals(19, repository.all().size.toLong())
     }
 }

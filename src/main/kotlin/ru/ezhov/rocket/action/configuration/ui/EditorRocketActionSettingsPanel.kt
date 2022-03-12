@@ -5,6 +5,10 @@ import ru.ezhov.rocket.action.api.RocketActionConfiguration
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
 import ru.ezhov.rocket.action.api.RocketActionConfigurationPropertyKey
 import ru.ezhov.rocket.action.configuration.domain.RocketActionConfigurationRepository
+import ru.ezhov.rocket.action.configuration.ui.event.ConfigurationUiListener
+import ru.ezhov.rocket.action.configuration.ui.event.ConfigurationUiObserverFactory
+import ru.ezhov.rocket.action.configuration.ui.event.model.ConfigurationUiEvent
+import ru.ezhov.rocket.action.configuration.ui.event.model.RemoveSettingUiEvent
 import ru.ezhov.rocket.action.domain.RocketActionUiRepository
 import ru.ezhov.rocket.action.icon.AppIcon
 import ru.ezhov.rocket.action.icon.IconRepositoryFactory
@@ -22,6 +26,7 @@ import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.JScrollPane
 import javax.swing.JTextPane
+import javax.swing.SwingConstants
 
 class EditorRocketActionSettingsPanel(
     private val rocketActionConfigurationRepository: RocketActionConfigurationRepository,
@@ -59,6 +64,13 @@ class EditorRocketActionSettingsPanel(
     }
 
     fun show(settings: TreeRocketActionSettings, callback: SavedRocketActionSettingsPanelCallback) {
+        if (stubPanel != null) {
+            this.remove(stubPanel)
+            stubPanel = null
+            this.add(basicPanel)
+            this.revalidate()
+            this.repaint()
+        }
         testPanel.clearTest()
         currentSettings = settings
         labelType.text = settings.settings.type().value()
@@ -201,15 +213,43 @@ class EditorRocketActionSettingsPanel(
         fun value(): Pair<RocketActionConfigurationPropertyKey, String> = Pair(first = value.key, valueCallback())
     }
 
+    private var stubPanel: JPanel? = null
+    private var basicPanel: JPanel = JPanel(BorderLayout())
+
     init {
-        add(top(), BorderLayout.NORTH)
-        add(JScrollPane(rocketActionSettingsPanel), BorderLayout.CENTER)
+        basicPanel.add(top(), BorderLayout.NORTH)
+        basicPanel.add(JScrollPane(rocketActionSettingsPanel), BorderLayout.CENTER)
 
         val southPanel = JPanel().apply {
             layout = BoxLayout(this, BoxLayout.Y_AXIS)
             add(testPanel)
             add(testAndCreate())
         }
-        add(southPanel, BorderLayout.SOUTH)
+        basicPanel.add(southPanel, BorderLayout.SOUTH)
+
+        add(basicPanel, BorderLayout.CENTER)
+
+        val editorPanel = this
+        ConfigurationUiObserverFactory.observer.register(object : ConfigurationUiListener {
+            override fun action(event: ConfigurationUiEvent) {
+                if (event is RemoveSettingUiEvent && event.countChildrenRoot == 0) {
+                    stubPanel = JPanel(BorderLayout()).apply {
+                        add(
+                            JLabel("Создайте первое действие").apply {
+                                horizontalTextPosition = SwingConstants.CENTER
+                                horizontalAlignment = SwingConstants.CENTER
+                                verticalTextPosition = SwingConstants.CENTER
+                                verticalAlignment = SwingConstants.CENTER
+                            },
+                            BorderLayout.CENTER
+                        )
+                    }
+                    editorPanel.remove(basicPanel)
+                    editorPanel.add(stubPanel, BorderLayout.CENTER)
+                    editorPanel.revalidate()
+                    editorPanel.repaint()
+                }
+            }
+        })
     }
 }

@@ -3,6 +3,10 @@ package ru.ezhov.rocket.action.configuration.ui
 import mu.KotlinLogging
 import ru.ezhov.rocket.action.api.RocketActionSettings
 import ru.ezhov.rocket.action.configuration.domain.RocketActionConfigurationRepository
+import ru.ezhov.rocket.action.configuration.ui.event.ConfigurationUiListener
+import ru.ezhov.rocket.action.configuration.ui.event.ConfigurationUiObserverFactory
+import ru.ezhov.rocket.action.configuration.ui.event.model.ConfigurationUiEvent
+import ru.ezhov.rocket.action.configuration.ui.event.model.RemoveSettingUiEvent
 import ru.ezhov.rocket.action.domain.RocketActionSettingsRepository
 import ru.ezhov.rocket.action.domain.RocketActionSettingsRepositoryException
 import ru.ezhov.rocket.action.domain.RocketActionUiRepository
@@ -26,14 +30,14 @@ import java.awt.event.MouseEvent
 import javax.swing.AbstractAction
 import javax.swing.DropMode
 import javax.swing.JButton
-import javax.swing.JDialog
+import javax.swing.JFrame
 import javax.swing.JLabel
-import javax.swing.JMenuBar
 import javax.swing.JMenuItem
 import javax.swing.JPanel
 import javax.swing.JPopupMenu
 import javax.swing.JScrollPane
 import javax.swing.JSplitPane
+import javax.swing.JToolBar
 import javax.swing.JTree
 import javax.swing.SwingUtilities
 import javax.swing.event.TreeExpansionEvent
@@ -55,7 +59,7 @@ class ConfigurationFrame(
     private val rocketActionSettingsRepository: RocketActionSettingsRepository,
     updateActionListener: ActionListener
 ) {
-    private val dialog: JDialog
+    private val frame: JFrame
     private val rocketActionConfigurationRepository: RocketActionConfigurationRepository
     private val rocketActionUiRepository: RocketActionUiRepository
     private val createRocketActionSettingsDialog: CreateRocketActionSettingsDialog
@@ -215,6 +219,9 @@ class ConfigurationFrame(
                                     expandedSet.forEach { path ->
                                         tree.expandPath(path)
                                     }
+
+                                    ConfigurationUiObserverFactory.observer
+                                        .notify(RemoveSettingUiEvent(defaultTreeModel.getChildCount(root)))
                                 }
                             }
 
@@ -283,7 +290,9 @@ class ConfigurationFrame(
     }
 
     fun setVisible(visible: Boolean) {
-        dialog.isVisible = visible
+        checkEmptyActionsAndShowButtonCreate(menuBar!!)
+
+        frame.isVisible = visible
     }
 
     private inner class RocketActionSettingsCellRender : DefaultTreeCellRenderer() {
@@ -298,16 +307,20 @@ class ConfigurationFrame(
         }
     }
 
+    private var menuBar: JToolBar?
 
     init {
-        dialog = JDialog(owner, "Конфигурирование действий")
-        dialog.setIconImage(IconRepositoryFactory.repository.by(AppIcon.ROCKET_APP).toImage())
+        frame = JFrame("Конфигурирование действий")
+        frame.iconImage = IconRepositoryFactory.repository.by(AppIcon.ROCKET_APP).toImage()
+        frame.isAlwaysOnTop = GeneralPropertiesRepositoryFactory.repository
+            .asBoolean(UsedPropertiesName.UI_CONFIGURATION_FRAME_ALWAYS_ON_TOP, false)
+        frame.defaultCloseOperation = JFrame.HIDE_ON_CLOSE
         this.updateActionListener = updateActionListener
         this.rocketActionConfigurationRepository = rocketActionConfigurationRepository
         this.rocketActionUiRepository = rocketActionUiRepository
 
         val size = Toolkit.getDefaultToolkit().screenSize
-        dialog.setSize(
+        frame.setSize(
             (size.width * GeneralPropertiesRepositoryFactory
                 .repository
                 .asFloat(UsedPropertiesName.UI_CONFIGURATION_DIALOG_WIDTH_IN_PERCENT,
@@ -319,47 +332,73 @@ class ConfigurationFrame(
                     0.6F)
                 ).toInt()
         )
-        dialog.setLocationRelativeTo(null)
+        frame.setLocationRelativeTo(null)
         createRocketActionSettingsDialog = CreateRocketActionSettingsDialog(
-            owner = dialog,
+            owner = frame,
             rocketActionConfigurationRepository = rocketActionConfigurationRepository,
             rocketActionUiRepository = rocketActionUiRepository
         )
 
-        dialog.add(createMenuBar(), BorderLayout.NORTH)
-        dialog.add(panel(), BorderLayout.CENTER)
+        val basePanel = JPanel(BorderLayout())
+
+        menuBar = createToolBar()
+
+        basePanel.add(menuBar, BorderLayout.NORTH)
+        basePanel.add(panel(), BorderLayout.CENTER)
+
+        frame.add(basePanel, BorderLayout.CENTER)
+
+        ConfigurationUiObserverFactory.observer.register(object : ConfigurationUiListener {
+            override fun action(event: ConfigurationUiEvent) {
+                if (event is RemoveSettingUiEvent && event.countChildrenRoot == 0) {
+                    createAndShowButtonCreateFirstAction(menuBar = menuBar!!)
+                }
+            }
+        })
     }
 
-    private fun createMenuBar(): JMenuBar {
-        val menuBar = JMenuBar()
-        val menuItemUpdate = JMenuItem("Обновить")
-        menuItemUpdate.icon = IconRepositoryFactory.repository.by(AppIcon.RELOAD)
-        menuItemUpdate.addActionListener { e: ActionEvent? ->
+    private fun createToolBar(): JToolBar {
+        val menuBar = JToolBar()
+        val buttonUpdate = JButton("Обновить")
+        buttonUpdate.icon = IconRepositoryFactory.repository.by(AppIcon.RELOAD)
+        buttonUpdate.addActionListener { e: ActionEvent? ->
             SwingUtilities.invokeLater {
                 updateActionListener.actionPerformed(e)
                 setVisible(false)
             }
         }
-        menuBar.add(menuItemUpdate)
-
-        if (rocketActionSettingsRepository.actions().isEmpty()) {
-            val menuItemCreate = JMenuItem("Создать первое действие")
-            menuItemCreate.icon = IconRepositoryFactory.repository.by(AppIcon.STAR)
-            menuItemCreate.addActionListener { _: ActionEvent? ->
-                createRocketActionSettingsDialog.show(object : CreatedRocketActionSettingsCallback {
-                    override fun create(settings: TreeRocketActionSettings) {
-                        val model = finalTree!!.model as DefaultTreeModel
-                        val root = model.root as DefaultMutableTreeNode
-                        root.add(DefaultMutableTreeNode(settings, true))
-                        model.reload(root)
-                        menuBar.remove(menuItemCreate)
-                        menuBar.repaint()
-                    }
-                })
-            }
-            menuBar.add(menuItemCreate)
-        }
+        menuBar.add(buttonUpdate)
 
         return menuBar
+    }
+
+    private
+    var buttonCreateNewAction: JButton? = null
+
+    private fun checkEmptyActionsAndShowButtonCreate(menuBar: JToolBar) {
+        if (rocketActionSettingsRepository.actions().isEmpty() && buttonCreateNewAction == null) {
+            createAndShowButtonCreateFirstAction(menuBar = menuBar)
+        }
+    }
+
+    private fun createAndShowButtonCreateFirstAction(menuBar: JToolBar) {
+        buttonCreateNewAction = JButton("Создать первое действие")
+        buttonCreateNewAction!!.icon = IconRepositoryFactory.repository.by(AppIcon.STAR)
+        buttonCreateNewAction!!.addActionListener { _: ActionEvent? ->
+            createRocketActionSettingsDialog.show(object : CreatedRocketActionSettingsCallback {
+                override fun create(settings: TreeRocketActionSettings) {
+                    val model = finalTree!!.model as DefaultTreeModel
+                    val root = model.root as DefaultMutableTreeNode
+                    root.add(DefaultMutableTreeNode(settings, true))
+                    model.reload(root)
+                    menuBar.remove(buttonCreateNewAction)
+                    buttonCreateNewAction = null
+                    menuBar.repaint()
+                }
+            })
+        }
+        menuBar.add(buttonCreateNewAction)
+        menuBar.repaint()
+        menuBar.revalidate()
     }
 }

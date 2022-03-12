@@ -40,3 +40,6 @@ Java 8
 
 First argument is file with actions.
 
+# Releases
+https://disk.yandex.ru/d/2Wk7TF_K0l0SOQ  
+
