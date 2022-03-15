@@ -19,11 +19,13 @@ import java.net.URI
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 import javax.swing.BoxLayout
+import javax.swing.Icon
 import javax.swing.JLabel
 import javax.swing.JMenu
 import javax.swing.JPanel
 
 class OpenUrlWithTextRocketActionUi : AbstractRocketAction() {
+    private val icon = IconRepositoryFactory.repository.by(AppIcon.LINK_INTACT)
 
     override fun create(settings: RocketActionSettings): RocketAction? =
         settings.settings()[BASE_URL]?.takeIf { it.isNotEmpty() }?.let { baseUrl ->
@@ -34,14 +36,12 @@ class OpenUrlWithTextRocketActionUi : AbstractRocketAction() {
 
             val menu = JMenu(label)
             menu.icon = IconService().load(
-                iconUrl,
-                IconRepositoryFactory.repository.by(AppIcon.LINK_INTACT)
+                iconUrl = iconUrl,
+                defaultIcon = icon
             )
             val panel = JPanel()
             panel.layout = BoxLayout(panel, BoxLayout.LINE_AXIS)
-            panel.add(
-                JLabel(IconRepositoryFactory.repository.by(AppIcon.LINK_INTACT))
-            )
+            panel.add(JLabel(icon))
             val textField = TextFieldWithText(label)
             textField.columns = 10
             panel.add(textField)
@@ -109,6 +109,8 @@ class OpenUrlWithTextRocketActionUi : AbstractRocketAction() {
     }
 
     override fun name(): String = "Открыть ссылку с подстановкой"
+
+    override fun icon(): Icon? = icon
 
     companion object {
         private val ICON_URL = RocketActionConfigurationPropertyKey("iconUrl")

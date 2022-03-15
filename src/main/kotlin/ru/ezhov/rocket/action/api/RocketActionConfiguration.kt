@@ -1,5 +1,7 @@
 package ru.ezhov.rocket.action.api
 
+import javax.swing.Icon
+
 /**
  * Конфигурация действия
  */
@@ -37,4 +39,11 @@ interface RocketActionConfiguration {
      * @return свойства действия
      */
     fun properties(): List<RocketActionConfigurationProperty>
+
+    /**
+     * Иконка конфигурации
+     *
+     * @return иконка
+     */
+    fun icon(): Icon?
 }

@@ -28,6 +28,7 @@ import java.net.URL
 import java.util.concurrent.ExecutionException
 import javax.imageio.ImageIO
 import javax.swing.AbstractAction
+import javax.swing.Icon
 import javax.swing.ImageIcon
 import javax.swing.JFrame
 import javax.swing.JLabel
@@ -40,6 +41,7 @@ import javax.swing.SwingWorker
 import javax.swing.WindowConstants
 
 class ShowImageRocketActionUi : AbstractRocketAction() {
+    private val icon = IconRepositoryFactory.repository.by(AppIcon.IMAGE)
 
     override fun create(settings: RocketActionSettings): RocketAction? =
         settings.settings()[IMAGE_URL]?.takeIf { it.isNotEmpty() }?.let { imageUrl ->
@@ -49,7 +51,7 @@ class ShowImageRocketActionUi : AbstractRocketAction() {
             val menu = JMenu(label)
             menu.toolTipText = description
             menu.icon = ImageIcon(this.javaClass.getResource("/load_16x16.gif"))
-            LoadImageWorker(imageUrl, menu, settings).execute()
+            LoadImageWorker(imageUrl = imageUrl, menu = menu, settings = settings).execute()
 
             object : RocketAction {
                 override fun contains(search: String): Boolean =
@@ -94,7 +96,7 @@ class ShowImageRocketActionUi : AbstractRocketAction() {
         }
 
         override fun done() {
-            menu.icon = IconRepositoryFactory.repository.by(AppIcon.IMAGE)
+            menu.icon = icon
             try {
                 val component: Component
                 if (settings.settings().containsKey(IMAGE_URL)) {
@@ -188,6 +190,8 @@ class ShowImageRocketActionUi : AbstractRocketAction() {
             )
         }
     }
+
+    override fun icon(): Icon? = icon
 
     companion object {
         private val LABEL = RocketActionConfigurationPropertyKey("label")

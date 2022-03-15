@@ -18,11 +18,13 @@ import java.awt.Desktop
 import java.net.URI
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
+import javax.swing.Icon
 import javax.swing.JMenu
 import javax.swing.SwingUtilities
 
 class OpenUrlWithTextHistoryRocketActionUi : AbstractRocketAction() {
     private var label: String? = null
+    private val icon = IconRepositoryFactory.repository.by(AppIcon.LINK_INTACT)
 
     override fun create(settings: RocketActionSettings): RocketAction? =
         settings.settings()[BASE_URL]?.takeIf { it.isNotEmpty() }?.let { baseUrl ->
@@ -33,8 +35,8 @@ class OpenUrlWithTextHistoryRocketActionUi : AbstractRocketAction() {
 
             val menu = JMenu(label)
             menu.icon = IconService().load(
-                iconUrl,
-                IconRepositoryFactory.repository.by(AppIcon.LINK_INTACT)
+                iconUrl = iconUrl,
+                defaultIcon = icon
             )
             val textField = TextFieldWithText(label)
             textField.columns = 10
@@ -125,6 +127,8 @@ class OpenUrlWithTextHistoryRocketActionUi : AbstractRocketAction() {
     }
 
     override fun name(): String = "Открытие ссылки с подстановкой и с сохранением истории"
+
+    override fun icon(): Icon? = icon
 
     companion object {
         private val LABEL = RocketActionConfigurationPropertyKey("label")

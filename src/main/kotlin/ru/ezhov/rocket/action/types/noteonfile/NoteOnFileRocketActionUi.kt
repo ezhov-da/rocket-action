@@ -28,6 +28,7 @@ import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.util.UUID
 import javax.swing.AbstractAction
+import javax.swing.Icon
 import javax.swing.JButton
 import javax.swing.JFrame
 import javax.swing.JLabel
@@ -43,6 +44,7 @@ import javax.swing.WindowConstants
 private val logger = KotlinLogging.logger {}
 
 class NoteOnFileRocketActionUi : AbstractRocketAction() {
+    private val iconDef = IconRepositoryFactory.repository.by(AppIcon.TEXT)
 
     override fun create(settings: RocketActionSettings): RocketAction? =
         settings.settings()[PATH_AND_NAME]
@@ -68,7 +70,7 @@ class NoteOnFileRocketActionUi : AbstractRocketAction() {
                             settings.settings() == actionSettings.settings())
 
                     override fun component(): Component = JMenu(label).apply {
-                        this.icon = IconRepositoryFactory.repository.by(AppIcon.TEXT)
+                        this.icon = iconDef
                         this.add(TextPanel(path = path, label = label, inputText = ""))
                     }
                 }
@@ -313,6 +315,8 @@ class NoteOnFileRocketActionUi : AbstractRocketAction() {
     }
 
     override fun name(): String = "Записка в файле"
+
+    override fun icon(): Icon? = iconDef
 
     companion object {
         private val LABEL = RocketActionConfigurationPropertyKey("label")

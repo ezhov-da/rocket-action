@@ -14,6 +14,7 @@ import ru.ezhov.rocket.action.types.AbstractRocketAction
 import java.awt.BorderLayout
 import java.awt.Component
 import javax.script.ScriptEngineManager
+import javax.swing.Icon
 import javax.swing.JButton
 import javax.swing.JMenu
 import javax.swing.JPanel
@@ -23,6 +24,8 @@ import javax.swing.SwingWorker
 private val logger = KotlinLogging.logger {}
 
 class KotlinScriptRocketActionUi : AbstractRocketAction() {
+    private val icon = IconRepositoryFactory.repository.by(AppIcon.BOLT)
+
     override fun create(settings: RocketActionSettings): RocketAction? = run {
         settings.settings()[SCRIPT]
             ?.takeIf { it.isNotEmpty() }
@@ -34,10 +37,10 @@ class KotlinScriptRocketActionUi : AbstractRocketAction() {
                         val menu = JMenu(label).apply {
                             toolTipText = description
                         }
-                        val panelExecute = PanelExecute(menu, script)
+                        val panelExecute = PanelExecute(parentMenu = menu, script = script, icon = icon)
                         menu.add(panelExecute)
 
-                        ScriptLoader(menu = menu, script = script, panelExecute = panelExecute).execute()
+                        ScriptLoader(menu = menu, script = script, panelExecute = panelExecute, icon = icon).execute()
 
                         object : RocketAction {
                             override fun contains(search: String): Boolean =
@@ -58,6 +61,7 @@ class KotlinScriptRocketActionUi : AbstractRocketAction() {
         private val menu: JMenu,
         private val panelExecute: PanelExecute,
         private val script: String,
+        private val icon: Icon,
     ) : SwingWorker<Any, Any>() {
         init {
             menu.icon = IconRepositoryFactory.repository.by(AppIcon.LOADER)
@@ -72,7 +76,7 @@ class KotlinScriptRocketActionUi : AbstractRocketAction() {
             try {
                 val textAsObject = this.get()
                 val text = textAsObject?.toString() ?: "null result"
-                menu.icon = IconRepositoryFactory.repository.by(AppIcon.BOLT)
+                menu.icon = icon
                 panelExecute.setText(text)
             } catch (ex: Exception) {
                 logger.warn(ex) { "Error script executed. Script $script" }
@@ -81,14 +85,15 @@ class KotlinScriptRocketActionUi : AbstractRocketAction() {
         }
     }
 
-    private class PanelExecute(parentMenu: JMenu, script: String) : JPanel() {
+    private class PanelExecute(parentMenu: JMenu, script: String, icon: Icon) : JPanel() {
         val textPane = JTextPane()
         val buttonExecute = JButton("Выполнить")
 
         init {
             layout = BorderLayout()
             buttonExecute.addActionListener {
-                ScriptLoader(menu = parentMenu, script = script, panelExecute = this).execute()
+                ScriptLoader(menu = parentMenu, script = script, panelExecute = this, icon = icon)
+                    .execute()
             }
 
             add(textPane, BorderLayout.NORTH)
@@ -115,6 +120,8 @@ class KotlinScriptRocketActionUi : AbstractRocketAction() {
     }
 
     override fun name(): String = "Kotlin script"
+
+    override fun icon(): Icon? = icon
 
     companion object {
         const val TYPE = "KOTLIN_SCRIPT"

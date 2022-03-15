@@ -18,6 +18,7 @@ import ru.ezhov.rocket.action.types.note.infrastructure.NoteRepositoryFactory
 import java.awt.Component
 import java.io.File
 import java.nio.file.Path
+import javax.swing.Icon
 import javax.swing.JMenu
 import javax.swing.SwingWorker
 import kotlin.io.path.Path
@@ -26,6 +27,8 @@ import kotlin.io.path.absolutePathString
 private val logger = KotlinLogging.logger {}
 
 class NoteRocketActionUi : AbstractRocketAction() {
+    private val iconDef = IconRepositoryFactory.repository.by(AppIcon.CLIPBOARD)
+
     override fun create(settings: RocketActionSettings): RocketAction? = run {
 
         settings.settings()[LABEL]
@@ -39,7 +42,7 @@ class NoteRocketActionUi : AbstractRocketAction() {
                         settings.settings()[ICON_URL].let { icon ->
                             menu.icon = IconService().load(
                                 iconUrl = icon ?: "",
-                                defaultIcon = IconRepositoryFactory.repository.by(AppIcon.CLIPBOARD)
+                                defaultIcon = iconDef
                             )
                         }
                         menu.toolTipText = description
@@ -121,6 +124,8 @@ class NoteRocketActionUi : AbstractRocketAction() {
                 default = File("").absolutePath),
         )
     }
+
+    override fun icon(): Icon? = iconDef
 
     override fun name(): String = "Заметки"
 

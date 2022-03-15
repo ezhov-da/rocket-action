@@ -28,6 +28,7 @@ import java.io.IOException
 import java.net.URL
 import javax.imageio.ImageIO
 import javax.swing.AbstractAction
+import javax.swing.Icon
 import javax.swing.ImageIcon
 import javax.swing.JFrame
 import javax.swing.JLabel
@@ -40,6 +41,7 @@ import javax.swing.SwingWorker
 import javax.swing.WindowConstants
 
 class ShowSvgImageRocketActionUi : AbstractRocketAction() {
+    private val icon = IconRepositoryFactory.repository.by(AppIcon.IMAGE)
 
     override fun create(settings: RocketActionSettings): RocketAction? =
         settings.settings()[IMAGE_URL]?.takeIf { it.isNotEmpty() }?.let { imageUrl ->
@@ -96,7 +98,7 @@ class ShowSvgImageRocketActionUi : AbstractRocketAction() {
         }
 
         override fun done() {
-            menu.icon = IconRepositoryFactory.repository.by(AppIcon.IMAGE)
+            menu.icon = icon
             try {
                 val component = if (settings.settings().containsKey(IMAGE_URL)) {
                     ImagePanel(cachedImage!!)
@@ -192,6 +194,8 @@ class ShowSvgImageRocketActionUi : AbstractRocketAction() {
     override fun asString(): List<RocketActionConfigurationPropertyKey> = listOf(LABEL, IMAGE_URL)
 
     override fun name(): String = "Показать изображение *.svg (beta)"
+
+    override fun icon(): Icon? = icon
 
     companion object {
         private val LABEL = RocketActionConfigurationPropertyKey("label")

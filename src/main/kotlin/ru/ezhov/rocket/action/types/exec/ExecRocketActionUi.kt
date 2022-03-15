@@ -26,6 +26,8 @@ private val logger = KotlinLogging.logger { }
 
 class ExecRocketActionUi : AbstractRocketAction() {
 
+    private val icon = IconRepositoryFactory.repository.by(AppIcon.FIRE)
+
     override fun create(settings: RocketActionSettings): RocketAction? =
         settings.settings()[COMMAND]?.takeIf { it.isNotEmpty() }?.let { command ->
             val workingDir = settings.settings()[WORKING_DIR]?.takeIf { it.isNotEmpty() }
@@ -61,8 +63,8 @@ class ExecRocketActionUi : AbstractRocketAction() {
 
     private fun icon(iconUrl: String, command: String): Icon {
         var menuIcon = IconService().load(
-            iconUrl,
-            IconRepositoryFactory.repository.by(AppIcon.FIRE)
+            iconUrl = iconUrl,
+            defaultIcon = icon
         )
         try {
             val file = File(command)
@@ -119,6 +121,8 @@ class ExecRocketActionUi : AbstractRocketAction() {
             createRocketActionProperty(ICON_URL, ICON_URL.value, "URL иконки", false)
         )
     }
+
+    override fun icon(): Icon? = icon
 
     companion object {
         private val LABEL = RocketActionConfigurationPropertyKey("label")

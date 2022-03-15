@@ -17,6 +17,7 @@ import java.awt.Toolkit
 import java.awt.datatransfer.StringSelection
 import java.awt.event.ActionEvent
 import javax.swing.AbstractAction
+import javax.swing.Icon
 import javax.swing.JButton
 import javax.swing.JFrame
 import javax.swing.JLabel
@@ -29,6 +30,8 @@ import javax.swing.SwingUtilities
 import javax.swing.WindowConstants
 
 class TextAsMenuRocketActionUi : AbstractRocketAction() {
+    private val iconDef = IconRepositoryFactory.repository.by(AppIcon.TEXT)
+
     override fun description(): String = "Show text"
 
     override fun properties(): List<RocketActionConfigurationProperty> =
@@ -53,7 +56,7 @@ class TextAsMenuRocketActionUi : AbstractRocketAction() {
                             settings.settings() == actionSettings.settings())
 
                     override fun component(): Component = JMenu(label).apply {
-                        this.icon = IconRepositoryFactory.repository.by(AppIcon.TEXT)
+                        this.icon = iconDef
                         val panel = JPanel(BorderLayout())
                         panel.add(
                             JToolBar().apply {
@@ -126,6 +129,8 @@ class TextAsMenuRocketActionUi : AbstractRocketAction() {
     override fun asString(): List<RocketActionConfigurationPropertyKey> = listOf(LABEL)
 
     override fun type(): RocketActionType = RocketActionType { "SHOW_TEXT_AS_MENU" }
+
+    override fun icon(): Icon? = iconDef
 
     companion object {
         private val LABEL = RocketActionConfigurationPropertyKey("label")

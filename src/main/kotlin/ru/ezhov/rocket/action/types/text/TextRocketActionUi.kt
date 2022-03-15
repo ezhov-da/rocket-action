@@ -5,6 +5,8 @@ import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
 import ru.ezhov.rocket.action.api.RocketActionConfigurationPropertyKey
 import ru.ezhov.rocket.action.api.RocketActionSettings
 import ru.ezhov.rocket.action.api.RocketActionType
+import ru.ezhov.rocket.action.icon.AppIcon
+import ru.ezhov.rocket.action.icon.IconRepositoryFactory
 import ru.ezhov.rocket.action.notification.NotificationFactory
 import ru.ezhov.rocket.action.notification.NotificationType
 import ru.ezhov.rocket.action.types.AbstractRocketAction
@@ -13,10 +15,13 @@ import java.awt.Toolkit
 import java.awt.datatransfer.StringSelection
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
+import javax.swing.Icon
 import javax.swing.JLabel
 import javax.swing.JTextPane
 
 class TextRocketActionUi : AbstractRocketAction() {
+    private val icon = IconRepositoryFactory.repository.by(AppIcon.TEXT)
+
     override fun description(): String = "Show text"
 
     override fun properties(): List<RocketActionConfigurationProperty> =
@@ -63,10 +68,13 @@ class TextRocketActionUi : AbstractRocketAction() {
 
     override fun asString(): List<RocketActionConfigurationPropertyKey> = listOf(LABEL)
 
+    override fun name(): String = "Отобразить текст"
+
+    override fun icon(): Icon? = icon
+
     companion object {
         private val LABEL = RocketActionConfigurationPropertyKey("label")
         private val DESCRIPTION = RocketActionConfigurationPropertyKey("description")
     }
 
-    override fun name(): String = "Отобразить текст"
 }

@@ -23,6 +23,7 @@ import java.net.URISyntaxException
 import java.util.concurrent.ExecutionException
 import javax.swing.DefaultListCellRenderer
 import javax.swing.DefaultListModel
+import javax.swing.Icon
 import javax.swing.ImageIcon
 import javax.swing.JLabel
 import javax.swing.JList
@@ -33,6 +34,7 @@ import javax.swing.JTextPane
 import javax.swing.SwingWorker
 
 class TodoistRocketAction : AbstractRocketAction() {
+    private val icon = IconRepositoryFactory.repository.by(AppIcon.BOOKMARK)
 
     override fun description(): String {
         return "Simple todoist client"
@@ -53,6 +55,8 @@ class TodoistRocketAction : AbstractRocketAction() {
     override fun asString(): List<RocketActionConfigurationPropertyKey> = listOf(LABEL)
 
     override fun name(): String = "Работа с Todois"
+
+    override fun icon(): Icon? = icon
 
     override fun create(settings: RocketActionSettings): RocketAction? =
         getToken(settings)?.takeIf { it.isNotEmpty() }?.let { token ->
@@ -89,7 +93,7 @@ class TodoistRocketAction : AbstractRocketAction() {
         }
 
         override fun done() {
-            menu.icon = IconRepositoryFactory.repository.by(AppIcon.BOOKMARK)
+            menu.icon = icon
             try {
                 menu.removeAll()
                 menu.add(this.get())

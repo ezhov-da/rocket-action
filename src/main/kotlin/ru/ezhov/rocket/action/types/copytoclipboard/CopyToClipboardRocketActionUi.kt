@@ -13,9 +13,12 @@ import ru.ezhov.rocket.action.types.AbstractRocketAction
 import java.awt.Component
 import java.awt.Toolkit
 import java.awt.datatransfer.StringSelection
+import javax.swing.Icon
 import javax.swing.JMenuItem
 
 class CopyToClipboardRocketActionUi : AbstractRocketAction() {
+
+    private val icon = IconRepositoryFactory.repository.by(AppIcon.CLIPBOARD)
 
     companion object {
         private val LABEL = RocketActionConfigurationPropertyKey("label")
@@ -28,7 +31,7 @@ class CopyToClipboardRocketActionUi : AbstractRocketAction() {
             val label = settings.settings()[LABEL]?.takeIf { it.isNotEmpty() } ?: text
             val description = settings.settings()[DESCRIPTION]?.takeIf { it.isNotEmpty() } ?: text
             val menuItem = JMenuItem(label)
-            menuItem.icon = IconRepositoryFactory.repository.by(AppIcon.CLIPBOARD)
+            menuItem.icon = icon
             menuItem.toolTipText = description
             menuItem.addActionListener {
                 val defaultToolkit = Toolkit.getDefaultToolkit()
@@ -71,5 +74,5 @@ class CopyToClipboardRocketActionUi : AbstractRocketAction() {
         )
     }
 
-
+    override fun icon(): Icon? = icon
 }

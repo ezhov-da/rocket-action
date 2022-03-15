@@ -22,6 +22,7 @@ import java.net.URISyntaxException
 import java.util.concurrent.ExecutionException
 import java.util.function.Consumer
 import javax.swing.DefaultListModel
+import javax.swing.Icon
 import javax.swing.ImageIcon
 import javax.swing.JButton
 import javax.swing.JLabel
@@ -35,6 +36,8 @@ import javax.swing.SwingWorker
 
 class GistRocketAction : AbstractRocketAction() {
 
+    private val icon = IconRepositoryFactory.repository.by(AppIcon.BOOKMARK)
+
     override fun description(): String {
         return "Github gist loader"
     }
@@ -45,14 +48,14 @@ class GistRocketAction : AbstractRocketAction() {
 
     override fun properties(): List<RocketActionConfigurationProperty> {
         return listOf(
-            createRocketActionProperty(LABEL, LABEL.value, "Label", true),
+            createRocketActionProperty(key = LABEL, name = LABEL.value, description = "Label", required = true),
             createRocketActionProperty(
-                TOKEN,
-                TOKEN.value,
-                "Используйте это свойство или свойство командной строки Java -D$TOKEN_PROPERTY",
-                false
+                key = TOKEN,
+                name = TOKEN.value,
+                description = "Используйте это свойство или свойство командной строки Java -D$TOKEN_PROPERTY",
+                required = false
             ),
-            createRocketActionProperty(USERNAME, USERNAME.value, "", true),
+            createRocketActionProperty(key = USERNAME, name = USERNAME.value, description = "", required = true),
             createRocketActionProperty(
                 BASE_GIST_URL,
                 BASE_GIST_URL.value,
@@ -68,7 +71,7 @@ class GistRocketAction : AbstractRocketAction() {
                 settings.settings()[USERNAME]?.takeIf { it.isNotEmpty() }?.let { username ->
                     settings.settings()[BASE_GIST_URL]?.let { url ->
                         val menu = JMenu(label)
-                        GistWorker(menu, gistUrl = url, token = token, username = username).execute()
+                        GistWorker(menu = menu, gistUrl = url, token = token, username = username).execute()
 
                         object : RocketAction {
                             override fun contains(search: String): Boolean = false
@@ -106,7 +109,7 @@ class GistRocketAction : AbstractRocketAction() {
         }
 
         override fun done() {
-            menu.icon = IconRepositoryFactory.repository.by(AppIcon.BOOKMARK)
+            menu.icon = icon
             try {
                 menu.removeAll()
                 menu.add(this.get())
@@ -205,6 +208,8 @@ class GistRocketAction : AbstractRocketAction() {
             textFieldSearch.addActionListener { SwingUtilities.invokeLater { fillAndSetModel(textFieldSearch.text) } }
         }
     }
+
+    override fun icon(): Icon? = icon
 
     companion object {
         private val LABEL = RocketActionConfigurationPropertyKey("label")

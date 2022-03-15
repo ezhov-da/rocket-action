@@ -18,6 +18,7 @@ import java.awt.Component
 import java.awt.Dimension
 import java.awt.event.ActionEvent
 import java.awt.event.ActionListener
+import javax.swing.Icon
 import javax.swing.ImageIcon
 import javax.swing.JButton
 import javax.swing.JMenu
@@ -30,6 +31,8 @@ import javax.swing.SwingWorker
 private val logger = KotlinLogging.logger {}
 
 class UrlParserRocketAction : AbstractRocketAction() {
+    private val iconDef = IconRepositoryFactory.repository.by(AppIcon.FLASH)
+
     override fun create(settings: RocketActionSettings): RocketAction? =
         settings.settings()[LABEL]
             ?.takeIf { it.isNotEmpty() && settings.type().value() == this.type().value() }
@@ -55,7 +58,7 @@ class UrlParserRocketAction : AbstractRocketAction() {
 
                     override fun component(): Component = JMenu(label).apply {
                         val panelTop = JPanel(BorderLayout())
-                        icon = IconRepositoryFactory.repository.by(AppIcon.FLASH)
+                        icon = iconDef
                         val textField = TextFieldWithText("URL")
                         textField.columns = 15
                         val txt = JTextPane()
@@ -93,6 +96,8 @@ class UrlParserRocketAction : AbstractRocketAction() {
     override fun description(): String = "Получение заголовка и описания URL"
 
     override fun asString(): List<RocketActionConfigurationPropertyKey> = listOf(LABEL)
+
+    override fun icon(): Icon? = iconDef
 
     override fun properties(): List<RocketActionConfigurationProperty> = listOf(
         createRocketActionProperty(

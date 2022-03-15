@@ -14,11 +14,13 @@ import ru.ezhov.rocket.action.types.AbstractRocketAction
 import java.awt.Component
 import java.awt.Desktop
 import java.io.File
+import javax.swing.Icon
 import javax.swing.JMenuItem
 
 private val logger = KotlinLogging.logger {}
 
 class OpenFileRocketActionUi : AbstractRocketAction() {
+    private val icon = IconRepositoryFactory.repository.by(AppIcon.FILE)
 
     override fun create(settings: RocketActionSettings): RocketAction? =
         settings.settings()[PATH]
@@ -29,7 +31,7 @@ class OpenFileRocketActionUi : AbstractRocketAction() {
                 val description = settings.settings()[DESCRIPTION]?.takeIf { it.isNotEmpty() } ?: path
 
                 val menuItem = JMenuItem(label)
-                menuItem.icon = IconRepositoryFactory.repository.by(AppIcon.FILE)
+                menuItem.icon = icon
                 menuItem.toolTipText = description
                 menuItem.addActionListener {
                     if (Desktop.isDesktopSupported()) {
@@ -94,6 +96,8 @@ class OpenFileRocketActionUi : AbstractRocketAction() {
     }
 
     override fun name(): String = "Открыть файл"
+
+    override fun icon(): Icon? = icon
 
     companion object {
         private val LABEL = RocketActionConfigurationPropertyKey("label")

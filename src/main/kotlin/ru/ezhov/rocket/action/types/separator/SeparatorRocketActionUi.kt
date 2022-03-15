@@ -5,8 +5,11 @@ import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
 import ru.ezhov.rocket.action.api.RocketActionConfigurationPropertyKey
 import ru.ezhov.rocket.action.api.RocketActionSettings
 import ru.ezhov.rocket.action.api.RocketActionType
+import ru.ezhov.rocket.action.icon.AppIcon
+import ru.ezhov.rocket.action.icon.IconRepositoryFactory
 import ru.ezhov.rocket.action.types.AbstractRocketAction
 import java.awt.Component
+import javax.swing.Icon
 import javax.swing.JSeparator
 
 class SeparatorRocketActionUi : AbstractRocketAction() {
@@ -26,6 +29,8 @@ class SeparatorRocketActionUi : AbstractRocketAction() {
     override fun name(): String = "Разделитель"
 
     override fun description(): String = "Разделитель"
+
+    override fun icon(): Icon? = IconRepositoryFactory.repository.by(AppIcon.MINUS)
 
     override fun properties(): List<RocketActionConfigurationProperty> = emptyList()
 }

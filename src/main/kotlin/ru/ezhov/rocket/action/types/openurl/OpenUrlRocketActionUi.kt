@@ -19,11 +19,14 @@ import java.awt.event.KeyEvent
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import java.net.URI
+import javax.swing.Icon
 import javax.swing.JMenuItem
 import javax.swing.event.MenuKeyEvent
 import javax.swing.event.MenuKeyListener
 
 class OpenUrlRocketActionUi : AbstractRocketAction() {
+    private val iconDef = IconRepositoryFactory.repository.by(AppIcon.LINK_INTACT)
+
     override fun create(settings: RocketActionSettings): RocketAction? =
         settings.settings()[URL]?.takeIf { it.isNotEmpty() }?.let { url ->
             val label = settings.settings()[LABEL]?.takeIf { it.isNotEmpty() } ?: url
@@ -41,8 +44,8 @@ class OpenUrlRocketActionUi : AbstractRocketAction() {
 
                 override fun component(): Component = JMenuItem(label).apply {
                     icon = IconService().load(
-                        iconUrl,
-                        IconRepositoryFactory.repository.by(AppIcon.LINK_INTACT)
+                        iconUrl = iconUrl,
+                        defaultIcon = iconDef
                     )
                     toolTipText = description
                     isFocusable = true
@@ -104,6 +107,8 @@ class OpenUrlRocketActionUi : AbstractRocketAction() {
     }
 
     override fun name(): String = "Открыть ссылку"
+
+    override fun icon(): Icon? = iconDef
 
     companion object {
         private val LABEL = RocketActionConfigurationPropertyKey("label")

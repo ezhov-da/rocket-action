@@ -12,11 +12,15 @@ import ru.ezhov.rocket.action.infrastructure.RocketActionComponentCacheFactory
 import ru.ezhov.rocket.action.types.AbstractRocketAction
 import java.awt.Component
 import java.util.concurrent.ExecutionException
+import javax.swing.Icon
 import javax.swing.ImageIcon
 import javax.swing.JMenu
 import javax.swing.SwingWorker
 
 class GroupRocketActionUi : AbstractRocketAction() {
+
+    private val icon = IconRepositoryFactory.repository.by(AppIcon.PROJECT)
+
     override fun create(settings: RocketActionSettings): RocketAction? =
         settings.settings()[LABEL]?.takeIf { it.isNotEmpty() }?.let { label ->
             val description = settings.settings()[DESCRIPTION]?.takeIf { it.isNotEmpty() } ?: label
@@ -103,6 +107,8 @@ class GroupRocketActionUi : AbstractRocketAction() {
             )
         }
     }
+
+    override fun icon(): Icon? = icon
 
     companion object {
         const val TYPE = "GROUP"

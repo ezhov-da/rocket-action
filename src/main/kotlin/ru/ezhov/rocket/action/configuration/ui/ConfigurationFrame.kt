@@ -302,6 +302,9 @@ class ConfigurationFrame(
             if (node.userObject is TreeRocketActionSettings) {
                 val settings = node.userObject as TreeRocketActionSettings
                 label.text = settings.asString()
+                settings.configuration.icon()?.let { icon ->
+                    label.icon = icon
+                }
             }
             return label
         }

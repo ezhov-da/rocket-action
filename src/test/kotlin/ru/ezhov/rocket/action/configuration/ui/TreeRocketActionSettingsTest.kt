@@ -7,6 +7,7 @@ import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
 import ru.ezhov.rocket.action.api.RocketActionConfigurationPropertyKey
 import ru.ezhov.rocket.action.api.RocketActionSettings
 import ru.ezhov.rocket.action.api.RocketActionType
+import javax.swing.Icon
 
 class TreeRocketActionSettingsTest {
     @Test
@@ -33,6 +34,8 @@ class TreeRocketActionSettingsTest {
                     override fun properties(): List<RocketActionConfigurationProperty> {
                         TODO("Not yet implemented")
                     }
+
+                    override fun icon(): Icon? = null
 
                 },
                 settings = object : RocketActionSettings {

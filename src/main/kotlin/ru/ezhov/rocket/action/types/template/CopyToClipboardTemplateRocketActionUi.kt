@@ -10,9 +10,11 @@ import ru.ezhov.rocket.action.icon.IconRepositoryFactory
 import ru.ezhov.rocket.action.template.infrastructure.VelocityEngineImpl
 import ru.ezhov.rocket.action.types.AbstractRocketAction
 import java.awt.Component
+import javax.swing.Icon
 import javax.swing.JMenu
 
 class CopyToClipboardTemplateRocketActionUi : AbstractRocketAction() {
+    private val icon = IconRepositoryFactory.repository.by(AppIcon.CLIPBOARD)
 
     override fun create(settings: RocketActionSettings): RocketAction? =
         settings.settings()[TEXT]?.takeIf { it.isNotEmpty() }?.let { text ->
@@ -21,7 +23,7 @@ class CopyToClipboardTemplateRocketActionUi : AbstractRocketAction() {
 
             val notePanelEngine = NotePanelEngine(text, VelocityEngineImpl())
             val menu = JMenu(label)
-            menu.icon = IconRepositoryFactory.repository.by(AppIcon.CLIPBOARD)
+            menu.icon = icon
             menu.toolTipText = description
             menu.add(notePanelEngine)
 
@@ -53,6 +55,8 @@ class CopyToClipboardTemplateRocketActionUi : AbstractRocketAction() {
     }
 
     override fun asString(): List<RocketActionConfigurationPropertyKey> = listOf(LABEL, TEXT)
+
+    override fun icon(): Icon? = icon
 
     companion object {
         private val LABEL = RocketActionConfigurationPropertyKey("label")
