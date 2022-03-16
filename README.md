@@ -27,10 +27,10 @@ mvn clean package
 
 |class| description                         |
 |-----|-------------------------------------|
-|ru.ezhov.rocket.action.notification.NotificationService| Сервис уведомлений                  |
-|ru.ezhov.rocket.action.icon.IconRepository| Хранилище иконок                    |
-| ru.ezhov.rocket.action.caching.Cache | Кеширование файлов по URL           |
-|ru.ezhov.rocket.action.properties.UsedPropertiesName| Доступные свойства для конфигурации |
+|NotificationService| Сервис уведомлений                  |
+|IconRepository| Хранилище иконок                    |
+| Cache | Кеширование файлов по URL           |
+|UsedPropertiesName| Доступные свойства для конфигурации |
 
 # Environment
 
@@ -39,7 +39,4 @@ Java 8
 # Run
 
 First argument is file with actions.
-
-# Releases
-https://disk.yandex.ru/d/2Wk7TF_K0l0SOQ  
 
