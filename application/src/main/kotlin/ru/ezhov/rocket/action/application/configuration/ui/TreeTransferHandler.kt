@@ -1,5 +1,7 @@
 package ru.ezhov.rocket.action.application.configuration.ui
 
+import ru.ezhov.rocket.action.application.configuration.ui.event.ConfigurationUiObserverFactory
+import ru.ezhov.rocket.action.application.configuration.ui.event.model.SettingMovedUiEvent
 import java.awt.datatransfer.DataFlavor
 import java.awt.datatransfer.Transferable
 import java.awt.datatransfer.UnsupportedFlavorException
@@ -140,6 +142,8 @@ internal class TreeTransferHandler : TransferHandler() {
             for (i in nodesToRemove.indices) {
                 model.removeNodeFromParent(nodesToRemove[i])
             }
+
+            ConfigurationUiObserverFactory.observer.notify(SettingMovedUiEvent())
         }
     }
 

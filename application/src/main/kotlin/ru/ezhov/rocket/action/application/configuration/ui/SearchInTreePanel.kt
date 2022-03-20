@@ -1,5 +1,9 @@
 package ru.ezhov.rocket.action.application.configuration.ui
 
+import ru.ezhov.rocket.action.application.configuration.ui.event.ConfigurationUiListener
+import ru.ezhov.rocket.action.application.configuration.ui.event.ConfigurationUiObserverFactory
+import ru.ezhov.rocket.action.application.configuration.ui.event.model.ConfigurationUiEvent
+import ru.ezhov.rocket.action.application.configuration.ui.event.model.SettingMovedUiEvent
 import ru.ezhov.rocket.action.icon.AppIcon
 import ru.ezhov.rocket.action.icon.IconRepositoryFactory
 import ru.ezhov.rocket.action.ui.swing.common.TextFieldWithText
@@ -11,6 +15,7 @@ import javax.swing.JButton
 import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.JTree
+import javax.swing.SwingUtilities
 import javax.swing.tree.DefaultMutableTreeNode
 import javax.swing.tree.DefaultTreeModel
 import javax.swing.tree.TreeNode
@@ -26,6 +31,13 @@ class SearchInTreePanel(
 
     init {
         this.layout = BorderLayout()
+        ConfigurationUiObserverFactory.observer.register(object : ConfigurationUiListener {
+            override fun action(event: ConfigurationUiEvent) {
+                if (event is SettingMovedUiEvent) {
+                    SwingUtilities.invokeLater { resetSearch(this@SearchInTreePanel) }
+                }
+            }
+        })
         val searchInTreePanel = this
         textField.addKeyListener(object : KeyAdapter() {
             override fun keyReleased(e: KeyEvent) {
@@ -41,16 +53,20 @@ class SearchInTreePanel(
                         searchInTreePanel.revalidate()
                     }
                 } else if (textField.text.isEmpty()) {
-                    if (currentResultPanel != null) {
-                        searchInTreePanel.remove(currentResultPanel)
-                    }
-                    currentResultPanel = null
-                    searchInTreePanel.repaint()
-                    searchInTreePanel.revalidate()
+                    resetSearch(searchInTreePanel)
                 }
             }
         })
         this.add(textField, BorderLayout.CENTER)
+    }
+
+    private fun resetSearch(searchInTreePanel: SearchInTreePanel) {
+        if (currentResultPanel != null) {
+            searchInTreePanel.remove(currentResultPanel)
+        }
+        currentResultPanel = null
+        searchInTreePanel.repaint()
+        searchInTreePanel.revalidate()
     }
 
     private fun searchInTree(
