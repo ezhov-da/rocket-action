@@ -13,7 +13,7 @@
     <version>0.19.0</version>
 
     <properties>
-        <icon.version>0.17.3</icon.version>
+        <icon.version>0.17.4</icon.version>
         <rocket-action-plugin-api.version>0.19.0</rocket-action-plugin-api.version>
     </properties>
 

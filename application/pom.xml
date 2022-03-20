@@ -24,7 +24,7 @@
 
     <properties>
         <plugin-api.version>0.19.0</plugin-api.version>
-        <icon.version>0.17.3</icon.version>
+        <icon.version>0.17.4</icon.version>
         <notification.version>0.17.3</notification.version>
         <cache.version>0.17.3</cache.version>
         <plugins.version>0.19.0</plugins.version>

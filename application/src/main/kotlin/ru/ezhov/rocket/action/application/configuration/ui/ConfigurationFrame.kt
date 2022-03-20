@@ -157,6 +157,7 @@ class ConfigurationFrame(
 
                         init {
                             putValue(NAME, "Добавить выше")
+                            putValue(SMALL_ICON, IconRepositoryFactory.repository.by(AppIcon.PLUS))
                         }
                     }))
                     popupMenu.add(JMenuItem(
@@ -178,6 +179,7 @@ class ConfigurationFrame(
 
                             init {
                                 putValue(NAME, "Добавить ниже")
+                                putValue(SMALL_ICON, IconRepositoryFactory.repository.by(AppIcon.PLUS))
                             }
                         }
                     ))
@@ -198,6 +200,39 @@ class ConfigurationFrame(
 
                                 init {
                                     putValue(NAME, "Создать и добавить как потомка")
+                                    putValue(SMALL_ICON, IconRepositoryFactory.repository.by(AppIcon.PLUS))
+                                }
+                            }
+                        ))
+                    }
+                    if (
+                        userObject != null &&
+                        userObject.settings.type().value() != GroupRocketActionUi.TYPE &&
+                        userObject.settings is MutableRocketActionSettings
+                    ) {
+                        popupMenu.add(JMenuItem(
+                            object : AbstractAction() {
+                                override fun actionPerformed(e: ActionEvent) {
+                                    val settings = userObject.settings
+                                    val duplicate = settings.copy(userObject.configuration)
+                                    SwingUtilities.invokeLater {
+                                        defaultTreeModel.insertNodeInto(
+                                            DefaultMutableTreeNode(
+                                                TreeRocketActionSettings(
+                                                    configuration = userObject.configuration,
+                                                    settings = duplicate,
+                                                ),
+                                                true
+                                            ),
+                                            mutableTreeNode.parent as MutableTreeNode,
+                                            mutableTreeNode.parent.getIndex(mutableTreeNode) + 1
+                                        )
+                                    }
+                                }
+
+                                init {
+                                    putValue(NAME, "Дублировать")
+                                    putValue(SMALL_ICON, IconRepositoryFactory.repository.by(AppIcon.FORK))
                                 }
                             }
                         ))
@@ -221,6 +256,7 @@ class ConfigurationFrame(
 
                             init {
                                 putValue(NAME, "Удалить")
+                                putValue(SMALL_ICON, IconRepositoryFactory.repository.by(AppIcon.MINUS))
                             }
                         }
                     ))

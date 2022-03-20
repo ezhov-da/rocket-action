@@ -10,7 +10,7 @@
     </parent>
 
     <artifactId>rocket-action-icon</artifactId>
-    <version>0.17.3</version>
+    <version>0.17.4</version>
 
     <properties>
         <notification.version>0.17.3</notification.version>

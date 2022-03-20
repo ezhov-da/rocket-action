@@ -1,8 +1,10 @@
 package ru.ezhov.rocket.action.application.infrastructure
 
+import ru.ezhov.rocket.action.api.RocketActionConfiguration
 import ru.ezhov.rocket.action.api.RocketActionConfigurationPropertyKey
 import ru.ezhov.rocket.action.api.RocketActionSettings
 import ru.ezhov.rocket.action.api.RocketActionType
+import ru.ezhov.rocket.action.application.configuration.ui.NewRocketActionSettings
 
 class MutableRocketActionSettings(
     private val id: String,
@@ -25,5 +27,20 @@ class MutableRocketActionSettings(
 
     fun add(settings: MutableRocketActionSettings) {
         actions.add(settings)
+    }
+
+    fun copy(configuration: RocketActionConfiguration): MutableRocketActionSettings {
+        val new = NewRocketActionSettings(
+            configuration = configuration,
+            type = type,
+            settings = settings.toMap(),
+            actions = actions.toList(),
+        )
+        return MutableRocketActionSettings(
+            new.id(),
+            type = new.type(),
+            settings = new.settings().toMutableMap(),
+            actions = new.actions().toMutableList(),
+        )
     }
 }
