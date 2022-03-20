@@ -1,5 +1,6 @@
 package ru.ezhov.rocket.action.plugin.showimage
 
+import mu.KotlinLogging
 import org.jdesktop.swingx.JXImageView
 import org.jdesktop.swingx.JXPanel
 import ru.ezhov.rocket.action.api.RocketAction
@@ -10,11 +11,11 @@ import ru.ezhov.rocket.action.api.RocketActionFactoryUi
 import ru.ezhov.rocket.action.api.RocketActionPlugin
 import ru.ezhov.rocket.action.api.RocketActionSettings
 import ru.ezhov.rocket.action.api.RocketActionType
+import ru.ezhov.rocket.action.api.support.AbstractRocketAction
 import ru.ezhov.rocket.action.cache.CacheFactory
 import ru.ezhov.rocket.action.icon.AppIcon
 import ru.ezhov.rocket.action.icon.IconRepositoryFactory
 import ru.ezhov.rocket.action.icon.toImage
-import ru.ezhov.rocket.action.api.support.AbstractRocketAction
 import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Component
@@ -27,10 +28,12 @@ import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import java.io.File
 import java.io.IOException
+import java.net.URI
 import java.net.URL
 import java.util.concurrent.ExecutionException
 import javax.imageio.ImageIO
 import javax.swing.AbstractAction
+import javax.swing.BoxLayout
 import javax.swing.Icon
 import javax.swing.ImageIcon
 import javax.swing.JFrame
@@ -42,6 +45,8 @@ import javax.swing.JToolBar
 import javax.swing.SwingUtilities
 import javax.swing.SwingWorker
 import javax.swing.WindowConstants
+
+private val logger = KotlinLogging.logger {}
 
 class ShowImageRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
     private val icon = IconRepositoryFactory.repository.by(AppIcon.IMAGE)
@@ -106,8 +111,9 @@ class ShowImageRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
             menu.icon = icon
             try {
                 val component: Component
-                if (settings.settings().containsKey(IMAGE_URL)) {
-                    component = ImagePanel(this.get(), cachedImage!!)
+                val originalImageUrl = settings.settings()[IMAGE_URL]
+                if (originalImageUrl != null) {
+                    component = ImagePanel(originalUrl = originalImageUrl, image = this.get(), cachedImage = cachedImage!!)
                 } else {
                     val panel = JPanel()
                     panel.add(JLabel(imageUrl))
@@ -122,7 +128,7 @@ class ShowImageRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
         }
     }
 
-    private inner class ImagePanel(image: Image?, cachedImage: File) : JXPanel(BorderLayout()) {
+    private inner class ImagePanel(originalUrl: String, image: Image?, cachedImage: File) : JXPanel(BorderLayout()) {
         init {
             val dimension = Toolkit.getDefaultToolkit().screenSize
             val widthNew = (dimension.width * 0.5).toInt()
@@ -135,7 +141,7 @@ class ShowImageRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
                     SwingUtilities.invokeLater {
                         val frame = JFrame(cachedImage.absolutePath)
                         frame.iconImage = IconRepositoryFactory.repository.by(AppIcon.ROCKET_APP).toImage()
-                        frame.add(ImagePanel(image, cachedImage))
+                        frame.add(ImagePanel(originalUrl = originalUrl, image = image, cachedImage = cachedImage))
                         frame.defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
                         frame.setSize((dimension.width * 0.8).toInt(), (dimension.height * 0.8).toInt())
                         frame.setLocationRelativeTo(null)
@@ -154,47 +160,80 @@ class ShowImageRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
             val imageView = JXImageView()
             imageView.image = image
             imageView.autoscrolls = true
-            panelImage.add(
-                imageView,
-                BorderLayout.CENTER
-            )
-            add(
-                toolBar,
-                BorderLayout.NORTH
-            )
-            add(
-                panelImage,
-                BorderLayout.CENTER
-            )
+            panelImage.add(imageView, BorderLayout.CENTER)
+            add(toolBar, BorderLayout.NORTH)
+            add(panelImage, BorderLayout.CENTER)
             val slider = JSlider(1, 100, 100)
             toolBar.add(slider)
             slider.addChangeListener { imageView.scale = slider.value / 100.0 }
-            val cachedLabel = JLabel("Cached: " + cachedImage.absolutePath)
-            cachedLabel.addMouseListener(object : MouseAdapter() {
-                override fun mouseReleased(e: MouseEvent) {
-                    SwingUtilities.invokeLater {
-                        if (Desktop.isDesktopSupported()) {
-                            try {
-                                Desktop.getDesktop().open(cachedImage.parentFile)
-                            } catch (ioException: IOException) {
-                                ioException.printStackTrace()
-                            }
+
+            val panelBottom = JPanel()
+            panelBottom.layout = BoxLayout(panelBottom, BoxLayout.Y_AXIS)
+            val cachedLabel = JLabel("Cached: ${cachedImage.absolutePath}")
+                .also { label ->
+                    label.addMouseListener(openFileMouseListener(label, cachedImage))
+                }
+            panelBottom.add(cachedLabel)
+
+            try {
+                URI.create(originalUrl)
+            } catch (ex: Exception) {
+                logger.warn { "Invalid URI='$originalUrl'" }
+                null
+            }
+                ?.let { uri ->
+                    val originalLabel = JLabel("Original: $originalUrl")
+                        .also { label ->
+                            label.addMouseListener(openUriMouseListener(label, uri))
                         }
+                    panelBottom.add(originalLabel)
+                }
+
+            add(panelBottom, BorderLayout.SOUTH)
+        }
+    }
+
+    private fun openFileMouseListener(label: JLabel, file: File) = object : MouseAdapter() {
+        override fun mouseReleased(e: MouseEvent) {
+            SwingUtilities.invokeLater {
+                if (Desktop.isDesktopSupported()) {
+                    try {
+                        Desktop.getDesktop().open(file)
+                    } catch (ioException: IOException) {
+                        ioException.printStackTrace()
                     }
                 }
+            }
+        }
 
-                override fun mouseEntered(e: MouseEvent) {
-                    SwingUtilities.invokeLater { cachedLabel.foreground = Color.BLUE }
-                }
+        override fun mouseEntered(e: MouseEvent) {
+            SwingUtilities.invokeLater { label.foreground = Color.BLUE }
+        }
 
-                override fun mouseExited(e: MouseEvent) {
-                    SwingUtilities.invokeLater { cachedLabel.foreground = JLabel().foreground }
+        override fun mouseExited(e: MouseEvent) {
+            SwingUtilities.invokeLater { label.foreground = JLabel().foreground }
+        }
+    }
+
+    private fun openUriMouseListener(label: JLabel, uri: URI) = object : MouseAdapter() {
+        override fun mouseReleased(e: MouseEvent) {
+            SwingUtilities.invokeLater {
+                if (Desktop.isDesktopSupported()) {
+                    try {
+                        Desktop.getDesktop().browse(uri)
+                    } catch (ioException: IOException) {
+                        ioException.printStackTrace()
+                    }
                 }
-            })
-            add(
-                cachedLabel,
-                BorderLayout.SOUTH
-            )
+            }
+        }
+
+        override fun mouseEntered(e: MouseEvent) {
+            SwingUtilities.invokeLater { label.foreground = Color.BLUE }
+        }
+
+        override fun mouseExited(e: MouseEvent) {
+            SwingUtilities.invokeLater { label.foreground = JLabel().foreground }
         }
     }
 
