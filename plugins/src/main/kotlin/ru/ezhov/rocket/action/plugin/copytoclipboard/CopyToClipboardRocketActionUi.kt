@@ -73,9 +73,9 @@ class CopyToClipboardRocketActionUi : AbstractRocketAction(), RocketActionPlugin
 
     override fun properties(): List<RocketActionConfigurationProperty> {
         return listOf(
-            createRocketActionProperty(ru.ezhov.rocket.action.plugin.copytoclipboard.CopyToClipboardRocketActionUi.Companion.LABEL, ru.ezhov.rocket.action.plugin.copytoclipboard.CopyToClipboardRocketActionUi.Companion.LABEL.value, "Текст для отображения", false),
-            createRocketActionProperty(ru.ezhov.rocket.action.plugin.copytoclipboard.CopyToClipboardRocketActionUi.Companion.DESCRIPTION, ru.ezhov.rocket.action.plugin.copytoclipboard.CopyToClipboardRocketActionUi.Companion.DESCRIPTION.value, "Описание", false),
-            createRocketActionProperty(ru.ezhov.rocket.action.plugin.copytoclipboard.CopyToClipboardRocketActionUi.Companion.TEXT, ru.ezhov.rocket.action.plugin.copytoclipboard.CopyToClipboardRocketActionUi.Companion.TEXT.value, "Текст для копирования в буфер", true)
+            createRocketActionProperty(LABEL, LABEL.value, "Текст для отображения", false),
+            createRocketActionProperty(DESCRIPTION, DESCRIPTION.value, "Описание", false),
+            createRocketActionProperty(TEXT, TEXT.value, "Текст для копирования в буфер", true)
         )
     }
 

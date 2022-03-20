@@ -7,6 +7,7 @@ import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
 import ru.ezhov.rocket.action.api.RocketActionConfigurationPropertyKey
 import ru.ezhov.rocket.action.api.RocketActionFactoryUi
 import ru.ezhov.rocket.action.api.RocketActionPlugin
+import ru.ezhov.rocket.action.api.RocketActionPropertySpec
 import ru.ezhov.rocket.action.api.RocketActionSettings
 import ru.ezhov.rocket.action.api.RocketActionType
 import ru.ezhov.rocket.action.api.support.AbstractRocketAction
@@ -112,7 +113,7 @@ class UrlParserRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
             name = "Название",
             description = "название для отображения",
             required = true,
-            default = "Получить заголовок URL"
+            property = RocketActionPropertySpec.StringPropertySpec(defaultValue = "Получить заголовок URL"),
         ),
         createRocketActionProperty(
             key = HEADERS,

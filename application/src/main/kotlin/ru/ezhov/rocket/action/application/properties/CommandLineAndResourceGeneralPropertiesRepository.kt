@@ -15,7 +15,7 @@ class CommandLineAndResourceGeneralPropertiesRepository : GeneralPropertiesRepos
     init {
         try {
             properties.load(this.javaClass.getResourceAsStream("/general.properties"))
-        } catch (e: IOException) {
+        } catch (e: Exception) {
             "Error read general properties"
                 .let { text ->
                     logger.error(e) { text }

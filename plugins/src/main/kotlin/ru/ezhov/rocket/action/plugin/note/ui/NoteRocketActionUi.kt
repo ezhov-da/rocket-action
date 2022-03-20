@@ -7,6 +7,7 @@ import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
 import ru.ezhov.rocket.action.api.RocketActionConfigurationPropertyKey
 import ru.ezhov.rocket.action.api.RocketActionFactoryUi
 import ru.ezhov.rocket.action.api.RocketActionPlugin
+import ru.ezhov.rocket.action.api.RocketActionPropertySpec
 import ru.ezhov.rocket.action.api.RocketActionSettings
 import ru.ezhov.rocket.action.api.RocketActionType
 import ru.ezhov.rocket.action.api.support.AbstractRocketAction
@@ -118,7 +119,7 @@ class NoteRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
 
     override fun properties(): List<RocketActionConfigurationProperty> {
         return listOf(
-            createRocketActionProperty(key = LABEL, name = LABEL.value, description = "Заголовок", required = true, default = "Заметки"),
+            createRocketActionProperty(key = LABEL, name = LABEL.value, description = "Заголовок", required = true, property = RocketActionPropertySpec.StringPropertySpec(defaultValue = "Заметки")),
             createRocketActionProperty(key = DESCRIPTION, name = DESCRIPTION.value, description = "Описание", required = false),
             createRocketActionProperty(key = ICON_URL, name = ICON_URL.value, description = "URL иконки", required = false),
             createRocketActionProperty(
@@ -126,7 +127,8 @@ class NoteRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
                 name = PATH.value,
                 description = "Путь хранения сохраняемых данных",
                 required = true,
-                default = File("").absolutePath),
+                property = RocketActionPropertySpec.StringPropertySpec(defaultValue = File("").absolutePath),
+            )
         )
     }
 

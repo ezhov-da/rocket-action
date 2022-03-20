@@ -10,11 +10,11 @@
     </parent>
 
     <artifactId>rocket-action-plugin-note-on-file</artifactId>
-    <version>0.0.1</version>
+    <version>0.19.0</version>
 
     <properties>
         <icon.version>0.17.3</icon.version>
-        <rocket-action-plugin-api.version>0.17.3</rocket-action-plugin-api.version>
+        <rocket-action-plugin-api.version>0.19.0</rocket-action-plugin-api.version>
     </properties>
 
     <dependencies>

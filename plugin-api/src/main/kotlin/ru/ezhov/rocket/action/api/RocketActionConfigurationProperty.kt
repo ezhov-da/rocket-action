@@ -27,12 +27,7 @@ interface RocketActionConfigurationProperty {
     fun isRequired(): Boolean
 
     /**
-     * Тип свойства, по-умолчанию [PropertyType.STRING]
+     * Свойство для конфигурирования
      */
-    fun type(): PropertyType = PropertyType.STRING
-
-    /**
-     * Значение по-умолчанию
-     */
-    fun default(): String?
+    fun property(): RocketActionPropertySpec
 }

@@ -7,6 +7,9 @@ import ru.ezhov.rocket.action.application.infrastructure.YmlRocketActionSettings
 import ru.ezhov.rocket.action.application.plugin.manager.infrastructure.RocketActionPluginRepositoryFactory
 import ru.ezhov.rocket.action.application.properties.GeneralPropertiesRepositoryFactory
 import ru.ezhov.rocket.action.application.properties.UsedPropertiesName
+import ru.ezhov.rocket.action.icon.AppIcon
+import ru.ezhov.rocket.action.icon.IconRepositoryFactory
+import ru.ezhov.rocket.action.icon.toImage
 import java.io.File
 import java.util.Enumeration
 import javax.swing.LookAndFeel

@@ -49,12 +49,12 @@ class TodoistRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
 
     override fun properties(): List<RocketActionConfigurationProperty> {
         return listOf(
-            createRocketActionProperty(LABEL, LABEL.value, "Заголовок", true),
+            createRocketActionProperty(key = LABEL, name = LABEL.value, description = "Заголовок", required = true),
             createRocketActionProperty(
-                TOKEN,
-                TOKEN.value,
-                "Используйте это свойство или свойство Java из командной строки -D${TOKEN_PROPERTY.value}",
-                true
+                key = TOKEN,
+                name = TOKEN.value,
+                description = "Используйте это свойство или свойство Java из командной строки -D${TOKEN_PROPERTY.value}",
+                required = true
             )
         )
     }

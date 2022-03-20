@@ -1,20 +1,20 @@
 package ru.ezhov.rocket.action.plugin.openurl
 
-import ru.ezhov.rocket.action.api.PropertyType
 import ru.ezhov.rocket.action.api.RocketAction
 import ru.ezhov.rocket.action.api.RocketActionConfiguration
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
 import ru.ezhov.rocket.action.api.RocketActionConfigurationPropertyKey
 import ru.ezhov.rocket.action.api.RocketActionFactoryUi
 import ru.ezhov.rocket.action.api.RocketActionPlugin
+import ru.ezhov.rocket.action.api.RocketActionPropertySpec
 import ru.ezhov.rocket.action.api.RocketActionSettings
 import ru.ezhov.rocket.action.api.RocketActionType
+import ru.ezhov.rocket.action.api.support.AbstractRocketAction
 import ru.ezhov.rocket.action.icon.AppIcon
 import ru.ezhov.rocket.action.icon.IconRepositoryFactory
 import ru.ezhov.rocket.action.icon.IconService
 import ru.ezhov.rocket.action.notification.NotificationFactory
 import ru.ezhov.rocket.action.notification.NotificationType
-import ru.ezhov.rocket.action.api.support.AbstractRocketAction
 import ru.ezhov.rocket.action.ui.swing.common.TextFieldWithText
 import java.awt.Component
 import java.awt.Desktop
@@ -117,18 +117,17 @@ class OpenUrlWithTextHistoryRocketActionUi : AbstractRocketAction(), RocketActio
 
     override fun properties(): List<RocketActionConfigurationProperty> {
         return listOf(
-            createRocketActionProperty(BASE_URL, BASE_URL.value, "Шаблон URL", true),
-            createRocketActionProperty(PLACEHOLDER, PLACEHOLDER.value, "Строка подстановки", true),
-            createRocketActionProperty(LABEL, LABEL.value, "Заголовок", false),
-            createRocketActionProperty(DESCRIPTION, DESCRIPTION.value, "Описание", false),
-            createRocketActionProperty(ICON_URL, ICON_URL.value, "URL иконки", false),
+            createRocketActionProperty(key = BASE_URL, name = BASE_URL.value, description = "Шаблон URL", required = true),
+            createRocketActionProperty(key = PLACEHOLDER, name = PLACEHOLDER.value, description = "Строка подстановки", required = true),
+            createRocketActionProperty(key = LABEL, name = LABEL.value, description = "Заголовок", required = false),
+            createRocketActionProperty(key = DESCRIPTION, name = DESCRIPTION.value, description = "Описание", required = false),
+            createRocketActionProperty(key = ICON_URL, name = ICON_URL.value, description = "URL иконки", required = false),
             createRocketActionProperty(
-                IS_ENCODE,
-                IS_ENCODE.value,
-                "Кодировать для URL",
-                false,
-                default = "false",
-                type = PropertyType.BOOLEAN
+                key = IS_ENCODE,
+                name = IS_ENCODE.value,
+                description = "Кодировать для URL",
+                required = false,
+                property = RocketActionPropertySpec.BooleanPropertySpec(defaultValue = false),
             )
         )
     }

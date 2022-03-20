@@ -55,9 +55,9 @@ class CopyToClipboardTemplateRocketActionUi : AbstractRocketAction(), RocketActi
 
     override fun properties(): List<RocketActionConfigurationProperty> {
         return listOf(
-            createRocketActionProperty(LABEL, LABEL.value, "Заголовок", false),
-            createRocketActionProperty(DESCRIPTION, DESCRIPTION.value, "Описание", false),
-            createRocketActionProperty(TEXT, TEXT.value, "Шаблон для копирования", true)
+            createRocketActionProperty(key = LABEL, name = LABEL.value, description = "Заголовок", required = false),
+            createRocketActionProperty(key = DESCRIPTION, name = DESCRIPTION.value, description = "Описание", required = false),
+            createRocketActionProperty(key = TEXT, name = TEXT.value, description = "Шаблон для копирования", required = true)
         )
     }
 

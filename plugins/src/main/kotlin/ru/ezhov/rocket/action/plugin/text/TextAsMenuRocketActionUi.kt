@@ -42,9 +42,9 @@ class TextAsMenuRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
 
     override fun properties(): List<RocketActionConfigurationProperty> =
         listOf(
-            createRocketActionProperty(LABEL, LABEL.value, "Заголовок", true),
-            createRocketActionProperty(TEXT, TEXT.value, "Текст", true),
-            createRocketActionProperty(DESCRIPTION, DESCRIPTION.value, "Описание", false),
+            createRocketActionProperty(key = LABEL, name = LABEL.value, description = "Заголовок", required = true),
+            createRocketActionProperty(key = TEXT, name = TEXT.value, description = "Текст", required = true),
+            createRocketActionProperty(key = DESCRIPTION, name = DESCRIPTION.value, description = "Описание", required = false),
         )
 
     override fun create(settings: RocketActionSettings): RocketAction? =

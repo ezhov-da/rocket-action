@@ -26,7 +26,7 @@ import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import java.net.URI
 import javax.swing.BorderFactory
-import javax.swing.JFrame
+import javax.swing.JDialog
 import javax.swing.JLabel
 import javax.swing.JMenu
 import javax.swing.JMenuBar
@@ -45,11 +45,11 @@ class UiQuickActionService(
     private val generalPropertiesRepository: GeneralPropertiesRepository,
 ) {
     private var configurationFrame: ConfigurationFrame? = null
-    private var frame: JFrame? = null
+    private var baseDialog: JDialog? = null
 
     @Throws(UiQuickActionServiceException::class)
-    fun createMenu(frame: JFrame): JMenuBar {
-        this.frame = frame
+    fun createMenu(baseDialog: JDialog): JMenuBar {
+        this.baseDialog = baseDialog
         return try {
             val menuBar = JMenuBar()
             val menu = JMenu()
@@ -57,9 +57,9 @@ class UiQuickActionService(
             //TODO: избранное
             //menuBar.add(createFavoriteComponent());
 
-            menuBar.add(createSearchField(frame, menu))
+            menuBar.add(createSearchField(baseDialog, menu))
             val moveLabel = JLabel(IconRepositoryFactory.repository.by(AppIcon.MOVE))
-            MoveUtil.addMoveAction(movableComponent = frame, grabbedComponent = moveLabel)
+            MoveUtil.addMoveAction(movableComponent = baseDialog, grabbedComponent = moveLabel)
             menuBar.add(moveLabel)
             CreateMenuWorker(menu).execute()
             menuBar
@@ -71,7 +71,7 @@ class UiQuickActionService(
     @Throws(Exception::class)
     private fun rocketActionSettings(): List<RocketActionSettings> = rocketActionSettingsRepository.actions()
 
-    private fun createSearchField(frame: JFrame, menu: JMenu): Component =
+    private fun createSearchField(baseDialog: JDialog, menu: JMenu): Component =
         JPanel(FlowLayout(FlowLayout.LEFT, 0, 0)).apply {
             border = BorderFactory.createEmptyBorder()
             val textField =
@@ -95,7 +95,7 @@ class UiQuickActionService(
                                                 tf.background = Color.GREEN
                                                 menu.removeAll()
                                                 ccl.forEach { menu.add(it.component()) }
-                                                menu.add(createTools(frame))
+                                                menu.add(createTools(baseDialog))
                                                 menu.doClick()
                                             }
                                         }
@@ -122,24 +122,24 @@ class UiQuickActionService(
             )
         }
 
-    private fun createTools(frame: JFrame): JMenu {
+    private fun createTools(baseDialog: JDialog): JMenu {
         val menuTools = JMenu("Инструменты")
         menuTools.icon = IconRepositoryFactory.repository.by(AppIcon.WRENCH)
         val updateActionListener = ActionListener {
             SwingUtilities.invokeLater {
                 var newMenuBar: JMenuBar? = null
                 try {
-                    newMenuBar = createMenu(frame)
+                    newMenuBar = createMenu(baseDialog)
                 } catch (ex: UiQuickActionServiceException) {
                     ex.printStackTrace()
                     NotificationFactory.notification.show(NotificationType.ERROR, "Ошибка создания меню инструментов")
                 }
                 if (newMenuBar != null) {
                     // пока костыль, но мы то знаем это "пока" :)
-                    frame.jMenuBar.removeAll()
-                    frame.jMenuBar = newMenuBar
-                    frame.revalidate()
-                    frame.repaint()
+                    baseDialog.jMenuBar.removeAll()
+                    baseDialog.jMenuBar = newMenuBar
+                    baseDialog.revalidate()
+                    baseDialog.repaint()
                 }
             }
         }
@@ -195,7 +195,7 @@ class UiQuickActionService(
             icon = IconRepositoryFactory.repository.by(AppIcon.X)
             addActionListener {
                 SwingUtilities.invokeLater {
-                    frame.dispose()
+                    baseDialog.dispose()
                     exitProcess(0)
                 }
             }
@@ -250,7 +250,7 @@ class UiQuickActionService(
                             }
                     }
             }
-            components.add(createTools(frame!!))
+            components.add(createTools(baseDialog!!))
             return components.toList()
         }
 

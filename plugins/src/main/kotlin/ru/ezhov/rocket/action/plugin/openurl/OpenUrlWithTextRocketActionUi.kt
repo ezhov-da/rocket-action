@@ -1,12 +1,12 @@
 package ru.ezhov.rocket.action.plugin.openurl
 
-import ru.ezhov.rocket.action.api.PropertyType
 import ru.ezhov.rocket.action.api.RocketAction
 import ru.ezhov.rocket.action.api.RocketActionConfiguration
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
 import ru.ezhov.rocket.action.api.RocketActionConfigurationPropertyKey
 import ru.ezhov.rocket.action.api.RocketActionFactoryUi
 import ru.ezhov.rocket.action.api.RocketActionPlugin
+import ru.ezhov.rocket.action.api.RocketActionPropertySpec
 import ru.ezhov.rocket.action.api.RocketActionSettings
 import ru.ezhov.rocket.action.api.RocketActionType
 import ru.ezhov.rocket.action.icon.AppIcon
@@ -105,12 +105,11 @@ class OpenUrlWithTextRocketActionUi : AbstractRocketAction(), RocketActionPlugin
             createRocketActionProperty(PLACEHOLDER, PLACEHOLDER.value, "Строка подстановки", true),
             createRocketActionProperty(ICON_URL, ICON_URL.value, "URL иконки", false),
             createRocketActionProperty(
-                IS_ENCODE,
-                IS_ENCODE.value,
-                "Кодировать для URL",
-                false,
-                default = "false",
-                type = PropertyType.BOOLEAN
+                key = IS_ENCODE,
+                name = IS_ENCODE.value,
+                description = "Кодировать для URL",
+                required = false,
+                property =  RocketActionPropertySpec.BooleanPropertySpec(defaultValue = false),
             )
         )
     }

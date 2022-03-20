@@ -33,8 +33,8 @@ class TextRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
 
     override fun properties(): List<RocketActionConfigurationProperty> =
         listOf(
-            createRocketActionProperty(LABEL, LABEL.value, "Текст для отображения", true),
-            createRocketActionProperty(DESCRIPTION, DESCRIPTION.value, "Описание", false)
+            createRocketActionProperty(key = LABEL, name = LABEL.value, description = "Текст для отображения", required = true),
+            createRocketActionProperty(key = DESCRIPTION, name = DESCRIPTION.value, description = "Описание", required = false)
         )
 
     override fun create(settings: RocketActionSettings): RocketAction? =

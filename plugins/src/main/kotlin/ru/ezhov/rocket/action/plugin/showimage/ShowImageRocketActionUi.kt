@@ -81,9 +81,9 @@ class ShowImageRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
 
     override fun properties(): List<RocketActionConfigurationProperty> {
         return listOf(
-            createRocketActionProperty(LABEL, LABEL.value, "Заголовок", false),
-            createRocketActionProperty(DESCRIPTION, DESCRIPTION.value, "Описание", false),
-            createRocketActionProperty(IMAGE_URL, IMAGE_URL.value, "URL изображения", true)
+            createRocketActionProperty(key = LABEL, name = LABEL.value, description = "Заголовок", required = false),
+            createRocketActionProperty(key = DESCRIPTION, name = DESCRIPTION.value, description = "Описание", required = false),
+            createRocketActionProperty(key = IMAGE_URL, name = IMAGE_URL.value, description = "URL изображения", required = true)
         )
     }
 

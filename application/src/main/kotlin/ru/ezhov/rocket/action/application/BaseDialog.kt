@@ -1,7 +1,7 @@
 package ru.ezhov.rocket.action.application
 
-import javax.swing.JFrame
+import javax.swing.JDialog
 
 object BaseDialog {
-    val dialog = JFrame()
+    val dialog = JDialog()
 }

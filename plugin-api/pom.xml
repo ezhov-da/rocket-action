@@ -10,7 +10,7 @@
     </parent>
 
     <artifactId>rocket-action-plugin-api</artifactId>
-    <version>0.17.3</version>
+    <version>0.19.0</version>
 
     <dependencies>
         <dependency>

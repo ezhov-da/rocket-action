@@ -1,10 +1,10 @@
 package ru.ezhov.rocket.action.api.support
 
-import ru.ezhov.rocket.action.api.PropertyType
 import ru.ezhov.rocket.action.api.RocketActionConfiguration
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
 import ru.ezhov.rocket.action.api.RocketActionConfigurationPropertyKey
 import ru.ezhov.rocket.action.api.RocketActionFactoryUi
+import ru.ezhov.rocket.action.api.RocketActionPropertySpec
 
 /**
  * Базовый класс для создания UI действия
@@ -15,15 +15,13 @@ abstract class AbstractRocketAction : RocketActionFactoryUi, RocketActionConfigu
         name: String,
         description: String,
         required: Boolean,
-        type: PropertyType = PropertyType.STRING,
-        default: String? = null
+        property: RocketActionPropertySpec = RocketActionPropertySpec.StringPropertySpec(),
     ): RocketActionConfigurationProperty =
         object : RocketActionConfigurationProperty {
             override fun key(): RocketActionConfigurationPropertyKey = key
             override fun name(): String = name
             override fun description(): String = description
             override fun isRequired(): Boolean = required
-            override fun type(): PropertyType = type
-            override fun default(): String? = default
+            override fun property(): RocketActionPropertySpec = property
         }
 }

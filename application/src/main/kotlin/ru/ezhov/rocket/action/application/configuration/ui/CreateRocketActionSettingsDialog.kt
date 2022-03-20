@@ -1,9 +1,12 @@
 package ru.ezhov.rocket.action.application.configuration.ui
 
-import ru.ezhov.rocket.action.api.PropertyType
+import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea
+import org.fife.ui.rsyntaxtextarea.SyntaxConstants
+import org.fife.ui.rtextarea.RTextScrollPane
 import ru.ezhov.rocket.action.api.RocketActionConfiguration
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
 import ru.ezhov.rocket.action.api.RocketActionConfigurationPropertyKey
+import ru.ezhov.rocket.action.api.RocketActionPropertySpec
 import ru.ezhov.rocket.action.application.infrastructure.MutableRocketActionSettings
 import ru.ezhov.rocket.action.application.plugin.manager.domain.RocketActionPluginRepository
 import ru.ezhov.rocket.action.icon.AppIcon
@@ -28,7 +31,6 @@ import javax.swing.JLabel
 import javax.swing.JList
 import javax.swing.JPanel
 import javax.swing.JScrollPane
-import javax.swing.JTextPane
 import javax.swing.SwingUtilities
 import javax.swing.WindowConstants
 
@@ -50,7 +52,9 @@ class CreateRocketActionSettingsDialog(
         val ownerSize = owner.size
         setSize((ownerSize.width * 0.7).toInt(), (ownerSize.height * 0.7).toInt())
         add(panelComboBox(), BorderLayout.NORTH)
-        actionSettingsPanel.setRocketActionConfiguration(comboBox.selectedItem as RocketActionConfiguration)
+        actionSettingsPanel.setRocketActionConfiguration(
+            comboBox.selectedItem as RocketActionConfiguration
+        )
         add(JScrollPane(actionSettingsPanel), BorderLayout.CENTER)
         add(createTestAndSaveDialog(), BorderLayout.SOUTH)
         defaultCloseOperation = WindowConstants.HIDE_ON_CLOSE
@@ -172,24 +176,43 @@ class CreateRocketActionSettingsDialog(
             topPanel.add(labelDescription)
 
             val centerPanel = JPanel(BorderLayout())
-            when (property.type()) {
-                PropertyType.STRING -> {
+            when (val configProperty = property.property()) {
+                is RocketActionPropertySpec.StringPropertySpec -> {
                     centerPanel.add(
-                        JScrollPane(
-                            JTextPane().also { tp ->
-                                valueCallback = { tp.text }
-                                tp.text = property.default().orEmpty()
-                            }
+                        RTextScrollPane(
+                            RSyntaxTextArea()
+                                .also { tp ->
+                                    tp.syntaxEditingStyle = SyntaxConstants.SYNTAX_STYLE_NONE
+                                    valueCallback = { tp.text }
+                                    tp.text = configProperty.defaultValue.orEmpty()
+                                }
                         ),
                         BorderLayout.CENTER
                     )
                 }
-                PropertyType.BOOLEAN -> {
+                is RocketActionPropertySpec.BooleanPropertySpec -> {
+                    centerPanel.add(
+                        JScrollPane(
+                            JCheckBox()
+                                .also { cb ->
+                                    cb.isSelected = configProperty.defaultValue.toBoolean()
+                                    valueCallback = { cb.isSelected.toString() }
+                                }
+                        ), BorderLayout.CENTER)
+                }
+                is RocketActionPropertySpec.ListPropertySpec -> {
+                    val default = configProperty.defaultValue.orEmpty()
+                    val selectedValues = configProperty.valuesForSelect
+                    if (!selectedValues.contains(default)) {
+                        selectedValues.toMutableList().add(default)
+                    }
+                    val list = JComboBox(selectedValues.toTypedArray())
+                    list.selectedItem = default
                     centerPanel.add(JScrollPane(
-                        JCheckBox().also { cb ->
-                            cb.isSelected = property.default().toBoolean()
-                            valueCallback = { cb.isSelected.toString() }
-                        }
+                        list
+                            .also { l ->
+                                valueCallback = { l.selectedItem.toString() }
+                            }
                     ), BorderLayout.CENTER)
                 }
             }
@@ -198,6 +221,7 @@ class CreateRocketActionSettingsDialog(
             this.add(centerPanel, BorderLayout.CENTER)
         }
 
-        fun value(): Pair<RocketActionConfigurationPropertyKey, String> = Pair(first = property.key(), second = valueCallback())
+        fun value(): Pair<RocketActionConfigurationPropertyKey, String> =
+            Pair(first = property.key(), second = valueCallback())
     }
 }

@@ -47,7 +47,7 @@ private val logger = KotlinLogging.logger {}
 
 class NoteDialog(
     noteApplicationService: NoteApplicationService
-) : JFrame() {
+) : JDialog() {
     companion object {
         private const val TEXT = "вставьте сюда"
     }
@@ -149,7 +149,7 @@ class NoteDialog(
 
     private class CreateDialog(
         private val noteApplicationService: NoteApplicationService,
-        owner: JFrame,
+        owner: JDialog,
         modal: Boolean
     ) : JDialog(owner, modal) {
         private val textPaneText = JTextPane()

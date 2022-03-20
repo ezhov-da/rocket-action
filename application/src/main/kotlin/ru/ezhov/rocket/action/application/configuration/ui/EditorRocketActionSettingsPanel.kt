@@ -1,9 +1,13 @@
 package ru.ezhov.rocket.action.application.configuration.ui
 
-import ru.ezhov.rocket.action.api.PropertyType
+import mu.KotlinLogging
+import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea
+import org.fife.ui.rsyntaxtextarea.SyntaxConstants
+import org.fife.ui.rtextarea.RTextScrollPane
 import ru.ezhov.rocket.action.api.RocketActionConfiguration
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
 import ru.ezhov.rocket.action.api.RocketActionConfigurationPropertyKey
+import ru.ezhov.rocket.action.api.RocketActionPropertySpec
 import ru.ezhov.rocket.action.application.configuration.ui.event.ConfigurationUiListener
 import ru.ezhov.rocket.action.application.configuration.ui.event.ConfigurationUiObserverFactory
 import ru.ezhov.rocket.action.application.configuration.ui.event.model.ConfigurationUiEvent
@@ -21,11 +25,13 @@ import javax.swing.Box
 import javax.swing.BoxLayout
 import javax.swing.JButton
 import javax.swing.JCheckBox
+import javax.swing.JComboBox
 import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.JScrollPane
-import javax.swing.JTextPane
 import javax.swing.SwingConstants
+
+private val logger = KotlinLogging.logger {}
 
 class EditorRocketActionSettingsPanel(
     private val rocketActionPluginRepository: RocketActionPluginRepository
@@ -165,48 +171,71 @@ class EditorRocketActionSettingsPanel(
         init {
             this.layout = BorderLayout()
             this.border = BorderFactory.createEmptyBorder(2, 2, 2, 2)
-            value.property?.let { property ->
-                val labelName = JLabel(property.name())
-                val labelDescription = JLabel(IconRepositoryFactory.repository.by(AppIcon.INFO))
-                labelDescription.toolTipText = property.description()
+            value.property
+                ?.let { property ->
+                    val labelName = JLabel(property.name())
+                    val labelDescription = JLabel(IconRepositoryFactory.repository.by(AppIcon.INFO))
+                    labelDescription.toolTipText = property.description()
 
-                val topPanel = JPanel()
-                topPanel.layout = BoxLayout(topPanel, BoxLayout.X_AXIS)
-                topPanel.border = BorderFactory.createEmptyBorder(0, 0, 1, 0)
-                topPanel.add(labelName)
-                if (property.isRequired()) {
-                    topPanel.add(JLabel("*").apply { foreground = Color.RED })
-                }
-                topPanel.add(labelDescription)
-
-                val centerPanel = JPanel(BorderLayout())
-                when (property.type()) {
-                    PropertyType.STRING -> {
-                        centerPanel.add(
-                            JScrollPane(
-                                JTextPane().also { tp ->
-                                    valueCallback = { tp.text }
-                                    tp.text = value.value
-                                }
-                            ),
-                            BorderLayout.CENTER
-                        )
+                    val topPanel = JPanel()
+                    topPanel.layout = BoxLayout(topPanel, BoxLayout.X_AXIS)
+                    topPanel.border = BorderFactory.createEmptyBorder(0, 0, 1, 0)
+                    topPanel.add(labelName)
+                    if (property.isRequired()) {
+                        topPanel.add(JLabel("*").apply { foreground = Color.RED })
                     }
-                    PropertyType.BOOLEAN -> {
-                        centerPanel.add(JScrollPane(
-                            JCheckBox().also { cb ->
-                                cb.isSelected = value.value.toBoolean()
-                                valueCallback = { cb.isSelected.toString() }
+                    topPanel.add(labelDescription)
+
+                    val centerPanel = JPanel(BorderLayout())
+                    when (val configProperty = property.property()) {
+                        is RocketActionPropertySpec.StringPropertySpec -> {
+                            centerPanel.add(
+                                RTextScrollPane(
+                                    RSyntaxTextArea()
+                                        .also { tp ->
+                                            tp.syntaxEditingStyle = SyntaxConstants.SYNTAX_STYLE_NONE
+                                            valueCallback = { tp.text }
+                                            tp.text = value.value
+                                        }
+                                ),
+                                BorderLayout.CENTER
+                            )
+                        }
+                        is RocketActionPropertySpec.BooleanPropertySpec -> {
+                            centerPanel.add(JScrollPane(
+                                JCheckBox()
+                                    .also { cb ->
+                                        cb.isSelected = value.value.toBoolean()
+                                        valueCallback = { cb.isSelected.toString() }
+                                    }
+                            ), BorderLayout.CENTER)
+                        }
+                        is RocketActionPropertySpec.ListPropertySpec -> {
+                            val default = configProperty.defaultValue.orEmpty()
+                            val selectedValues = configProperty.valuesForSelect
+                            if (!selectedValues.contains(default)) {
+                                selectedValues.toMutableList().add(default)
                             }
-                        ), BorderLayout.CENTER)
+                            val list = JComboBox(selectedValues.toTypedArray())
+                            list.selectedItem = default
+                            centerPanel.add(JScrollPane(
+                                list
+                                    .also { l ->
+                                        valueCallback = { l.selectedItem.toString() }
+                                    }
+                            ), BorderLayout.CENTER)
+                        }
                     }
-                }
 
-                this.add(topPanel, BorderLayout.NORTH)
-                this.add(centerPanel, BorderLayout.CENTER)
-            } ?: run {
-                this.add(JLabel("Обнаружено незарегистрированное свойство '${value.key}:${value.value}'"), BorderLayout.CENTER)
-                valueCallback = { value.value }
+                    this.add(topPanel, BorderLayout.NORTH)
+                    this.add(centerPanel, BorderLayout.CENTER)
+                } ?: run {
+                val text = "Обнаружено незарегистрированное свойство '${value.key.value}:${value.value}'"
+                logger.warn { text }
+                NotificationFactory.notification.show(
+                    type = NotificationType.WARN,
+                    text = text
+                )
             }
         }
 
