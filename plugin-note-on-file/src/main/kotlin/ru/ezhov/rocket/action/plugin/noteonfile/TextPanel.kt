@@ -17,6 +17,10 @@ import java.awt.Dimension
 import java.awt.Toolkit
 import java.awt.datatransfer.StringSelection
 import java.awt.event.ActionEvent
+import java.awt.event.FocusEvent
+import java.awt.event.FocusListener
+import java.awt.event.KeyAdapter
+import java.awt.event.KeyEvent
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import java.io.File
@@ -162,6 +166,14 @@ internal class TextPanel(
         labelPath.addMouseListener(object : MouseAdapter() {
             override fun mouseClicked(e: MouseEvent?) {
                 Desktop.getDesktop().open(File(path))
+            }
+        })
+
+        textPane.addKeyListener(object : KeyAdapter() {
+            override fun keyReleased(e: KeyEvent) {
+                if (e.keyCode == 83 /*S*/ && e.isControlDown) {
+                    WriteSwingWorker(path = path, text = textPane.text).execute()
+                }
             }
         })
     }
