@@ -228,13 +228,14 @@ class UiQuickActionService(
                     ?.let {
                         (
                             cache
-                                .by(rocketActionSettings.id())?.let {
+                                .by(rocketActionSettings.id())
+                                ?.let { action ->
                                     logger.debug {
                                         "found in cache type='${rocketActionSettings.type().value()}'" +
                                             "id='${rocketActionSettings.id()}"
                                     }
 
-                                    it.component()
+                                    action.component()
                                 }
                                 ?: run {
                                     logger.debug {
@@ -268,7 +269,7 @@ class UiQuickActionService(
 
                                 logger.debug {
                                     "must be create '$mustBeCreate' type='${rocketActionSettings.type().value()}'" +
-                                        "id='${rocketActionSettings.id()}"
+                                        "id='${rocketActionSettings.id()}'"
                                 }
 
                                 if (mustBeCreate) {
@@ -276,7 +277,7 @@ class UiQuickActionService(
                                         ?.let { action ->
                                             logger.debug {
                                                 "added to cache type='${rocketActionSettings.type().value()}'" +
-                                                    "id='${rocketActionSettings.id()}"
+                                                    "id='${rocketActionSettings.id()}'"
                                             }
 
                                             cache.add(

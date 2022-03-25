@@ -43,6 +43,19 @@ class NoteOnFileRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
                 val description = settings.settings()[DESCRIPTION]?.takeIf { it.isNotEmpty() } ?: path
                 val loadTextOnInitialize = settings.settings()[LOAD_TEXT_ON_INITIALIZE]?.toBoolean() ?: true
 
+                val component = JMenu(label).apply {
+                    this.icon = iconDef
+                    this.add(
+                        TextPanel(
+                            path = path,
+                            label = label,
+                            loadOnInitialize = loadTextOnInitialize,
+                            style = settings.settings()[SYNTAX_STYLE],
+                            addStyleSelected = false,
+                        )
+                    )
+                }
+
                 object : RocketAction {
                     override fun contains(search: String): Boolean =
                         path.contains(search, ignoreCase = true)
@@ -53,19 +66,7 @@ class NoteOnFileRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
                         !(settings.id() == actionSettings.id() &&
                             settings.settings() == actionSettings.settings())
 
-                    override fun component(): Component =
-                        JMenu(label).apply {
-                            this.icon = iconDef
-                            this.add(
-                                TextPanel(
-                                    path = path,
-                                    label = label,
-                                    loadOnInitialize = loadTextOnInitialize,
-                                    style = settings.settings()[SYNTAX_STYLE],
-                                    addStyleSelected = false,
-                                )
-                            )
-                        }
+                    override fun component(): Component = component
                 }
             }
 

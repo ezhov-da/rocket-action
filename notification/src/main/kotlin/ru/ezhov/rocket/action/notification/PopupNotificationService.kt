@@ -7,17 +7,14 @@ import java.awt.Toolkit
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
 import java.util.LinkedList
-import javax.swing.SwingUtilities
 
 private val logger = KotlinLogging.logger { }
 
 internal class PopupNotificationService : NotificationService {
     private val messages = LinkedList<Message>()
     override fun show(type: NotificationType, text: String) {
-        SwingUtilities.invokeLater {
-            createAndShowMessage(type, text)
-            logger.info { "Notification with type='$type' showed" }
-        }
+        createAndShowMessage(type, text)
+        logger.info { "Notification with type='$type' showed" }
     }
 
     private fun createAndShowMessage(type: NotificationType, text: String) {

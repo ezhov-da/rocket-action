@@ -8,11 +8,11 @@ import ru.ezhov.rocket.action.api.RocketActionFactoryUi
 import ru.ezhov.rocket.action.api.RocketActionPlugin
 import ru.ezhov.rocket.action.api.RocketActionSettings
 import ru.ezhov.rocket.action.api.RocketActionType
+import ru.ezhov.rocket.action.api.support.AbstractRocketAction
+import ru.ezhov.rocket.action.application.infrastructure.RocketActionComponentCacheFactory
 import ru.ezhov.rocket.action.icon.AppIcon
 import ru.ezhov.rocket.action.icon.IconRepositoryFactory
 import ru.ezhov.rocket.action.icon.IconService
-import ru.ezhov.rocket.action.application.infrastructure.RocketActionComponentCacheFactory
-import ru.ezhov.rocket.action.api.support.AbstractRocketAction
 import java.awt.Component
 import java.util.concurrent.ExecutionException
 import javax.swing.Icon
@@ -34,7 +34,12 @@ class GroupRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
             val menu = JMenu(label)
             menu.icon = ImageIcon(this.javaClass.getResource("/load_16x16.gif"))
             menu.toolTipText = description
-            GroupSwingWorker(menu, iconUrl, settings).execute()
+            GroupSwingWorker(
+                parentMenu = menu,
+                iconUrl = iconUrl,
+                settings = settings,
+            )
+                .execute()
 
             object : RocketAction {
                 override fun contains(search: String): Boolean = false
@@ -66,7 +71,7 @@ class GroupRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
     private class GroupSwingWorker(
         private val parentMenu: JMenu,
         private val iconUrl: String,
-        private val settings: RocketActionSettings
+        private val settings: RocketActionSettings,
     ) : SwingWorker<List<Component?>, String?>() {
         @Throws(Exception::class)
         override fun doInBackground(): List<Component> {
@@ -87,7 +92,11 @@ class GroupRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
                         val menu = JMenu(label)
                         menu.icon = ImageIcon(this.javaClass.getResource("/load_16x16.gif"))
                         menu.toolTipText = description
-                        GroupSwingWorker(menu, iconUrl, settings).execute()
+                        GroupSwingWorker(
+                            parentMenu = menu,
+                            iconUrl = iconUrl,
+                            settings = settings,
+                        ).execute()
                         createGroup(settings.actions())
                         children.add(menu)
                     }
