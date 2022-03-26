@@ -1,6 +1,7 @@
 package ru.ezhov.rocket.action.cache
 
 import com.google.common.hash.Hashing
+import mu.KotlinLogging
 import java.io.File
 import java.io.FileOutputStream
 import java.net.URL
@@ -12,22 +13,32 @@ import javax.net.ssl.SSLContext
 import javax.net.ssl.SSLSession
 import javax.net.ssl.X509TrustManager
 
+private val logger = KotlinLogging.logger {}
+
 class DiskCache : Cache {
-    private val cacheFolder = File("./cache"        )
+    private val cacheFolder = File("./cache")
 
     override fun get(url: URL): File? {
         if (!cacheFolder.exists()) {
-            cacheFolder.mkdirs()
+            val result = cacheFolder.mkdirs()
+            logger.debug { "Cache folder='$cacheFolder' created with result='$result'" }
+        } else {
+            logger.debug { "Cache folder='$cacheFolder' already exists" }
         }
         checkQuietly()
         val sha256hexUrl = Hashing
             .sha256()
             .hashString(url.toString(), StandardCharsets.UTF_8)
             .toString()
+
+        logger.debug { "SHA256='$sha256hexUrl' for url='$url'" }
+
         val file = File(cacheFolder, sha256hexUrl)
         return if (file.exists()) {
+            logger.debug { "Return url='$url' from cache file='${file.absolutePath}'" }
             file
         } else {
+            logger.debug { "Cache file does not exists. Load file from url='$url'" }
             readFromUrl(url, file)
         }
     }

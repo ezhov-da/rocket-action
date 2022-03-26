@@ -21,26 +21,27 @@ class IconService {
             .takeIf { it.isNotEmpty() }
             ?.let { url ->
                 try {
-                    CacheFactory.cache.get(URL(url))?.let { file ->
-                        val image: BufferedImage =
-                            if (url.endsWith("ico")) {
-                                val bufferedImages = ICODecoder.readExt(file)
-                                bufferedImages[bufferedImages.size - 1].image
-                            } else {
-                                ImageIO.read(file)
-                            }
-                        ImageIcon(handleICOImage(image))
-                    }
+                    CacheFactory.cache.get(URL(url))
+                        ?.let { file ->
+                            val image: BufferedImage =
+                                if (url.endsWith("ico")) {
+                                    val bufferedImages = ICODecoder.readExt(file)
+                                    bufferedImages[bufferedImages.size - 1].image
+                                } else {
+                                    ImageIO.read(file)
+                                }
+                            ImageIcon(scaleImage(image))
+                        }
                 } catch (e: Exception) {
-                    logger.warn("Exception when load icon url='$iconUrl'", e)
+                    logger.warn(e) { "Exception when load icon url='$iconUrl'" }
                     NotificationFactory.notification.show(NotificationType.ERROR, "Error icon loading")
                     defaultIcon
                 }
             } ?: defaultIcon
 
-    private fun handleICOImage(icoImage: BufferedImage): BufferedImage {
+    private fun scaleImage(image: BufferedImage): BufferedImage {
         val resampleOp = ResampleOp(16, 16)
         resampleOp.unsharpenMask = AdvancedResizeOp.UnsharpenMask.Oversharpened
-        return resampleOp.filter(icoImage, null)
+        return resampleOp.filter(image, null)
     }
 }

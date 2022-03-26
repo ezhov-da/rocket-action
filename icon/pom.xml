@@ -17,6 +17,7 @@
         <cache.version>0.17.3</cache.version>
 
         <java-image-scaling.version>0.8.6</java-image-scaling.version>
+        <webp-imageio.version>0.1.6</webp-imageio.version>
     </properties>
 
     <dependencies>
@@ -42,11 +43,27 @@
             <artifactId>kotlin-logging-jvm</artifactId>
         </dependency>
 
-        <!-- https://mvnrepository.com/artifact/com.mortennobel/java-image-scaling -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>com.mortennobel</groupId>
             <artifactId>java-image-scaling</artifactId>
             <version>${java-image-scaling.version}</version>
+        </dependency>
+
+        <!--support .webp format-->
+        <dependency>
+            <groupId>org.sejda.imageio</groupId>
+            <artifactId>webp-imageio</artifactId>
+            <version>${webp-imageio.version}</version>
         </dependency>
 
         <dependency>
