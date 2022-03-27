@@ -40,7 +40,24 @@ class TextRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
     override fun create(settings: RocketActionSettings): RocketAction? =
         settings.settings()[LABEL]?.takeIf { it.isNotEmpty() }?.let { label ->
             val description = settings.settings()[DESCRIPTION]
-
+            val textPane = JTextPane().apply {
+                text = label
+                description?.let { description ->
+                    this.toolTipText = description
+                }
+                isEditable = false
+                background = JLabel().background
+                addMouseListener(object : MouseAdapter() {
+                    override fun mouseReleased(e: MouseEvent) {
+                        if (e.button == MouseEvent.BUTTON3) {
+                            val defaultToolkit = Toolkit.getDefaultToolkit()
+                            val clipboard = defaultToolkit.systemClipboard
+                            clipboard.setContents(StringSelection(text), null)
+                            NotificationFactory.notification.show(NotificationType.INFO, "Текст скопирован в буфер")
+                        }
+                    }
+                })
+            }
             object : RocketAction {
                 override fun contains(search: String): Boolean =
                     label.contains(search, ignoreCase = true)
@@ -50,24 +67,7 @@ class TextRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
                     !(settings.id() == actionSettings.id() &&
                         settings.settings() == actionSettings.settings())
 
-                override fun component(): Component = JTextPane().apply {
-                    text = label
-                    description?.let { description ->
-                        this.toolTipText = description
-                    }
-                    isEditable = false
-                    background = JLabel().background
-                    addMouseListener(object : MouseAdapter() {
-                        override fun mouseReleased(e: MouseEvent) {
-                            if (e.button == MouseEvent.BUTTON3) {
-                                val defaultToolkit = Toolkit.getDefaultToolkit()
-                                val clipboard = defaultToolkit.systemClipboard
-                                clipboard.setContents(StringSelection(text), null)
-                                NotificationFactory.notification.show(NotificationType.INFO, "Текст скопирован в буфер")
-                            }
-                        }
-                    })
-                }
+                override fun component(): Component = textPane
             }
         }
 

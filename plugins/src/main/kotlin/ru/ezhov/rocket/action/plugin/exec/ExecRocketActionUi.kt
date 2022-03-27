@@ -43,6 +43,18 @@ class ExecRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
             val description = settings.settings()[DESCRIPTION]?.takeIf { it.isNotEmpty() } ?: command
             val iconUrl = settings.settings()[ICON_URL].orEmpty()
             val menuIcon = icon(iconUrl, command)
+            val menu = JMenuItem(label).apply {
+                icon = menuIcon
+                toolTipText = description
+                addActionListener { executeCommand(workingDir, command) }
+                addMouseListener(object : MouseAdapter() {
+                    override fun mouseReleased(e: MouseEvent) {
+                        if (e.button == MouseEvent.BUTTON3) {
+                            copyToClipboard(command)
+                        }
+                    }
+                })
+            }
 
             object : RocketAction {
                 override fun contains(search: String): Boolean =
@@ -53,18 +65,7 @@ class ExecRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
                     !(settings.id() == actionSettings.id() &&
                         settings.settings() == actionSettings.settings())
 
-                override fun component(): Component = JMenuItem(label).apply {
-                    icon = menuIcon
-                    toolTipText = description
-                    addActionListener { executeCommand(workingDir, command) }
-                    addMouseListener(object : MouseAdapter() {
-                        override fun mouseReleased(e: MouseEvent) {
-                            if (e.button == MouseEvent.BUTTON3) {
-                                copyToClipboard(command)
-                            }
-                        }
-                    })
-                }
+                override fun component(): Component = menu
             }
         }
 

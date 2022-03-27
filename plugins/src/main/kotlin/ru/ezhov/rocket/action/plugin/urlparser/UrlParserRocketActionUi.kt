@@ -57,6 +57,37 @@ class UrlParserRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
                     }
                     ?.toMap()
                     .orEmpty()
+
+                val component = JMenu(label).apply {
+                    val panelTop = JPanel(BorderLayout())
+                    icon = iconDef
+                    val textField = TextFieldWithText("URL")
+                    textField.columns = 15
+                    val txt = JTextPane()
+                    val button = JButton("Получить описание").apply {
+                        addActionListener(
+                            ButtonListener(
+                                callbackUrl = { textField.text },
+                                callbackSetText = { text ->
+                                    SwingUtilities.invokeLater { txt.text = text }
+                                },
+                                headers = headers
+                            )
+                        )
+                    }
+                    panelTop.add(textField, BorderLayout.NORTH)
+                    panelTop.add(button, BorderLayout.SOUTH)
+                    val panel = JPanel(BorderLayout()).apply {
+                        val dimension = Dimension(300, 150)
+                        minimumSize = dimension
+                        maximumSize = dimension
+                        preferredSize = dimension
+                    }
+                    panel.add(panelTop, BorderLayout.NORTH)
+                    panel.add(JScrollPane(txt), BorderLayout.CENTER)
+
+                    add(panel)
+                }
                 object : RocketAction {
                     override fun contains(search: String): Boolean = label.contains(search)
 
@@ -64,36 +95,7 @@ class UrlParserRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
                         !(settings.id() == actionSettings.id() &&
                             settings.settings() == actionSettings.settings())
 
-                    override fun component(): Component = JMenu(label).apply {
-                        val panelTop = JPanel(BorderLayout())
-                        icon = iconDef
-                        val textField = TextFieldWithText("URL")
-                        textField.columns = 15
-                        val txt = JTextPane()
-                        val button = JButton("Получить описание").apply {
-                            addActionListener(
-                                ButtonListener(
-                                    callbackUrl = { textField.text },
-                                    callbackSetText = { text ->
-                                        SwingUtilities.invokeLater { txt.text = text }
-                                    },
-                                    headers = headers
-                                )
-                            )
-                        }
-                        panelTop.add(textField, BorderLayout.NORTH)
-                        panelTop.add(button, BorderLayout.SOUTH)
-                        val panel = JPanel(BorderLayout()).apply {
-                            val dimension = Dimension(300, 150)
-                            minimumSize = dimension
-                            maximumSize = dimension
-                            preferredSize = dimension
-                        }
-                        panel.add(panelTop, BorderLayout.NORTH)
-                        panel.add(JScrollPane(txt), BorderLayout.CENTER)
-
-                        add(panel)
-                    }
+                    override fun component(): Component = component
                 }
             }
 
@@ -119,7 +121,7 @@ class UrlParserRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
             key = HEADERS,
             name = "Заголовки",
             description =
-            """Заголовки для запроса в формате - каждый заголовок с новой строки: 
+            """Заголовки для запроса в формате - каждый заголовок с новой строки:
                         |Имя${DELIMITER}Значение
                     """.trimMargin(),
             required = false,

@@ -51,6 +51,73 @@ class TextAsMenuRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
         settings.settings()[LABEL]?.takeIf { it.isNotEmpty() }?.let { label ->
             settings.settings()[TEXT]?.takeIf { it.isNotEmpty() }?.let { text ->
                 val description = settings.settings()[DESCRIPTION]
+                val menu = JMenu(label).apply {
+                    this.icon = iconDef
+                    val panel = JPanel(BorderLayout())
+                    panel.add(
+                        JToolBar().apply {
+                            add(JButton(
+                                object : AbstractAction() {
+                                    init {
+                                        putValue(SHORT_DESCRIPTION, "Скопировать текст в буфер")
+                                        putValue(SMALL_ICON, IconRepositoryFactory.repository.by(AppIcon.COPY_WRITING))
+                                    }
+
+                                    override fun actionPerformed(e: ActionEvent?) {
+                                        val defaultToolkit = Toolkit.getDefaultToolkit()
+                                        val clipboard = defaultToolkit.systemClipboard
+                                        clipboard.setContents(StringSelection(text), null)
+                                        NotificationFactory.notification.show(
+                                            type = NotificationType.INFO,
+                                            text = "Текст скопирован в буфер"
+                                        )
+                                    }
+                                }
+                            ))
+                            add(JButton(
+                                object : AbstractAction() {
+                                    init {
+                                        putValue(SHORT_DESCRIPTION, "Открыть в отдельном окне")
+                                        putValue(SMALL_ICON, IconRepositoryFactory.repository.by(AppIcon.ARROW_TOP))
+                                    }
+
+                                    override fun actionPerformed(e: ActionEvent?) {
+                                        SwingUtilities.invokeLater {
+                                            val dimension = Toolkit.getDefaultToolkit().screenSize
+                                            val frame = JFrame(label)
+                                            frame.iconImage = IconRepositoryFactory
+                                                .repository.by(AppIcon.ROCKET_APP)
+                                                .toImage()
+                                            frame.add(JScrollPane(JTextPane().apply {
+                                                this.text = text
+                                                isEditable = false
+                                            }))
+                                            frame.defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
+                                            frame.setSize(
+                                                (dimension.width * 0.8).toInt(),
+                                                (dimension.height * 0.8).toInt()
+                                            )
+                                            frame.setLocationRelativeTo(null)
+                                            frame.isVisible = true
+                                        }
+                                    }
+                                }
+                            ))
+                        },
+                        BorderLayout.NORTH
+                    )
+                    panel.add(
+                        JTextPane().apply {
+                            val textPane = this
+                            textPane.text = text
+                            isEditable = false
+                            background = JLabel().background
+                        },
+                        BorderLayout.CENTER
+                    )
+
+                    this.add(panel)
+                }
                 object : RocketAction {
                     override fun contains(search: String): Boolean =
                         label.contains(search, ignoreCase = true)
@@ -61,73 +128,7 @@ class TextAsMenuRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
                         !(settings.id() == actionSettings.id() &&
                             settings.settings() == actionSettings.settings())
 
-                    override fun component(): Component = JMenu(label).apply {
-                        this.icon = iconDef
-                        val panel = JPanel(BorderLayout())
-                        panel.add(
-                            JToolBar().apply {
-                                add(JButton(
-                                    object : AbstractAction() {
-                                        init {
-                                            putValue(SHORT_DESCRIPTION, "Скопировать текст в буфер")
-                                            putValue(SMALL_ICON, IconRepositoryFactory.repository.by(AppIcon.COPY_WRITING))
-                                        }
-
-                                        override fun actionPerformed(e: ActionEvent?) {
-                                            val defaultToolkit = Toolkit.getDefaultToolkit()
-                                            val clipboard = defaultToolkit.systemClipboard
-                                            clipboard.setContents(StringSelection(text), null)
-                                            NotificationFactory.notification.show(
-                                                type = NotificationType.INFO,
-                                                text = "Текст скопирован в буфер"
-                                            )
-                                        }
-                                    }
-                                ))
-                                add(JButton(
-                                    object : AbstractAction() {
-                                        init {
-                                            putValue(SHORT_DESCRIPTION, "Открыть в отдельном окне")
-                                            putValue(SMALL_ICON, IconRepositoryFactory.repository.by(AppIcon.ARROW_TOP))
-                                        }
-
-                                        override fun actionPerformed(e: ActionEvent?) {
-                                            SwingUtilities.invokeLater {
-                                                val dimension = Toolkit.getDefaultToolkit().screenSize
-                                                val frame = JFrame(label)
-                                                frame.iconImage = IconRepositoryFactory
-                                                    .repository.by(AppIcon.ROCKET_APP)
-                                                    .toImage()
-                                                frame.add(JScrollPane(JTextPane().apply {
-                                                    this.text = text
-                                                    isEditable = false
-                                                }))
-                                                frame.defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
-                                                frame.setSize(
-                                                    (dimension.width * 0.8).toInt(),
-                                                    (dimension.height * 0.8).toInt()
-                                                )
-                                                frame.setLocationRelativeTo(null)
-                                                frame.isVisible = true
-                                            }
-                                        }
-                                    }
-                                ))
-                            },
-                            BorderLayout.NORTH
-                        )
-                        panel.add(
-                            JTextPane().apply {
-                                val textPane = this
-                                textPane.text = text
-                                isEditable = false
-                                background = JLabel().background
-                            },
-                            BorderLayout.CENTER
-                        )
-
-                        this.add(panel)
-                    }
+                    override fun component(): Component = menu
                 }
             }
         }

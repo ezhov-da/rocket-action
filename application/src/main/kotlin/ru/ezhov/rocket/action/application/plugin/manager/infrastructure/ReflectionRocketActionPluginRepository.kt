@@ -1,9 +1,14 @@
 package ru.ezhov.rocket.action.application.plugin.manager.infrastructure
 
 import mu.KotlinLogging
+import ru.ezhov.rocket.action.api.RocketAction
+import ru.ezhov.rocket.action.api.RocketActionConfiguration
+import ru.ezhov.rocket.action.api.RocketActionFactoryUi
 import ru.ezhov.rocket.action.api.RocketActionPlugin
+import ru.ezhov.rocket.action.api.RocketActionSettings
 import ru.ezhov.rocket.action.api.RocketActionType
 import ru.ezhov.rocket.action.application.plugin.manager.domain.RocketActionPluginRepository
+import java.awt.Component
 import kotlin.system.measureTimeMillis
 
 private val logger = KotlinLogging.logger {}
@@ -42,7 +47,8 @@ class ReflectionRocketActionPluginRepository : RocketActionPluginRepository {
                 val initTimeClass = measureTimeMillis {
                     try {
                         val clazz = Class.forName(classAsName)
-                        list.add(clazz.newInstance() as RocketActionPlugin)
+                        val plugin = clazz.newInstance() as RocketActionPlugin
+                        list.add(RocketActionPluginDecorator(plugin))
                     } catch (e: InstantiationException) {
                         logger.warn(e) { "Error when load class $classAsName" }
                     } catch (e: IllegalAccessException) {
@@ -69,4 +75,55 @@ class ReflectionRocketActionPluginRepository : RocketActionPluginRepository {
 
     override fun by(type: RocketActionType): RocketActionPlugin? =
         all().firstOrNull { r: RocketActionPlugin -> r.configuration().type().value() == type.value() }
+}
+
+private class RocketActionPluginDecorator(
+    private val rocketActionPluginOriginal: RocketActionPlugin
+) : RocketActionPlugin {
+    override fun factory(): RocketActionFactoryUi = RocketActionFactoryUiDecorator(
+        rocketActionFactoryUi = rocketActionPluginOriginal.factory()
+    )
+
+    override fun configuration(): RocketActionConfiguration = rocketActionPluginOriginal.configuration()
+}
+
+private class RocketActionFactoryUiDecorator(
+    private val rocketActionFactoryUi: RocketActionFactoryUi
+) : RocketActionFactoryUi {
+    override fun create(settings: RocketActionSettings): RocketAction? =
+        rocketActionFactoryUi.create(settings = settings)
+            ?.let { ra ->
+                RocketActionDecorator(originalRocketAction = ra)
+            }
+
+    override fun type(): RocketActionType = rocketActionFactoryUi.type()
+}
+
+private class RocketActionDecorator(
+    private val originalRocketAction: RocketAction
+) : RocketAction {
+    companion object {
+        const val MAX_TIME__GET_COMPONENT_IN_MILLS = 2
+    }
+
+    override fun contains(search: String): Boolean = originalRocketAction.contains(search = search)
+
+    override fun isChanged(actionSettings: RocketActionSettings): Boolean =
+        originalRocketAction.isChanged(actionSettings = actionSettings)
+
+    override fun component(): Component {
+        val component: Component
+        val timeInMillis = measureTimeMillis {
+            component = originalRocketAction.component()
+        }
+
+        if (timeInMillis > MAX_TIME__GET_COMPONENT_IN_MILLS) {
+            logger.warn {
+                "Getting component for action was over '$MAX_TIME__GET_COMPONENT_IN_MILLS' milliseconds. " +
+                    "This can slow down the application"
+            }
+        }
+
+        return component
+    }
 }

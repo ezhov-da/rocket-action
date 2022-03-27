@@ -8,12 +8,12 @@ import ru.ezhov.rocket.action.api.RocketActionFactoryUi
 import ru.ezhov.rocket.action.api.RocketActionPlugin
 import ru.ezhov.rocket.action.api.RocketActionSettings
 import ru.ezhov.rocket.action.api.RocketActionType
+import ru.ezhov.rocket.action.api.support.AbstractRocketAction
 import ru.ezhov.rocket.action.icon.AppIcon
 import ru.ezhov.rocket.action.icon.IconRepositoryFactory
 import ru.ezhov.rocket.action.icon.IconService
 import ru.ezhov.rocket.action.notification.NotificationFactory
 import ru.ezhov.rocket.action.notification.NotificationType
-import ru.ezhov.rocket.action.api.support.AbstractRocketAction
 import java.awt.Component
 import java.awt.Desktop
 import java.awt.Toolkit
@@ -39,6 +39,34 @@ class OpenUrlRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
             val label = settings.settings()[LABEL]?.takeIf { it.isNotEmpty() } ?: url
             val description = settings.settings()[DESCRIPTION]?.takeIf { it.isNotEmpty() } ?: url
             val iconUrl = settings.settings()[ICON_URL].orEmpty()
+            val menu = JMenuItem(label).apply {
+                icon = IconService().load(
+                    iconUrl = iconUrl,
+                    defaultIcon = iconDef
+                )
+                toolTipText = description
+                isFocusable = true
+                addMouseListener(object : MouseAdapter() {
+                    override fun mouseReleased(e: MouseEvent) {
+                        when (e.button) {
+                            MouseEvent.BUTTON1 -> openUrl(url)
+                            MouseEvent.BUTTON3 -> copyUrlToClipBoard(url)
+                        }
+                    }
+                })
+
+                addMenuKeyListener(object : MenuKeyListener {
+                    override fun menuKeyTyped(e: MenuKeyEvent) = Unit
+
+                    override fun menuKeyPressed(e: MenuKeyEvent) = Unit
+
+                    override fun menuKeyReleased(e: MenuKeyEvent) {
+                        when (e.keyCode) {
+                            KeyEvent.VK_TAB -> openUrl(url)
+                        }
+                    }
+                })
+            }
 
             object : RocketAction {
                 override fun contains(search: String): Boolean =
@@ -49,34 +77,7 @@ class OpenUrlRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
                     !(settings.id() == actionSettings.id() &&
                         settings.settings() == actionSettings.settings())
 
-                override fun component(): Component = JMenuItem(label).apply {
-                    icon = IconService().load(
-                        iconUrl = iconUrl,
-                        defaultIcon = iconDef
-                    )
-                    toolTipText = description
-                    isFocusable = true
-                    addMouseListener(object : MouseAdapter() {
-                        override fun mouseReleased(e: MouseEvent) {
-                            when (e.button) {
-                                MouseEvent.BUTTON1 -> openUrl(url)
-                                MouseEvent.BUTTON3 -> copyUrlToClipBoard(url)
-                            }
-                        }
-                    })
-
-                    addMenuKeyListener(object : MenuKeyListener {
-                        override fun menuKeyTyped(e: MenuKeyEvent) = Unit
-
-                        override fun menuKeyPressed(e: MenuKeyEvent) = Unit
-
-                        override fun menuKeyReleased(e: MenuKeyEvent) {
-                            when (e.keyCode) {
-                                KeyEvent.VK_TAB -> openUrl(url)
-                            }
-                        }
-                    })
-                }
+                override fun component(): Component = menu
             }
         }
 

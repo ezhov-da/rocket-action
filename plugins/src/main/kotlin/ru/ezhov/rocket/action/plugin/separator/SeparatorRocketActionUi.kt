@@ -8,9 +8,9 @@ import ru.ezhov.rocket.action.api.RocketActionFactoryUi
 import ru.ezhov.rocket.action.api.RocketActionPlugin
 import ru.ezhov.rocket.action.api.RocketActionSettings
 import ru.ezhov.rocket.action.api.RocketActionType
+import ru.ezhov.rocket.action.api.support.AbstractRocketAction
 import ru.ezhov.rocket.action.icon.AppIcon
 import ru.ezhov.rocket.action.icon.IconRepositoryFactory
-import ru.ezhov.rocket.action.api.support.AbstractRocketAction
 import java.awt.Component
 import javax.swing.Icon
 import javax.swing.JSeparator
@@ -21,12 +21,14 @@ class SeparatorRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
     override fun configuration(): RocketActionConfiguration = this
 
     override fun create(settings: RocketActionSettings): RocketAction =
-        object : RocketAction {
-            override fun contains(search: String): Boolean = false
+        JSeparator().let { sep ->
+            object : RocketAction {
+                override fun contains(search: String): Boolean = false
 
-            override fun isChanged(actionSettings: RocketActionSettings): Boolean = false
+                override fun isChanged(actionSettings: RocketActionSettings): Boolean = false
 
-            override fun component(): Component = JSeparator()
+                override fun component(): Component = sep
+            }
         }
 
     override fun asString(): List<RocketActionConfigurationPropertyKey> = emptyList()
