@@ -45,15 +45,19 @@ class UrlParserRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
         settings.settings()[LABEL]
             ?.takeIf { it.isNotEmpty() && settings.type().value() == this.type().value() }
             ?.let { label ->
-                val headers = settings.settings()[HEADERS]
+                val headers = settings
+                    .settings()[HEADERS]
                     ?.split("\n")
-                    ?.mapNotNull { v ->
-                        v.split(DELIMITER)
-                            .takeIf { it.size == 2 }
-                            ?.let { Pair(first = it[0], second = it[1]) } ?: run {
-                            logger.warn { "Header $v is not standard" }
-                            null
-                        }
+                    ?.mapNotNull { header ->
+                        if (header.isNotBlank()) {
+                            header.split(DELIMITER)
+                                .takeIf { it.size == 2 }
+                                ?.let { Pair(first = it[0], second = it[1]) }
+                                ?: run {
+                                    logger.warn { "Header $header is not standard" }
+                                    null
+                                }
+                        } else null
                     }
                     ?.toMap()
                     .orEmpty()
