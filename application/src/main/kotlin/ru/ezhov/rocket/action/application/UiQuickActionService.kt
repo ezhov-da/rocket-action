@@ -33,6 +33,7 @@ import javax.swing.JMenuBar
 import javax.swing.JMenuItem
 import javax.swing.JPanel
 import javax.swing.JTextArea
+import javax.swing.JTextField
 import javax.swing.SwingUtilities
 import javax.swing.SwingWorker
 import kotlin.system.exitProcess
@@ -75,52 +76,57 @@ class UiQuickActionService(
         JPanel(FlowLayout(FlowLayout.LEFT, 0, 0)).apply {
             border = BorderFactory.createEmptyBorder()
             val textField =
-                TextFieldWithText("Поиск").apply { ->
-                    val tf = this
-                    columns = 5
-                    addKeyListener(object : KeyAdapter() {
-                        override fun keyPressed(e: KeyEvent?) {
-                            e?.takeIf { it.keyCode == KeyEvent.VK_ENTER }?.let {
-                                val cache = RocketActionComponentCacheFactory.cache
-
-                                if (text.isNotEmpty()) {
-                                    cache
-                                        .all()
-                                        .filter { it.contains(text) }
-                                        .takeIf { it.isNotEmpty() }
-                                        ?.let { ccl ->
-                                            logger.info { "found by search '$text': ${ccl.size}" }
-
-                                            SwingUtilities.invokeLater {
-                                                tf.background = Color.GREEN
-                                                menu.removeAll()
-                                                ccl.forEach { menu.add(it.component()) }
-                                                menu.add(createTools(baseDialog))
-                                                menu.doClick()
+                TextFieldWithText("Поиск")
+                    .apply { ->
+                        val tf = this
+                        columns = 5
+                        addKeyListener(object : KeyAdapter() {
+                            override fun keyPressed(e: KeyEvent) {
+                                if (e.keyCode == KeyEvent.VK_ENTER) {
+                                    val cache = RocketActionComponentCacheFactory.cache
+                                    if (text.isNotEmpty()) {
+                                        cache
+                                            .all()
+                                            .filter { it.contains(text) }
+                                            .takeIf { it.isNotEmpty() }
+                                            ?.let { ccl ->
+                                                logger.info { "found by search '$text': ${ccl.size}" }
+                                                SwingUtilities.invokeLater {
+                                                    tf.background = Color.GREEN
+                                                    menu.removeAll()
+                                                    ccl.forEach { menu.add(it.component()) }
+                                                    menu.add(createTools(baseDialog))
+                                                    menu.doClick()
+                                                }
                                             }
-                                        }
-                                } else {
-                                    SwingUtilities.invokeLater { tf.background = Color.WHITE }
-                                    CreateMenuWorker(menu).execute()
+                                    } else {
+                                        SwingUtilities.invokeLater { tf.background = Color.WHITE }
+                                        CreateMenuWorker(menu).execute()
+                                    }
+                                } else if (e.keyCode == KeyEvent.VK_ESCAPE) {
+                                    resetSearch(textField = tf, menu = menu)
                                 }
                             }
-                        }
-                    })
-                }
+                        })
+                    }
             add(textField)
             add(
                 JLabel(IconRepositoryFactory.repository.by(AppIcon.CLEAR))
                     .apply {
                         addMouseListener(object : MouseAdapter() {
                             override fun mouseReleased(e: MouseEvent?) {
-                                textField.text = ""
-                                SwingUtilities.invokeLater { textField.background = Color.WHITE }
-                                CreateMenuWorker(menu).execute()
+                                resetSearch(textField = textField, menu = menu)
                             }
                         })
                     }
             )
         }
+
+    private fun resetSearch(textField: JTextField, menu: JMenu) {
+        textField.text = ""
+        SwingUtilities.invokeLater { textField.background = Color.WHITE }
+        CreateMenuWorker(menu).execute()
+    }
 
     private fun createTools(baseDialog: JDialog): JMenu {
         val menuTools = JMenu("Инструменты")
