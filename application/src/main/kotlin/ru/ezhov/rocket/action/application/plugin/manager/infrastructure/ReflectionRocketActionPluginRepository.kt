@@ -1,5 +1,8 @@
 package ru.ezhov.rocket.action.application.plugin.manager.infrastructure
 
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
 import ru.ezhov.rocket.action.api.RocketAction
 import ru.ezhov.rocket.action.api.RocketActionConfiguration
@@ -37,33 +40,43 @@ class ReflectionRocketActionPluginRepository : RocketActionPluginRepository {
         "ru.ezhov.rocket.action.plugin.noteonfile.NoteOnFileRocketActionUi",
     )
 
-    private fun load() {
+    private fun load() = runBlocking {
         val times = measureTimeMillis {
             logger.info { "Initialise configuration rocket action repository" }
-
-            list = mutableListOf()
-
-            configs.forEach { classAsName ->
-                val initTimeClass = measureTimeMillis {
-                    try {
-                        val clazz = Class.forName(classAsName)
-                        val plugin = clazz.newInstance() as RocketActionPlugin
-                        list.add(RocketActionPluginDecorator(plugin))
-                    } catch (e: InstantiationException) {
-                        logger.warn(e) { "Error when load class $classAsName" }
-                    } catch (e: IllegalAccessException) {
-                        logger.warn(e) { "Error when load class $classAsName" }
-                    } catch (e: NoSuchMethodException) {
-                        logger.warn(e) { "Error when load class $classAsName" }
-                    } catch (e: Exception) {
-                        logger.warn(e) { "Error when load class $classAsName" }
-                    }
+            list = configs
+                .map { classAsName ->
+                    async { loadPlugin(classAsName) }
                 }
-
-                logger.debug { "Initialize timeMs='$initTimeClass' for class='$classAsName'}" }
-            }
+                .awaitAll()
+                .filterNotNull()
+                .toMutableList()
         }
         logger.info { "Configuration rocket action repository initialize successful. timeMs=$times count=${list.size}" }
+    }
+
+    private fun loadPlugin(classAsName: String): RocketActionPlugin? {
+        var rap: RocketActionPlugin? = null
+        val initTimeClass = measureTimeMillis {
+            try {
+                logger.debug { "Initialize class='$classAsName'} run..." }
+
+                val clazz = Class.forName(classAsName)
+                val plugin = clazz.newInstance() as RocketActionPlugin
+                rap = RocketActionPluginDecorator(plugin)
+            } catch (e: InstantiationException) {
+                logger.warn(e) { "Error when load class $classAsName" }
+            } catch (e: IllegalAccessException) {
+                logger.warn(e) { "Error when load class $classAsName" }
+            } catch (e: NoSuchMethodException) {
+                logger.warn(e) { "Error when load class $classAsName" }
+            } catch (e: Exception) {
+                logger.warn(e) { "Error when load class $classAsName" }
+            }
+        }
+
+        logger.debug { "Initialize timeMs='$initTimeClass' for class='$classAsName'}" }
+
+        return rap
     }
 
     override fun all(): List<RocketActionPlugin> {
