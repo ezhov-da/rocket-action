@@ -7,13 +7,14 @@ import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
 import ru.ezhov.rocket.action.api.RocketActionConfigurationPropertyKey
 import ru.ezhov.rocket.action.api.RocketActionFactoryUi
 import ru.ezhov.rocket.action.api.RocketActionPlugin
+import ru.ezhov.rocket.action.api.RocketActionPropertySpec
 import ru.ezhov.rocket.action.api.RocketActionSettings
 import ru.ezhov.rocket.action.api.RocketActionType
+import ru.ezhov.rocket.action.api.support.AbstractRocketAction
 import ru.ezhov.rocket.action.icon.AppIcon
 import ru.ezhov.rocket.action.icon.IconRepositoryFactory
 import ru.ezhov.rocket.action.notification.NotificationFactory
 import ru.ezhov.rocket.action.notification.NotificationType
-import ru.ezhov.rocket.action.api.support.AbstractRocketAction
 import java.awt.BorderLayout
 import java.awt.Component
 import javax.script.ScriptEngineManager
@@ -46,8 +47,11 @@ class KotlinScriptRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
                         }
                         val panelExecute = PanelExecute(parentMenu = menu, script = script, icon = icon)
                         menu.add(panelExecute)
+                        menu.icon = icon
 
-                        ScriptLoader(menu = menu, script = script, panelExecute = panelExecute, icon = icon).execute()
+                        if (settings.settings()[EXECUTE_ON_LOAD].toBoolean()) {
+                            ScriptLoader(menu = menu, script = script, panelExecute = panelExecute, icon = icon).execute()
+                        }
 
                         object : RocketAction {
                             override fun contains(search: String): Boolean =
@@ -123,6 +127,13 @@ class KotlinScriptRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
             createRocketActionProperty(key = SCRIPT, name = SCRIPT.value, description = "Скрипт для выполнения", required = true),
             createRocketActionProperty(key = LABEL, name = LABEL.value, description = "Заголовок", required = true),
             createRocketActionProperty(key = DESCRIPTION, name = DESCRIPTION.value, description = "Описание", required = false),
+            createRocketActionProperty(
+                key = EXECUTE_ON_LOAD,
+                name = EXECUTE_ON_LOAD.value,
+                description = "Выполнять скрипт при загрузке",
+                required = true,
+                property = RocketActionPropertySpec.BooleanPropertySpec(defaultValue = false),
+            ),
         )
     }
 
@@ -135,5 +146,6 @@ class KotlinScriptRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
         private val LABEL = RocketActionConfigurationPropertyKey("label")
         private val SCRIPT = RocketActionConfigurationPropertyKey("script")
         private val DESCRIPTION = RocketActionConfigurationPropertyKey("description")
+        private val EXECUTE_ON_LOAD = RocketActionConfigurationPropertyKey("executeOnLoad")
     }
 }
