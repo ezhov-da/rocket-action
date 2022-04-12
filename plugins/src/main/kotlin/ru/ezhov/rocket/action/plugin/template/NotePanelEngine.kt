@@ -4,22 +4,24 @@ import ru.ezhov.rocket.action.notification.NotificationFactory
 import ru.ezhov.rocket.action.notification.NotificationType
 import ru.ezhov.rocket.action.plugin.template.domain.Engine
 import java.awt.BorderLayout
+import java.awt.Dimension
 import java.awt.Toolkit
 import java.awt.datatransfer.StringSelection
 import java.awt.event.KeyAdapter
 import java.awt.event.KeyEvent
 import javax.swing.JButton
-import javax.swing.JLabel
 import javax.swing.JPanel
+import javax.swing.JScrollPane
+import javax.swing.JTextPane
 import javax.swing.SwingUtilities
 
 class NotePanelEngine(private val originText: String, private val engine: Engine) : JPanel(BorderLayout()) {
     private val panelEngine: PanelEngine
-    private val labelText: JLabel
+    private val textPane: JTextPane
     private fun apply() {
         val finalText = engine.apply(originText, panelEngine.apply())
         SwingUtilities.invokeLater {
-            labelText.text = finalText
+            textPane.text = finalText
             val defaultToolkit = Toolkit.getDefaultToolkit()
             val clipboard = defaultToolkit.systemClipboard
             clipboard.setContents(StringSelection(finalText), null)
@@ -36,14 +38,22 @@ class NotePanelEngine(private val originText: String, private val engine: Engine
                 }
             }
         })
-        add(panelEngine, BorderLayout.CENTER)
+        val screenSize = Toolkit.getDefaultToolkit().screenSize
+        val panelDimension = Dimension((screenSize.width * 0.3).toInt(), (screenSize.height * 0.2).toInt())
+        size = panelDimension
+        minimumSize = panelDimension
+        maximumSize = panelDimension
+        preferredSize = panelDimension
+        add(panelEngine, BorderLayout.NORTH)
         val button = JButton("Применить (CTRL + ENTER на поле)")
         val panelButton = JPanel(BorderLayout())
         panelButton.add(button, BorderLayout.NORTH)
-        labelText = JLabel(originText)
-        panelButton.add(button, BorderLayout.NORTH)
-        panelButton.add(labelText, BorderLayout.CENTER)
-        add(panelButton, BorderLayout.SOUTH)
+        textPane = JTextPane().apply {
+            text = originText
+            isEditable = false
+        }
+        panelButton.add(JScrollPane(textPane), BorderLayout.CENTER)
+        add(panelButton, BorderLayout.CENTER)
         button.addActionListener { apply() }
     }
 }

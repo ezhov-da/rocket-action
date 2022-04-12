@@ -8,7 +8,6 @@ import org.apache.velocity.runtime.resource.loader.StringResourceLoader
 import org.apache.velocity.runtime.resource.util.StringResourceRepository
 import ru.ezhov.rocket.action.plugin.template.domain.Engine
 import java.io.StringWriter
-import java.util.regex.Pattern
 
 class VelocityEngineImpl : Engine {
     override fun apply(template: String, values: Map<String, String>): String {
@@ -22,11 +21,11 @@ class VelocityEngineImpl : Engine {
 
         // Initialize my template repository. You can replace the "Hello $w" with your String.
         val repo = engine.getApplicationAttribute(StringResourceLoader.REPOSITORY_NAME_DEFAULT) as StringResourceRepository
-        repo.putStringResource("template", template)
+        repo.putStringResource("template", templateWithoutWorlds(template))
 
         // Set parameters for my template.
         val context = VelocityContext()
-        values.forEach { (key: String?, value: String?) -> context.put(key, value) }
+        values.forEach { (key: String, value: String) -> context.put(key, value) }
 
         // Get and merge the template with my parameters.
         val templateVelocity = engine.getTemplate("template", "UTF-8")
@@ -35,16 +34,19 @@ class VelocityEngineImpl : Engine {
         return writer.toString()
     }
 
-    override fun words(text: String): List<String> {
-        val words: MutableList<String> = ArrayList()
-        val pattern = Pattern.compile("\\$\\w+")
-        val matcher = pattern.matcher(text.replace("\n\r", ""))
-        while (matcher.find()) {
-            val w = matcher.group()
-            if (!words.contains(w)) {
-                words.add(matcher.group())
-            }
-        }
-        return words
+    companion object {
+        private const val PREFIX_VARIABLE = "_>"
     }
+
+    override fun words(text: String): List<String> =
+        text
+            .lines()
+            .filter { it.startsWith(PREFIX_VARIABLE) }
+            .map { it.substringAfter(PREFIX_VARIABLE).trim() }
+
+    private fun templateWithoutWorlds(text: String): String =
+        text
+            .lines()
+            .filter { !it.startsWith(PREFIX_VARIABLE) }
+            .joinToString(separator = "")
 }

@@ -17,11 +17,14 @@ import ru.ezhov.rocket.action.notification.NotificationFactory
 import ru.ezhov.rocket.action.notification.NotificationType
 import java.awt.BorderLayout
 import java.awt.Component
+import java.awt.Dimension
+import java.awt.Toolkit
 import javax.script.ScriptEngineManager
 import javax.swing.Icon
 import javax.swing.JButton
 import javax.swing.JMenu
 import javax.swing.JPanel
+import javax.swing.JScrollPane
 import javax.swing.JTextPane
 import javax.swing.SwingWorker
 
@@ -102,12 +105,18 @@ class KotlinScriptRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
 
         init {
             layout = BorderLayout()
+            val screenSize = Toolkit.getDefaultToolkit().screenSize
+            val panelDimension = Dimension((screenSize.width * 0.3).toInt(), (screenSize.height * 0.2).toInt())
+            size = panelDimension
+            minimumSize = panelDimension
+            preferredSize = panelDimension
+            maximumSize = panelDimension
             buttonExecute.addActionListener {
                 ScriptLoader(menu = parentMenu, script = script, panelExecute = this, icon = icon)
                     .execute()
             }
 
-            add(textPane, BorderLayout.NORTH)
+            add(JScrollPane(textPane), BorderLayout.CENTER)
             add(buttonExecute, BorderLayout.SOUTH)
         }
 

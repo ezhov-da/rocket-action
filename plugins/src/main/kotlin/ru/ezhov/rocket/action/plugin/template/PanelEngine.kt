@@ -36,15 +36,6 @@ internal class PanelEngine(words: List<String>, keyListenerForAllTextFields: Key
             )
     }
 
-    fun initVariables(map: Map<String, String?>) {
-        map.forEach { (k: String, v: String?) ->
-            val textField = this.map["$$k"]
-            if (textField != null) {
-                textField.text = v
-            }
-        }
-    }
-
     init {
         this.words = words.sortedBy { it }
         layout = BorderLayout()

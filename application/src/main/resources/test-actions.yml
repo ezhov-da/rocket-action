@@ -155,7 +155,9 @@ actions:
     _id: 25
     label: kubectl get all -n $ns 2323462346
     description: COPY_TO_CLIPBOARD_TEMPLATE
-    text: kubectl get all -n $ns
+    text: |
+        _>ns
+        kubectl get all -n $ns
 
   - type: SHOW_TEXT_AS_MENU
     _id: 26
@@ -184,7 +186,7 @@ actions:
       import java.time.ZoneId
       import java.time.temporal.ChronoUnit
       import kotlin.math.ceil
-      
+
       val daysInSprint = 14
       val firstDateFirstSprint: LocalDate = LocalDate.of(2021, 7, 26)
       val endDateFirstSprint: LocalDate = firstDateFirstSprint.plusDays(daysInSprint.toLong())
@@ -192,13 +194,13 @@ actions:
       val daysBetween = ChronoUnit.DAYS.between(endDateFirstSprint, nowDate)
       val plusSprint = if (daysBetween < daysInSprint) 1 else ceil(daysBetween / daysInSprint.toDouble()).toInt()
       val currentSprintNumber = plusSprint + 1 //sprint
-      
+
       val daysBetweenStartAndCurrent = ChronoUnit.DAYS.between(firstDateFirstSprint, nowDate)
       val daysCurrentSprint = ceil(daysBetweenStartAndCurrent / daysInSprint.toDouble()).toInt()
       val startCurrentSprintDay = (daysCurrentSprint * daysInSprint) - daysInSprint
       val startCurrentSprint: LocalDate = firstDateFirstSprint.plusDays(startCurrentSprintDay.toLong())
       val endCurrentSprint: LocalDate = startCurrentSprint.plusDays(daysInSprint.toLong() - 1)
-      
+
       "Sprint № $currentSprintNumber. Начало `$startCurrentSprint` окончание `$endCurrentSprint`"
 
   - type: NOTE_ON_FILE
