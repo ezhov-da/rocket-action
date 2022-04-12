@@ -69,7 +69,7 @@ class VelocityEngineImplTest {
                 ))
 
         assertThat(result)
-            .isEqualTo("1 2 3")
+            .isEqualTo("1234567")
     }
 
 
