@@ -9,10 +9,11 @@ import ru.ezhov.rocket.action.notification.NotificationType
 import ru.ezhov.rocket.action.plugin.note.application.NoteApplicationService
 import ru.ezhov.rocket.action.plugin.note.domain.model.Note
 import ru.ezhov.rocket.action.plugin.url.parser.UrlParser
+import ru.ezhov.rocket.action.plugin.url.parser.UrlParserFilter
+import ru.ezhov.rocket.action.plugin.url.parser.UrlParserResult
 import ru.ezhov.rocket.action.ui.swing.common.MoveUtil
 import java.awt.BorderLayout
 import java.awt.Color
-import java.awt.Dialog
 import java.awt.Dimension
 import java.awt.Toolkit
 import java.awt.datatransfer.Clipboard
@@ -32,7 +33,6 @@ import javax.swing.BorderFactory
 import javax.swing.JButton
 import javax.swing.JComponent
 import javax.swing.JDialog
-import javax.swing.JFrame
 import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.JScrollPane
@@ -226,11 +226,11 @@ class NoteDialog(
         private class UrlLoader(
             private val url: String,
             private val executeOnDone: (value: String) -> Unit
-        ) : SwingWorker<String, String>() {
-            override fun doInBackground(): String = UrlParser(url = url, headers = emptyMap()).parse()
+        ) : SwingWorker<UrlParserResult, String>() {
+            override fun doInBackground(): UrlParserResult = UrlParser(url = url, headers = emptyMap()).parse(UrlParserFilter())
 
             override fun done() {
-                executeOnDone(this.get())
+                executeOnDone(this.get().title.orEmpty())
             }
         }
     }

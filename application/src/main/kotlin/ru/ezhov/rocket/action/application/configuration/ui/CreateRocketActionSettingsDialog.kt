@@ -31,6 +31,8 @@ import javax.swing.JLabel
 import javax.swing.JList
 import javax.swing.JPanel
 import javax.swing.JScrollPane
+import javax.swing.JSpinner
+import javax.swing.SpinnerNumberModel
 import javax.swing.SwingUtilities
 import javax.swing.WindowConstants
 
@@ -214,6 +216,16 @@ class CreateRocketActionSettingsDialog(
                                 valueCallback = { l.selectedItem.toString() }
                             }
                     ), BorderLayout.CENTER)
+                }
+                is RocketActionPropertySpec.IntPropertySpec -> {
+                    val default = configProperty.defaultValue?.toIntOrNull() ?: 0
+                    centerPanel.add(
+                        JSpinner(SpinnerNumberModel(default, configProperty.min, configProperty.max, 1))
+                            .also {
+                                valueCallback = { it.model.value.toString() }
+                            },
+                        BorderLayout.CENTER
+                    )
                 }
             }
 

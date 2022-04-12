@@ -16,6 +16,8 @@ import ru.ezhov.rocket.action.icon.IconRepositoryFactory
 import ru.ezhov.rocket.action.notification.NotificationFactory
 import ru.ezhov.rocket.action.notification.NotificationType
 import ru.ezhov.rocket.action.plugin.url.parser.UrlParser
+import ru.ezhov.rocket.action.plugin.url.parser.UrlParserFilter
+import ru.ezhov.rocket.action.plugin.url.parser.UrlParserResult
 import ru.ezhov.rocket.action.ui.swing.common.TextFieldWithText
 import java.awt.BorderLayout
 import java.awt.Component
@@ -72,8 +74,13 @@ class UrlParserRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
                         addActionListener(
                             ButtonListener(
                                 callbackUrl = { textField.text },
-                                callbackSetText = { text ->
-                                    SwingUtilities.invokeLater { txt.text = text }
+                                callbackSetText = { result ->
+                                    SwingUtilities.invokeLater {
+                                        txt.text = """
+                                        ${result.title}
+                                        ${result.description}
+                                    """.trimIndent()
+                                    }
                                 },
                                 headers = headers
                             )
@@ -140,7 +147,7 @@ class UrlParserRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
 
     private class ButtonListener(
         private val callbackUrl: () -> String,
-        private val callbackSetText: (value: String) -> Unit,
+        private val callbackSetText: (value: UrlParserResult) -> Unit,
         private val headers: Map<String, String>
     ) : ActionListener {
         override fun actionPerformed(e: ActionEvent?) {
@@ -155,14 +162,15 @@ class UrlParserRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
         private class UrlWorker(
             private val button: JButton,
             private val url: String,
-            private val callbackSetText: (value: String) -> Unit,
+            private val callbackSetText: (value: UrlParserResult) -> Unit,
             private val headers: Map<String, String>,
-        ) : SwingWorker<String, String>() {
+        ) : SwingWorker<UrlParserResult, UrlParserResult>() {
             init {
                 button.icon = ImageIcon(this.javaClass.getResource("/load_16x16.gif"))
             }
 
-            override fun doInBackground(): String = UrlParser(url, headers).parse()
+            override fun doInBackground(): UrlParserResult =
+                UrlParser(url, headers).parse(UrlParserFilter(readTitle = true, readDescription = true))
 
             override fun done() {
                 try {

@@ -29,6 +29,8 @@ import javax.swing.JComboBox
 import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.JScrollPane
+import javax.swing.JSpinner
+import javax.swing.SpinnerNumberModel
 import javax.swing.SwingConstants
 
 private val logger = KotlinLogging.logger {}
@@ -224,6 +226,16 @@ class EditorRocketActionSettingsPanel(
                                         valueCallback = { l.selectedItem.toString() }
                                     }
                             ), BorderLayout.CENTER)
+                        }
+                        is RocketActionPropertySpec.IntPropertySpec -> {
+                            val default = configProperty.defaultValue?.toIntOrNull() ?: 0
+                            centerPanel.add(
+                                JSpinner(SpinnerNumberModel(default, configProperty.min, configProperty.max, 1))
+                                    .also {
+                                        valueCallback = { it.model.value.toString() }
+                                    },
+                                BorderLayout.CENTER
+                            )
                         }
                     }
 
