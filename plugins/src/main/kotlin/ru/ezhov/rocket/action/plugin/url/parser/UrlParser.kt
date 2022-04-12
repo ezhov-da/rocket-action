@@ -14,7 +14,6 @@ class UrlParser(
                 .headers(headers)
                 .get()
 
-
         val title = if (filter.readTitle) doc.title() else null
         val elementsMeta = doc.getElementsByTag("meta")
         val description = if (filter.readDescription) {
