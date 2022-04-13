@@ -109,7 +109,7 @@ class OpenUrlWithTextRocketActionUi : AbstractRocketAction(), RocketActionPlugin
                 name = IS_ENCODE.value,
                 description = "Кодировать для URL",
                 required = false,
-                property =  RocketActionPropertySpec.BooleanPropertySpec(defaultValue = false),
+                property = RocketActionPropertySpec.BooleanPropertySpec(defaultValue = false),
             )
         )
     }

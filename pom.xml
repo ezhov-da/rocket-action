@@ -27,13 +27,27 @@
     </properties>
 
     <modules>
+        <module>utils</module>
         <module>ui-utils</module>
         <module>notification</module>
         <module>icon</module>
         <module>cache</module>
         <module>plugin-api</module>
         <module>plugin-note-on-file</module>
-        <module>plugins</module>
+        <module>plugin-copy-to-clipboard</module>
+        <module>plugin-exec</module>
+        <module>plugin-gist</module>
+        <module>plugin-note</module>
+        <module>plugin-open-file</module>
+        <module>plugin-open-url</module>
+        <module>plugin-script</module>
+        <module>plugin-separator</module>
+        <module>plugin-show-image</module>
+        <module>plugin-show-image-svg</module>
+        <module>plugin-template</module>
+        <module>plugin-text</module>
+        <module>plugin-todoist</module>
+        <module>plugin-url-parser</module>
         <module>application</module>
     </modules>
 

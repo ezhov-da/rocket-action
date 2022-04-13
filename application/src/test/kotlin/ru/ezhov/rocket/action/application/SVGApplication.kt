@@ -15,10 +15,15 @@ import java.awt.event.InputEvent
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
 import java.io.IOException
-import javax.swing.*
+import javax.swing.JButton
+import javax.swing.JComponent
+import javax.swing.JFileChooser
+import javax.swing.JFrame
+import javax.swing.JLabel
+import javax.swing.JPanel
 
 class SVGApplication(  // The frame.
-        protected var frame: JFrame) {
+    protected var frame: JFrame) {
     // The "Load" button, which displays up a file chooser upon clicking.
     protected var button = JButton("Load...")
 

@@ -13,9 +13,9 @@ class InterfaceTest {
     @Test
     fun searchImplementationTest() {
         val reflections = Reflections(
-                ConfigurationBuilder()
-                        .addUrls(ClasspathHelper.forPackage("ru.ezhov.rocket.action"))
-                        .setScanners(Scanners.SubTypes)
+            ConfigurationBuilder()
+                .addUrls(ClasspathHelper.forPackage("ru.ezhov.rocket.action"))
+                .setScanners(Scanners.SubTypes)
         )
         val classes = reflections.getSubTypesOf(RocketActionConfiguration::class.java)
         for (aClass in classes) {

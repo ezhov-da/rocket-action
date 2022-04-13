@@ -9,139 +9,141 @@
 
 package net.sf.image4j.test;
 
-import java.io.*;
+import javax.imageio.ImageIO;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 
-import javax.imageio.ImageIO;
-
 /**
- *
  * @author Ian McDonagh
  */
 public class Test {
 
-	public static void main(String[] args) {
+    public static void main(String[] args) {
 
-		// input and output file names
+        // input and output file names
 
-		if (args.length < 2) {
-			System.out.println("Usage:\n\tTest <inputfile> <outputfile>");
-			System.exit(1);
-		}
-		
-		String strInFile = args[0];
-		String strOutFile = args[1];
+        if (args.length < 2) {
+            System.out.println("Usage:\n\tTest <inputfile> <outputfile>");
+            System.exit(1);
+        }
 
-		InputStream in = null;
-		try {
-			
-			java.util.List<java.awt.image.BufferedImage> images;
+        String strInFile = args[0];
+        String strOutFile = args[1];
 
-			/***** decode ICO and save images as BMP and PNG ****/
+        InputStream in = null;
+        try {
 
-			if (strInFile.startsWith("http:")) {
-				in = new URL(strInFile).openStream();
-			} else {
-				in = new FileInputStream(strInFile);
-			}
-			
-			if (!strInFile.endsWith(".ico")) {
+            java.util.List<java.awt.image.BufferedImage> images;
 
-				images = new ArrayList<java.awt.image.BufferedImage>(1);
-				images.add(ImageIO.read(in));
-				
-				System.out.println("Read image "+strInFile+"...OK");
-				
-			} else {
+            /***** decode ICO and save images as BMP and PNG ****/
 
-				System.out.println("Decoding ICO file '" + strInFile + "'.");
+            if (strInFile.startsWith("http:")) {
+                in = new URL(strInFile).openStream();
+            } else {
+                in = new FileInputStream(strInFile);
+            }
 
-				// load and decode ICO file
+            if (!strInFile.endsWith(".ico")) {
 
-				images = net.sf.image4j.codec.ico.ICODecoder.read(in);
-				System.out.println("ICO decoding...OK");
+                images = new ArrayList<java.awt.image.BufferedImage>(1);
+                images.add(ImageIO.read(in));
 
-				// display summary of decoded images
+                System.out.println("Read image " + strInFile + "...OK");
 
-				System.out.println("  image count = " + images.size());
-				System.out.println("  image summary:");
-				for (int i = 0; i < images.size(); i++) {
-					java.awt.image.BufferedImage img = images.get(i);
-					int bpp = img.getColorModel().getPixelSize();
-					int width = img.getWidth();
-					int height = img.getHeight();
-					System.out.println("    # " + i + ": size=" + width + "x"
-							+ height + "; colour depth=" + bpp + " bpp");
-				}
+            } else {
 
-				// save images as separate BMP and PNG files
+                System.out.println("Decoding ICO file '" + strInFile + "'.");
 
-				System.out.println("  saving separate images:");
+                // load and decode ICO file
 
-				String format = "png";
+                images = net.sf.image4j.codec.ico.ICODecoder.read(in);
+                System.out.println("ICO decoding...OK");
 
-				for (int j = 0; j < images.size(); j++) {
-					java.awt.image.BufferedImage img = images.get(j);
-					String name = strOutFile + "-" + j;
-					File bmpFile = new File(name + ".bmp");
-					File pngFile = new File(name + ".png");
+                // display summary of decoded images
 
-					// write BMP
-					System.out.println("    writing '" + name + ".bmp'");
-					net.sf.image4j.codec.bmp.BMPEncoder.write(img, bmpFile);
+                System.out.println("  image count = " + images.size());
+                System.out.println("  image summary:");
+                for (int i = 0; i < images.size(); i++) {
+                    java.awt.image.BufferedImage img = images.get(i);
+                    int bpp = img.getColorModel().getPixelSize();
+                    int width = img.getWidth();
+                    int height = img.getHeight();
+                    System.out.println("    # " + i + ": size=" + width + "x"
+                        + height + "; colour depth=" + bpp + " bpp");
+                }
 
-					// write PNG
-					System.out.println("    writing '" + name + ".png'");
-					ImageIO.write(img, format, pngFile);
-				}
+                // save images as separate BMP and PNG files
 
-				System.out.println("BMP encoding...OK");
+                System.out.println("  saving separate images:");
 
-				/***** reload BMP images *****/
+                String format = "png";
 
-				System.out.println("  reloading BMP files:");
+                for (int j = 0; j < images.size(); j++) {
+                    java.awt.image.BufferedImage img = images.get(j);
+                    String name = strOutFile + "-" + j;
+                    File bmpFile = new File(name + ".bmp");
+                    File pngFile = new File(name + ".png");
 
-				java.util.List<java.awt.image.BufferedImage> images2 = new ArrayList<java.awt.image.BufferedImage>(
-						images.size());
+                    // write BMP
+                    System.out.println("    writing '" + name + ".bmp'");
+                    net.sf.image4j.codec.bmp.BMPEncoder.write(img, bmpFile);
 
-				for (int k = 0; k < images.size(); k++) {
-					String name = strOutFile + "-" + k + ".bmp";
-					File file = new File(name);
+                    // write PNG
+                    System.out.println("    writing '" + name + ".png'");
+                    ImageIO.write(img, format, pngFile);
+                }
 
-					// read BMP
-					System.out.println("    reading '" + name + "'");
-					java.awt.image.BufferedImage image = net.sf.image4j.codec.bmp.BMPDecoder
-							.read(file);
-					images2.add(image);
-				}
+                System.out.println("BMP encoding...OK");
 
-				System.out.println("BMP decoding...OK");
+                /***** reload BMP images *****/
 
-			}
+                System.out.println("  reloading BMP files:");
 
-			/***** encode images and save as ICO *****/
+                java.util.List<java.awt.image.BufferedImage> images2 = new ArrayList<java.awt.image.BufferedImage>(
+                    images.size());
 
-			System.out.println("Encoding ICO file '" + strOutFile + "'.");
+                for (int k = 0; k < images.size(); k++) {
+                    String name = strOutFile + "-" + k + ".bmp";
+                    File file = new File(name);
 
-			File outFile = new File(strOutFile);
+                    // read BMP
+                    System.out.println("    reading '" + name + "'");
+                    java.awt.image.BufferedImage image = net.sf.image4j.codec.bmp.BMPDecoder
+                        .read(file);
+                    images2.add(image);
+                }
 
-			net.sf.image4j.codec.ico.ICOEncoder.write(images, outFile);
+                System.out.println("BMP decoding...OK");
 
-			System.out.println("ICO encoding...OK");
+            }
 
-		} catch (IOException ex) {
-			ex.printStackTrace();
-		} finally {
-			try {
-				in.close();
-			} catch (IOException ex) { }
-		}
+            /***** encode images and save as ICO *****/
 
-	}
+            System.out.println("Encoding ICO file '" + strOutFile + "'.");
 
-	private static void usage() {
+            File outFile = new File(strOutFile);
 
-	}
+            net.sf.image4j.codec.ico.ICOEncoder.write(images, outFile);
+
+            System.out.println("ICO encoding...OK");
+
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        } finally {
+            try {
+                in.close();
+            } catch (IOException ex) {
+            }
+        }
+
+    }
+
+    private static void usage() {
+
+    }
 
 }
