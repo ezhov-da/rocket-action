@@ -242,7 +242,8 @@ class EditorRocketActionSettingsPanel(
                     this.add(topPanel, BorderLayout.NORTH)
                     this.add(centerPanel, BorderLayout.CENTER)
                 } ?: run {
-                val text = "Обнаружено незарегистрированное свойство '${value.key.value}:${value.value}'"
+                val text = "Обнаружено незарегистрированное свойство '${value.key.value}:${value.value}' " +
+                    "description=${value.property?.description()}"
                 logger.warn { text }
                 NotificationFactory.notification.show(
                     type = NotificationType.WARN,
