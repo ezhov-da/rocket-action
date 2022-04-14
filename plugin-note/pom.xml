@@ -15,6 +15,8 @@
     <properties>
         <icon.version>0.17.4</icon.version>
         <rocket-action-plugin-api.version>0.19.0</rocket-action-plugin-api.version>
+        <rocket-action-utils.version>0.19.0</rocket-action-utils.version>
+        <rocket-action-ui-utils.version>0.0.1</rocket-action-ui-utils.version>
 
         <c3p0.version>0.9.5.5</c3p0.version>
     </properties>
@@ -30,6 +32,18 @@
             <groupId>ru.ezhov</groupId>
             <artifactId>rocket-action-icon</artifactId>
             <version>${icon.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>ru.ezhov</groupId>
+            <artifactId>rocket-action-utils</artifactId>
+            <version>${rocket-action-utils.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>ru.ezhov</groupId>
+            <artifactId>rocket-action-ui-utils</artifactId>
+            <version>${rocket-action-ui-utils.version}</version>
         </dependency>
 
         <dependency>
@@ -51,6 +65,18 @@
             <groupId>com.mchange</groupId>
             <artifactId>c3p0</artifactId>
             <version>${c3p0.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 

@@ -227,7 +227,8 @@ class NoteDialog(
             private val url: String,
             private val executeOnDone: (value: String) -> Unit
         ) : SwingWorker<UrlParserResult, String>() {
-            override fun doInBackground(): UrlParserResult = UrlParser(url = url, headers = emptyMap()).parse(UrlParserFilter())
+            override fun doInBackground(): UrlParserResult =
+                UrlParser(url = url, headers = emptyMap()).parse(UrlParserFilter())
 
             override fun done() {
                 executeOnDone(this.get().title.orEmpty())
