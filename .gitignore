@@ -2,6 +2,7 @@
 *.iml
 target
 notes
+application/plugins
 
 actions.yml
 

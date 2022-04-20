@@ -23,13 +23,7 @@
     </repositories>
 
     <properties>
-        <plugin-api.version>0.19.0</plugin-api.version>
-        <icon.version>0.17.4</icon.version>
-        <notification.version>0.17.3</notification.version>
-        <cache.version>0.17.3</cache.version>
-        <plugins.version>0.19.0</plugins.version>
-        <rocket-action-plugin-note-on-file.version>0.19.0</rocket-action-plugin-note-on-file.version>
-        <rocket-action-ui-utils.version>0.0.1</rocket-action-ui-utils.version>
+        <snakeyaml.version>1.30</snakeyaml.version>
 
         <flatlaf.version>2.0.2</flatlaf.version>
         <flatlaf-swingx.version>2.0.2</flatlaf-swingx.version>
@@ -39,43 +33,31 @@
         <dependency>
             <groupId>ru.ezhov</groupId>
             <artifactId>rocket-action-plugin-api</artifactId>
-            <version>${plugin-api.version}</version>
         </dependency>
 
         <dependency>
             <groupId>ru.ezhov</groupId>
-            <artifactId>rocket-action-plugins</artifactId>
-            <version>${plugins.version}</version>
+            <artifactId>rocket-action-utils</artifactId>
         </dependency>
 
         <dependency>
             <groupId>ru.ezhov</groupId>
             <artifactId>rocket-action-ui-utils</artifactId>
-            <version>${rocket-action-ui-utils.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>ru.ezhov</groupId>
-            <artifactId>rocket-action-plugin-note-on-file</artifactId>
-            <version>${rocket-action-plugin-note-on-file.version}</version>
         </dependency>
 
         <dependency>
             <groupId>ru.ezhov</groupId>
             <artifactId>rocket-action-icon</artifactId>
-            <version>${icon.version}</version>
         </dependency>
 
         <dependency>
             <groupId>ru.ezhov</groupId>
             <artifactId>rocket-action-notification</artifactId>
-            <version>${notification.version}</version>
         </dependency>
 
         <dependency>
             <groupId>ru.ezhov</groupId>
             <artifactId>rocket-action-cache</artifactId>
-            <version>${cache.version}</version>
         </dependency>
 
         <!--=====================================-->
@@ -83,6 +65,11 @@
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-stdlib</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.fifesoft</groupId>
+            <artifactId>rsyntaxtextarea</artifactId>
         </dependency>
 
         <dependency>
@@ -106,6 +93,12 @@
         </dependency>
 
         <dependency>
+            <groupId>org.yaml</groupId>
+            <artifactId>snakeyaml</artifactId>
+            <version>${snakeyaml.version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>com.formdev</groupId>
             <artifactId>flatlaf</artifactId>
             <version>${flatlaf.version}</version>
@@ -120,6 +113,13 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 

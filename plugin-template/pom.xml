@@ -13,10 +13,6 @@
     <version>0.19.0</version>
 
     <properties>
-        <icon.version>0.17.4</icon.version>
-        <rocket-action-plugin-api.version>0.19.0</rocket-action-plugin-api.version>
-        <rocket-action-ui-utils.version>0.0.1</rocket-action-ui-utils.version>
-
         <velocity.version>1.7</velocity.version>
     </properties>
 
@@ -24,34 +20,43 @@
         <dependency>
             <groupId>ru.ezhov</groupId>
             <artifactId>rocket-action-plugin-api</artifactId>
-            <version>${rocket-action-plugin-api.version}</version>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>ru.ezhov</groupId>
             <artifactId>rocket-action-icon</artifactId>
-            <version>${icon.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>ru.ezhov</groupId>
+            <artifactId>rocket-action-notification</artifactId>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>ru.ezhov</groupId>
             <artifactId>rocket-action-ui-utils</artifactId>
-            <version>${rocket-action-ui-utils.version}</version>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-stdlib</artifactId>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>io.github.microutils</groupId>
             <artifactId>kotlin-logging-jvm</artifactId>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>io.arrow-kt</groupId>
             <artifactId>arrow-core</artifactId>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
@@ -146,7 +151,7 @@
                     <descriptorRefs>
                         <descriptorRef>jar-with-dependencies</descriptorRef>
                     </descriptorRefs>
-                    <finalName>${project.artifactId}</finalName>
+                    <finalName>${project.artifactId}-${project.version}-fat</finalName>
                     <appendAssemblyId>false</appendAssemblyId>
                 </configuration>
                 <executions>
