@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 DIRECTORY=application/plugins
-mkdir -p $DIRECTORY && cp -f plugin-copy-to-clipboard/target/*fat.jar \
+rm -rf $DIRECTORY && mkdir -p $DIRECTORY && cp -f plugin-copy-to-clipboard/target/*fat.jar \
 plugin-exec/target/*fat.jar \
 plugin-gist/target/*fat.jar \
 plugin-note/target/*fat.jar \

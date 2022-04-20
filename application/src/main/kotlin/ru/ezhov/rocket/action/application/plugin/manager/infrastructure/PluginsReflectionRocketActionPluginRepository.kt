@@ -24,7 +24,7 @@ private val logger = KotlinLogging.logger {}
 class PluginsReflectionRocketActionPluginRepository : RocketActionPluginRepository {
     private var list: MutableList<RocketActionPlugin> = mutableListOf()
 
-    private val innerPlugins = listOf(GroupRocketActionUi.javaClass.canonicalName)
+    private val innerPlugins = listOf(GroupRocketActionUi::class.java.canonicalName)
 
     private fun load() = runBlocking {
         val times = measureTimeMillis {
