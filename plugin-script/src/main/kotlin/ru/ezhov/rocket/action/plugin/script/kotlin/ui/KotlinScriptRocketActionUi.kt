@@ -83,7 +83,11 @@ class KotlinScriptRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
 
         override fun doInBackground(): Any {
             val scriptEngine = ScriptEngineManager().getEngineByExtension("kts")
-            return scriptEngine.eval(script)
+            return if (scriptEngine == null) {
+                "Script manager not found"
+            } else {
+                scriptEngine.eval(script)
+            }
         }
 
         override fun done() {
@@ -151,10 +155,10 @@ class KotlinScriptRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
     override fun icon(): Icon? = icon
 
     companion object {
-        const val TYPE = "KOTLIN_SCRIPT"
-        private val LABEL = RocketActionConfigurationPropertyKey("label")
-        private val SCRIPT = RocketActionConfigurationPropertyKey("script")
-        private val DESCRIPTION = RocketActionConfigurationPropertyKey("description")
-        private val EXECUTE_ON_LOAD = RocketActionConfigurationPropertyKey("executeOnLoad")
+        internal const val TYPE = "KOTLIN_SCRIPT"
+        internal val LABEL = RocketActionConfigurationPropertyKey("label")
+        internal val SCRIPT = RocketActionConfigurationPropertyKey("script")
+        internal val DESCRIPTION = RocketActionConfigurationPropertyKey("description")
+        internal val EXECUTE_ON_LOAD = RocketActionConfigurationPropertyKey("executeOnLoad")
     }
 }
