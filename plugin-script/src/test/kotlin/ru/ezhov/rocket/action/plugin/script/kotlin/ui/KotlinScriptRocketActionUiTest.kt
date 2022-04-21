@@ -10,7 +10,6 @@ import javax.swing.JMenuBar
 import javax.swing.SwingUtilities
 import javax.swing.UIManager
 
-
 fun main() {
     SwingUtilities.invokeLater {
         try {
@@ -29,7 +28,7 @@ fun main() {
                 override fun settings(): Map<RocketActionConfigurationPropertyKey, String> =
                     mapOf(
                         KotlinScriptRocketActionUi.LABEL to "TEST",
-                        KotlinScriptRocketActionUi.SCRIPT to "test",
+                        KotlinScriptRocketActionUi.SCRIPT to "\"test\"",
                         KotlinScriptRocketActionUi.DESCRIPTION to "Description",
                         KotlinScriptRocketActionUi.EXECUTE_ON_LOAD to "true",
                     )

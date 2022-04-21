@@ -30,6 +30,7 @@
         <assertj-core.version>3.22.0</assertj-core.version>
         <slf4j-api.version>1.7.36</slf4j-api.version>
         <logback-classic.version>1.2.11</logback-classic.version>
+        <swingx.version>1.6.1</swingx.version>
     </properties>
 
     <modules>
@@ -98,6 +99,12 @@
             </dependency>
 
             <!--========================================-->
+
+            <dependency>
+                <groupId>org.swinglabs</groupId>
+                <artifactId>swingx</artifactId>
+                <version>${swingx.version}</version>
+            </dependency>
 
             <dependency>
                 <groupId>org.jetbrains.kotlin</groupId>

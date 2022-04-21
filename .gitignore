@@ -1,9 +1,8 @@
 .idea
 *.iml
 target
-notes
-application/plugins
+/notes
+/application/plugins
+/plugins
 
 actions.yml
-
-*.s3db

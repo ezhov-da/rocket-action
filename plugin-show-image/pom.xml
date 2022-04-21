@@ -13,7 +13,9 @@
     <version>0.19.0</version>
 
     <properties>
-        <swingx.version>1.6.1</swingx.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
 
     <dependencies>
@@ -55,7 +57,6 @@
         <dependency>
             <groupId>org.swinglabs</groupId>
             <artifactId>swingx</artifactId>
-            <version>${swingx.version}</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>

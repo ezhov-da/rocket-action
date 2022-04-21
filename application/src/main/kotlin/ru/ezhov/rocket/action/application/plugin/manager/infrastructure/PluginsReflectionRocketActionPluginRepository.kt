@@ -29,24 +29,55 @@ class PluginsReflectionRocketActionPluginRepository : RocketActionPluginReposito
     private fun load() = runBlocking {
         val times = measureTimeMillis {
             logger.info { "Initialise configuration rocket action repository" }
-            list = jars()
+            val fromJars = jars()
                 .map { jar ->
                     async { loadPlugin(jar) }
                 }
                 .awaitAll()
                 .flatten()
-                .plus(
-                    innerPlugins.mapNotNull { clazzName -> loadPlugin(clazzName) }
-                )
                 .toMutableList()
 
+
+            val inner = innerPlugins
+                .mapNotNull { clazzName ->
+                    async {
+                        loadPlugin(clazzName)
+                    }
+                }
+                .awaitAll()
+                .filterNotNull()
+                .toMutableList()
+
+            val extended = extendedPluginClassess()
+                .mapNotNull { clazzName ->
+                    async {
+                        loadPlugin(clazzName)
+                    }
+                }
+                .awaitAll()
+                .filterNotNull()
+                .toMutableList()
+
+            logger.info { "Load plugins. jars='${fromJars.size}' inner='${inner.size}' extended='${extended.size}'" }
+
+            val allPlugins = mutableListOf<RocketActionPlugin>()
+            allPlugins.addAll(fromJars)
+            allPlugins.addAll(inner)
+            allPlugins.addAll(extended)
+
+            list = allPlugins
         }
         logger.info { "Configuration rocket action repository initialize successful. timeMs=$times count=${list.size}" }
     }
 
     private fun jars() =
         File("plugins")
-            .listFiles { f -> f.name.endsWith(suffix = ".jar") }
+            .takeIf {
+                logger.info { "Plugins folder='${it.absolutePath}' exists=${it.exists()}" }
+                it.exists()
+            }
+            ?.listFiles { f -> f.name.endsWith(suffix = ".jar") }
+            ?: emptyArray()
 
     private fun loadPlugin(jar: File): List<RocketActionPlugin> {
         val plugins = mutableListOf<RocketActionPlugin>()
@@ -59,7 +90,7 @@ class PluginsReflectionRocketActionPluginRepository : RocketActionPluginReposito
             } else {
                 val text = jarFile.getInputStream(jarEntry)?.bufferedReader()?.use { it.readText() }
                 val classLoader by lazy {
-                    URLClassLoader.newInstance(arrayOf(jar.toURI().toURL()))
+                    URLClassLoader.newInstance(arrayOf(jar.toURI().toURL()), this.javaClass.classLoader)
                 }
                 text
                     ?.lines()
@@ -68,7 +99,7 @@ class PluginsReflectionRocketActionPluginRepository : RocketActionPluginReposito
                         try {
                             val clazz = classLoader.loadClass(clazzName)
                             val plugin = clazz.getDeclaredConstructor().newInstance() as RocketActionPlugin
-                            plugins.add(RocketActionPluginDecorator(plugin))
+                            plugins.add(RocketActionPluginDecorator(rocketActionPluginOriginal = plugin))
                         } catch (e: Exception) {
                             logger.warn(e) { "Error when load class '$clazzName' from file '${jar.absolutePath}'" }
                         }
@@ -100,6 +131,12 @@ class PluginsReflectionRocketActionPluginRepository : RocketActionPluginReposito
         return rap
     }
 
+    private fun extendedPluginClassess(): List<String> =
+        System.getProperty("rocket.action.extended.plugin.classess")
+            ?.split(";")
+            ?.map { it.trimIndent().trim() }
+            ?: emptyList()
+
     override fun all(): List<RocketActionPlugin> {
         if (list.isEmpty()) {
             load();
@@ -111,7 +148,7 @@ class PluginsReflectionRocketActionPluginRepository : RocketActionPluginReposito
         all().firstOrNull { r: RocketActionPlugin -> r.configuration().type().value() == type.value() }
 
     private class RocketActionPluginDecorator(
-        private val rocketActionPluginOriginal: RocketActionPlugin
+        private val rocketActionPluginOriginal: RocketActionPlugin,
     ) : RocketActionPlugin {
         override fun factory(): RocketActionFactoryUi = RocketActionFactoryUiDecorator(
             rocketActionFactoryUi = rocketActionPluginOriginal.factory()
