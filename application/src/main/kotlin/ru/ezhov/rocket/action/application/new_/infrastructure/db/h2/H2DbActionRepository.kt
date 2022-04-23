@@ -3,9 +3,13 @@ package ru.ezhov.rocket.action.application.new_.infrastructure.db.h2
 import arrow.core.Either
 import arrow.core.flatMap
 import org.ktorm.dsl.eq
+import org.ktorm.entity.filter
 import org.ktorm.entity.find
+import org.ktorm.entity.map
+import org.ktorm.entity.toCollection
 import ru.ezhov.rocket.action.application.new_.domain.ActionRepository
 import ru.ezhov.rocket.action.application.new_.domain.GetActionRepositoryException
+import ru.ezhov.rocket.action.application.new_.domain.GetChildrenActionRepositoryException
 import ru.ezhov.rocket.action.application.new_.domain.model.Action
 import ru.ezhov.rocket.action.application.new_.domain.model.ActionId
 import ru.ezhov.rocket.action.application.new_.domain.model.ActionOrder
@@ -18,7 +22,7 @@ class H2DbActionRepository(private val factory: KtormDbConnectionFactory) : Acti
     override fun action(id: ActionId): Either<GetActionRepositoryException, Action?> =
         factory.database { e ->
             GetActionRepositoryException(
-                message = "Error get connection when get action settings",
+                message = "Error get connection when get action by id=${id.value}",
                 cause = e
             )
         }
@@ -27,10 +31,10 @@ class H2DbActionRepository(private val factory: KtormDbConnectionFactory) : Acti
                     Either.Right(
                         db.actions
                             .find { it.id eq id.value }
-                            ?.let { ae -> ae.toDomainModel() }
+                            ?.toDomainModel()
                     )
                 } catch (e: Exception) {
-                    Either.Left(GetActionRepositoryException("Error when get action by id=${id.value.toString()}", e))
+                    Either.Left(GetActionRepositoryException("Error when get action by id=${id.value}", e))
                 }
             }
 
@@ -43,15 +47,48 @@ class H2DbActionRepository(private val factory: KtormDbConnectionFactory) : Acti
         parentId = parentId?.let { ActionId(it) },
     )
 
-    override fun actions(): Either<GetActionRepositoryException, List<Action>> {
-        TODO("Not yet implemented")
-    }
+    override fun actions(): Either<GetActionRepositoryException, List<Action>> =
+        factory.database { e ->
+            GetActionRepositoryException(
+                message = "Error get connection when get actions",
+                cause = e
+            )
+        }
+            .flatMap { db ->
+                try {
+                    Either.Right(
+                        db.actions.toCollection(ArrayList()).map { ae -> ae.toDomainModel() }
+                    )
+                } catch (e: Exception) {
+                    Either.Left(GetActionRepositoryException("Error when get actions", e))
+                }
+            }
 
     override fun save(action: Action): Either<GetActionRepositoryException, Unit> {
         TODO("Not yet implemented")
     }
 
-    override fun children(id: ActionId): Either<GetActionRepositoryException, List<Action>> {
-        TODO("Not yet implemented")
-    }
+    override fun children(id: ActionId): Either<GetChildrenActionRepositoryException, List<Action>> =
+        factory.database { e ->
+            GetChildrenActionRepositoryException(
+                message = "Error get connection when get action children by id=${id.value}",
+                cause = e
+            )
+        }
+            .flatMap { db ->
+                try {
+                    Either.Right(
+                        db.actions
+                            .filter { it.parentId eq id.value }
+                            .map { it.toDomainModel() }
+                    )
+                } catch (e: Exception) {
+                    Either.Left(
+                        GetChildrenActionRepositoryException(
+                            message = "Error when get action children by id=${id.value}",
+                            cause = e
+                        )
+                    )
+                }
+            }
 }

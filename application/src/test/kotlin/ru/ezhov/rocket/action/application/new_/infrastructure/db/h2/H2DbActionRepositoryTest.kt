@@ -36,4 +36,16 @@ class H2DbActionRepositoryTest {
             assertThat(action).isNull()
         }
     }
+
+    @Test
+    fun `should be get children successfully`() {
+        with(LiquibaseDbPreparedService.prepareH2Db(tempFolder = tempFolder)) {
+            val repo = H2DbActionRepository(H2DbKtormDbConnectionFactorySampleData.default(factory = dbCredentialsFactory))
+
+            val actions = repo.children(ActionIdSampleData.default("de16aba8-c229-11ec-9d64-0242ac120002"))
+                .getOrHandle { throw it }
+
+            assertThat(actions).hasSize(3)
+        }
+    }
 }
