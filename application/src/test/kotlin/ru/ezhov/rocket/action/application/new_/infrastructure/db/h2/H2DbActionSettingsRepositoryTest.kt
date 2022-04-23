@@ -51,9 +51,9 @@ class H2DbActionSettingsRepositoryTest {
             )
             val actionId =
                 ActionIdSampleData.default(uuidAsString = "de2a6ba8-c229-11ec-9d64-0242ac120002")
+            val actionSettingsFromRepo = repo.settings(actionId).getOrHandle { throw it }
             val name = ActionSettingName(value = "name123")
             val value = ActionSettingValue("value123")
-            val actionSettingsFromRepo = repo.settings(actionId).getOrHandle { throw it }
             val newActionSettings = actionSettingsFromRepo!!.addOrChangeProperty(
                 name = name,
                 value = value,
@@ -61,7 +61,6 @@ class H2DbActionSettingsRepositoryTest {
             repo.save(newActionSettings).getOrHandle { throw it }
 
             val actionSettingsFromRepoAfterSave = repo.settings(actionId).getOrHandle { throw it }
-
             assertThat(actionSettingsFromRepoAfterSave!!.value(name)!!.value).isEqualTo(value.value)
         }
     }

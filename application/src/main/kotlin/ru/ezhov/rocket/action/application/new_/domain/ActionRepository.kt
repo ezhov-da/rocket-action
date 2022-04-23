@@ -11,5 +11,5 @@ interface ActionRepository {
 
     fun save(action: Action): Either<GetActionRepositoryException, Unit>
 
-    fun children(id: ActionId): Either<GetActionRepositoryException, List<Action>>
+    fun children(id: ActionId): Either<GetChildrenActionRepositoryException, List<Action>>
 }
