@@ -1,0 +1,283 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.9.xsd">
+
+    <changeSet author="ezhovda" id="003-fill-table-action-c_dev" context="dev">
+        <insert tableName="ACTION">
+            <column name="ID" value="de1a6ba8-c229-11ec-9d64-0242ac120002"/>
+            <column name="TYPE" value="TODOIST"/>
+            <column name="CREATION_DATE" value="2022-04-22 13:55:11.189"/>
+            <column name="UPDATE_DATE" value="null"/>
+            <column name="ORDER" value="1"/>
+            <column name="PARENT_ID" value="null"/>
+        </insert>
+
+        <insert tableName="ACTION">
+            <column name="ID" value="de2a6ba8-c229-11ec-9d64-0242ac120002"/>
+            <column name="TYPE" value="SHOW_SVG_IMAGE"/>
+            <column name="CREATION_DATE" value="2022-04-22 13:55:11.202"/>
+            <column name="UPDATE_DATE" value="null"/>
+            <column name="ORDER" value="2"/>
+            <column name="PARENT_ID" value="null"/>
+        </insert>
+
+        <insert tableName="ACTION">
+            <column name="ID" value="de3a6ba8-c229-11ec-9d64-0242ac120002"/>
+            <column name="TYPE" value="SHOW_SVG_IMAGE"/>
+            <column name="CREATION_DATE" value="2022-04-22 13:55:11.205"/>
+            <column name="UPDATE_DATE" value="null"/>
+            <column name="ORDER" value="3"/>
+            <column name="PARENT_ID" value="null"/>
+        </insert>
+
+        <insert tableName="ACTION">
+            <column name="ID" value="de4a6ba8-c229-11ec-9d64-0242ac120002"/>
+            <column name="TYPE" value="GIST"/>
+            <column name="CREATION_DATE" value="2022-04-22 13:55:11.207"/>
+            <column name="UPDATE_DATE" value="null"/>
+            <column name="ORDER" value="4"/>
+            <column name="PARENT_ID" value="null"/>
+        </insert>
+
+        <insert tableName="ACTION">
+            <column name="ID" value="de5a6ba8-c229-11ec-9d64-0242ac120002"/>
+            <column name="TYPE" value="SHOW_TEXT"/>
+            <column name="CREATION_DATE" value="2022-04-22 13:55:11.202"/>
+            <column name="UPDATE_DATE" value="null"/>
+            <column name="ORDER" value="5"/>
+            <column name="PARENT_ID" value="null"/>
+        </insert>
+
+        <insert tableName="ACTION">
+            <column name="ID" value="de6a6ba8-c229-11ec-9d64-0242ac120002"/>
+            <column name="TYPE" value="SHOW_TEXT"/>
+            <column name="CREATION_DATE" value="2022-04-22 13:55:11.202"/>
+            <column name="UPDATE_DATE" value="null"/>
+            <column name="ORDER" value="6"/>
+            <column name="PARENT_ID" value="null"/>
+        </insert>
+
+        <insert tableName="ACTION">
+            <column name="ID" value="de7a6ba8-c229-11ec-9d64-0242ac120002"/>
+            <column name="TYPE" value="OPEN_URL_WITH_TEXT"/>
+            <column name="CREATION_DATE" value="2022-04-22 13:55:11.202"/>
+            <column name="UPDATE_DATE" value="null"/>
+            <column name="ORDER" value="7"/>
+            <column name="PARENT_ID" value="null"/>
+        </insert>
+
+        <insert tableName="ACTION">
+            <column name="ID" value="de8a6ba8-c229-11ec-9d64-0242ac120002"/>
+            <column name="TYPE" value="OPEN_URL_WITH_TEXT"/>
+            <column name="CREATION_DATE" value="2022-04-22 13:55:11.202"/>
+            <column name="UPDATE_DATE" value="null"/>
+            <column name="ORDER" value="8"/>
+            <column name="PARENT_ID" value="null"/>
+        </insert>
+
+        <insert tableName="ACTION">
+            <column name="ID" value="de9a6ba8-c229-11ec-9d64-0242ac120002"/>
+            <column name="TYPE" value="OPEN_URL_WITH_TEXT_HISTORY"/>
+            <column name="CREATION_DATE" value="2022-04-22 13:55:11.202"/>
+            <column name="UPDATE_DATE" value="null"/>
+            <column name="ORDER" value="9"/>
+            <column name="PARENT_ID" value="null"/>
+        </insert>
+
+        <insert tableName="ACTION">
+            <column name="ID" value="de10aba8-c229-11ec-9d64-0242ac120002"/>
+            <column name="TYPE" value="OPEN_URL_WITH_TEXT_HISTORY"/>
+            <column name="CREATION_DATE" value="2022-04-22 13:55:11.202"/>
+            <column name="UPDATE_DATE" value="null"/>
+            <column name="ORDER" value="10"/>
+            <column name="PARENT_ID" value="null"/>
+        </insert>
+
+        <insert tableName="ACTION">
+            <column name="ID" value="de11aba8-c229-11ec-9d64-0242ac120002"/>
+            <column name="TYPE" value="SEPARATOR"/>
+            <column name="CREATION_DATE" value="2022-04-22 13:55:11.202"/>
+            <column name="UPDATE_DATE" value="null"/>
+            <column name="ORDER" value="11"/>
+            <column name="PARENT_ID" value="null"/>
+        </insert>
+
+        <insert tableName="ACTION">
+            <column name="ID" value="de12aba8-c229-11ec-9d64-0242ac120002"/>
+            <column name="TYPE" value="OPEN_URL"/>
+            <column name="CREATION_DATE" value="2022-04-22 13:55:11.202"/>
+            <column name="UPDATE_DATE" value="null"/>
+            <column name="ORDER" value="12"/>
+            <column name="PARENT_ID" value="null"/>
+        </insert>
+
+        <insert tableName="ACTION">
+            <column name="ID" value="de13aba8-c229-11ec-9d64-0242ac120002"/>
+            <column name="TYPE" value="COPY_TO_CLIPBOARD"/>
+            <column name="CREATION_DATE" value="2022-04-22 13:55:11.202"/>
+            <column name="UPDATE_DATE" value="null"/>
+            <column name="ORDER" value="13"/>
+            <column name="PARENT_ID" value="null"/>
+        </insert>
+
+        <insert tableName="ACTION">
+            <column name="ID" value="de14aba8-c229-11ec-9d64-0242ac120002"/>
+            <column name="TYPE" value="OPEN_FILE"/>
+            <column name="CREATION_DATE" value="2022-04-22 13:55:11.202"/>
+            <column name="UPDATE_DATE" value="null"/>
+            <column name="ORDER" value="14"/>
+            <column name="PARENT_ID" value="null"/>
+        </insert>
+
+        <insert tableName="ACTION">
+            <column name="ID" value="de15aba8-c229-11ec-9d64-0242ac120002"/>
+            <column name="TYPE" value="OPEN_FILE"/>
+            <column name="CREATION_DATE" value="2022-04-22 13:55:11.202"/>
+            <column name="UPDATE_DATE" value="null"/>
+            <column name="ORDER" value="15"/>
+            <column name="PARENT_ID" value="null"/>
+        </insert>
+
+        <insert tableName="ACTION">
+            <column name="ID" value="de16aba8-c229-11ec-9d64-0242ac120002	"/>
+            <column name="TYPE" value="GROUP"/>
+            <column name="CREATION_DATE" value="2022-04-22 13:55:11.202"/>
+            <column name="UPDATE_DATE" value="null"/>
+            <column name="ORDER" value="16"/>
+            <column name="PARENT_ID" value="null"/>
+        </insert>
+
+        <insert tableName="ACTION">
+            <column name="ID" value="de17aba8-c229-11ec-9d64-0242ac120002"/>
+            <column name="TYPE" value="COPY_TO_CLIPBOARD"/>
+            <column name="CREATION_DATE" value="2022-04-22 13:55:11.202"/>
+            <column name="UPDATE_DATE" value="null"/>
+            <column name="ORDER" value="1"/>
+            <column name="PARENT_ID" value="de16aba8-c229-11ec-9d64-0242ac120002"/>
+        </insert>
+
+        <insert tableName="ACTION">
+            <column name="ID" value="de18aba8-c229-11ec-9d64-0242ac120002"/>
+            <column name="TYPE" value="OPEN_FILE"/>
+            <column name="CREATION_DATE" value="2022-04-22 13:55:11.202"/>
+            <column name="UPDATE_DATE" value="null"/>
+            <column name="ORDER" value="2"/>
+            <column name="PARENT_ID" value="de16aba8-c229-11ec-9d64-0242ac120002"/>
+        </insert>
+
+        <insert tableName="ACTION">
+            <column name="ID" value="de19aba8-c229-11ec-9d64-0242ac120002"/>
+            <column name="TYPE" value="GROUP"/>
+            <column name="CREATION_DATE" value="2022-04-22 13:55:11.202"/>
+            <column name="UPDATE_DATE" value="null"/>
+            <column name="ORDER" value="3"/>
+            <column name="PARENT_ID" value="de16aba8-c229-11ec-9d64-0242ac120002"/>
+        </insert>
+
+        <insert tableName="ACTION">
+            <column name="ID" value="de20aba8-c229-11ec-9d64-0242ac120002"/>
+            <column name="TYPE" value="COPY_TO_CLIPBOARD"/>
+            <column name="CREATION_DATE" value="2022-04-22 13:55:11.202"/>
+            <column name="UPDATE_DATE" value="null"/>
+            <column name="ORDER" value="1"/>
+            <column name="PARENT_ID" value="de19aba8-c229-11ec-9d64-0242ac120002"/>
+        </insert>
+
+        <insert tableName="ACTION">
+            <column name="ID" value="de21aba8-c229-11ec-9d64-0242ac120002"/>
+            <column name="TYPE" value="OPEN_FILE"/>
+            <column name="CREATION_DATE" value="2022-04-22 13:55:11.202"/>
+            <column name="UPDATE_DATE" value="null"/>
+            <column name="ORDER" value="2"/>
+            <column name="PARENT_ID" value="de19aba8-c229-11ec-9d64-0242ac120002"/>
+        </insert>
+
+        <insert tableName="ACTION">
+            <column name="ID" value="de22aba8-c229-11ec-9d64-0242ac120002"/>
+            <column name="TYPE" value="SHOW_IMAGE"/>
+            <column name="CREATION_DATE" value="2022-04-22 13:55:11.202"/>
+            <column name="UPDATE_DATE" value="null"/>
+            <column name="ORDER" value="17"/>
+            <column name="PARENT_ID" value="null"/>
+        </insert>
+
+        <insert tableName="ACTION">
+            <column name="ID" value="de23aba8-c229-11ec-9d64-0242ac120002"/>
+            <column name="TYPE" value="SHOW_IMAGE"/>
+            <column name="CREATION_DATE" value="2022-04-22 13:55:11.202"/>
+            <column name="UPDATE_DATE" value="null"/>
+            <column name="ORDER" value="18"/>
+            <column name="PARENT_ID" value="null"/>
+        </insert>
+
+        <insert tableName="ACTION">
+            <column name="ID" value="de24aba8-c229-11ec-9d64-0242ac120002"/>
+            <column name="TYPE" value="EXEC"/>
+            <column name="CREATION_DATE" value="2022-04-22 13:55:11.202"/>
+            <column name="UPDATE_DATE" value="null"/>
+            <column name="ORDER" value="19"/>
+            <column name="PARENT_ID" value="null"/>
+        </insert>
+
+        <insert tableName="ACTION">
+            <column name="ID" value="de25aba8-c229-11ec-9d64-0242ac120002"/>
+            <column name="TYPE" value="COPY_TO_CLIPBOARD_TEMPLATE"/>
+            <column name="CREATION_DATE" value="2022-04-22 13:55:11.202"/>
+            <column name="UPDATE_DATE" value="null"/>
+            <column name="ORDER" value="20"/>
+            <column name="PARENT_ID" value="null"/>
+        </insert>
+
+        <insert tableName="ACTION">
+            <column name="ID" value="de26aba8-c229-11ec-9d64-0242ac120002"/>
+            <column name="TYPE" value="SHOW_TEXT_AS_MENU"/>
+            <column name="CREATION_DATE" value="2022-04-22 13:55:11.202"/>
+            <column name="UPDATE_DATE" value="null"/>
+            <column name="ORDER" value="21"/>
+            <column name="PARENT_ID" value="null"/>
+        </insert>
+
+        <insert tableName="ACTION">
+            <column name="ID" value="de27aba8-c229-11ec-9d64-0242ac120002"/>
+            <column name="TYPE" value="URL_PARSER"/>
+            <column name="CREATION_DATE" value="2022-04-22 13:55:11.202"/>
+            <column name="UPDATE_DATE" value="null"/>
+            <column name="ORDER" value="22"/>
+            <column name="PARENT_ID" value="null"/>
+        </insert>
+
+        <insert tableName="ACTION">
+            <column name="ID" value="de28aba8-c229-11ec-9d64-0242ac120002"/>
+            <column name="TYPE" value="NOTE"/>
+            <column name="CREATION_DATE" value="2022-04-22 13:55:11.202"/>
+            <column name="UPDATE_DATE" value="null"/>
+            <column name="ORDER" value="23"/>
+            <column name="PARENT_ID" value="null"/>
+        </insert>
+
+        <insert tableName="ACTION">
+            <column name="ID" value="de29aba8-c229-11ec-9d64-0242ac120002"/>
+            <column name="TYPE" value="KOTLIN_SCRIPT"/>
+            <column name="CREATION_DATE" value="2022-04-22 13:55:11.202"/>
+            <column name="UPDATE_DATE" value="null"/>
+            <column name="ORDER" value="24"/>
+            <column name="PARENT_ID" value="null"/>
+        </insert>
+
+        <insert tableName="ACTION">
+            <column name="ID" value="de30aba8-c229-11ec-9d64-0242ac120002"/>
+            <column name="TYPE" value="NOTE_ON_FILE"/>
+            <column name="CREATION_DATE" value="2022-04-22 13:55:11.202"/>
+            <column name="UPDATE_DATE" value="null"/>
+            <column name="ORDER" value="25"/>
+            <column name="PARENT_ID" value="null"/>
+        </insert>
+
+        <rollback>
+            <delete tableName="ACTION" schemaName="PUBLIC"/>
+        </rollback>
+    </changeSet>
+</databaseChangeLog>

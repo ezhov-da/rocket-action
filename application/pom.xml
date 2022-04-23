@@ -33,6 +33,7 @@
         <flatlaf-swingx.version>2.0.2</flatlaf-swingx.version>
         <h2.version>2.1.212</h2.version>
         <liquibase.version>4.9.1</liquibase.version>
+        <ktorm.version>3.4.1</ktorm.version>
 
         <profile.propertyFile>./../liquibase/liquibase.properties</profile.propertyFile>
         <profile.changeLogFile>./../liquibase/dbchangelog.xml</profile.changeLogFile>
@@ -135,6 +136,12 @@
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
             <version>${h2.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.ktorm</groupId>
+            <artifactId>ktorm-core</artifactId>
+            <version>${ktorm.version}</version>
         </dependency>
 
         <dependency>

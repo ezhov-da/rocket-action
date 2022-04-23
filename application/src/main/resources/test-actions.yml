@@ -2,30 +2,30 @@
 actions:
 
   - type: TODOIST
-    _id: 1
+    _id: de1a6ba8-c229-11ec-9d64-0242ac120002
     label: Todoist 23525245
     todoistToken: ""
 
   - type: SHOW_SVG_IMAGE
-    _id: 2
+    _id: de2a6ba8-c229-11ec-9d64-0242ac120002
     label: SVG big image 2345234523466
     description: description
     imageUrl: http://www.plantuml.com/plantuml/svg/ZL9BRzf04BxxLsmvELA3Bpdr532eIGI9LKEJdj2iFS2g-x1srr1KzRztTi4kbAYgJzREz_ZcSUyyMDygoVAxrLIYGkrTya7eIhOrigttZVkKPHRsmutmsvQt3crbj2VSi38gQoJemBzrlfQ2P_dTRH6UblDPfi1vjFIqoea1GgCTDeHDajdesyjoiNfzN3oiPjFFq-T9UfCa1LfdT5grpXk5zYCR75z0iZ7exq9lM7wg3QWuOXsIcJNpMsISK0CIAWzah5PZq-eQx25rdE2Fci9ezBtM4JMu-Pam-lg8wHxvg6c8yOgSqPyK5NXXTF1yWXqmq3Kh6niqvb_py3n1ANQKDQPmdk0LEqs9ybpAkmQ8KH9R8YjWW-zvb9KLZOzE8xrf9SIE2sjseYOVaBBhMNHjyLDRwrPNGGgay8ShTnNCvuOB6Ns3wXiei8Ai-qADEr7Xtzm9JsiUcWKF71m6mXUKCJUhJu-ihBQe8DHARomw5Yx6NUM0HeGLDkA_9jor_bv_l_fzJt_ubBo59FpqDlnqEuuhSd6cmURcdA5qQ9nIhIqexAxZcf9Gh_rjn2NsQ--gVowtlw6bGnUq7XQBeYJS9IpAHCnLINMLJZnYuzXwqQVovJaxLrR_XaHChDSyBWzgnzRMg3ZmlHKU7VCcyYRZ_8BH3RP4JIGyZhTrfr6LyqL1y1wjz5c6j_ciZt1Fz5R9tm00
 
   - type: SHOW_SVG_IMAGE
-    _id: 3
+    _id: de3a6ba8-c229-11ec-9d64-0242ac120002
     label: SVG image 5734572372357
     description: description
     imageUrl: http://www.plantuml.com/plantuml/svg/SoWkIImgAStDuNBAJrBGjLDmpCbCJbMmKiX8pSd9vt98pKi1IW80
 
   - type: GIST
-    _id: 4
+    _id: de4a6ba8-c229-11ec-9d64-0242ac120002
     label: Gists 3462362346
     baseGistUrl: https://gist.github.com/ezhov-da
     username: ezhov-da
 
   - type: SHOW_TEXT
-    _id: 5
+    _id: de5a6ba8-c229-11ec-9d64-0242ac120002
     label: |
       Lorem Ipsum is simply dummy text of the printing and typesetting industry.
       Lorem Ipsum has been the industry's standard dummy text ever since the 1500s,
@@ -35,12 +35,12 @@ actions:
       and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
 
   - type: SHOW_TEXT
-    _id: 6
+    _id: de6a6ba8-c229-11ec-9d64-0242ac120002
     label: >
       Simple text 234623462463
 
   - type: OPEN_URL_WITH_TEXT
-    _id: 7
+    _id: de7a6ba8-c229-11ec-9d64-0242ac120002
     label: OPEN_URL_WITH_TEXT 23623462346
     iconUrl: https://github.githubassets.com/favicons/favicon.png
     description: description
@@ -48,14 +48,14 @@ actions:
     placeholder: _____
 
   - type: OPEN_URL_WITH_TEXT
-    _id: 8
+    _id: de8a6ba8-c229-11ec-9d64-0242ac120002
     label: OPEN_URL_WITH_TEXT 234623642346
     description: description
     baseUrl: https://github.com/_____/
     placeholder: _____
 
   - type: OPEN_URL_WITH_TEXT_HISTORY
-    _id: 9
+    _id: de9a6ba8-c229-11ec-9d64-0242ac120002
     label: OPEN_URL_WITH_TEXT_HISTORY 23462346246
     iconUrl: https://github.githubassets.com/favicons/favicon.png
     description: description
@@ -63,88 +63,88 @@ actions:
     placeholder: _____
 
   - type: OPEN_URL_WITH_TEXT_HISTORY
-    _id: 10
+    _id: de10aba8-c229-11ec-9d64-0242ac120002
     label: OPEN_URL_WITH_TEXT_HISTORY 347357234572
     description: description
     baseUrl: https://github.com/_____/
     placeholder: _____
 
   - type: SEPARATOR
-    _id: 11
+    _id: de11aba8-c229-11ec-9d64-0242ac120002
 
   - type: OPEN_URL
-    _id: 12
+    _id: de12aba8-c229-11ec-9d64-0242ac120002
     label: OPEN_URL 26234236
     iconUrl: https://github.githubassets.com/favicons/favicon.png
     description: description
     url: url
 
   - type: COPY_TO_CLIPBOARD
-    _id: 13
+    _id: de13aba8-c229-11ec-9d64-0242ac120002
     label: COPY_TO_CLIPBOARD 2363623462346
     description: description
     text: COPY_TO_CLIPBOARD
 
   - type: OPEN_FILE
-    _id: 14
+    _id: de14aba8-c229-11ec-9d64-0242ac120002
     label: OPEN_FILE 2362362346
     description: description
     path: text
 
   - type: OPEN_FILE
-    _id: 15
+    _id: de15aba8-c229-11ec-9d64-0242ac120002
     label:
     description:
     path: open file with only path
 
   - type: GROUP
-    _id: 16
+    _id: de16aba8-c229-11ec-9d64-0242ac120002
     label: GROUP 2342362346
     iconUrl: https://www.elastic.co/favicon.ico
     description: description
     actions:
       - type: COPY_TO_CLIPBOARD
-        _id: 17
+        _id: de17aba8-c229-11ec-9d64-0242ac120002
         label: label1 236236236
         description: description
         text: text
 
       - type: OPEN_FILE
-        _id: 18
+        _id: de18aba8-c229-11ec-9d64-0242ac120002
         label: label1 236236236236
         description: description
         path: text
 
       - type: GROUP
-        _id: 19
+        _id: de19aba8-c229-11ec-9d64-0242ac120002
         label: GROUP 234623462346
         description: description
         actions:
           - type: COPY_TO_CLIPBOARD
-            _id: 20
+            _id: de20aba8-c229-11ec-9d64-0242ac120002
             label: label2 23462362346
             description: description
             text: text
 
           - type: OPEN_FILE
-            _id: 21
+            _id: de21aba8-c229-11ec-9d64-0242ac120002
             label: label2 326423462346
             description: description
             path: text
   - type: SHOW_IMAGE
-    _id: 22
+    _id: de22aba8-c229-11ec-9d64-0242ac120002
     label: SHOW_IMAGE 2362362346
     description: SHOW_IMAGE
     imageUrl: http://www.plantuml.com/plantuml/png/dOvD3i8W48MleWkMTcYDMbqsquDKIeI4duQ29fxUEBCeRjsyV0mVlDdRe5oPTKbkPt9UrXj0cbxDmsPJxcNLISMGTSYDYXxqsyJdOPu04S5FDe10AQwZm5Rqyil3aP8PANlA2y_9F5VpiJAHRWVYa-WaQnjiJiSEDtBx7__JiQyMRYbP67-UT18HcwLuzm40
 
   - type: SHOW_IMAGE
-    _id: 23
+    _id: de23aba8-c229-11ec-9d64-0242ac120002
     label: Стандарт описания задачи 236232346
     description: Стандарт описания задачи
     imageUrl: https://github.com/ezhov-da/notes/blob/master/uml/%D0%A1%D1%82%D0%B0%D0%BD%D0%B4%D0%B0%D1%80%D1%82%20%D0%BE%D0%BF%D0%B8%D1%81%D0%B0%D0%BD%D0%B8%D1%8F%20%D0%B7%D0%B0%D0%B4%D0%B0%D1%87%D0%B8.png?raw=true
 
   - type: EXEC
-    _id: 24
+    _id: de24aba8-c229-11ec-9d64-0242ac120002
     label: Выполнить команду 23623462346
     description: Выполнить команду описание
     command: D:\programs\jmc-8.0.1_windows-x64\JDK Mission Control\jmc.exe
@@ -152,7 +152,7 @@ actions:
     iconUrl:
 
   - type: COPY_TO_CLIPBOARD_TEMPLATE
-    _id: 25
+    _id: de25aba8-c229-11ec-9d64-0242ac120002
     label: kubectl get all -n $ns 2323462346
     description: COPY_TO_CLIPBOARD_TEMPLATE
     text: |
@@ -160,7 +160,7 @@ actions:
         kubectl get all -n $ns
 
   - type: SHOW_TEXT_AS_MENU
-    _id: 26
+    _id: de26aba8-c229-11ec-9d64-0242ac120002
     label: Text as menu
     description: Text as menu description
     text: |
@@ -168,18 +168,18 @@ actions:
       в нём очень много строк :)
 
   - type: URL_PARSER
-    _id: 27
+    _id: de27aba8-c229-11ec-9d64-0242ac120002
     label: URL_PARSER
     url: https://github.com/mockito/mockito
     headers: user-agent_____Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.61 Safari/537.36
 
   - type: NOTE
-    _id: 28
+    _id: de28aba8-c229-11ec-9d64-0242ac120002
     label: NOTE_28
     path:
 
   - type: KOTLIN_SCRIPT
-    _id: 29
+    _id: de29aba8-c229-11ec-9d64-0242ac120002
     label: Номер спринта
     script: |
       import java.time.LocalDate
@@ -204,7 +204,7 @@ actions:
       "Sprint № $currentSprintNumber. Начало `$startCurrentSprint` окончание `$endCurrentSprint`"
 
   - type: NOTE_ON_FILE
-    _id: 30
+    _id: de30aba8-c229-11ec-9d64-0242ac120002
     label: "Test File"
     description: "Описание"
     pathAndName: "./notes/d9530ff6-a228-11ec-b909-0242ac120002.txt"

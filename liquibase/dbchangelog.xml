@@ -6,5 +6,7 @@
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.9.xsd">
 
     <include file="changesets/001-create-table-action.xml" relativeToChangelogFile="true"/>
-    <include file="changesets/002-create-table-action-info.xml" relativeToChangelogFile="true"/>
+    <include file="changesets/002-create-table-action_settings.xml" relativeToChangelogFile="true"/>
+    <include file="changesets/003-fill-table-action-c_dev.xml" relativeToChangelogFile="true"/>
+    <include file="changesets/004-fill-table-action_settings-c_dev.xml" relativeToChangelogFile="true"/>
 </databaseChangeLog>

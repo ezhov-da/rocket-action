@@ -10,6 +10,9 @@
             <column name="ID" type="UUID">
                 <constraints nullable="false"/>
             </column>
+            <column name="TYPE" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
             <column name="CREATION_DATE" type="TIMESTAMP" defaultValue="CURRENT_TIMESTAMP">
                 <constraints nullable="false"/>
             </column>
@@ -17,9 +20,7 @@
             <column name="ORDER" type="INTEGER">
                 <constraints nullable="false"/>
             </column>
-            <column name="PARENT_ID" type="UUID">
-                <constraints nullable="false"/>
-            </column>
+            <column name="PARENT_ID" type="UUID"/>
         </createTable>
 
         <rollback>
