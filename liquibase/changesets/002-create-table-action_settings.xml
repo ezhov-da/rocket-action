@@ -13,7 +13,7 @@
             <column name="NAME" type="VARCHAR(100)">
                 <constraints nullable="false"/>
             </column>
-            <column name="VALUE" type="CHARACTER LARGE OBJECT"/>
+            <column name="DATA" type="CHARACTER LARGE OBJECT"/>
         </createTable>
 
         <rollback>

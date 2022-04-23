@@ -17,7 +17,7 @@
                 <constraints nullable="false"/>
             </column>
             <column name="UPDATE_DATE" type="TIMESTAMP"/>
-            <column name="ORDER" type="INTEGER">
+            <column name="SEQUENCE_ORDER" type="INTEGER">
                 <constraints nullable="false"/>
             </column>
             <column name="PARENT_ID" type="UUID"/>

@@ -14,7 +14,7 @@
         <insert tableName="ACTION_SETTINGS">
             <column name="ID" value="de1a6ba8-c229-11ec-9d64-0242ac120002"/>
             <column name="NAME" value="label"/>
-            <column name="VALUE">
+            <column name="DATA">
                 <![CDATA[Todoist 23525245]]>
             </column>
         </insert>
@@ -22,7 +22,7 @@
         <insert tableName="ACTION_SETTINGS">
             <column name="ID" value="de2a6ba8-c229-11ec-9d64-0242ac120002"/>
             <column name="NAME" value="imageUrl"/>
-            <column name="VALUE">
+            <column name="DATA">
                 <![CDATA[
                 http://www.plantuml.com/plantuml/svg/ZL9BRzf04BxxLsmvELA3Bpdr532eIGI9LKEJdj2iFS2g-x1srr1KzRztTi4kbAYgJzREz_ZcSUyyMDygoVAxrLIYGkrTya7eIhOrigttZVkKPHRsmutmsvQt3crbj2VSi38gQoJemBzrlfQ2P_dTRH6UblDPfi1vjFIqoea1GgCTDeHDajdesyjoiNfzN3oiPjFFq-T9UfCa1LfdT5grpXk5zYCR75z0iZ7exq9lM7wg3QWuOXsIcJNpMsISK0CIAWzah5PZq-eQx25rdE2Fci9ezBtM4JMu-Pam-lg8wHxvg6c8yOgSqPyK5NXXTF1yWXqmq3Kh6niqvb_py3n1ANQKDQPmdk0LEqs9ybpAkmQ8KH9R8YjWW-zvb9KLZOzE8xrf9SIE2sjseYOVaBBhMNHjyLDRwrPNGGgay8ShTnNCvuOB6Ns3wXiei8Ai-qADEr7Xtzm9JsiUcWKF71m6mXUKCJUhJu-ihBQe8DHARomw5Yx6NUM0HeGLDkA_9jor_bv_l_fzJt_ubBo59FpqDlnqEuuhSd6cmURcdA5qQ9nIhIqexAxZcf9Gh_rjn2NsQ--gVowtlw6bGnUq7XQBeYJS9IpAHCnLINMLJZnYuzXwqQVovJaxLrR_XaHChDSyBWzgnzRMg3ZmlHKU7VCcyYRZ_8BH3RP4JIGyZhTrfr6LyqL1y1wjz5c6j_ciZt1Fz5R9tm00
                 ]]>
@@ -32,7 +32,7 @@
         <insert tableName="ACTION_SETTINGS">
             <column name="ID" value="de2a6ba8-c229-11ec-9d64-0242ac120002"/>
             <column name="NAME" value="description"/>
-            <column name="VALUE">
+            <column name="DATA">
                 <![CDATA[
                 description
                 ]]>
@@ -42,7 +42,7 @@
         <insert tableName="ACTION_SETTINGS">
             <column name="ID" value="de2a6ba8-c229-11ec-9d64-0242ac120002"/>
             <column name="NAME" value="label"/>
-            <column name="VALUE">
+            <column name="DATA">
                 <![CDATA[
                 SVG big image 2345234523466
                 ]]>
@@ -52,7 +52,7 @@
         <insert tableName="ACTION_SETTINGS">
             <column name="ID" value="de3a6ba8-c229-11ec-9d64-0242ac120002"/>
             <column name="NAME" value="imageUrl"/>
-            <column name="VALUE">
+            <column name="DATA">
                 <![CDATA[
                 http://www.plantuml.com/plantuml/svg/SoWkIImgAStDuNBAJrBGjLDmpCbCJbMmKiX8pSd9vt98pKi1IW80
                 ]]>
@@ -62,7 +62,7 @@
         <insert tableName="ACTION_SETTINGS">
             <column name="ID" value="de3a6ba8-c229-11ec-9d64-0242ac120002"/>
             <column name="NAME" value="description"/>
-            <column name="VALUE">
+            <column name="DATA">
                 <![CDATA[
                 description
                 ]]>
@@ -72,7 +72,7 @@
         <insert tableName="ACTION_SETTINGS">
             <column name="ID" value="de3a6ba8-c229-11ec-9d64-0242ac120002"/>
             <column name="NAME" value="label"/>
-            <column name="VALUE">
+            <column name="DATA">
                 <![CDATA[
                 SVG image 5734572372357
                 ]]>
@@ -82,7 +82,7 @@
         <insert tableName="ACTION_SETTINGS">
             <column name="ID" value="de4a6ba8-c229-11ec-9d64-0242ac120002"/>
             <column name="NAME" value="label"/>
-            <column name="VALUE">
+            <column name="DATA">
                 <![CDATA[
                 Gists 3462362346
                 ]]>
@@ -92,7 +92,7 @@
         <insert tableName="ACTION_SETTINGS">
             <column name="ID" value="de4a6ba8-c229-11ec-9d64-0242ac120002"/>
             <column name="NAME" value="baseGistUrl"/>
-            <column name="VALUE">
+            <column name="DATA">
                 <![CDATA[
                 https://gist.github.com/ezhov-da
                 ]]>
@@ -102,7 +102,7 @@
         <insert tableName="ACTION_SETTINGS">
             <column name="ID" value="de4a6ba8-c229-11ec-9d64-0242ac120002"/>
             <column name="NAME" value="username"/>
-            <column name="VALUE">
+            <column name="DATA">
                 <![CDATA[
                 ezhov-da
                 ]]>
@@ -112,7 +112,7 @@
         <insert tableName="ACTION_SETTINGS">
             <column name="ID" value="de5a6ba8-c229-11ec-9d64-0242ac120002"/>
             <column name="NAME" value="label"/>
-            <column name="VALUE">
+            <column name="DATA">
                 <![CDATA[
                 Lorem Ipsum is simply dummy text of the printing and typesetting industry.
                 Lorem Ipsum has been the industry's standard dummy text ever since the 1500s,
@@ -127,7 +127,7 @@
         <insert tableName="ACTION_SETTINGS">
             <column name="ID" value="de6a6ba8-c229-11ec-9d64-0242ac120002"/>
             <column name="NAME" value="label"/>
-            <column name="VALUE">
+            <column name="DATA">
                 <![CDATA[
                 Simple text 234623462463
                 ]]>
@@ -137,7 +137,7 @@
         <insert tableName="ACTION_SETTINGS">
             <column name="ID" value="de7a6ba8-c229-11ec-9d64-0242ac120002"/>
             <column name="NAME" value="baseUrl"/>
-            <column name="VALUE">
+            <column name="DATA">
                 <![CDATA[
                 https://github.com/_____/
                 ]]>
@@ -147,7 +147,7 @@
         <insert tableName="ACTION_SETTINGS">
             <column name="ID" value="de7a6ba8-c229-11ec-9d64-0242ac120002"/>
             <column name="NAME" value="description"/>
-            <column name="VALUE">
+            <column name="DATA">
                 <![CDATA[
                 description
                 ]]>
@@ -157,7 +157,7 @@
         <insert tableName="ACTION_SETTINGS">
             <column name="ID" value="de7a6ba8-c229-11ec-9d64-0242ac120002"/>
             <column name="NAME" value="label"/>
-            <column name="VALUE">
+            <column name="DATA">
                 <![CDATA[
                 OPEN_URL_WITH_TEXT 23623462346
                 ]]>
@@ -167,7 +167,7 @@
         <insert tableName="ACTION_SETTINGS">
             <column name="ID" value="de7a6ba8-c229-11ec-9d64-0242ac120002"/>
             <column name="NAME" value="iconUrl"/>
-            <column name="VALUE">
+            <column name="DATA">
                 <![CDATA[
                 https://github.githubassets.com/favicons/favicon.png
                 ]]>
@@ -177,7 +177,7 @@
         <insert tableName="ACTION_SETTINGS">
             <column name="ID" value="de7a6ba8-c229-11ec-9d64-0242ac120002"/>
             <column name="NAME" value="placeholder"/>
-            <column name="VALUE">
+            <column name="DATA">
                 <![CDATA[
                 _____
                 ]]>
@@ -187,7 +187,7 @@
         <insert tableName="ACTION_SETTINGS">
             <column name="ID" value="de8a6ba8-c229-11ec-9d64-0242ac120002"/>
             <column name="NAME" value="baseUrl"/>
-            <column name="VALUE">
+            <column name="DATA">
                 <![CDATA[
                 https://github.com/_____/
                 ]]>
@@ -197,7 +197,7 @@
         <insert tableName="ACTION_SETTINGS">
             <column name="ID" value="de8a6ba8-c229-11ec-9d64-0242ac120002"/>
             <column name="NAME" value="description"/>
-            <column name="VALUE">
+            <column name="DATA">
                 <![CDATA[
                 description
                 ]]>
@@ -207,7 +207,7 @@
         <insert tableName="ACTION_SETTINGS">
             <column name="ID" value="de8a6ba8-c229-11ec-9d64-0242ac120002"/>
             <column name="NAME" value="label"/>
-            <column name="VALUE">
+            <column name="DATA">
                 <![CDATA[
                 OPEN_URL_WITH_TEXT 234623642346
                 ]]>
@@ -217,7 +217,7 @@
         <insert tableName="ACTION_SETTINGS">
             <column name="ID" value="de8a6ba8-c229-11ec-9d64-0242ac120002"/>
             <column name="NAME" value="placeholder"/>
-            <column name="VALUE">
+            <column name="DATA">
                 <![CDATA[
                 _____
                 ]]>
@@ -227,7 +227,7 @@
         <insert tableName="ACTION_SETTINGS">
             <column name="ID" value="de9a6ba8-c229-11ec-9d64-0242ac120002"/>
             <column name="NAME" value="baseUrl"/>
-            <column name="VALUE">
+            <column name="DATA">
                 <![CDATA[
                 https://github.com/_____/
                 ]]>
@@ -237,7 +237,7 @@
         <insert tableName="ACTION_SETTINGS">
             <column name="ID" value="de9a6ba8-c229-11ec-9d64-0242ac120002"/>
             <column name="NAME" value="description"/>
-            <column name="VALUE">
+            <column name="DATA">
                 <![CDATA[
                 description
                 ]]>
@@ -247,7 +247,7 @@
         <insert tableName="ACTION_SETTINGS">
             <column name="ID" value="de9a6ba8-c229-11ec-9d64-0242ac120002"/>
             <column name="NAME" value="label"/>
-            <column name="VALUE">
+            <column name="DATA">
                 <![CDATA[
                 OPEN_URL_WITH_TEXT_HISTORY 23462346246
                 ]]>
@@ -257,7 +257,7 @@
         <insert tableName="ACTION_SETTINGS">
             <column name="ID" value="de9a6ba8-c229-11ec-9d64-0242ac120002"/>
             <column name="NAME" value="iconUrl"/>
-            <column name="VALUE">
+            <column name="DATA">
                 <![CDATA[
                 https://github.githubassets.com/favicons/favicon.png
                 ]]>
@@ -267,7 +267,7 @@
         <insert tableName="ACTION_SETTINGS">
             <column name="ID" value="de9a6ba8-c229-11ec-9d64-0242ac120002"/>
             <column name="NAME" value="placeholder"/>
-            <column name="VALUE">
+            <column name="DATA">
                 <![CDATA[
                 _____
                 ]]>
@@ -277,7 +277,7 @@
         <insert tableName="ACTION_SETTINGS">
             <column name="ID" value="de10aba8-c229-11ec-9d64-0242ac120002"/>
             <column name="NAME" value="baseUrl"/>
-            <column name="VALUE">
+            <column name="DATA">
                 <![CDATA[
                 https://github.com/_____/
                 ]]>
@@ -287,7 +287,7 @@
         <insert tableName="ACTION_SETTINGS">
             <column name="ID" value="de10aba8-c229-11ec-9d64-0242ac120002"/>
             <column name="NAME" value="description"/>
-            <column name="VALUE">
+            <column name="DATA">
                 <![CDATA[
                 description
                 ]]>
@@ -297,7 +297,7 @@
         <insert tableName="ACTION_SETTINGS">
             <column name="ID" value="de10aba8-c229-11ec-9d64-0242ac120002"/>
             <column name="NAME" value="label"/>
-            <column name="VALUE">
+            <column name="DATA">
                 <![CDATA[
                 OPEN_URL_WITH_TEXT_HISTORY 347357234572
                 ]]>
@@ -307,7 +307,7 @@
         <insert tableName="ACTION_SETTINGS">
             <column name="ID" value="de10aba8-c229-11ec-9d64-0242ac120002"/>
             <column name="NAME" value="placeholder"/>
-            <column name="VALUE">
+            <column name="DATA">
                 <![CDATA[
                 _____
                 ]]>
@@ -317,7 +317,7 @@
         <insert tableName="ACTION_SETTINGS">
             <column name="ID" value="de12aba8-c229-11ec-9d64-0242ac120002"/>
             <column name="NAME" value="description"/>
-            <column name="VALUE">
+            <column name="DATA">
                 <![CDATA[
                 description
                 ]]>
@@ -327,7 +327,7 @@
         <insert tableName="ACTION_SETTINGS">
             <column name="ID" value="de12aba8-c229-11ec-9d64-0242ac120002"/>
             <column name="NAME" value="label"/>
-            <column name="VALUE">
+            <column name="DATA">
                 <![CDATA[
                 OPEN_URL 26234236
                 ]]>
@@ -337,7 +337,7 @@
         <insert tableName="ACTION_SETTINGS">
             <column name="ID" value="de12aba8-c229-11ec-9d64-0242ac120002"/>
             <column name="NAME" value="iconUrl"/>
-            <column name="VALUE">
+            <column name="DATA">
                 <![CDATA[
                 https://github.githubassets.com/favicons/favicon.png
                 ]]>
@@ -347,7 +347,7 @@
         <insert tableName="ACTION_SETTINGS">
             <column name="ID" value="de12aba8-c229-11ec-9d64-0242ac120002"/>
             <column name="NAME" value="url"/>
-            <column name="VALUE">
+            <column name="DATA">
                 <![CDATA[
                 url
                 ]]>
@@ -357,7 +357,7 @@
         <insert tableName="ACTION_SETTINGS">
             <column name="ID" value="de13aba8-c229-11ec-9d64-0242ac120002"/>
             <column name="NAME" value="description"/>
-            <column name="VALUE">
+            <column name="DATA">
                 <![CDATA[
                 description
                 ]]>
@@ -367,7 +367,7 @@
         <insert tableName="ACTION_SETTINGS">
             <column name="ID" value="de13aba8-c229-11ec-9d64-0242ac120002"/>
             <column name="NAME" value="label"/>
-            <column name="VALUE">
+            <column name="DATA">
                 <![CDATA[
                 COPY_TO_CLIPBOARD 2363623462346
                 ]]>
@@ -377,7 +377,7 @@
         <insert tableName="ACTION_SETTINGS">
             <column name="ID" value="de13aba8-c229-11ec-9d64-0242ac120002"/>
             <column name="NAME" value="text"/>
-            <column name="VALUE">
+            <column name="DATA">
                 <![CDATA[
                 COPY_TO_CLIPBOARD
                 ]]>
@@ -387,7 +387,7 @@
         <insert tableName="ACTION_SETTINGS">
             <column name="ID" value="de14aba8-c229-11ec-9d64-0242ac120002"/>
             <column name="NAME" value="path"/>
-            <column name="VALUE">
+            <column name="DATA">
                 <![CDATA[
                 text
                 ]]>
@@ -397,7 +397,7 @@
         <insert tableName="ACTION_SETTINGS">
             <column name="ID" value="de14aba8-c229-11ec-9d64-0242ac120002"/>
             <column name="NAME" value="description"/>
-            <column name="VALUE">
+            <column name="DATA">
                 <![CDATA[
                 description
                 ]]>
@@ -407,7 +407,7 @@
         <insert tableName="ACTION_SETTINGS">
             <column name="ID" value="de14aba8-c229-11ec-9d64-0242ac120002"/>
             <column name="NAME" value="label"/>
-            <column name="VALUE">
+            <column name="DATA">
                 <![CDATA[
                 OPEN_FILE 2362362346
                 ]]>
@@ -417,7 +417,7 @@
         <insert tableName="ACTION_SETTINGS">
             <column name="ID" value="de15aba8-c229-11ec-9d64-0242ac120002"/>
             <column name="NAME" value="path"/>
-            <column name="VALUE">
+            <column name="DATA">
                 <![CDATA[
                 open file with only path
                 ]]>
@@ -427,7 +427,7 @@
         <insert tableName="ACTION_SETTINGS">
             <column name="ID" value="de15aba8-c229-11ec-9d64-0242ac120002"/>
             <column name="NAME" value="description"/>
-            <column name="VALUE">
+            <column name="DATA">
                 <![CDATA[]]>
             </column>
         </insert>
@@ -435,7 +435,7 @@
         <insert tableName="ACTION_SETTINGS">
             <column name="ID" value="de15aba8-c229-11ec-9d64-0242ac120002"/>
             <column name="NAME" value="label"/>
-            <column name="VALUE">
+            <column name="DATA">
                 <![CDATA[]]>
             </column>
         </insert>
@@ -443,7 +443,7 @@
         <insert tableName="ACTION_SETTINGS">
             <column name="ID" value="de16aba8-c229-11ec-9d64-0242ac120002"/>
             <column name="NAME" value="description"/>
-            <column name="VALUE">
+            <column name="DATA">
                 <![CDATA[
                 description
                 ]]>
@@ -453,7 +453,7 @@
         <insert tableName="ACTION_SETTINGS">
             <column name="ID" value="de16aba8-c229-11ec-9d64-0242ac120002"/>
             <column name="NAME" value="label"/>
-            <column name="VALUE">
+            <column name="DATA">
                 <![CDATA[
                 GROUP 2342362346
                 ]]>
@@ -463,7 +463,7 @@
         <insert tableName="ACTION_SETTINGS">
             <column name="ID" value="de16aba8-c229-11ec-9d64-0242ac120002"/>
             <column name="NAME" value="iconUrl"/>
-            <column name="VALUE">
+            <column name="DATA">
                 <![CDATA[
                 https://www.elastic.co/favicon.ico
                 ]]>
@@ -473,7 +473,7 @@
         <insert tableName="ACTION_SETTINGS">
             <column name="ID" value="de17aba8-c229-11ec-9d64-0242ac120002"/>
             <column name="NAME" value="description"/>
-            <column name="VALUE">
+            <column name="DATA">
                 <![CDATA[
                 description
                 ]]>
@@ -483,7 +483,7 @@
         <insert tableName="ACTION_SETTINGS">
             <column name="ID" value="de17aba8-c229-11ec-9d64-0242ac120002"/>
             <column name="NAME" value="label"/>
-            <column name="VALUE">
+            <column name="DATA">
                 <![CDATA[
                 label1 236236236
                 ]]>
@@ -493,7 +493,7 @@
         <insert tableName="ACTION_SETTINGS">
             <column name="ID" value="de17aba8-c229-11ec-9d64-0242ac120002"/>
             <column name="NAME" value="text"/>
-            <column name="VALUE">
+            <column name="DATA">
                 <![CDATA[
                 text
                 ]]>
@@ -503,7 +503,7 @@
         <insert tableName="ACTION_SETTINGS">
             <column name="ID" value="de18aba8-c229-11ec-9d64-0242ac120002"/>
             <column name="NAME" value="path"/>
-            <column name="VALUE">
+            <column name="DATA">
                 <![CDATA[
                 text
                 ]]>
@@ -513,7 +513,7 @@
         <insert tableName="ACTION_SETTINGS">
             <column name="ID" value="de18aba8-c229-11ec-9d64-0242ac120002"/>
             <column name="NAME" value="description"/>
-            <column name="VALUE">
+            <column name="DATA">
                 <![CDATA[
                 description
                 ]]>
@@ -523,7 +523,7 @@
         <insert tableName="ACTION_SETTINGS">
             <column name="ID" value="de18aba8-c229-11ec-9d64-0242ac120002"/>
             <column name="NAME" value="label"/>
-            <column name="VALUE">
+            <column name="DATA">
                 <![CDATA[
                 label1 236236236236
                 ]]>
@@ -533,7 +533,7 @@
         <insert tableName="ACTION_SETTINGS">
             <column name="ID" value="de19aba8-c229-11ec-9d64-0242ac120002"/>
             <column name="NAME" value="description"/>
-            <column name="VALUE">
+            <column name="DATA">
                 <![CDATA[
                 description
                 ]]>
@@ -543,7 +543,7 @@
         <insert tableName="ACTION_SETTINGS">
             <column name="ID" value="de19aba8-c229-11ec-9d64-0242ac120002"/>
             <column name="NAME" value="label"/>
-            <column name="VALUE">
+            <column name="DATA">
                 <![CDATA[
                 GROUP 234623462346
                 ]]>
@@ -553,7 +553,7 @@
         <insert tableName="ACTION_SETTINGS">
             <column name="ID" value="de20aba8-c229-11ec-9d64-0242ac120002"/>
             <column name="NAME" value="description"/>
-            <column name="VALUE">
+            <column name="DATA">
                 <![CDATA[
                 description
                 ]]>
@@ -563,7 +563,7 @@
         <insert tableName="ACTION_SETTINGS">
             <column name="ID" value="de20aba8-c229-11ec-9d64-0242ac120002"/>
             <column name="NAME" value="label"/>
-            <column name="VALUE">
+            <column name="DATA">
                 <![CDATA[
                 label2 23462362346
                 ]]>
@@ -573,7 +573,7 @@
         <insert tableName="ACTION_SETTINGS">
             <column name="ID" value="de20aba8-c229-11ec-9d64-0242ac120002"/>
             <column name="NAME" value="text"/>
-            <column name="VALUE">
+            <column name="DATA">
                 <![CDATA[
                 text
                 ]]>
@@ -583,7 +583,7 @@
         <insert tableName="ACTION_SETTINGS">
             <column name="ID" value="de21aba8-c229-11ec-9d64-0242ac120002"/>
             <column name="NAME" value="path"/>
-            <column name="VALUE">
+            <column name="DATA">
                 <![CDATA[
                 text
                 ]]>
@@ -593,7 +593,7 @@
         <insert tableName="ACTION_SETTINGS">
             <column name="ID" value="de21aba8-c229-11ec-9d64-0242ac120002"/>
             <column name="NAME" value="description"/>
-            <column name="VALUE">
+            <column name="DATA">
                 <![CDATA[
                 description
                 ]]>
@@ -603,7 +603,7 @@
         <insert tableName="ACTION_SETTINGS">
             <column name="ID" value="de21aba8-c229-11ec-9d64-0242ac120002"/>
             <column name="NAME" value="label"/>
-            <column name="VALUE">
+            <column name="DATA">
                 <![CDATA[
                 label2 326423462346
                 ]]>
@@ -613,7 +613,7 @@
         <insert tableName="ACTION_SETTINGS">
             <column name="ID" value="de22aba8-c229-11ec-9d64-0242ac120002"/>
             <column name="NAME" value="imageUrl"/>
-            <column name="VALUE">
+            <column name="DATA">
                 <![CDATA[
                 http://www.plantuml.com/plantuml/png/dOvD3i8W48MleWkMTcYDMbqsquDKIeI4duQ29fxUEBCeRjsyV0mVlDdRe5oPTKbkPt9UrXj0cbxDmsPJxcNLISMGTSYDYXxqsyJdOPu04S5FDe10AQwZm5Rqyil3aP8PANlA2y_9F5VpiJAHRWVYa-WaQnjiJiSEDtBx7__JiQyMRYbP67-UT18HcwLuzm40
                 ]]>
@@ -623,7 +623,7 @@
         <insert tableName="ACTION_SETTINGS">
             <column name="ID" value="de22aba8-c229-11ec-9d64-0242ac120002"/>
             <column name="NAME" value="description"/>
-            <column name="VALUE">
+            <column name="DATA">
                 <![CDATA[
                 SHOW_IMAGE
                 ]]>
@@ -633,7 +633,7 @@
         <insert tableName="ACTION_SETTINGS">
             <column name="ID" value="de22aba8-c229-11ec-9d64-0242ac120002"/>
             <column name="NAME" value="label"/>
-            <column name="VALUE">
+            <column name="DATA">
                 <![CDATA[
                 SHOW_IMAGE 2362362346
                 ]]>
@@ -643,7 +643,7 @@
         <insert tableName="ACTION_SETTINGS">
             <column name="ID" value="de23aba8-c229-11ec-9d64-0242ac120002"/>
             <column name="NAME" value="imageUrl"/>
-            <column name="VALUE">
+            <column name="DATA">
                 <![CDATA[
                 https://github.com/ezhov-da/notes/blob/master/uml/%D0%A1%D1%82%D0%B0%D0%BD%D0%B4%D0%B0%D1%80%D1%82%20%D0%BE%D0%BF%D0%B8%D1%81%D0%B0%D0%BD%D0%B8%D1%8F%20%D0%B7%D0%B0%D0%B4%D0%B0%D1%87%D0%B8.png?raw=true
                 ]]>
@@ -653,7 +653,7 @@
         <insert tableName="ACTION_SETTINGS">
             <column name="ID" value="de23aba8-c229-11ec-9d64-0242ac120002"/>
             <column name="NAME" value="description"/>
-            <column name="VALUE">
+            <column name="DATA">
                 <![CDATA[
                 Стандарт описания задачи
                 ]]>
@@ -663,7 +663,7 @@
         <insert tableName="ACTION_SETTINGS">
             <column name="ID" value="de23aba8-c229-11ec-9d64-0242ac120002"/>
             <column name="NAME" value="label"/>
-            <column name="VALUE">
+            <column name="DATA">
                 <![CDATA[
                 Стандарт описания задачи 236232346
                 ]]>
@@ -673,7 +673,7 @@
         <insert tableName="ACTION_SETTINGS">
             <column name="ID" value="de24aba8-c229-11ec-9d64-0242ac120002"/>
             <column name="NAME" value="workingDirectory"/>
-            <column name="VALUE">
+            <column name="DATA">
                 <![CDATA[]]>
             </column>
         </insert>
@@ -681,7 +681,7 @@
         <insert tableName="ACTION_SETTINGS">
             <column name="ID" value="de24aba8-c229-11ec-9d64-0242ac120002"/>
             <column name="NAME" value="description"/>
-            <column name="VALUE">
+            <column name="DATA">
                 <![CDATA[
                 Выполнить команду описание
                 ]]>
@@ -691,7 +691,7 @@
         <insert tableName="ACTION_SETTINGS">
             <column name="ID" value="de24aba8-c229-11ec-9d64-0242ac120002"/>
             <column name="NAME" value="label"/>
-            <column name="VALUE">
+            <column name="DATA">
                 <![CDATA[
                 Выполнить команду 23623462346
                 ]]>
@@ -701,7 +701,7 @@
         <insert tableName="ACTION_SETTINGS">
             <column name="ID" value="de24aba8-c229-11ec-9d64-0242ac120002"/>
             <column name="NAME" value="iconUrl"/>
-            <column name="VALUE">
+            <column name="DATA">
                 <![CDATA[]]>
             </column>
         </insert>
@@ -709,7 +709,7 @@
         <insert tableName="ACTION_SETTINGS">
             <column name="ID" value="de24aba8-c229-11ec-9d64-0242ac120002"/>
             <column name="NAME" value="command"/>
-            <column name="VALUE">
+            <column name="DATA">
                 <![CDATA[
                 D:\programs\jmc-8.0.1_windows-x64\JDK Mission Control\jmc.exe
                 ]]>
@@ -719,7 +719,7 @@
         <insert tableName="ACTION_SETTINGS">
             <column name="ID" value="de25aba8-c229-11ec-9d64-0242ac120002"/>
             <column name="NAME" value="description"/>
-            <column name="VALUE">
+            <column name="DATA">
                 <![CDATA[
                 COPY_TO_CLIPBOARD_TEMPLATE
                 ]]>
@@ -729,7 +729,7 @@
         <insert tableName="ACTION_SETTINGS">
             <column name="ID" value="de25aba8-c229-11ec-9d64-0242ac120002"/>
             <column name="NAME" value="label"/>
-            <column name="VALUE">
+            <column name="DATA">
                 <![CDATA[
                 kubectl get all -n $ns 2323462346
                 ]]>
@@ -739,7 +739,7 @@
         <insert tableName="ACTION_SETTINGS">
             <column name="ID" value="de25aba8-c229-11ec-9d64-0242ac120002"/>
             <column name="NAME" value="text"/>
-            <column name="VALUE">
+            <column name="DATA">
                 <![CDATA[
                 _>ns
                 kubectl get all -n $ns
@@ -750,7 +750,7 @@
         <insert tableName="ACTION_SETTINGS">
             <column name="ID" value="de26aba8-c229-11ec-9d64-0242ac120002"/>
             <column name="NAME" value="description"/>
-            <column name="VALUE">
+            <column name="DATA">
                 <![CDATA[
                 Text as menu description
                 ]]>
@@ -760,7 +760,7 @@
         <insert tableName="ACTION_SETTINGS">
             <column name="ID" value="de26aba8-c229-11ec-9d64-0242ac120002"/>
             <column name="NAME" value="label"/>
-            <column name="VALUE">
+            <column name="DATA">
                 <![CDATA[
                 Text as menu
                 ]]>
@@ -770,7 +770,7 @@
         <insert tableName="ACTION_SETTINGS">
             <column name="ID" value="de26aba8-c229-11ec-9d64-0242ac120002"/>
             <column name="NAME" value="text"/>
-            <column name="VALUE">
+            <column name="DATA">
                 <![CDATA[
                 А вот и текст,
                 в нём очень много строк :)
@@ -781,7 +781,7 @@
         <insert tableName="ACTION_SETTINGS">
             <column name="ID" value="de27aba8-c229-11ec-9d64-0242ac120002"/>
             <column name="NAME" value="headers"/>
-            <column name="VALUE">
+            <column name="DATA">
                 <![CDATA[
                 user-agent_____Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.61 Safari/537.36
                 ]]>
@@ -791,7 +791,7 @@
         <insert tableName="ACTION_SETTINGS">
             <column name="ID" value="de27aba8-c229-11ec-9d64-0242ac120002"/>
             <column name="NAME" value="label"/>
-            <column name="VALUE">
+            <column name="DATA">
                 <![CDATA[
                 URL_PARSER
                 ]]>
@@ -801,7 +801,7 @@
         <insert tableName="ACTION_SETTINGS">
             <column name="ID" value="de27aba8-c229-11ec-9d64-0242ac120002"/>
             <column name="NAME" value="url"/>
-            <column name="VALUE">
+            <column name="DATA">
                 <![CDATA[
                 https://github.com/mockito/mockito
                 ]]>
@@ -811,7 +811,7 @@
         <insert tableName="ACTION_SETTINGS">
             <column name="ID" value="de28aba8-c229-11ec-9d64-0242ac120002"/>
             <column name="NAME" value="path"/>
-            <column name="VALUE">
+            <column name="DATA">
                 <![CDATA[]]>
             </column>
         </insert>
@@ -819,7 +819,7 @@
         <insert tableName="ACTION_SETTINGS">
             <column name="ID" value="de28aba8-c229-11ec-9d64-0242ac120002"/>
             <column name="NAME" value="label"/>
-            <column name="VALUE">
+            <column name="DATA">
                 <![CDATA[
                 NOTE_28
                 ]]>
@@ -829,7 +829,7 @@
         <insert tableName="ACTION_SETTINGS">
             <column name="ID" value="de29aba8-c229-11ec-9d64-0242ac120002"/>
             <column name="NAME" value="label"/>
-            <column name="VALUE">
+            <column name="DATA">
                 <![CDATA[
                 Номер спринта
                 ]]>
@@ -839,7 +839,7 @@
         <insert tableName="ACTION_SETTINGS">
             <column name="ID" value="de29aba8-c229-11ec-9d64-0242ac120002"/>
             <column name="NAME" value="script"/>
-            <column name="VALUE">
+            <column name="DATA">
                 <![CDATA[
                 import java.time.LocalDate
                 import java.time.ZoneId
@@ -868,7 +868,7 @@
         <insert tableName="ACTION_SETTINGS">
             <column name="ID" value="de30aba8-c229-11ec-9d64-0242ac120002"/>
             <column name="NAME" value="pathAndName"/>
-            <column name="VALUE">
+            <column name="DATA">
                 <![CDATA[
                 ./notes/d9530ff6-a228-11ec-b909-0242ac120002.txt
                 ]]>
@@ -878,7 +878,7 @@
         <insert tableName="ACTION_SETTINGS">
             <column name="ID" value="de30aba8-c229-11ec-9d64-0242ac120002"/>
             <column name="NAME" value="description"/>
-            <column name="VALUE">
+            <column name="DATA">
                 <![CDATA[
                 Описание
                 ]]>
@@ -888,7 +888,7 @@
         <insert tableName="ACTION_SETTINGS">
             <column name="ID" value="de30aba8-c229-11ec-9d64-0242ac120002"/>
             <column name="NAME" value="label"/>
-            <column name="VALUE">
+            <column name="DATA">
                 <![CDATA[
                 Test File
                 ]]>

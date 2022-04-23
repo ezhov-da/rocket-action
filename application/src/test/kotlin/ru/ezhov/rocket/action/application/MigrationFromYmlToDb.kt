@@ -23,7 +23,7 @@ fun main() {
 private fun addActionToDb(actions: List<RocketActionSettings>, connection: Connection, parent: RocketActionSettings?) {
     var order = 1
     actions.forEach { ac ->
-        with(connection.prepareStatement("INSERT INTO ACTION(ID, \"TYPE\", \"ORDER\", PARENT_ID) VALUES (?, ?, ?, ?)")) {
+        with(connection.prepareStatement("INSERT INTO ACTION(ID, \"TYPE\", \"SEQUENCE_ORDER\", PARENT_ID) VALUES (?, ?, ?, ?)")) {
             setObject(1, UUID.fromString(ac.id()))
             setString(2, ac.type().value())
             setInt(3, order)
@@ -32,7 +32,7 @@ private fun addActionToDb(actions: List<RocketActionSettings>, connection: Conne
             execute()
         }
         ac.settings().forEach { (key: RocketActionConfigurationPropertyKey, value: String) ->
-            with(connection.prepareStatement("INSERT INTO ACTION_SETTINGS(ID, \"NAME\", \"VALUE\") VALUES (?, ?, ?)")) {
+            with(connection.prepareStatement("INSERT INTO ACTION_SETTINGS(ID, \"NAME\", \"DATA\") VALUES (?, ?, ?)")) {
                 setObject(1, UUID.fromString(ac.id()))
                 setString(2, key.value)
                 setCharacterStream(3, StringReader(value))

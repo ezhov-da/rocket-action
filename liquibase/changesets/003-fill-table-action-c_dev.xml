@@ -11,7 +11,7 @@
             <column name="TYPE" value="TODOIST"/>
             <column name="CREATION_DATE" value="2022-04-22 13:55:11.189"/>
             <column name="UPDATE_DATE" value="null"/>
-            <column name="ORDER" value="1"/>
+            <column name="SEQUENCE_ORDER" value="1"/>
             <column name="PARENT_ID" value="null"/>
         </insert>
 
@@ -20,7 +20,7 @@
             <column name="TYPE" value="SHOW_SVG_IMAGE"/>
             <column name="CREATION_DATE" value="2022-04-22 13:55:11.202"/>
             <column name="UPDATE_DATE" value="null"/>
-            <column name="ORDER" value="2"/>
+            <column name="SEQUENCE_ORDER" value="2"/>
             <column name="PARENT_ID" value="null"/>
         </insert>
 
@@ -29,7 +29,7 @@
             <column name="TYPE" value="SHOW_SVG_IMAGE"/>
             <column name="CREATION_DATE" value="2022-04-22 13:55:11.205"/>
             <column name="UPDATE_DATE" value="null"/>
-            <column name="ORDER" value="3"/>
+            <column name="SEQUENCE_ORDER" value="3"/>
             <column name="PARENT_ID" value="null"/>
         </insert>
 
@@ -38,7 +38,7 @@
             <column name="TYPE" value="GIST"/>
             <column name="CREATION_DATE" value="2022-04-22 13:55:11.207"/>
             <column name="UPDATE_DATE" value="null"/>
-            <column name="ORDER" value="4"/>
+            <column name="SEQUENCE_ORDER" value="4"/>
             <column name="PARENT_ID" value="null"/>
         </insert>
 
@@ -47,7 +47,7 @@
             <column name="TYPE" value="SHOW_TEXT"/>
             <column name="CREATION_DATE" value="2022-04-22 13:55:11.202"/>
             <column name="UPDATE_DATE" value="null"/>
-            <column name="ORDER" value="5"/>
+            <column name="SEQUENCE_ORDER" value="5"/>
             <column name="PARENT_ID" value="null"/>
         </insert>
 
@@ -56,7 +56,7 @@
             <column name="TYPE" value="SHOW_TEXT"/>
             <column name="CREATION_DATE" value="2022-04-22 13:55:11.202"/>
             <column name="UPDATE_DATE" value="null"/>
-            <column name="ORDER" value="6"/>
+            <column name="SEQUENCE_ORDER" value="6"/>
             <column name="PARENT_ID" value="null"/>
         </insert>
 
@@ -65,7 +65,7 @@
             <column name="TYPE" value="OPEN_URL_WITH_TEXT"/>
             <column name="CREATION_DATE" value="2022-04-22 13:55:11.202"/>
             <column name="UPDATE_DATE" value="null"/>
-            <column name="ORDER" value="7"/>
+            <column name="SEQUENCE_ORDER" value="7"/>
             <column name="PARENT_ID" value="null"/>
         </insert>
 
@@ -74,7 +74,7 @@
             <column name="TYPE" value="OPEN_URL_WITH_TEXT"/>
             <column name="CREATION_DATE" value="2022-04-22 13:55:11.202"/>
             <column name="UPDATE_DATE" value="null"/>
-            <column name="ORDER" value="8"/>
+            <column name="SEQUENCE_ORDER" value="8"/>
             <column name="PARENT_ID" value="null"/>
         </insert>
 
@@ -83,7 +83,7 @@
             <column name="TYPE" value="OPEN_URL_WITH_TEXT_HISTORY"/>
             <column name="CREATION_DATE" value="2022-04-22 13:55:11.202"/>
             <column name="UPDATE_DATE" value="null"/>
-            <column name="ORDER" value="9"/>
+            <column name="SEQUENCE_ORDER" value="9"/>
             <column name="PARENT_ID" value="null"/>
         </insert>
 
@@ -92,7 +92,7 @@
             <column name="TYPE" value="OPEN_URL_WITH_TEXT_HISTORY"/>
             <column name="CREATION_DATE" value="2022-04-22 13:55:11.202"/>
             <column name="UPDATE_DATE" value="null"/>
-            <column name="ORDER" value="10"/>
+            <column name="SEQUENCE_ORDER" value="10"/>
             <column name="PARENT_ID" value="null"/>
         </insert>
 
@@ -101,7 +101,7 @@
             <column name="TYPE" value="SEPARATOR"/>
             <column name="CREATION_DATE" value="2022-04-22 13:55:11.202"/>
             <column name="UPDATE_DATE" value="null"/>
-            <column name="ORDER" value="11"/>
+            <column name="SEQUENCE_ORDER" value="11"/>
             <column name="PARENT_ID" value="null"/>
         </insert>
 
@@ -110,7 +110,7 @@
             <column name="TYPE" value="OPEN_URL"/>
             <column name="CREATION_DATE" value="2022-04-22 13:55:11.202"/>
             <column name="UPDATE_DATE" value="null"/>
-            <column name="ORDER" value="12"/>
+            <column name="SEQUENCE_ORDER" value="12"/>
             <column name="PARENT_ID" value="null"/>
         </insert>
 
@@ -119,7 +119,7 @@
             <column name="TYPE" value="COPY_TO_CLIPBOARD"/>
             <column name="CREATION_DATE" value="2022-04-22 13:55:11.202"/>
             <column name="UPDATE_DATE" value="null"/>
-            <column name="ORDER" value="13"/>
+            <column name="SEQUENCE_ORDER" value="13"/>
             <column name="PARENT_ID" value="null"/>
         </insert>
 
@@ -128,7 +128,7 @@
             <column name="TYPE" value="OPEN_FILE"/>
             <column name="CREATION_DATE" value="2022-04-22 13:55:11.202"/>
             <column name="UPDATE_DATE" value="null"/>
-            <column name="ORDER" value="14"/>
+            <column name="SEQUENCE_ORDER" value="14"/>
             <column name="PARENT_ID" value="null"/>
         </insert>
 
@@ -137,7 +137,7 @@
             <column name="TYPE" value="OPEN_FILE"/>
             <column name="CREATION_DATE" value="2022-04-22 13:55:11.202"/>
             <column name="UPDATE_DATE" value="null"/>
-            <column name="ORDER" value="15"/>
+            <column name="SEQUENCE_ORDER" value="15"/>
             <column name="PARENT_ID" value="null"/>
         </insert>
 
@@ -146,7 +146,7 @@
             <column name="TYPE" value="GROUP"/>
             <column name="CREATION_DATE" value="2022-04-22 13:55:11.202"/>
             <column name="UPDATE_DATE" value="null"/>
-            <column name="ORDER" value="16"/>
+            <column name="SEQUENCE_ORDER" value="16"/>
             <column name="PARENT_ID" value="null"/>
         </insert>
 
@@ -155,7 +155,7 @@
             <column name="TYPE" value="COPY_TO_CLIPBOARD"/>
             <column name="CREATION_DATE" value="2022-04-22 13:55:11.202"/>
             <column name="UPDATE_DATE" value="null"/>
-            <column name="ORDER" value="1"/>
+            <column name="SEQUENCE_ORDER" value="1"/>
             <column name="PARENT_ID" value="de16aba8-c229-11ec-9d64-0242ac120002"/>
         </insert>
 
@@ -164,7 +164,7 @@
             <column name="TYPE" value="OPEN_FILE"/>
             <column name="CREATION_DATE" value="2022-04-22 13:55:11.202"/>
             <column name="UPDATE_DATE" value="null"/>
-            <column name="ORDER" value="2"/>
+            <column name="SEQUENCE_ORDER" value="2"/>
             <column name="PARENT_ID" value="de16aba8-c229-11ec-9d64-0242ac120002"/>
         </insert>
 
@@ -173,7 +173,7 @@
             <column name="TYPE" value="GROUP"/>
             <column name="CREATION_DATE" value="2022-04-22 13:55:11.202"/>
             <column name="UPDATE_DATE" value="null"/>
-            <column name="ORDER" value="3"/>
+            <column name="SEQUENCE_ORDER" value="3"/>
             <column name="PARENT_ID" value="de16aba8-c229-11ec-9d64-0242ac120002"/>
         </insert>
 
@@ -182,7 +182,7 @@
             <column name="TYPE" value="COPY_TO_CLIPBOARD"/>
             <column name="CREATION_DATE" value="2022-04-22 13:55:11.202"/>
             <column name="UPDATE_DATE" value="null"/>
-            <column name="ORDER" value="1"/>
+            <column name="SEQUENCE_ORDER" value="1"/>
             <column name="PARENT_ID" value="de19aba8-c229-11ec-9d64-0242ac120002"/>
         </insert>
 
@@ -191,7 +191,7 @@
             <column name="TYPE" value="OPEN_FILE"/>
             <column name="CREATION_DATE" value="2022-04-22 13:55:11.202"/>
             <column name="UPDATE_DATE" value="null"/>
-            <column name="ORDER" value="2"/>
+            <column name="SEQUENCE_ORDER" value="2"/>
             <column name="PARENT_ID" value="de19aba8-c229-11ec-9d64-0242ac120002"/>
         </insert>
 
@@ -200,7 +200,7 @@
             <column name="TYPE" value="SHOW_IMAGE"/>
             <column name="CREATION_DATE" value="2022-04-22 13:55:11.202"/>
             <column name="UPDATE_DATE" value="null"/>
-            <column name="ORDER" value="17"/>
+            <column name="SEQUENCE_ORDER" value="17"/>
             <column name="PARENT_ID" value="null"/>
         </insert>
 
@@ -209,7 +209,7 @@
             <column name="TYPE" value="SHOW_IMAGE"/>
             <column name="CREATION_DATE" value="2022-04-22 13:55:11.202"/>
             <column name="UPDATE_DATE" value="null"/>
-            <column name="ORDER" value="18"/>
+            <column name="SEQUENCE_ORDER" value="18"/>
             <column name="PARENT_ID" value="null"/>
         </insert>
 
@@ -218,7 +218,7 @@
             <column name="TYPE" value="EXEC"/>
             <column name="CREATION_DATE" value="2022-04-22 13:55:11.202"/>
             <column name="UPDATE_DATE" value="null"/>
-            <column name="ORDER" value="19"/>
+            <column name="SEQUENCE_ORDER" value="19"/>
             <column name="PARENT_ID" value="null"/>
         </insert>
 
@@ -227,7 +227,7 @@
             <column name="TYPE" value="COPY_TO_CLIPBOARD_TEMPLATE"/>
             <column name="CREATION_DATE" value="2022-04-22 13:55:11.202"/>
             <column name="UPDATE_DATE" value="null"/>
-            <column name="ORDER" value="20"/>
+            <column name="SEQUENCE_ORDER" value="20"/>
             <column name="PARENT_ID" value="null"/>
         </insert>
 
@@ -236,7 +236,7 @@
             <column name="TYPE" value="SHOW_TEXT_AS_MENU"/>
             <column name="CREATION_DATE" value="2022-04-22 13:55:11.202"/>
             <column name="UPDATE_DATE" value="null"/>
-            <column name="ORDER" value="21"/>
+            <column name="SEQUENCE_ORDER" value="21"/>
             <column name="PARENT_ID" value="null"/>
         </insert>
 
@@ -245,7 +245,7 @@
             <column name="TYPE" value="URL_PARSER"/>
             <column name="CREATION_DATE" value="2022-04-22 13:55:11.202"/>
             <column name="UPDATE_DATE" value="null"/>
-            <column name="ORDER" value="22"/>
+            <column name="SEQUENCE_ORDER" value="22"/>
             <column name="PARENT_ID" value="null"/>
         </insert>
 
@@ -254,7 +254,7 @@
             <column name="TYPE" value="NOTE"/>
             <column name="CREATION_DATE" value="2022-04-22 13:55:11.202"/>
             <column name="UPDATE_DATE" value="null"/>
-            <column name="ORDER" value="23"/>
+            <column name="SEQUENCE_ORDER" value="23"/>
             <column name="PARENT_ID" value="null"/>
         </insert>
 
@@ -263,7 +263,7 @@
             <column name="TYPE" value="KOTLIN_SCRIPT"/>
             <column name="CREATION_DATE" value="2022-04-22 13:55:11.202"/>
             <column name="UPDATE_DATE" value="null"/>
-            <column name="ORDER" value="24"/>
+            <column name="SEQUENCE_ORDER" value="24"/>
             <column name="PARENT_ID" value="null"/>
         </insert>
 
@@ -272,7 +272,7 @@
             <column name="TYPE" value="NOTE_ON_FILE"/>
             <column name="CREATION_DATE" value="2022-04-22 13:55:11.202"/>
             <column name="UPDATE_DATE" value="null"/>
-            <column name="ORDER" value="25"/>
+            <column name="SEQUENCE_ORDER" value="25"/>
             <column name="PARENT_ID" value="null"/>
         </insert>
 
