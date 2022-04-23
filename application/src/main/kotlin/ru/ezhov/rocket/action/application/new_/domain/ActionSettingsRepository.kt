@@ -8,4 +8,6 @@ interface ActionSettingsRepository {
     fun all(): Either<AllActionSettingsRepositoryException, List<ActionSettings>>
 
     fun settings(id: ActionId): Either<ActionSettingsRepositoryException, ActionSettings?>
+
+    fun save(actionSettings: ActionSettings): Either<SaveActionSettingsRepositoryException, Unit>
 }

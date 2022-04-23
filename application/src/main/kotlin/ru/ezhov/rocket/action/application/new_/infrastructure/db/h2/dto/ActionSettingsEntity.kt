@@ -6,7 +6,7 @@ import java.util.UUID
 interface ActionSettingsEntity : Entity<ActionSettingsEntity> {
     companion object : Entity.Factory<ActionSettingsEntity>()
 
-    val id: UUID
-    val name: String
-    val value: String
+    var id: UUID
+    var name: String
+    var value: String?
 }

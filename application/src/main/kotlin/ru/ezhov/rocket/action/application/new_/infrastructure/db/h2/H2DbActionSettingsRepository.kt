@@ -3,12 +3,15 @@ package ru.ezhov.rocket.action.application.new_.infrastructure.db.h2
 import arrow.core.Either
 import arrow.core.flatMap
 import org.ktorm.dsl.eq
+import org.ktorm.entity.add
 import org.ktorm.entity.filter
+import org.ktorm.entity.removeIf
 import org.ktorm.entity.toCollection
 import org.ktorm.entity.toList
 import ru.ezhov.rocket.action.application.new_.domain.ActionSettingsRepository
 import ru.ezhov.rocket.action.application.new_.domain.ActionSettingsRepositoryException
 import ru.ezhov.rocket.action.application.new_.domain.AllActionSettingsRepositoryException
+import ru.ezhov.rocket.action.application.new_.domain.SaveActionSettingsRepositoryException
 import ru.ezhov.rocket.action.application.new_.domain.model.ActionId
 import ru.ezhov.rocket.action.application.new_.domain.model.ActionSettingName
 import ru.ezhov.rocket.action.application.new_.domain.model.ActionSettingValue
@@ -59,11 +62,42 @@ class H2DbActionSettingsRepository(
                 }
             }
 
+    override fun save(actionSettings: ActionSettings): Either<SaveActionSettingsRepositoryException, Unit> =
+        factory.database { e ->
+            SaveActionSettingsRepositoryException(
+                message = "Error when save action settings by id='${actionSettings.id.value}",
+                cause = e
+            )
+        }
+            .flatMap { database ->
+                try {
+                    database.useTransaction {
+                        database.actionSettings.removeIf { ast -> ast.id eq actionSettings.id.value }
+                        actionSettings.map.forEach { m ->
+                            database.actionSettings.add(ActionSettingsEntity {
+                                id = actionSettings.id.value
+                                name = m.key.value
+                                value = m.value?.value
+                            })
+                        }
+                    }
+
+                    Either.Right(Unit)
+                } catch (e: Exception) {
+                    Either.Left(
+                        SaveActionSettingsRepositoryException(
+                            message = "Error when save action settings by id='${actionSettings.id.value}'",
+                            cause = e
+                        )
+                    )
+                }
+            }
+
     private fun List<ActionSettingsEntity>.toDomainModel() =
         this.groupBy { it.id }
             .map { (k, v) ->
                 val values =
-                    v.associate { ActionSettingName(it.name) to ActionSettingValue(it.value) }
+                    v.associate { ActionSettingName(it.name) to it.value?.let { v -> ActionSettingValue(v) } }
                 ActionSettings(ActionId(k), values)
             }
 }
