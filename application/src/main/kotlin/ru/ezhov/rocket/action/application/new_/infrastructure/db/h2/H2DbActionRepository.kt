@@ -2,7 +2,6 @@ package ru.ezhov.rocket.action.application.new_.infrastructure.db.h2
 
 import arrow.core.Either
 import arrow.core.flatMap
-import arrow.core.handleErrorWith
 import org.ktorm.dsl.eq
 import org.ktorm.entity.find
 import ru.ezhov.rocket.action.application.new_.domain.ActionRepository
@@ -12,19 +11,17 @@ import ru.ezhov.rocket.action.application.new_.domain.model.ActionId
 import ru.ezhov.rocket.action.application.new_.domain.model.ActionOrder
 import ru.ezhov.rocket.action.application.new_.domain.model.ActionType
 import ru.ezhov.rocket.action.application.new_.infrastructure.db.KtormDbConnectionFactory
+import ru.ezhov.rocket.action.application.new_.infrastructure.db.database
 import ru.ezhov.rocket.action.application.new_.infrastructure.db.h2.dto.ActionEntity
 
 class H2DbActionRepository(private val factory: KtormDbConnectionFactory) : ActionRepository {
     override fun action(id: ActionId): Either<GetActionRepositoryException, Action?> =
-        factory.database()
-            .handleErrorWith { ex ->
-                Either.Left(
-                    GetActionRepositoryException(
-                        message = "Error get connection when get action by id=${id.value}",
-                        cause = ex
-                    )
-                )
-            }
+        factory.database { e ->
+            GetActionRepositoryException(
+                message = "Error get connection when get action settings",
+                cause = e
+            )
+        }
             .flatMap { db ->
                 try {
                     Either.Right(

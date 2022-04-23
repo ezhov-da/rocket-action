@@ -1,4 +1,4 @@
-package ru.ezhov.rocket.action.application.new_.infrastructure.db.h2
+package ru.ezhov.rocket.action.application.new_.infrastructure.db
 
 import arrow.core.Either
 import ru.ezhov.rocket.action.application.new_.infrastructure.db.DbConnectionFactory
@@ -7,7 +7,7 @@ import java.sql.Connection
 import java.sql.DriverManager
 import java.sql.SQLException
 
-class H2DbConnectionFactory(private val credentials: DbCredentialsFactory) : DbConnectionFactory {
+class DriverManagerConnectionFactory(private val credentials: DbCredentialsFactory) : DbConnectionFactory {
     override fun connection(): Either<SQLException, Connection> = try {
         Either.Right(
             DriverManager.getConnection(

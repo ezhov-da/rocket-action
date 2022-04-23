@@ -1,15 +1,12 @@
 package ru.ezhov.rocket.action.application.new_.infrastructure.db.h2
 
 import arrow.core.getOrHandle
-import mu.KotlinLogging
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
-import ru.ezhov.rocket.action.application.new_.infrastructure.db.DbCredentialsFactory
+import ru.ezhov.rocket.action.application.new_.domain.model.ActionIdSampleData
 import ru.ezhov.rocket.action.application.new_.infrastructure.db.LiquibaseDbPreparedService
-
-private val logger = KotlinLogging.logger {}
 
 class H2DbActionSettingsRepositoryTest {
 
@@ -19,23 +16,28 @@ class H2DbActionSettingsRepositoryTest {
 
     @Test
     fun `should be get all action settings when get all`() {
-        val tempFile = tempFolder.newFile();
-        logger.debug { "Test db=${tempFile.absolutePath}" }
+        with(LiquibaseDbPreparedService.prepareH2Db(tempFolder = tempFolder)) {
+            val repo = H2DbActionSettingsRepository(
+                factory = H2DbKtormDbConnectionFactorySampleData.default(factory = dbCredentialsFactory)
+            )
 
-        val credentialFactory = object : DbCredentialsFactory {
-            override val url: String
-                get() = "jdbc:h2:${tempFile.absolutePath}"
-            override val user: String
-                get() = "test"
-            override val password: String
-                get() = "test"
+            val all = repo.all().getOrHandle { throw it }
+
+            assertThat(all).hasSize(29)
         }
-        LiquibaseDbPreparedService.prepare(H2DbConnectionFactorySampleData.default(factory = credentialFactory))
+    }
 
-        val repo = H2DbActionSettingsRepository(H2DbKtormDbConnectionFactorySampleData.default(factory = credentialFactory))
+    @Test
+    fun `should be found action settings by id`() {
+        with(LiquibaseDbPreparedService.prepareH2Db(tempFolder = tempFolder)) {
+            val repo = H2DbActionSettingsRepository(
+                factory = H2DbKtormDbConnectionFactorySampleData.default(factory = dbCredentialsFactory)
+            )
+            val id = ActionIdSampleData.default(uuidAsString = "de2a6ba8-c229-11ec-9d64-0242ac120002")
 
-        val all = repo.all().getOrHandle { throw it }
+            val actionSettings = repo.settings(id).getOrHandle { throw it }
 
-        assertThat(all).hasSize(29)
+            assertThat(actionSettings).isNotNull.extracting { it?.id }.isEqualTo(id)
+        }
     }
 }
