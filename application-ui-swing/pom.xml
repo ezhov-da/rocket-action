@@ -31,14 +31,6 @@
 
         <flatlaf.version>2.0.2</flatlaf.version>
         <flatlaf-swingx.version>2.0.2</flatlaf-swingx.version>
-        <h2.version>2.1.212</h2.version>
-        <liquibase.version>4.9.1</liquibase.version>
-        <ktorm.version>3.4.1</ktorm.version>
-
-        <profile.propertyFile>./../liquibase/liquibase.properties</profile.propertyFile>
-        <profile.changeLogFile>./../liquibase/dbchangelog.xml</profile.changeLogFile>
-        <profile.verbose>false</profile.verbose>
-        <profile.logging>info</profile.logging>
     </properties>
 
     <dependencies>
@@ -133,24 +125,6 @@
         </dependency>
 
         <dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
-            <version>${h2.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.liquibase</groupId>
-            <artifactId>liquibase-core</artifactId>
-            <version>${liquibase.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.ktorm</groupId>
-            <artifactId>ktorm-core</artifactId>
-            <version>${ktorm.version}</version>
-        </dependency>
-
-        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <scope>test</scope>
@@ -165,27 +139,6 @@
 
     <build>
         <plugins>
-            <plugin>
-                <groupId>org.liquibase</groupId>
-                <artifactId>liquibase-maven-plugin</artifactId>
-                <version>${liquibase.version}</version>
-                <configuration>
-                    <propertyFile>${profile.propertyFile}</propertyFile>
-                    <changeLogFile>${profile.changeLogFile}</changeLogFile>
-                    <!-- log  -->
-                    <verbose>${profile.verbose}</verbose>
-                    <logging>${profile.logging}</logging>
-                    <promptOnNonLocalDatabase>false</promptOnNonLocalDatabase>
-                </configuration>
-                <dependencies>
-                    <dependency>
-                        <groupId>com.h2database</groupId>
-                        <artifactId>h2</artifactId>
-                        <version>${h2.version}</version>
-                    </dependency>
-                </dependencies>
-            </plugin>
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
