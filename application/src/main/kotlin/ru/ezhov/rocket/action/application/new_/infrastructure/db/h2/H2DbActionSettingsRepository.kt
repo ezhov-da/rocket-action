@@ -8,10 +8,10 @@ import org.ktorm.entity.filter
 import org.ktorm.entity.removeIf
 import org.ktorm.entity.toCollection
 import org.ktorm.entity.toList
-import ru.ezhov.rocket.action.application.new_.domain.ActionSettingsRepository
-import ru.ezhov.rocket.action.application.new_.domain.ActionSettingsRepositoryException
-import ru.ezhov.rocket.action.application.new_.domain.AllActionSettingsRepositoryException
-import ru.ezhov.rocket.action.application.new_.domain.SaveActionSettingsRepositoryException
+import ru.ezhov.rocket.action.application.new_.domain.repository.ActionSettingsRepository
+import ru.ezhov.rocket.action.application.new_.domain.repository.ActionSettingsRepositoryException
+import ru.ezhov.rocket.action.application.new_.domain.repository.AllActionSettingsRepositoryException
+import ru.ezhov.rocket.action.application.new_.domain.repository.SaveActionSettingsRepositoryException
 import ru.ezhov.rocket.action.application.new_.domain.model.ActionId
 import ru.ezhov.rocket.action.application.new_.domain.model.ActionSettingName
 import ru.ezhov.rocket.action.application.new_.domain.model.ActionSettingValue
@@ -73,12 +73,8 @@ class H2DbActionSettingsRepository(
                 try {
                     database.useTransaction {
                         database.actionSettings.removeIf { ast -> ast.id eq actionSettings.id.value }
-                        actionSettings.map.forEach { m ->
-                            database.actionSettings.add(ActionSettingsEntity {
-                                id = actionSettings.id.value
-                                name = m.key.value
-                                value = m.value?.value
-                            })
+                        actionSettings.toDbModel().forEach { ast ->
+                            database.actionSettings.add(ast)
                         }
                     }
 
@@ -92,6 +88,17 @@ class H2DbActionSettingsRepository(
                     )
                 }
             }
+
+    private fun ActionSettings.toDbModel(): List<ActionSettingsEntity> {
+        val actionId = this.id.value
+        return this.map.map { aso ->
+            ActionSettingsEntity {
+                this.id = actionId
+                this.name = aso.key.value
+                this.value = aso.value?.value
+            }
+        }
+    }
 
     private fun List<ActionSettingsEntity>.toDomainModel() =
         this.groupBy { it.id }

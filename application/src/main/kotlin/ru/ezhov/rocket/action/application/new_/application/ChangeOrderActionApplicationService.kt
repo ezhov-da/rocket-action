@@ -1,8 +1,10 @@
 package ru.ezhov.rocket.action.application.new_.application
 
+import arrow.core.Either
 import ru.ezhov.rocket.action.application.new_.domain.model.ActionId
 
 interface ChangeOrderActionApplicationService {
-    fun before(set: ActionId, before: ActionId)
-    fun after(set: ActionId, after: ActionId)
+    fun before(target: ActionId, before: ActionId): Either<ChangeOrderActionApplicationServiceException, Unit>
+
+    fun after(target: ActionId, after: ActionId): Either<ChangeOrderActionApplicationServiceException, Unit>
 }

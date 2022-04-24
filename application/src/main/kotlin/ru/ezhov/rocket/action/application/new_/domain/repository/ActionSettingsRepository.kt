@@ -1,4 +1,4 @@
-package ru.ezhov.rocket.action.application.new_.domain
+package ru.ezhov.rocket.action.application.new_.domain.repository
 
 import arrow.core.Either
 import ru.ezhov.rocket.action.application.new_.domain.model.ActionId

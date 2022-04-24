@@ -7,11 +7,11 @@ import java.util.UUID
 interface ActionEntity : Entity<ActionEntity> {
     companion object : Entity.Factory<ActionEntity>()
 
-    val id: UUID
-    val type: String
-    val order: Int
-    val creationDate: LocalDateTime
-    val updateDate: LocalDateTime?
-    val parentId: UUID?
+    var id: UUID
+    var type: String
+    var order: Int
+    var creationDate: LocalDateTime
+    var updateDate: LocalDateTime?
+    var parentId: UUID?
 }
 
