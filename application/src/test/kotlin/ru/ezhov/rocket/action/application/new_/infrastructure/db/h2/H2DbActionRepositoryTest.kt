@@ -71,7 +71,7 @@ class H2DbActionRepositoryTest {
                 id = ActionIdSampleData.default(uuidAsString = "651cc1fc-c372-11ec-9d64-0242ac120002")
             )
 
-            repo.addOrUpdate(action).getOrHandle { throw it }
+            repo.addOrUpdate(listOf(action)).getOrHandle { throw it }
 
             val savedAction = repo.action(action.id).getOrHandle { throw it }
             assertThat(savedAction).isNotNull
@@ -84,7 +84,7 @@ class H2DbActionRepositoryTest {
             val repo = H2DbActionRepository(H2DbKtormDbConnectionFactorySampleData.default(factory = dbCredentialsFactory))
             val action = ActionSampleData.default().withNewOrder(ActionOrder(5))
 
-            repo.addOrUpdate(action).getOrHandle { throw it }
+            repo.addOrUpdate(listOf(action)).getOrHandle { throw it }
 
             val savedAction = repo.action(action.id).getOrHandle { throw it }
             assertThat(savedAction!!.order.value).isEqualTo(5)
