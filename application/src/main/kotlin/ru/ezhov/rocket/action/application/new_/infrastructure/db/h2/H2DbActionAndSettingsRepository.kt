@@ -9,9 +9,8 @@ import org.ktorm.dsl.or
 import org.ktorm.entity.add
 import org.ktorm.entity.filter
 import org.ktorm.entity.toCollection
-import ru.ezhov.rocket.action.application.new_.domain.model.Action
 import ru.ezhov.rocket.action.application.new_.domain.model.ActionId
-import ru.ezhov.rocket.action.application.new_.domain.model.ActionSettings
+import ru.ezhov.rocket.action.application.new_.domain.model.NewAction
 import ru.ezhov.rocket.action.application.new_.domain.repository.ActionAndSettingsRepository
 import ru.ezhov.rocket.action.application.new_.domain.repository.AddActionAndSettingsRepositoryException
 import ru.ezhov.rocket.action.application.new_.domain.repository.RemoveActionAndSettingsRepositoryException
@@ -25,7 +24,7 @@ import ru.ezhov.rocket.action.application.new_.infrastructure.db.h2.schema.Actio
 class H2DbActionAndSettingsRepository(
     private val factory: KtormDbConnectionFactory
 ) : ActionAndSettingsRepository {
-    override fun add(action: Action, actionSettings: ActionSettings): Either<AddActionAndSettingsRepositoryException, Unit> =
+    override fun add(action: NewAction): Either<AddActionAndSettingsRepositoryException, Unit> =
         factory.database { e ->
             AddActionAndSettingsRepositoryException(
                 message = "Error get connection when save actions and settings",
@@ -35,8 +34,8 @@ class H2DbActionAndSettingsRepository(
             .flatMap { db ->
                 try {
                     db.useTransaction {
-                        db.actions.add(action.toDbModel())
-                        actionSettings.toDbModel().forEach { db.actionSettings.add(it) }
+                        db.actions.add(action.toActionDbModel())
+                        action.toSettingsDbModel().forEach { db.actionSettings.add(it) }
                     }
 
                     Either.Right(Unit)
@@ -112,7 +111,7 @@ class H2DbActionAndSettingsRepository(
                 }
             }
 
-    private fun Action.toDbModel(): ActionEntity {
+    private fun NewAction.toActionDbModel(): ActionEntity {
         val action = this
         return ActionEntity {
             this.id = action.id.value
@@ -124,7 +123,7 @@ class H2DbActionAndSettingsRepository(
         }
     }
 
-    private fun ActionSettings.toDbModel(): List<ActionSettingsEntity> {
+    private fun NewAction.toSettingsDbModel(): List<ActionSettingsEntity> {
         val actionId = this.id.value
         return this.map.map { aso ->
             ActionSettingsEntity {

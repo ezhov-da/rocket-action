@@ -1,4 +1,4 @@
-package ru.ezhov.rocket.action.application.new_.application
+package ru.ezhov.rocket.action.application.new_.application.changeorder
 
 import arrow.core.Either
 import ru.ezhov.rocket.action.application.new_.domain.model.ActionId

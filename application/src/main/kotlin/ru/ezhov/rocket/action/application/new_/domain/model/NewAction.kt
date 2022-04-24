@@ -5,6 +5,7 @@ import java.time.LocalDateTime
 class NewAction(
     val id: ActionId,
     val type: ActionType,
+    val order: ActionOrder,
     val creationDate: LocalDateTime,
     val updateDate: LocalDateTime?,
     val parentId: ActionId,
