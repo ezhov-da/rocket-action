@@ -6,5 +6,8 @@ import ru.ezhov.rocket.action.core.domain.model.ActionId
 
 interface GetActionApplicationService {
     fun children(id: ActionId): Either<GetActionApplicationServiceException, List<Action>>
-    fun action(id: ActionId): Either<GetActionApplicationServiceException,Action?>
+
+    fun action(id: ActionId): Either<GetActionApplicationServiceException, Action?>
+
+    fun all(): Either<GetActionApplicationServiceException, List<Action>>
 }

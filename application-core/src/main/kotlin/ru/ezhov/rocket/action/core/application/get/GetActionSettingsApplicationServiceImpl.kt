@@ -17,4 +17,13 @@ class GetActionSettingsApplicationServiceImpl(
                     cause = e
                 ))
             }
+
+    override fun all(): Either<GetActionSettingsApplicationServiceException, List<ActionSettings>> =
+        actionSettingsRepository.all()
+            .handleErrorWith { e ->
+                Either.Left(GetActionSettingsApplicationServiceException(
+                    message = "Error when get all action settings",
+                    cause = e
+                ))
+            }
 }

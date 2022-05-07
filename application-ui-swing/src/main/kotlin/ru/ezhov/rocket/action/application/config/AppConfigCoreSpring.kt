@@ -15,6 +15,8 @@ import ru.ezhov.rocket.action.core.application.delete.DeleteActionApplicationSer
 import ru.ezhov.rocket.action.core.application.delete.DeleteActionApplicationServiceImpl
 import ru.ezhov.rocket.action.core.application.get.GetActionApplicationService
 import ru.ezhov.rocket.action.core.application.get.GetActionApplicationServiceImpl
+import ru.ezhov.rocket.action.core.application.get.GetActionSettingsApplicationService
+import ru.ezhov.rocket.action.core.application.get.GetActionSettingsApplicationServiceImpl
 import ru.ezhov.rocket.action.core.domain.changeorder.AfterChangeOrderService
 import ru.ezhov.rocket.action.core.domain.changeorder.AfterChangeOrderServiceImpl
 import ru.ezhov.rocket.action.core.domain.changeorder.BeforeChangeOrderService
@@ -100,7 +102,6 @@ open class AppConfigCoreSpring {
             actionAndSettingsRepository = actionAndSettingsRepository
         )
 
-
     @Bean
     open fun deleteActionApplicationService(
         actionAndSettingsRepository: ActionAndSettingsRepository
@@ -109,10 +110,17 @@ open class AppConfigCoreSpring {
             actionAndSettingsRepository = actionAndSettingsRepository
         )
 
-
     @Bean
     open fun getActionApplicationService(actionRepository: ActionRepository): GetActionApplicationService =
         GetActionApplicationServiceImpl(
             actionRepository = actionRepository
+        )
+
+    @Bean
+    open fun getActionSettingsApplicationService(
+        actionSettingsRepository: ActionSettingsRepository
+    ): GetActionSettingsApplicationService =
+        GetActionSettingsApplicationServiceImpl(
+            actionSettingsRepository = actionSettingsRepository
         )
 }

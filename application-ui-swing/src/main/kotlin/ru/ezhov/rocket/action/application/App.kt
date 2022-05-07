@@ -5,6 +5,7 @@ import mu.KotlinLogging
 import ru.ezhov.rocket.action.application.domain.RocketActionSettingsRepository
 import ru.ezhov.rocket.action.application.infrastructure.YmlRocketActionSettingsRepository
 import ru.ezhov.rocket.action.application.plugin.manager.infrastructure.RocketActionPluginRepositoryFactory
+import ru.ezhov.rocket.action.application.properties.GeneralPropertiesRepository
 import ru.ezhov.rocket.action.application.properties.GeneralPropertiesRepositoryFactory
 import ru.ezhov.rocket.action.application.properties.UsedPropertiesName
 import java.io.File
@@ -17,15 +18,16 @@ import javax.swing.plaf.FontUIResource
 private val logger = KotlinLogging.logger { }
 
 fun main(args: Array<String>) {
+    val generalPropertiesRepository = GeneralPropertiesRepositoryFactory.repository
     SwingUtilities.invokeLater {
-        FlatLightLaf.setup(lookAndFeel())
+        FlatLightLaf.setup(lookAndFeel(generalPropertiesRepository))
         try {
-            getFont()?.let { font -> setUIFont(font) }
+            getFont(generalPropertiesRepository)?.let { font -> setUIFont(font) }
 
             val actionService = UiQuickActionService(
                 rocketActionSettingsRepository = rockerActionRepository(args),
                 rocketActionPluginRepository = RocketActionPluginRepositoryFactory.repository,
-                generalPropertiesRepository = GeneralPropertiesRepositoryFactory.repository
+                generalPropertiesRepository = generalPropertiesRepository,
             )
             BaseDialog.dialog.apply {
                 jMenuBar = actionService.createMenu(this)
@@ -70,18 +72,18 @@ private fun rockerActionRepository(args: Array<String>): RocketActionSettingsRep
         repository
     }
 
-private fun lookAndFeel(): LookAndFeel {
-    val className = GeneralPropertiesRepositoryFactory.repository
+private fun lookAndFeel(repository: GeneralPropertiesRepository): LookAndFeel {
+    val className = repository
         .asString(name = UsedPropertiesName.UI_CONFIGURATION_LOOK_AND_FEEL_CLASS,
             default = "com.formdev.flatlaf.FlatLightLaf")
 
     return Class.forName(className).newInstance() as LookAndFeel
 }
 
-private fun getFont(): FontUIResource? {
-    val name = GeneralPropertiesRepositoryFactory.repository.asStringOrNull(UsedPropertiesName.FONT_NAME)
-    val style = GeneralPropertiesRepositoryFactory.repository.asIntegerOrNull(UsedPropertiesName.FONT_STYLE)
-    val size = GeneralPropertiesRepositoryFactory.repository.asIntegerOrNull(UsedPropertiesName.FONT_SIZE)
+private fun getFont(repository: GeneralPropertiesRepository): FontUIResource? {
+    val name = repository.asStringOrNull(UsedPropertiesName.FONT_NAME)
+    val style = repository.asIntegerOrNull(UsedPropertiesName.FONT_STYLE)
+    val size = repository.asIntegerOrNull(UsedPropertiesName.FONT_SIZE)
 
     return if (name != null && style != null && size != null) {
         FontUIResource(name, style, size)
@@ -90,7 +92,7 @@ private fun getFont(): FontUIResource? {
     }
 }
 
-fun setUIFont(f: FontUIResource?) {
+private fun setUIFont(f: FontUIResource?) {
     val keys: Enumeration<*> = UIManager.getDefaults().keys()
     while (keys.hasMoreElements()) {
         val key = keys.nextElement()

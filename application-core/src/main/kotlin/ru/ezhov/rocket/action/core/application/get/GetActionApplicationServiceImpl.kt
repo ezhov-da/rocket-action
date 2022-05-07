@@ -26,4 +26,13 @@ class GetActionApplicationServiceImpl(
                     cause = e
                 ))
             }
+
+    override fun all(): Either<GetActionApplicationServiceException, List<Action>> =
+        actionRepository.all()
+            .handleErrorWith { e ->
+                Either.Left(GetActionApplicationServiceException(
+                    message = "Error when get all actions",
+                    cause = e
+                ))
+            }
 }
