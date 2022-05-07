@@ -21,10 +21,12 @@ class LiquibaseDbPreparedService private constructor(
 ) {
 
     companion object {
-        fun prepareH2Db(tempFolder: TemporaryFolder): LiquibaseDbPreparedService {
-            val tempFile = tempFolder.newFile();
-            logger.debug { "Test db=${tempFile.absolutePath}" }
-            val credentialFactory = H2DbCredentialsFactorySampleData.from(tempFile)
+        fun prepareH2Db(tempFolder: TemporaryFolder): LiquibaseDbPreparedService =
+            prepareH2Db(tempFolder.newFile())
+
+        fun prepareH2Db(file: File): LiquibaseDbPreparedService {
+            logger.debug { "Test db=${file.absolutePath}" }
+            val credentialFactory = H2DbCredentialsFactorySampleData.from(file)
 
             return LiquibaseDbPreparedService(
                 factory = ConnectionFactorySampleData.driverManager(factory = credentialFactory),
