@@ -9,6 +9,7 @@ class CreateActionApplicationServiceImpl(
     private val actionAndSettingsRepository: ActionAndSettingsRepository
 ) : CreateActionApplicationService {
     override fun `do`(new: NewAction): Either<CreateActionApplicationServiceException, Unit> =
+        // TODO реализовать вычисление порядка и изменение остальных
         actionAndSettingsRepository.add(new)
             .handleErrorWith { e ->
                 Either.Left(CreateActionApplicationServiceException(

@@ -7,7 +7,7 @@ import ru.ezhov.rocket.action.api.RocketActionConfiguration
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
 import ru.ezhov.rocket.action.api.RocketActionConfigurationPropertyKey
 import ru.ezhov.rocket.action.api.RocketActionPropertySpec
-import ru.ezhov.rocket.action.application.infrastructure.MutableRocketActionSettings
+import ru.ezhov.rocket.action.application.infrastructure.RocketActionSettingsNode
 import ru.ezhov.rocket.action.application.plugin.manager.domain.RocketActionPluginRepository
 import ru.ezhov.rocket.action.icon.AppIcon
 import ru.ezhov.rocket.action.icon.IconRepositoryFactory
@@ -103,7 +103,7 @@ class CreateRocketActionSettingsDialog(
             currentCallback!!.create(
                 TreeRocketActionSettings(
                     configuration = settings.configuration,
-                    settings = MutableRocketActionSettings(
+                    settings = RocketActionSettingsNode(
                         settings.id(),
                         settings.type(),
                         settings.settings().toMutableMap(),

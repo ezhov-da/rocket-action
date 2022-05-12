@@ -12,7 +12,7 @@ import ru.ezhov.rocket.action.application.configuration.ui.event.ConfigurationUi
 import ru.ezhov.rocket.action.application.configuration.ui.event.ConfigurationUiObserverFactory
 import ru.ezhov.rocket.action.application.configuration.ui.event.model.ConfigurationUiEvent
 import ru.ezhov.rocket.action.application.configuration.ui.event.model.RemoveSettingUiEvent
-import ru.ezhov.rocket.action.application.infrastructure.MutableRocketActionSettings
+import ru.ezhov.rocket.action.application.infrastructure.RocketActionSettingsNode
 import ru.ezhov.rocket.action.application.plugin.manager.domain.RocketActionPluginRepository
 import ru.ezhov.rocket.action.icon.AppIcon
 import ru.ezhov.rocket.action.icon.IconRepositoryFactory
@@ -157,7 +157,7 @@ class EditorRocketActionSettingsPanel(
         fun create(): TreeRocketActionSettings? = currentSettings?.let { rs ->
             TreeRocketActionSettings(
                 configuration = rs.configuration,
-                settings = MutableRocketActionSettings(
+                settings = RocketActionSettingsNode(
                     rs.settings.id(),
                     rs.settings.type(),
                     settingPanels.associate { panel -> panel.value() }.toMutableMap(),

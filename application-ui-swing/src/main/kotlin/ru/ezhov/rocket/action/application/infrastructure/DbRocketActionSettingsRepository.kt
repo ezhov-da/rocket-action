@@ -5,7 +5,6 @@ import mu.KotlinLogging
 import ru.ezhov.rocket.action.api.RocketActionConfigurationPropertyKey
 import ru.ezhov.rocket.action.api.RocketActionSettings
 import ru.ezhov.rocket.action.application.domain.RocketActionSettingsRepository
-import ru.ezhov.rocket.action.core.application.change.ChangeActionApplicationService
 import ru.ezhov.rocket.action.core.application.get.GetActionApplicationService
 import ru.ezhov.rocket.action.core.application.get.GetActionSettingsApplicationService
 import ru.ezhov.rocket.action.core.domain.model.Action
@@ -53,7 +52,7 @@ class DbRocketActionSettingsRepository(
     }
 
     private fun Action.toMutableRocketActionSettings(settings: Map<UUID, List<ActionSettings>>) =
-        MutableRocketActionSettings(
+        RocketActionSettingsNode(
             id = this.id.value.toString(),
             type = { this.type.value },
             settings = settings[this.id.value]

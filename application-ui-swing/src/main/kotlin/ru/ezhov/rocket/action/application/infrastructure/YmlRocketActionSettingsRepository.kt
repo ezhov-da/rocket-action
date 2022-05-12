@@ -1,5 +1,6 @@
 package ru.ezhov.rocket.action.application.infrastructure
 
+import arrow.core.Either
 import mu.KotlinLogging
 import org.yaml.snakeyaml.Yaml
 import ru.ezhov.rocket.action.api.RocketActionConfigurationPropertyKey
@@ -56,6 +57,26 @@ class YmlRocketActionSettingsRepository(private val uri: URI) : RocketActionSett
         logger.info { "Actions settings saving completed. count=${settings.size}" }
     }
 
+    override fun save(settings: RocketActionSettings): Either<RocketActionSettingsRepositoryException, Unit> {
+        TODO("Not yet implemented")
+    }
+
+    override fun create(settings: RocketActionSettings): Either<RocketActionSettingsRepositoryException, Unit> {
+        TODO("Not yet implemented")
+    }
+
+    override fun delete(id: String): Either<RocketActionSettingsRepositoryException, Unit> {
+        TODO("Not yet implemented")
+    }
+
+    override fun before(id: String, beforeId: String): Either<RocketActionSettingsRepositoryException, Unit> {
+        TODO("Not yet implemented")
+    }
+
+    override fun after(id: String, afterId: String): Either<RocketActionSettingsRepositoryException, Unit> {
+        TODO("Not yet implemented")
+    }
+
     private fun recursiveSettings(settings: List<RocketActionSettings>?, actions: MutableList<Map<String?, Any?>>) {
         for (data in settings!!) {
             val objectYml: MutableMap<String?, Any?> = LinkedHashMap()
@@ -100,7 +121,7 @@ class YmlRocketActionSettingsRepository(private val uri: URI) : RocketActionSett
             return if (actions == null || actions.isEmpty()) {
                 val map: MutableMap<RocketActionConfigurationPropertyKey, String> = HashMap()
                 action.forEach { (k: String, v: Any?) -> map[RocketActionConfigurationPropertyKey(k)] = v?.toString().orEmpty() }
-                MutableRocketActionSettings(id, { actionType }, map, mutableListOf())
+                RocketActionSettingsNode(id, { actionType }, map, mutableListOf())
             } else {
                 val settings: MutableList<RocketActionSettings> = ArrayList()
                 for (a in actions) {
@@ -108,7 +129,7 @@ class YmlRocketActionSettingsRepository(private val uri: URI) : RocketActionSett
                 }
                 val map: MutableMap<RocketActionConfigurationPropertyKey, String> = HashMap()
                 action.forEach { (k: String, v: Any) -> map[RocketActionConfigurationPropertyKey(k)] = v.toString() }
-                MutableRocketActionSettings(id, { actionType }, map, settings)
+                RocketActionSettingsNode(id, { actionType }, map, settings)
             }
         }
     }
