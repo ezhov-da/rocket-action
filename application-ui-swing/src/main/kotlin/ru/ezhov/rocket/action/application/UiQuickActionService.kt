@@ -3,7 +3,7 @@ package ru.ezhov.rocket.action.application
 import mu.KotlinLogging
 import ru.ezhov.rocket.action.api.RocketActionSettings
 import ru.ezhov.rocket.action.application.configuration.ui.ConfigurationFrame
-import ru.ezhov.rocket.action.application.domain.RocketActionSettingsRepository
+import ru.ezhov.rocket.action.application.domain.ConfigRocketActionSettingsRepository
 import ru.ezhov.rocket.action.application.infrastructure.RocketActionComponentCacheFactory
 import ru.ezhov.rocket.action.application.plugin.group.GroupRocketActionUi
 import ru.ezhov.rocket.action.application.plugin.manager.domain.RocketActionPluginRepository
@@ -41,7 +41,7 @@ import kotlin.system.exitProcess
 private val logger = KotlinLogging.logger { }
 
 class UiQuickActionService(
-    private val rocketActionSettingsRepository: RocketActionSettingsRepository,
+    private val rocketActionSettingsRepository: ConfigRocketActionSettingsRepository,
     private val rocketActionPluginRepository: RocketActionPluginRepository,
     private val generalPropertiesRepository: GeneralPropertiesRepository,
 ) {
@@ -70,7 +70,8 @@ class UiQuickActionService(
     }
 
     @Throws(Exception::class)
-    private fun rocketActionSettings(): List<RocketActionSettings> = rocketActionSettingsRepository.actions()
+    private fun rocketActionSettings(): List<RocketActionSettings> =
+        rocketActionSettingsRepository.actions().map { it.to() }
 
     private fun createSearchField(baseDialog: JDialog, menu: JMenu): Component =
         JPanel(FlowLayout(FlowLayout.LEFT, 0, 0)).apply {

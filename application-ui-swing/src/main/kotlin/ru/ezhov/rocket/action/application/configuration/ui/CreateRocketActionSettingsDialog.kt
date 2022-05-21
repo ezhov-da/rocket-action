@@ -9,6 +9,12 @@ import ru.ezhov.rocket.action.api.RocketActionConfigurationPropertyKey
 import ru.ezhov.rocket.action.api.RocketActionPropertySpec
 import ru.ezhov.rocket.action.application.infrastructure.RocketActionSettingsNode
 import ru.ezhov.rocket.action.application.plugin.manager.domain.RocketActionPluginRepository
+import ru.ezhov.rocket.action.core.domain.model.Action
+import ru.ezhov.rocket.action.core.domain.model.ActionOrder
+import ru.ezhov.rocket.action.core.domain.model.ActionSettingName
+import ru.ezhov.rocket.action.core.domain.model.ActionSettingValue
+import ru.ezhov.rocket.action.core.domain.model.ActionSettings
+import ru.ezhov.rocket.action.core.domain.model.ActionType
 import ru.ezhov.rocket.action.icon.AppIcon
 import ru.ezhov.rocket.action.icon.IconRepositoryFactory
 import ru.ezhov.rocket.action.icon.toImage
@@ -16,6 +22,7 @@ import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Component
 import java.awt.event.ItemEvent
+import java.time.LocalDateTime
 import java.util.function.Consumer
 import javax.swing.BorderFactory
 import javax.swing.Box
@@ -101,13 +108,24 @@ class CreateRocketActionSettingsDialog(
         buttonCreate.addActionListener {
             val settings = actionSettingsPanel.create()
             currentCallback!!.create(
+                // TODO откорректировать создание, свойства должны проставляться не здесь
                 TreeRocketActionSettings(
                     configuration = settings.configuration,
-                    settings = RocketActionSettingsNode(
-                        settings.id(),
-                        settings.type(),
-                        settings.settings().toMutableMap(),
-                        settings.actions().toMutableList()
+                    node = RocketActionSettingsNode(
+                        action = Action.create(
+                            id = settings.actionId,
+                            type = ActionType(settings.configuration.type().value()),
+                            order = ActionOrder(1),
+                            creationDate = LocalDateTime.now(),
+                            updateDate = null,
+                            parentId = null,
+                        ),
+                        settings = ActionSettings(
+                            id = settings.actionId,
+                            map = settings.settings()
+                                .map { (k, v) -> ActionSettingName(k.value) to ActionSettingValue(v) }
+                                .toMap().toMutableMap(),
+                        ),
                     )
                 )
             )

@@ -111,17 +111,17 @@ class H2DbActionAndSettingsRepository(
                 }
             }
 
-    private fun NewAction.toActionDbModel(): ActionEntity {
-        val action = this
-        return ActionEntity {
-            this.id = action.id.value
-            this.type = action.type.value
-            this.order = action.order.value
-            this.creationDate = action.creationDate
-            this.updateDate = action.updateDate
-            this.parentId = action.parentId?.value
+    private fun NewAction.toActionDbModel(): ActionEntity =
+        this.let { action ->
+            ActionEntity {
+                this.id = action.id.value
+                this.type = action.type.value
+                this.order = action.order.value
+                this.creationDate = action.creationDate
+                this.updateDate = null
+                this.parentId = action.parentId?.value
+            }
         }
-    }
 
     private fun NewAction.toSettingsDbModel(): List<ActionSettingsEntity> {
         val actionId = this.id.value

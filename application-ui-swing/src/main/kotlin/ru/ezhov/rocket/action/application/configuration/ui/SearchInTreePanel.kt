@@ -80,7 +80,7 @@ class SearchInTreePanel(
             node = e.nextElement() as DefaultMutableTreeNode
             if (node.userObject != null && node.userObject is TreeRocketActionSettings) {
                 val settings = node.userObject as TreeRocketActionSettings
-                val contains = settings.settings.settings()
+                val contains = settings.node.to().settings()
                     .filter { set -> set.value.contains(other = text, ignoreCase = true) }
                 if (contains.isNotEmpty()) {
                     mutableList.add(node)

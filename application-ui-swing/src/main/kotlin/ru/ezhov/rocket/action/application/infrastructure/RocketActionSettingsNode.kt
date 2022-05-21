@@ -12,7 +12,7 @@ import java.time.LocalDateTime
 class RocketActionSettingsNode(
     val action: Action,
     val settings: ActionSettings,
-    private val children: MutableList<RocketActionSettingsNode> = ArrayList()
+    val children: MutableList<RocketActionSettingsNode> = ArrayList()
 ) {
 
     fun add(settings: RocketActionSettingsNode) {

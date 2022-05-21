@@ -5,13 +5,10 @@ import mu.KotlinLogging
 import org.springframework.context.ApplicationContext
 import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import ru.ezhov.rocket.action.application.config.AppConfigCoreSpring
-import ru.ezhov.rocket.action.application.domain.RocketActionSettingsRepository
-import ru.ezhov.rocket.action.application.infrastructure.YmlRocketActionSettingsRepository
+import ru.ezhov.rocket.action.application.domain.ConfigRocketActionSettingsRepository
 import ru.ezhov.rocket.action.application.plugin.manager.domain.RocketActionPluginRepository
 import ru.ezhov.rocket.action.application.properties.GeneralPropertiesRepository
-import ru.ezhov.rocket.action.application.properties.GeneralPropertiesRepositoryFactory
 import ru.ezhov.rocket.action.application.properties.UsedPropertiesName
-import java.io.File
 import java.util.Enumeration
 import javax.swing.LookAndFeel
 import javax.swing.SwingUtilities
@@ -25,7 +22,7 @@ fun main(args: Array<String>) {
     val baseDialog = appContext.getBean(BaseDialogClass::class.java)
     val rocketActionPluginRepository = appContext.getBean(RocketActionPluginRepository::class.java)
     val generalPropertiesRepository = appContext.getBean(GeneralPropertiesRepository::class.java)
-    val rocketActionSettingsRepository = appContext.getBean(RocketActionSettingsRepository::class.java)
+    val rocketActionSettingsRepository = appContext.getBean(ConfigRocketActionSettingsRepository::class.java)
 
     SwingUtilities.invokeLater {
         FlatLightLaf.setup(lookAndFeel(generalPropertiesRepository))

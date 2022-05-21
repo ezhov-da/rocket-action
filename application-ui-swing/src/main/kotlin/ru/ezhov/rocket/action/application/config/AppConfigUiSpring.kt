@@ -4,14 +4,19 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.ComponentScan
 import org.springframework.context.annotation.Configuration
 import ru.ezhov.rocket.action.application.BaseDialogClass
+import ru.ezhov.rocket.action.application.domain.ConfigRocketActionSettingsRepository
 import ru.ezhov.rocket.action.application.domain.RocketActionComponentCache
 import ru.ezhov.rocket.action.application.domain.RocketActionSettingsRepository
+import ru.ezhov.rocket.action.application.infrastructure.DbConfigRocketActionSettingsRepository
 import ru.ezhov.rocket.action.application.infrastructure.DbRocketActionSettingsRepository
 import ru.ezhov.rocket.action.application.infrastructure.InMemoryRocketActionComponentCache
 import ru.ezhov.rocket.action.application.plugin.manager.domain.RocketActionPluginRepository
 import ru.ezhov.rocket.action.application.plugin.manager.infrastructure.PluginsReflectionRocketActionPluginRepository
 import ru.ezhov.rocket.action.application.properties.CommandLineAndResourceGeneralPropertiesRepository
 import ru.ezhov.rocket.action.application.properties.GeneralPropertiesRepository
+import ru.ezhov.rocket.action.core.application.change.ChangeActionApplicationService
+import ru.ezhov.rocket.action.core.application.create.CreateActionApplicationService
+import ru.ezhov.rocket.action.core.application.delete.DeleteActionApplicationService
 import ru.ezhov.rocket.action.core.application.get.GetActionApplicationService
 import ru.ezhov.rocket.action.core.application.get.GetActionSettingsApplicationService
 
@@ -27,6 +32,22 @@ open class AppConfigUiSpring {
     @Bean
     open fun rocketActionPluginRepository(): RocketActionPluginRepository =
         PluginsReflectionRocketActionPluginRepository()
+
+    @Bean
+    open fun configRocketActionSettingsRepository(
+        getActionApplicationService: GetActionApplicationService,
+        getActionSettingsApplicationService: GetActionSettingsApplicationService,
+        createActionApplicationService: CreateActionApplicationService,
+        deleteActionApplicationService: DeleteActionApplicationService,
+        changeActionApplicationService: ChangeActionApplicationService,
+    ): ConfigRocketActionSettingsRepository =
+        DbConfigRocketActionSettingsRepository(
+            getActionApplicationService = getActionApplicationService,
+            getActionSettingsApplicationService = getActionSettingsApplicationService,
+            createActionApplicationService = createActionApplicationService,
+            deleteActionApplicationService = deleteActionApplicationService,
+            changeActionApplicationService = changeActionApplicationService,
+        )
 
     @Bean
     open fun generalPropertiesRepository(): GeneralPropertiesRepository =

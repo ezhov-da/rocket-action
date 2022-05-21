@@ -2,7 +2,6 @@ package ru.ezhov.rocket.action.application.infrastructure
 
 import arrow.core.getOrHandle
 import mu.KotlinLogging
-import ru.ezhov.rocket.action.api.RocketActionConfigurationPropertyKey
 import ru.ezhov.rocket.action.api.RocketActionSettings
 import ru.ezhov.rocket.action.application.domain.RocketActionSettingsRepository
 import ru.ezhov.rocket.action.core.application.get.GetActionApplicationService
@@ -32,38 +31,29 @@ class DbRocketActionSettingsRepository(
             .map { it.toMutableRocketActionSettings(settings = actionSettings) }
             .toMutableList()
 
-        val actionsMap = rootActions.groupBy { it.id() }.toMutableMap()
+        val actionsMap = rootActions.groupBy { it.action.id.value }.toMutableMap()
 
         actions.forEach { action ->
             if (action.parentId != null) {
                 val parentId = action.parentId!!
-                val parent = actionsMap[parentId.value.toString()]?.firstOrNull()
+                val parent = actionsMap[parentId.value]?.firstOrNull()
                 val m = action.toMutableRocketActionSettings(actionSettings)
                 if (parent == null) {
                     rootActions.add(m)
                 } else {
                     parent!!.add(m)
                 }
-                actionsMap[m.id()] = listOf(m)
+                actionsMap[m.action.id.value] = listOf(m)
             }
         }
 
-        return rootActions
+        return rootActions.map { it.to() }
     }
 
     private fun Action.toMutableRocketActionSettings(settings: Map<UUID, List<ActionSettings>>) =
         RocketActionSettingsNode(
-            id = this.id.value.toString(),
-            type = { this.type.value },
-            settings = settings[this.id.value]
-                ?.firstOrNull()
-                ?.map
-                ?.entries
-                ?.associate {
-                    RocketActionConfigurationPropertyKey(it.key.value) to it.value?.value.orEmpty()
-                }
-                ?.toMutableMap()
-                ?: mutableMapOf()
+            action = this,
+            settings = settings[this.id.value]?.firstOrNull() ?: ActionSettings.empty(this.id),
         )
 
     override fun save(settings: List<RocketActionSettings>) {

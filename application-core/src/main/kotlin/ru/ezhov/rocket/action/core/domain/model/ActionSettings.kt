@@ -1,5 +1,7 @@
 package ru.ezhov.rocket.action.core.domain.model
 
+import ru.ezhov.rocket.action.api.RocketActionSettings
+
 class ActionSettings(
     val id: ActionId,
     val map: Map<ActionSettingName, ActionSettingValue?> = emptyMap(),

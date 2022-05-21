@@ -9,15 +9,13 @@ object NewActionSampleData {
         type: ActionType = ActionType("test"),
         order: ActionOrder = ActionOrder(1),
         creationDate: LocalDateTime = LocalDateTime.now(),
-        updateDate: LocalDateTime? = null,
         parentId: ActionId? = null,
         map: Map<ActionSettingName, ActionSettingValue> = emptyMap(),
-    ) = NewAction(
+    ) = NewAction.create(
         id = id,
         type = type,
         order = order,
         creationDate = creationDate,
-        updateDate = updateDate,
         parentId = parentId,
         map = map,
     )

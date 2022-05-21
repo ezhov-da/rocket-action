@@ -70,8 +70,7 @@ class DbConfigRocketActionSettingsRepository(
     private fun Action.toMutableRocketActionSettings(settings: Map<UUID, List<ActionSettings>>) =
         RocketActionSettingsNode(
             action = this,
-            settings = settings[this.id.value]
-                ?.firstOrNull()
+            settings = settings[this.id.value]?.firstOrNull() ?: ActionSettings.empty(this.id),
         )
 
     override fun create(
@@ -105,15 +104,15 @@ class DbConfigRocketActionSettingsRepository(
             .handleErrorWith { Either.Left(RocketActionSettingsRepositoryException("error", it)) }
     }
 
-    override fun delete(id: String): Either<RocketActionSettingsRepositoryException, Unit> =
-        deleteActionApplicationService.`do`(id = ActionId.of(id), withAllChildrenRecursive = true)
+    override fun delete(id: ActionId): Either<RocketActionSettingsRepositoryException, Unit> =
+        deleteActionApplicationService.`do`(id = id, withAllChildrenRecursive = true)
             .handleErrorWith { Either.Left(RocketActionSettingsRepositoryException("error", it)) }
 
-    override fun before(id: String, beforeId: String): Either<RocketActionSettingsRepositoryException, Unit> {
+    override fun before(id: ActionId, beforeId: ActionId): Either<RocketActionSettingsRepositoryException, Unit> {
         TODO("Not yet implemented")
     }
 
-    override fun after(id: String, afterId: String): Either<RocketActionSettingsRepositoryException, Unit> {
+    override fun after(id: ActionId, afterId: ActionId): Either<RocketActionSettingsRepositoryException, Unit> {
         TODO("Not yet implemented")
     }
 }

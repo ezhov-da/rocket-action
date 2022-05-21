@@ -1,3 +1,7 @@
 package ru.ezhov.rocket.action.core.domain.model
 
-class ActionType(val value: String)
+import ru.ezhov.rocket.action.api.RocketActionType
+
+class ActionType(val value: String) {
+    fun asRocketActionPlugin() = RocketActionType { value }
+}

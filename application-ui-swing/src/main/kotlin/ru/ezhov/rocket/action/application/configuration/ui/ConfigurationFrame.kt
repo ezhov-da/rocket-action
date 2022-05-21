@@ -1,14 +1,16 @@
 package ru.ezhov.rocket.action.application.configuration.ui
 
+import arrow.core.Either
 import mu.KotlinLogging
 import ru.ezhov.rocket.action.api.RocketActionSettings
 import ru.ezhov.rocket.action.application.configuration.ui.event.ConfigurationUiListener
 import ru.ezhov.rocket.action.application.configuration.ui.event.ConfigurationUiObserverFactory
 import ru.ezhov.rocket.action.application.configuration.ui.event.model.ConfigurationUiEvent
 import ru.ezhov.rocket.action.application.configuration.ui.event.model.RemoveSettingUiEvent
-import ru.ezhov.rocket.action.application.domain.RocketActionSettingsRepository
+import ru.ezhov.rocket.action.application.domain.ConfigRocketActionSettingsRepository
 import ru.ezhov.rocket.action.application.domain.RocketActionSettingsRepositoryException
 import ru.ezhov.rocket.action.application.infrastructure.MutableRocketActionSettings
+import ru.ezhov.rocket.action.application.infrastructure.RocketActionSettingsNode
 import ru.ezhov.rocket.action.application.plugin.group.GroupRocketActionUi
 import ru.ezhov.rocket.action.application.plugin.manager.domain.RocketActionPluginRepository
 import ru.ezhov.rocket.action.application.properties.GeneralPropertiesRepositoryFactory
@@ -52,7 +54,7 @@ private val logger = KotlinLogging.logger { }
 
 class ConfigurationFrame(
     rocketActionPluginRepository: RocketActionPluginRepository,
-    private val rocketActionSettingsRepository: RocketActionSettingsRepository,
+    private val rocketActionSettingsRepository: ConfigRocketActionSettingsRepository,
     updateActionListener: ActionListener
 ) {
     private val frame: JFrame = JFrame("Конфигурирование действий")
@@ -183,7 +185,7 @@ class ConfigurationFrame(
                             }
                         }
                     ))
-                    if (userObject?.settings?.type()?.value() == GroupRocketActionUi.TYPE) {
+                    if (userObject?.node?.to()?.type()?.value() == GroupRocketActionUi.TYPE) {
                         popupMenu.add(JMenuItem(
                             object : AbstractAction() {
                                 override fun actionPerformed(e: ActionEvent) {
@@ -207,27 +209,29 @@ class ConfigurationFrame(
                     }
                     if (
                         userObject != null &&
-                        userObject.settings.type().value() != GroupRocketActionUi.TYPE &&
-                        userObject.settings is MutableRocketActionSettings
+                        userObject.node.to().type().value() != GroupRocketActionUi.TYPE &&
+                        userObject.node.to() is MutableRocketActionSettings
                     ) {
                         popupMenu.add(JMenuItem(
                             object : AbstractAction() {
                                 override fun actionPerformed(e: ActionEvent) {
-                                    val settings = userObject.settings
-                                    val duplicate = settings.copy(userObject.configuration)
-                                    SwingUtilities.invokeLater {
-                                        defaultTreeModel.insertNodeInto(
-                                            DefaultMutableTreeNode(
-                                                TreeRocketActionSettings(
-                                                    configuration = userObject.configuration,
-                                                    settings = duplicate,
-                                                ),
-                                                true
-                                            ),
-                                            mutableTreeNode.parent as MutableTreeNode,
-                                            mutableTreeNode.parent.getIndex(mutableTreeNode) + 1
-                                        )
-                                    }
+                                    // TODO Реализовать дублирование
+
+//                                    val settings = userObject.node.settings
+//                                    val duplicate = settings.copy(userObject.configuration)
+//                                    SwingUtilities.invokeLater {
+//                                        defaultTreeModel.insertNodeInto(
+//                                            DefaultMutableTreeNode(
+//                                                TreeRocketActionSettings(
+//                                                    configuration = userObject.configuration,
+//                                                    settings = duplicate,
+//                                                ),
+//                                                true
+//                                            ),
+//                                            mutableTreeNode.parent as MutableTreeNode,
+//                                            mutableTreeNode.parent.getIndex(mutableTreeNode) + 1
+//                                        )
+//                                    }
                                 }
 
                                 init {
@@ -240,18 +244,41 @@ class ConfigurationFrame(
                     popupMenu.add(JMenuItem(
                         object : AbstractAction() {
                             override fun actionPerformed(e: ActionEvent) {
-                                SwingUtilities.invokeLater {
-                                    val parent = mutableTreeNode.parent
-                                    mutableTreeNode.removeFromParent()
-                                    defaultTreeModel.reload(parent)
+                                (mutableTreeNode.userObject as? TreeRocketActionSettings)
+                                    ?.let { userObject ->
+                                        rocketActionSettingsRepository.delete(userObject.node.action.id)
+                                            .let { result ->
+                                                when (result) {
+                                                    is Either.Left -> {
+                                                        logger.error(result.value) { "Error when delete action" }
 
-                                    expandedSet.forEach { path ->
-                                        tree.expandPath(path)
+                                                        NotificationFactory.notification.show(
+                                                            NotificationType.ERROR,
+                                                            text = "Ошибка удаления действия"
+                                                        )
+                                                    }
+
+                                                    is Either.Right -> {
+                                                        SwingUtilities.invokeLater {
+                                                            val parent = mutableTreeNode.parent
+                                                            mutableTreeNode.removeFromParent()
+                                                            defaultTreeModel.reload(parent)
+
+                                                            expandedSet.forEach { path ->
+                                                                tree.expandPath(path)
+                                                            }
+
+                                                            ConfigurationUiObserverFactory.observer
+                                                                .notify(
+                                                                    event = RemoveSettingUiEvent(
+                                                                        defaultTreeModel.getChildCount(root)
+                                                                    )
+                                                                )
+                                                        }
+                                                    }
+                                                }
+                                            }
                                     }
-
-                                    ConfigurationUiObserverFactory.observer
-                                        .notify(RemoveSettingUiEvent(defaultTreeModel.getChildCount(root)))
-                                }
                             }
 
                             init {
@@ -268,26 +295,26 @@ class ConfigurationFrame(
         return panel
     }
 
-    private fun fillTreeNodes(actions: List<RocketActionSettings>?, parent: DefaultMutableTreeNode) {
-        for (rocketActionSettings in actions!!) {
-            rocketActionPluginRepository.by(type = rocketActionSettings.type())
+    private fun fillTreeNodes(actions: List<RocketActionSettingsNode>, parent: DefaultMutableTreeNode) {
+        for (rocketActionSettingsNode in actions) {
+            rocketActionPluginRepository.by(type = rocketActionSettingsNode.action.type.asRocketActionPlugin())
                 ?.configuration()
                 ?.let { config ->
                     val current = DefaultMutableTreeNode(
                         TreeRocketActionSettings(
                             configuration = config,
-                            settings = rocketActionSettings,
+                            node = rocketActionSettingsNode,
                         ),
                         true
                     )
                     parent.add(current)
-                    if (rocketActionSettings.actions().isNotEmpty()) {
-                        val childAction = rocketActionSettings.actions()
+                    if (rocketActionSettingsNode.children.isNotEmpty()) {
+                        val childAction = rocketActionSettingsNode.children
                         fillTreeNodes(actions = childAction, parent = current)
                     }
                 } ?: run {
                 logger.warn {
-                    "Configuration for settings '${rocketActionSettings.type().value()}' " +
+                    "Configuration for settings '${rocketActionSettingsNode.action.type.value}' " +
                         "not found and skipped"
                 }
             }
@@ -299,10 +326,10 @@ class ConfigurationFrame(
         val root = treeModel.root as DefaultMutableTreeNode
         val childCount = root.childCount
         for (i in 0 until childCount) {
-            recursiveGetSettings(root.getChildAt(i) as DefaultMutableTreeNode, settings, null)
+//            recursiveGetSettings(root.getChildAt(i) as DefaultMutableTreeNode, settings, null)
         }
         try {
-            rocketActionSettingsRepository!!.save(settings)
+//            rocketActionSettingsRepository!!.save(settings)
             NotificationFactory.notification.show(NotificationType.INFO, "Действия сохранены")
         } catch (e: RocketActionSettingsRepositoryException) {
             e.printStackTrace()
@@ -310,19 +337,19 @@ class ConfigurationFrame(
         }
     }
 
-    private fun recursiveGetSettings(node: DefaultMutableTreeNode, settings: MutableList<RocketActionSettings>, parent: MutableRocketActionSettings?) {
-        val originalActionSettings = node.userObject as TreeRocketActionSettings
-        val finalActionSettings = MutableRocketActionSettings(
-            id = originalActionSettings.settings.id(),
-            type = originalActionSettings.settings.type(),
-            settings = originalActionSettings.settings.settings().toMutableMap()
-        )
-        parent?.add(finalActionSettings) ?: settings.add(finalActionSettings)
-        val childCount = node.childCount
-        for (i in 0 until childCount) {
-            recursiveGetSettings(node.getChildAt(i) as DefaultMutableTreeNode, settings, finalActionSettings)
-        }
-    }
+//    private fun recursiveGetSettings(node: DefaultMutableTreeNode, settings: MutableList<RocketActionSettings>, parent: MutableRocketActionSettings?) {
+//        val originalActionSettings = node.userObject as TreeRocketActionSettings
+//        val finalActionSettings = MutableRocketActionSettings(
+//            id = originalActionSettings.settings.id(),
+//            type = originalActionSettings.settings.type(),
+//            settings = originalActionSettings.settings.settings().toMutableMap()
+//        )
+//        parent?.add(finalActionSettings) ?: settings.add(finalActionSettings)
+//        val childCount = node.childCount
+//        for (i in 0 until childCount) {
+//            recursiveGetSettings(node.getChildAt(i) as DefaultMutableTreeNode, settings, finalActionSettings)
+//        }
+//    }
 
     fun setVisible(visible: Boolean) {
         checkEmptyActionsAndShowButtonCreate(menuBar!!)

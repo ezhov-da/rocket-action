@@ -14,6 +14,9 @@ import ru.ezhov.rocket.action.application.configuration.ui.event.model.Configura
 import ru.ezhov.rocket.action.application.configuration.ui.event.model.RemoveSettingUiEvent
 import ru.ezhov.rocket.action.application.infrastructure.RocketActionSettingsNode
 import ru.ezhov.rocket.action.application.plugin.manager.domain.RocketActionPluginRepository
+import ru.ezhov.rocket.action.core.domain.model.ActionSettingName
+import ru.ezhov.rocket.action.core.domain.model.ActionSettingValue
+import ru.ezhov.rocket.action.core.domain.model.ActionSettings
 import ru.ezhov.rocket.action.icon.AppIcon
 import ru.ezhov.rocket.action.icon.IconRepositoryFactory
 import ru.ezhov.rocket.action.notification.NotificationFactory
@@ -45,7 +48,7 @@ class EditorRocketActionSettingsPanel(
     private val labelDescription = JLabel()
     private val testPanel: TestPanel =
         TestPanel(rocketActionPluginRepository = rocketActionPluginRepository) {
-            rocketActionSettingsPanel.create()?.settings
+            rocketActionSettingsPanel.create()?.node?.to()
         }
 
     private fun top(): JPanel {
@@ -81,13 +84,14 @@ class EditorRocketActionSettingsPanel(
         }
         testPanel.clearTest()
         currentSettings = settings
-        labelType.text = settings.settings.type().value()
+        val rocketSettings = settings.node.to()
+        labelType.text = rocketSettings.type().value()
         this.callback = callback
-        val configuration: RocketActionConfiguration? = rocketActionPluginRepository.by(settings.settings.type())?.configuration()
+        val configuration: RocketActionConfiguration? = rocketActionPluginRepository.by(rocketSettings.type())?.configuration()
         configuration?.let {
             labelDescription.text = configuration.description()
         }
-        val settingsFinal = settings.settings.settings()
+        val settingsFinal = rocketSettings.settings()
         val values = settingsFinal
             .map { (k: RocketActionConfigurationPropertyKey, v: String) ->
                 val property = configuration
@@ -154,17 +158,24 @@ class EditorRocketActionSettingsPanel(
             revalidate()
         }
 
-        fun create(): TreeRocketActionSettings? = currentSettings?.let { rs ->
-            TreeRocketActionSettings(
-                configuration = rs.configuration,
-                settings = RocketActionSettingsNode(
-                    rs.settings.id(),
-                    rs.settings.type(),
-                    settingPanels.associate { panel -> panel.value() }.toMutableMap(),
-                    rs.settings.actions().toMutableList()
-                )
-            )
-        }
+        fun create(): TreeRocketActionSettings? =
+            currentSettings
+                ?.let { rs ->
+                    TreeRocketActionSettings(
+                        configuration = rs.configuration,
+                        node = RocketActionSettingsNode(
+                            action = rs.node.action,
+                            settings = ActionSettings(
+                                id = rs.node.action.id,
+                                map = settingPanels
+                                    .associate { panel -> panel.value() }
+                                    .map { (k, v) -> ActionSettingName(k.value) to ActionSettingValue(v) }
+                                    .toMap().toMutableMap(),
+                            ),
+                            children = rs.node.children
+                        )
+                    )
+                }
     }
 
     private class SettingPanel(private val value: Value) : JPanel() {
