@@ -8,6 +8,9 @@ import ru.ezhov.rocket.action.core.domain.model.ActionId
 interface ConfigRocketActionSettingsRepository {
     fun actions(): List<RocketActionSettingsNode>
 
+
+    fun update(settings: RocketActionSettings, afterId: String? = null): Either<RocketActionSettingsRepositoryException, Unit>
+
     fun create(settings: RocketActionSettings, afterId: String? = null): Either<RocketActionSettingsRepositoryException, Unit>
 
     fun delete(id: ActionId): Either<RocketActionSettingsRepositoryException, Unit>

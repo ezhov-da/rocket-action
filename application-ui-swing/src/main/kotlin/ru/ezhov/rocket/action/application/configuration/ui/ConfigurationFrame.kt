@@ -97,6 +97,9 @@ class ConfigurationFrame(
                         settings = settings,
                         callback = object : SavedRocketActionSettingsPanelCallback {
                             override fun saved(settings: TreeRocketActionSettings) {
+                                rocketActionSettingsRepository.
+
+
                                 node.userObject = settings
                             }
                         }
