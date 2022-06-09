@@ -4,9 +4,9 @@ import arrow.core.Either
 import arrow.core.getOrHandle
 import arrow.core.handleErrorWith
 import mu.KotlinLogging
-import ru.ezhov.rocket.action.api.RocketActionSettings
 import ru.ezhov.rocket.action.application.domain.ConfigRocketActionSettingsRepository
 import ru.ezhov.rocket.action.application.domain.RocketActionSettingsRepositoryException
+import ru.ezhov.rocket.action.application.domain.model.NewRocketActionSettings
 import ru.ezhov.rocket.action.core.application.change.ChangeActionApplicationService
 import ru.ezhov.rocket.action.core.application.create.CreateActionApplicationService
 import ru.ezhov.rocket.action.core.application.delete.DeleteActionApplicationService
@@ -14,7 +14,6 @@ import ru.ezhov.rocket.action.core.application.get.GetActionApplicationService
 import ru.ezhov.rocket.action.core.application.get.GetActionSettingsApplicationService
 import ru.ezhov.rocket.action.core.domain.model.Action
 import ru.ezhov.rocket.action.core.domain.model.ActionId
-import ru.ezhov.rocket.action.core.domain.model.ActionOrder
 import ru.ezhov.rocket.action.core.domain.model.ActionSettingName
 import ru.ezhov.rocket.action.core.domain.model.ActionSettingValue
 import ru.ezhov.rocket.action.core.domain.model.ActionSettings
@@ -66,6 +65,10 @@ class DbConfigRocketActionSettingsRepository(
         return rootActions
     }
 
+    override fun update(settings: NewRocketActionSettings): Either<RocketActionSettingsRepositoryException, Unit> {
+        TODO("Not yet implemented")
+    }
+
 
     private fun Action.toMutableRocketActionSettings(settings: Map<UUID, List<ActionSettings>>) =
         RocketActionSettingsNode(
@@ -74,31 +77,18 @@ class DbConfigRocketActionSettingsRepository(
         )
 
     override fun create(
-        settings: RocketActionSettings,
-        afterId: String?,
-    ): Either<RocketActionSettingsRepositoryException, Unit> =
-        if (afterId == null) {
-            Either.Right(null)
-        } else {
-            getActionApplicationService
-                .action(ActionId.of(afterId))
-        }
-            .handleErrorWith { Either.Left(RocketActionSettingsRepositoryException("Error", it)) }
-            .map { create(settings = settings, afterAction = it) }
-
-    private fun create(
-        settings: RocketActionSettings,
-        afterAction: Action? = null,
+        settings: NewRocketActionSettings,
     ): Either<RocketActionSettingsRepositoryException, Unit> {
         val newAction = NewAction.create(
-            id = ActionId(UUID.fromString(settings.id())),
-            type = ActionType(settings.type().value()),
-            order = afterAction?.let { it.order.plusOne() } ?: ActionOrder(1),
+            id = ActionId.create(),
+            type = ActionType(settings.type),
+            order = settings.order.to(),
             creationDate = LocalDateTime.now(),
-            parentId = afterAction?.let { it.parentId },
-            map = settings.settings()
+            parentId = ActionId.of(settings.parentId),
+            map = settings
+                .properties
                 .entries
-                .associate { ActionSettingName(it.key.value) to ActionSettingValue(it.key.value) }
+                .associate { ActionSettingName(it.key) to ActionSettingValue(it.value) }
         )
         return createActionApplicationService.`do`(newAction)
             .handleErrorWith { Either.Left(RocketActionSettingsRepositoryException("error", it)) }

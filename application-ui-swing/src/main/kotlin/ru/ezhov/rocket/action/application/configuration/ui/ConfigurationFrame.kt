@@ -3,12 +3,18 @@ package ru.ezhov.rocket.action.application.configuration.ui
 import arrow.core.Either
 import mu.KotlinLogging
 import ru.ezhov.rocket.action.api.RocketActionSettings
+import ru.ezhov.rocket.action.application.configuration.ui.create.CreateRocketActionSettingsDialog
+import ru.ezhov.rocket.action.application.configuration.ui.create.CreatedRocketActionSettingsCallback
+import ru.ezhov.rocket.action.application.configuration.ui.create.model.CreateRocketAction
+import ru.ezhov.rocket.action.application.configuration.ui.edit.EditorRocketActionSettingsPanel
 import ru.ezhov.rocket.action.application.configuration.ui.event.ConfigurationUiListener
 import ru.ezhov.rocket.action.application.configuration.ui.event.ConfigurationUiObserverFactory
 import ru.ezhov.rocket.action.application.configuration.ui.event.model.ConfigurationUiEvent
 import ru.ezhov.rocket.action.application.configuration.ui.event.model.RemoveSettingUiEvent
 import ru.ezhov.rocket.action.application.domain.ConfigRocketActionSettingsRepository
 import ru.ezhov.rocket.action.application.domain.RocketActionSettingsRepositoryException
+import ru.ezhov.rocket.action.application.domain.model.NewRocketActionSettings
+import ru.ezhov.rocket.action.application.domain.model.Order
 import ru.ezhov.rocket.action.application.infrastructure.MutableRocketActionSettings
 import ru.ezhov.rocket.action.application.infrastructure.RocketActionSettingsNode
 import ru.ezhov.rocket.action.application.plugin.group.GroupRocketActionUi
@@ -97,10 +103,7 @@ class ConfigurationFrame(
                         settings = settings,
                         callback = object : SavedRocketActionSettingsPanelCallback {
                             override fun saved(settings: TreeRocketActionSettings) {
-                                rocketActionSettingsRepository.
-
-
-                                node.userObject = settings
+                                // TODO скорее всего не нужно
                             }
                         }
                     )
@@ -143,19 +146,34 @@ class ConfigurationFrame(
                 if (e.button == MouseEvent.BUTTON3) {
                     val treePath = tree.getClosestPathForLocation(e.x, e.y) ?: return
                     val mutableTreeNode = treePath.lastPathComponent as DefaultMutableTreeNode
-                    val userObject = mutableTreeNode.userObject as? TreeRocketActionSettings
+                    val currentSelectedUserObject = mutableTreeNode.userObject as? TreeRocketActionSettings
                     val popupMenu = JPopupMenu()
                     popupMenu.add(JMenuItem(object : AbstractAction() {
                         override fun actionPerformed(e: ActionEvent) {
                             createRocketActionSettingsDialog.show(object : CreatedRocketActionSettingsCallback {
-                                override fun create(settings: TreeRocketActionSettings) {
-                                    SwingUtilities.invokeLater {
-                                        defaultTreeModel.insertNodeInto(
-                                            DefaultMutableTreeNode(settings, true),
-                                            mutableTreeNode.parent as MutableTreeNode,
-                                            mutableTreeNode.parent.getIndex(mutableTreeNode)
-                                        )
-                                    }
+                                override fun create(action: CreateRocketAction) {
+                                    val parent = mutableTreeNode.parent as DefaultMutableTreeNode
+                                    val parentUserObject = parent.userObject as? TreeRocketActionSettings
+
+                                    val curr = currentSelectedUserObject?.node?.action!!
+                                    val newSettings = NewRocketActionSettings(
+                                        parentId = parentUserObject?.node?.action?.id?.value?.toString(),
+                                        order = Order.before(id = curr.id.value.toString(), orderRelation = curr.order.value),
+                                        type = action.type,
+                                        properties = action.properties,
+                                    )
+
+                                    rocketActionSettingsRepository.create(newSettings)
+
+
+                                    //TODO реализовать вставку
+//                                    SwingUtilities.invokeLater {
+//                                        defaultTreeModel.insertNodeInto(
+//                                            DefaultMutableTreeNode(settings, true),
+//                                            mutableTreeNode.parent as MutableTreeNode,
+//                                            mutableTreeNode.parent.getIndex(mutableTreeNode)
+//                                        )
+//                                    }
                                 }
                             })
                         }
@@ -169,14 +187,28 @@ class ConfigurationFrame(
                         object : AbstractAction() {
                             override fun actionPerformed(e: ActionEvent) {
                                 createRocketActionSettingsDialog.show(object : CreatedRocketActionSettingsCallback {
-                                    override fun create(settings: TreeRocketActionSettings) {
-                                        SwingUtilities.invokeLater {
-                                            defaultTreeModel.insertNodeInto(
-                                                DefaultMutableTreeNode(settings, true),
-                                                mutableTreeNode.parent as MutableTreeNode,
-                                                mutableTreeNode.parent.getIndex(mutableTreeNode) + 1
-                                            )
-                                        }
+                                    override fun create(action: CreateRocketAction) {
+
+                                        val parent = mutableTreeNode.parent as DefaultMutableTreeNode
+                                        val parentUserObject = parent.userObject as? TreeRocketActionSettings
+
+                                        val curr = currentSelectedUserObject?.node?.action!!
+                                        val newSettings = NewRocketActionSettings(
+                                            parentId = parentUserObject?.node?.action?.id?.value?.toString(),
+                                            order = Order.after(id = curr.id.value.toString(), orderRelation = curr.order.value),
+                                            type = action.type,
+                                            properties = action.properties,
+                                        )
+
+                                        rocketActionSettingsRepository.create(newSettings)
+  //TODO реализовать вставку
+//                                        SwingUtilities.invokeLater {
+//                                            defaultTreeModel.insertNodeInto(
+//                                                DefaultMutableTreeNode(settings, true),
+//                                                mutableTreeNode.parent as MutableTreeNode,
+//                                                mutableTreeNode.parent.getIndex(mutableTreeNode) + 1
+//                                            )
+//                                        }
                                     }
 
                                 })
@@ -188,17 +220,32 @@ class ConfigurationFrame(
                             }
                         }
                     ))
-                    if (userObject?.node?.to()?.type()?.value() == GroupRocketActionUi.TYPE) {
+                    if (currentSelectedUserObject?.node?.to()?.type()?.value() == GroupRocketActionUi.TYPE) {
                         popupMenu.add(JMenuItem(
                             object : AbstractAction() {
                                 override fun actionPerformed(e: ActionEvent) {
                                     createRocketActionSettingsDialog.show(object : CreatedRocketActionSettingsCallback {
-                                        override fun create(settings: TreeRocketActionSettings) {
-                                            SwingUtilities.invokeLater {
-                                                mutableTreeNode.add(
-                                                    DefaultMutableTreeNode(settings, true))
-                                                defaultTreeModel.reload(mutableTreeNode)
-                                            }
+                                        override fun create(action: CreateRocketAction) {
+                                            val parent = mutableTreeNode.parent as DefaultMutableTreeNode
+                                            val parentUserObject = parent.userObject as? TreeRocketActionSettings
+
+                                            val curr = currentSelectedUserObject?.node?.action!!
+                                            val newSettings = NewRocketActionSettings(
+                                                parentId = parentUserObject?.node?.action?.id?.value?.toString(),
+                                                order = Order.before(id = curr.id.value.toString(), orderRelation = curr.order.value),
+                                                type = action.type,
+                                                properties = action.properties,
+                                            )
+
+                                            rocketActionSettingsRepository.create(newSettings)
+
+
+//TODO реализовать вставку
+//                                            SwingUtilities.invokeLater {
+//                                                mutableTreeNode.add(
+//                                                    DefaultMutableTreeNode(settings, true))
+//                                                defaultTreeModel.reload(mutableTreeNode)
+//                                            }
                                         }
                                     })
                                 }
@@ -211,9 +258,9 @@ class ConfigurationFrame(
                         ))
                     }
                     if (
-                        userObject != null &&
-                        userObject.node.to().type().value() != GroupRocketActionUi.TYPE &&
-                        userObject.node.to() is MutableRocketActionSettings
+                        currentSelectedUserObject != null &&
+                        currentSelectedUserObject.node.to().type().value() != GroupRocketActionUi.TYPE &&
+                        currentSelectedUserObject.node.to() is MutableRocketActionSettings
                     ) {
                         popupMenu.add(JMenuItem(
                             object : AbstractAction() {
@@ -450,17 +497,18 @@ class ConfigurationFrame(
         buttonCreateNewAction = JButton("Создать первое действие")
         buttonCreateNewAction!!.icon = IconRepositoryFactory.repository.by(AppIcon.STAR)
         buttonCreateNewAction!!.addActionListener { _: ActionEvent? ->
-            createRocketActionSettingsDialog.show(object : CreatedRocketActionSettingsCallback {
-                override fun create(settings: TreeRocketActionSettings) {
-                    val model = finalTree!!.model as DefaultTreeModel
-                    val root = model.root as DefaultMutableTreeNode
-                    root.add(DefaultMutableTreeNode(settings, true))
-                    model.reload(root)
-                    menuBar.remove(buttonCreateNewAction)
-                    buttonCreateNewAction = null
-                    menuBar.repaint()
-                }
-            })
+//TODO реализовать кнопку добавления первой настройки
+//            createRocketActionSettingsDialog.show(object : CreatedRocketActionSettingsCallback {
+//                override fun create(settings: TreeRocketActionSettings) {
+//                    val model = finalTree!!.model as DefaultTreeModel
+//                    val root = model.root as DefaultMutableTreeNode
+//                    root.add(DefaultMutableTreeNode(settings, true))
+//                    model.reload(root)
+//                    menuBar.remove(buttonCreateNewAction)
+//                    buttonCreateNewAction = null
+//                    menuBar.repaint()
+//                }
+//            })
         }
         menuBar.add(buttonCreateNewAction)
         menuBar.repaint()

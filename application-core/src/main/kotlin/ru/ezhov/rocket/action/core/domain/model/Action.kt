@@ -36,14 +36,13 @@ class Action private constructor(
             type: ActionType,
             order: ActionOrder,
             creationDate: LocalDateTime,
-            updateDate: LocalDateTime?,
             parentId: ActionId?,
         ) = Action(
             id = id,
             type = type,
             order = order,
             creationDate = creationDate,
-            updateDate = updateDate,
+            updateDate = null,
             parentId = parentId,
         )
 

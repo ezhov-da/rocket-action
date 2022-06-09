@@ -4,7 +4,7 @@ import ru.ezhov.rocket.action.api.RocketActionConfiguration
 import ru.ezhov.rocket.action.api.RocketActionConfigurationPropertyKey
 import ru.ezhov.rocket.action.api.RocketActionSettings
 import ru.ezhov.rocket.action.api.RocketActionType
-import ru.ezhov.rocket.action.application.configuration.ui.NewRocketActionSettings
+import ru.ezhov.rocket.action.application.configuration.ui.create.NewRocketActionSettings
 
 class MutableRocketActionSettings(
     private val id: String,

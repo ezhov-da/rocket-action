@@ -1,4 +1,4 @@
-package ru.ezhov.rocket.action.application.configuration.ui
+package ru.ezhov.rocket.action.application.configuration.ui.edit
 
 import mu.KotlinLogging
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea
@@ -8,6 +8,9 @@ import ru.ezhov.rocket.action.api.RocketActionConfiguration
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
 import ru.ezhov.rocket.action.api.RocketActionConfigurationPropertyKey
 import ru.ezhov.rocket.action.api.RocketActionPropertySpec
+import ru.ezhov.rocket.action.application.configuration.ui.SavedRocketActionSettingsPanelCallback
+import ru.ezhov.rocket.action.application.configuration.ui.TestPanel
+import ru.ezhov.rocket.action.application.configuration.ui.TreeRocketActionSettings
 import ru.ezhov.rocket.action.application.configuration.ui.event.ConfigurationUiListener
 import ru.ezhov.rocket.action.application.configuration.ui.event.ConfigurationUiObserverFactory
 import ru.ezhov.rocket.action.application.configuration.ui.event.model.ConfigurationUiEvent

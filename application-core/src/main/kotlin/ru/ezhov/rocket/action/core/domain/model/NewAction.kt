@@ -5,7 +5,7 @@ import java.time.LocalDateTime
 class NewAction private constructor(
     val id: ActionId,
     val type: ActionType,
-    val order: ActionOrder,
+    val order: NewActionOrder,
     val creationDate: LocalDateTime,
     val parentId: ActionId?,
     val map: Map<ActionSettingName, ActionSettingValue?>,
@@ -14,7 +14,7 @@ class NewAction private constructor(
         fun create(
             id: ActionId,
             type: ActionType,
-            order: ActionOrder,
+            order: NewActionOrder,
             creationDate: LocalDateTime,
             parentId: ActionId?,
             map: Map<ActionSettingName, ActionSettingValue?>,
@@ -27,4 +27,17 @@ class NewAction private constructor(
             map = map,
         )
     }
+
+    fun toAction() = Action.create(
+        id = id,
+        type = type,
+        order = ActionOrder(order.order()),
+        creationDate = creationDate,
+        parentId = parentId,
+    )
+
+    fun toActionSettings() = ActionSettings(
+        id = id,
+        map = map,
+    )
 }
