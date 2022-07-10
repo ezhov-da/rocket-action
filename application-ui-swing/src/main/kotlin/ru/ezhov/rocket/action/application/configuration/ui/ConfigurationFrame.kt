@@ -73,7 +73,7 @@ class ConfigurationFrame(
         val splitPane = JSplitPane(JSplitPane.HORIZONTAL_SPLIT)
         splitPane.setDividerLocation(0.5)
         splitPane.resizeWeight = 0.5
-        val actions = rocketActionSettingsRepository!!.actions()
+        val actions = rocketActionSettingsRepository.actions()
         val root = DefaultMutableTreeNode(null, true)
         fillTreeNodes(actions, root)
         val defaultTreeModel = DefaultTreeModel(root)
@@ -302,7 +302,7 @@ class ConfigurationFrame(
             recursiveGetSettings(root.getChildAt(i) as DefaultMutableTreeNode, settings, null)
         }
         try {
-            rocketActionSettingsRepository!!.save(settings)
+            rocketActionSettingsRepository.save(settings)
             NotificationFactory.notification.show(NotificationType.INFO, "Действия сохранены")
         } catch (e: RocketActionSettingsRepositoryException) {
             e.printStackTrace()

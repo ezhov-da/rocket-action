@@ -29,6 +29,7 @@ enum class AppIcon(val iconName: String) {
     MINUS("minus-2x"),
     PLUS("plus-2x"),
     FORK("fork-2x"),
+    CLOCK("clock-2x"),
 
     LOADER("/load_16x16.gif"),
 }

@@ -25,8 +25,8 @@ class YmlRocketActionSettingsRepository(private val uri: URI) : RocketActionSett
             val obj = yaml.load<Map<String, Any>>(inputStream)
             for ((key, value) in obj) {
                 if (ACTIONS == key) {
-                    val linkedHashMaps = value as ArrayList<LinkedHashMap<String, Any>>
-                    for (l in linkedHashMaps) {
+                    val linkedHashMaps = value as? ArrayList<LinkedHashMap<String, String?>>
+                    for (l in linkedHashMaps.orEmpty()) {
                         actions.add(createAction(l))
                     }
                 }
@@ -73,7 +73,7 @@ class YmlRocketActionSettingsRepository(private val uri: URI) : RocketActionSett
     }
 
     @Throws(RocketActionSettingsRepositoryException::class)
-    private fun createAction(action: LinkedHashMap<String, Any>): RocketActionSettings {
+    private fun createAction(action: LinkedHashMap<String, String?>): RocketActionSettings {
         return QuickActionFactory.create(
             getOrGenerateId(action),
             action[TYPE].toString(),
@@ -83,7 +83,7 @@ class YmlRocketActionSettingsRepository(private val uri: URI) : RocketActionSett
 
     private object QuickActionFactory {
         @Throws(RocketActionSettingsRepositoryException::class)
-        fun createAction(action: LinkedHashMap<String, Any>): RocketActionSettings {
+        fun createAction(action: LinkedHashMap<String, String?>): RocketActionSettings {
             return create(
                 getOrGenerateId(action),
                 action[TYPE].toString(),
@@ -92,14 +92,14 @@ class YmlRocketActionSettingsRepository(private val uri: URI) : RocketActionSett
         }
 
         @Throws(RocketActionSettingsRepositoryException::class)
-        fun create(id: String, actionType: String, action: LinkedHashMap<String, Any>): RocketActionSettings {
-            val actions = action[ACTIONS] as ArrayList<LinkedHashMap<String, Any>>?
+        fun create(id: String, actionType: String, action: LinkedHashMap<String, String?>): RocketActionSettings {
+            val actions = action[ACTIONS] as? ArrayList<LinkedHashMap<String, String?>>
             action.remove(TYPE)
             action.remove(ID)
             action.remove(ACTIONS)
             return if (actions == null || actions.isEmpty()) {
                 val map: MutableMap<RocketActionConfigurationPropertyKey, String> = HashMap()
-                action.forEach { (k: String, v: Any?) -> map[RocketActionConfigurationPropertyKey(k)] = v?.toString().orEmpty() }
+                action.forEach { (k: String, v: String?) -> map[RocketActionConfigurationPropertyKey(k)] = v.orEmpty() }
                 MutableRocketActionSettings(id, { actionType }, map, mutableListOf())
             } else {
                 val settings: MutableList<RocketActionSettings> = ArrayList()
@@ -107,7 +107,7 @@ class YmlRocketActionSettingsRepository(private val uri: URI) : RocketActionSett
                     settings.add(createAction(a))
                 }
                 val map: MutableMap<RocketActionConfigurationPropertyKey, String> = HashMap()
-                action.forEach { (k: String, v: Any) -> map[RocketActionConfigurationPropertyKey(k)] = v.toString() }
+                action.forEach { (k: String, v: String?) -> map[RocketActionConfigurationPropertyKey(k)] = v.orEmpty() }
                 MutableRocketActionSettings(id, { actionType }, map, settings)
             }
         }
@@ -117,7 +117,7 @@ class YmlRocketActionSettingsRepository(private val uri: URI) : RocketActionSett
         private const val TYPE = "type"
         private const val ID = "_id"
         private const val ACTIONS = "actions"
-        private fun getOrGenerateId(action: LinkedHashMap<String, Any>): String {
+        private fun getOrGenerateId(action: LinkedHashMap<String, String?>): String {
             var idAsObject = action[ID]
             if (idAsObject == null || "" == idAsObject.toString()) {
                 idAsObject = UUID.randomUUID().toString()

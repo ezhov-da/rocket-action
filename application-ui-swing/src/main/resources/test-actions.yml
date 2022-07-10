@@ -209,4 +209,14 @@ actions:
     description: "Описание"
     pathAndName: "./notes/d9530ff6-a228-11ec-b909-0242ac120002.txt"
 
+  - type: JIRA_WORK_LOG
+    _id: de31aba8-c229-11ec-9d64-0242ac120002
+    label: "Jira work log"
+    description: "Описание"
+    username: "123"
+    password: "123"
+    url: "http://localhost"
+    predefinedTasks: |
+        123___qwe
+        345___rty
 ...

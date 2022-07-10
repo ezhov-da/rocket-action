@@ -1,6 +1,6 @@
 package ru.ezhov.rocket.action.application.configuration.ui
 
-import junit.framework.Assert.assertEquals
+import org.junit.Assert.assertEquals
 import org.junit.Test
 import ru.ezhov.rocket.action.api.RocketActionConfiguration
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
