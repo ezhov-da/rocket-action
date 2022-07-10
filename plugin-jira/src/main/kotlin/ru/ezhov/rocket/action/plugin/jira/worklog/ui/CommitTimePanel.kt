@@ -16,6 +16,7 @@ import javax.swing.JTextArea
 import javax.swing.JTextField
 import javax.swing.JTextPane
 import javax.swing.SwingUtilities
+import javax.swing.SwingWorker
 import javax.swing.event.DocumentEvent
 import javax.swing.event.DocumentListener
 
@@ -47,14 +48,12 @@ class CommitTimePanel(
         }, BorderLayout.SOUTH)
 
         buttonCommit.addActionListener {
-            currentCommitTimeTasks?.let {
-                commitTimeService
-                    .commit(it.commitTimeTask)
-                    .getOrHandle { ex ->
-                        val text = "Error when commit time"
-                        logger.error(ex) { text }
-                        NotificationFactory.notification.show(type = NotificationType.WARN, text = text)
-                    }
+            currentCommitTimeTasks?.let { tasks ->
+                CommitWorker(
+                    commitTimeTasks = tasks,
+                    commitTimeService = commitTimeService,
+                    button = buttonCommit
+                ).execute()
             }
         }
 
@@ -76,6 +75,38 @@ class CommitTimePanel(
                 printInfo(currentCommitTimeTasks!!)
             }
         })
+    }
+
+    private class CommitWorker(
+        private val commitTimeTasks: CommitTimeTasks,
+        private val commitTimeService: CommitTimeService,
+        private val button: JButton,
+    ) : SwingWorker<Unit, String>() {
+
+        init {
+            button.isEnabled = false
+        }
+
+        override fun doInBackground(): Unit =
+            commitTimeService
+                .commit(commitTimeTasks.commitTimeTask)
+                .getOrHandle { ex -> throw ex }
+
+        override fun done() {
+            try {
+                get()
+                NotificationFactory.notification.show(
+                    type = NotificationType.INFO,
+                    text = "Tasks time added to Jira"
+                )
+            } catch (ex: Exception) {
+                val text = "Error when commit time"
+                logger.error(ex) { text }
+                NotificationFactory.notification.show(type = NotificationType.WARN, text = text)
+            } finally {
+                button.isEnabled = true
+            }
+        }
     }
 
     private fun printInfo(tasks: CommitTimeTasks) {

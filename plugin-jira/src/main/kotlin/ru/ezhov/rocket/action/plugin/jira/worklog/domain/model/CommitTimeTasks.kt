@@ -51,7 +51,7 @@ class CommitTimeTasks private constructor(
                         val dateFormat = DateTimeFormatter.ofPattern(dateFormatPattern)
                         val time = try {
                             when (val timeAsString = parts[1]) {
-                                "now" -> LocalDateTime.now()
+                                "now", "n" -> LocalDateTime.now()
                                 else -> LocalDateTime.parse(timeAsString, dateFormat)
                             }
                         } catch (ex: DateTimeParseException) {

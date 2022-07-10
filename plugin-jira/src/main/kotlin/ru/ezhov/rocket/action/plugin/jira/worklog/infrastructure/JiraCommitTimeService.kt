@@ -36,7 +36,7 @@ class JiraCommitTimeService(
                                             time.minute,
                                         )
                                     },
-                                    60
+                                    task.timeSpentMinute,
                                 )
                             ).claim()
                         }
@@ -45,7 +45,10 @@ class JiraCommitTimeService(
                 }
             Unit.right()
         } catch (ex: Exception) {
-            CommitTimeServiceException("Ошибка внесения времени. Часть данных не внесена.", ex).left()
+            CommitTimeServiceException(
+                message = "Error jira work log. Part of information not add.",
+                cause = ex
+            ).left()
         }
 
 
