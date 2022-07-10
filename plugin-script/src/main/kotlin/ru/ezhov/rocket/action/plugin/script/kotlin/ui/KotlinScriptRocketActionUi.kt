@@ -18,7 +18,7 @@ class KotlinScriptRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
 
     override fun configuration(): RocketActionConfiguration = this
 
-    override fun create(settings: RocketActionSettings): RocketAction? = run {
+    override fun create(settings: RocketActionSettings): RocketAction? =
         settings.settings()[SCRIPT]
             ?.takeIf { it.isNotEmpty() }
             ?.let { script ->
@@ -32,6 +32,7 @@ class KotlinScriptRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
                             description = description,
                             executeOnLoad = settings.settings()[EXECUTE_ON_LOAD].toBoolean(),
                         )
+
                         object : RocketAction {
                             override fun contains(search: String): Boolean =
                                 label.contains(search, ignoreCase = true)
@@ -45,7 +46,6 @@ class KotlinScriptRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
                         }
                     }
             }
-    }
 
     override fun type(): RocketActionType = RocketActionType { TYPE }
 

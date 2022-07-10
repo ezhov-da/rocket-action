@@ -37,7 +37,6 @@ class PluginsReflectionRocketActionPluginRepository : RocketActionPluginReposito
                 .flatten()
                 .toMutableList()
 
-
             val inner = innerPlugins
                 .mapNotNull { clazzName ->
                     async {
@@ -173,7 +172,7 @@ class PluginsReflectionRocketActionPluginRepository : RocketActionPluginReposito
         private val originalRocketAction: RocketAction
     ) : RocketAction {
         companion object {
-            const val MAX_TIME__GET_COMPONENT_IN_MILLS = 2
+            const val MAX_TIME_GET_COMPONENT_IN_MILLS = 2
         }
 
         override fun contains(search: String): Boolean = originalRocketAction.contains(search = search)
@@ -187,9 +186,9 @@ class PluginsReflectionRocketActionPluginRepository : RocketActionPluginReposito
                 component = originalRocketAction.component()
             }
 
-            if (timeInMillis > MAX_TIME__GET_COMPONENT_IN_MILLS) {
+            if (timeInMillis > MAX_TIME_GET_COMPONENT_IN_MILLS) {
                 logger.warn {
-                    "Getting component for action was over '$MAX_TIME__GET_COMPONENT_IN_MILLS' milliseconds. " +
+                    "Getting component for action was over '$MAX_TIME_GET_COMPONENT_IN_MILLS' milliseconds. " +
                         "This can slow down the application"
                 }
             }
