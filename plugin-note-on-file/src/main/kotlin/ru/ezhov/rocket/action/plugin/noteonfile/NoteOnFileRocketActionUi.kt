@@ -42,6 +42,10 @@ class NoteOnFileRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
                     ?: path.let { File(path).name }
                 val description = settings.settings()[DESCRIPTION]?.takeIf { it.isNotEmpty() } ?: path
                 val loadTextOnInitialize = settings.settings()[LOAD_TEXT_ON_INITIALIZE]?.toBoolean() ?: true
+                val delimiter = settings.settings()[DELIMITER].orEmpty()
+
+                val autoSave = settings.settings()[AUTO_SAVE]?.toBooleanStrictOrNull()
+                val autoSaveInSeconds = settings.settings()[AUTO_SAVE_PERIOD_IN_SECOND]?.toIntOrNull()
 
                 val component = JMenu(label).apply {
                     this.icon = iconDef
@@ -52,6 +56,13 @@ class NoteOnFileRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
                             loadOnInitialize = loadTextOnInitialize,
                             style = settings.settings()[SYNTAX_STYLE],
                             addStyleSelected = false,
+                            delimiter = delimiter,
+                            textAutoSave = autoSave?.let {
+                                TextAutoSave(
+                                    enable = it,
+                                    delayInSeconds = autoSaveInSeconds ?: DEFAULT_AUTO_SAVE_PERIOD_IN_SECOND
+                                )
+                            },
                         )
                     )
                 }
@@ -93,7 +104,7 @@ class NoteOnFileRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
             createRocketActionProperty(
                 key = DESCRIPTION,
                 name = "Описание",
-                description = """Описание, которое будет всплывать при наведении, 
+                description = """Описание, которое будет всплывать при наведении,
                             |в случае отсутствия будет отображаться путь""".trimMargin(),
                 required = false,
                 property = RocketActionPropertySpec.StringPropertySpec(),
@@ -118,13 +129,39 @@ class NoteOnFileRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
                 ),
             ),
             createRocketActionProperty(
+                key = DELIMITER,
+                name = "Разделитель для групп",
+                description = """Если указан разделитель для групп,
+                    |в файле будет искаться указанный разделитель и строиться список групп для быстрого перехода""".trimMargin(),
+                required = false,
+                property = RocketActionPropertySpec.StringPropertySpec(),
+            ),
+            createRocketActionProperty(
                 key = LOAD_TEXT_ON_INITIALIZE,
                 name = "Загружать текст из файла при инициализации",
-                description = """При установке true загружает текст при инициализации. 
+                description = """При установке true загружает текст при инициализации.
                     "В случае, если текста много, может повлиять на первоначальную загрузку""",
                 required = true,
                 property = RocketActionPropertySpec.BooleanPropertySpec(
                     defaultValue = true,
+                ),
+            ),
+            createRocketActionProperty(
+                key = AUTO_SAVE,
+                name = "Сохранять текст автоматически ",
+                description = """Автоматическое сохранение текста""",
+                required = true,
+                property = RocketActionPropertySpec.BooleanPropertySpec(
+                    defaultValue = true,
+                ),
+            ),
+            createRocketActionProperty(
+                key = AUTO_SAVE_PERIOD_IN_SECOND,
+                name = "Автоматически сохранять через указанное время в секундах",
+                description = """Автоматически сохранять через указанное время в секундах""",
+                required = false,
+                property = RocketActionPropertySpec.IntPropertySpec(
+                    defaultValue = DEFAULT_AUTO_SAVE_PERIOD_IN_SECOND,
                 ),
             ),
         )
@@ -140,5 +177,9 @@ class NoteOnFileRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
         private val SYNTAX_STYLE = RocketActionConfigurationPropertyKey("syntaxStyle")
         private val LOAD_TEXT_ON_INITIALIZE = RocketActionConfigurationPropertyKey("loadTextOnInitialize")
         private val PATH_AND_NAME = RocketActionConfigurationPropertyKey("pathAndName")
+        private val DELIMITER = RocketActionConfigurationPropertyKey("delimiter")
+        private val AUTO_SAVE = RocketActionConfigurationPropertyKey("autoSave")
+        private val AUTO_SAVE_PERIOD_IN_SECOND = RocketActionConfigurationPropertyKey("autoSavePeriodInSecond")
+        private const val DEFAULT_AUTO_SAVE_PERIOD_IN_SECOND = 5
     }
 }
