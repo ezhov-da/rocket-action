@@ -12,50 +12,76 @@ import java.time.format.DateTimeParseException
 class CommitTimeTasks private constructor(
     val commitTimeTask: List<CommitTimeTask> = emptyList(),
     val errors: List<CommitTimeTasksError> = emptyList(),
+    private val delimiter: String,
 ) {
     companion object {
-        fun of(value: String): CommitTimeTasks =
+        fun of(
+            value: String,
+            delimiter: String,
+            dateFormatPattern: String,
+            constantsNowDate: List<String>,
+            aliasForTaskIds: AliasForTaskIds,
+        ): CommitTimeTasks =
             if (value.isBlank()) {
-                CommitTimeTasks(errors = listOf(CommitTimeTasksError("Данные не могут быть пустыми")))
+                CommitTimeTasks(
+                    errors = listOf(
+                        CommitTimeTasksError("Данные не могут быть пустыми")
+                    ),
+                    delimiter = delimiter
+                )
             } else {
                 val rows = value.split("\n")
                 if (rows.isEmpty()) {
-                    CommitTimeTasks(errors = listOf(CommitTimeTasksError("Нет данных")))
+                    CommitTimeTasks(errors = listOf(CommitTimeTasksError("Нет данных")), delimiter = delimiter)
                 } else {
                     rows
-                        .map { it.toCommitTimeTask() }
+                        .map {
+                            it.toCommitTimeTask(
+                                delimiter = delimiter,
+                                dateFormatPattern = dateFormatPattern,
+                                constantsNowDate = constantsNowDate,
+                                aliasForTaskIds = aliasForTaskIds,
+                            )
+                        }
                         .let { tasks ->
                             val corrects = mutableListOf<CommitTimeTask?>()
                             val errors = mutableListOf<CommitTimeTasksError>()
                             tasks.forEach { t -> corrects.add(t.getOrHandle { errors.add(it); null }) }
                             CommitTimeTasks(
                                 commitTimeTask = corrects.filterNotNull(),
-                                errors = errors
+                                errors = errors,
+                                delimiter = delimiter,
                             )
                         }
                 }
             }
 
-        private fun String.toCommitTimeTask(): Either<CommitTimeTasksError, CommitTimeTask> {
+        private fun String.toCommitTimeTask(
+            delimiter: String,
+            dateFormatPattern: String,
+            constantsNowDate: List<String>,
+            aliasForTaskIds: AliasForTaskIds,
+        ): Either<CommitTimeTasksError, CommitTimeTask> {
             val error by lazy { "Для строки '$this' есть ошибки: " }
             return this
-                .split("___")
+                .split(delimiter)
                 .let { parts ->
                     if (parts.size != 4) {
-                        CommitTimeTasksError("$error Данные должны состоять из четырёх столбцов разделённых '___'. ").left()
+                        CommitTimeTasksError("$error Данные должны состоять из четырёх столбцов разделённых '$delimiter'. ").left()
                     } else {
                         val errors = mutableListOf<String>()
 
-                        val id = parts[0]
-                        val dateFormatPattern = "yyyyMMddHHmm"
+                        val originalId = parts[0]
+                        val idFinal = originalId.let { id -> aliasForTaskIds.taskIdByAlias(id) ?: id }
                         val dateFormat = DateTimeFormatter.ofPattern(dateFormatPattern)
+                        val originalTimeAsString = parts[1]
                         val time = try {
-                            when (val timeAsString = parts[1]) {
-                                "now", "n" -> LocalDateTime.now()
-                                else -> LocalDateTime.parse(timeAsString, dateFormat)
+                            when {
+                                constantsNowDate.contains(originalTimeAsString) -> LocalDateTime.now()
+                                else -> LocalDateTime.parse(originalTimeAsString, dateFormat)
                             }
                         } catch (ex: DateTimeParseException) {
-                            errors.add("Некорректный формат даты и времени. Корректный '$dateFormatPattern' или 'now'")
+                            errors.add("Некорректный формат даты и времени. Корректный '$dateFormatPattern' или '$constantsNowDate'")
                             null
                         }
                         val timeSpentMinute = try {
@@ -69,15 +95,22 @@ class CommitTimeTasks private constructor(
                             CommitTimeTasksError("$error ${errors.joinToString(separator = "; ")}").left()
                         } else {
                             CommitTimeTask(
-                                id = id,
+                                id = idFinal,
                                 time = time!!,
                                 timeSpentMinute = timeSpentMinute!!,
                                 comment = comment,
+                                originalId = originalId,
+                                originalTime = originalTimeAsString,
                             ).right()
                         }
                     }
                 }
         }
+    }
+
+    fun detailInfoAboutInputAndOutput(): List<String> = commitTimeTask.map {
+        "input: ${it.originalId}$delimiter${it.originalTime}$delimiter${it.timeSpentMinute}$delimiter${it.comment} ->" +
+            " output: ${it.id}$delimiter${it.time}$delimiter${it.timeSpentMinute}$delimiter${it.comment}"
     }
 
     fun sumOfTimeTasksAsMinute() = commitTimeTask.sumOf { it.timeSpentMinute }

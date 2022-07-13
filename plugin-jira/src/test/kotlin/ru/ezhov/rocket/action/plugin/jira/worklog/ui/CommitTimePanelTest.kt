@@ -4,6 +4,7 @@ import arrow.core.Either
 import arrow.core.right
 import ru.ezhov.rocket.action.plugin.jira.worklog.domain.CommitTimeService
 import ru.ezhov.rocket.action.plugin.jira.worklog.domain.CommitTimeServiceException
+import ru.ezhov.rocket.action.plugin.jira.worklog.domain.model.AliasForTaskIds
 import ru.ezhov.rocket.action.plugin.jira.worklog.domain.model.CommitTimeTask
 import ru.ezhov.rocket.action.plugin.jira.worklog.domain.model.Task
 import javax.swing.JFrame
@@ -35,7 +36,16 @@ fun main() {
                         println("commit")
                         return Unit.right()
                     }
-                }
+                },
+                delimiter = "_",
+                dateFormatPattern = "yyyyMMddHH",
+                constantsNowDate = listOf("n"),
+                aliasForTaskIds = AliasForTaskIds.of(
+                    """
+                      123_тру,ля
+                      123_тру,ля
+                    """.trimIndent()
+                ),
             )
         )
 

@@ -6,8 +6,14 @@ import org.junit.Test
 internal class CommitTimeTasksTest {
     @Test
     fun test() {
-        val сommitTimeTasks = CommitTimeTasks.of("qweqweqwe")
+        val commitTimeTasks = CommitTimeTasks.of(
+            value = "какая-то задача_с_40_А это описание",
+            delimiter = "_",
+            dateFormatPattern = "yyyyMMddHHmm",
+            constantsNowDate = listOf("now", "n", "с"),
+            aliasForTaskIds = AliasForTaskIds.EMPTY
+        )
 
-        println(сommitTimeTasks)
+        println(commitTimeTasks)
     }
 }

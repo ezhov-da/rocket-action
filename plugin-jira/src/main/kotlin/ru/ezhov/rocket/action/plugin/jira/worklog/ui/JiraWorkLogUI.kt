@@ -1,6 +1,7 @@
 package ru.ezhov.rocket.action.plugin.jira.worklog.ui
 
 import ru.ezhov.rocket.action.plugin.jira.worklog.domain.CommitTimeService
+import ru.ezhov.rocket.action.plugin.jira.worklog.domain.model.AliasForTaskIds
 import ru.ezhov.rocket.action.plugin.jira.worklog.domain.model.Task
 import java.awt.BorderLayout
 import java.awt.Dimension
@@ -14,8 +15,19 @@ import javax.swing.SwingUtilities
 class JiraWorkLogUI(
     private val tasks: List<Task> = emptyList(),
     private val commitTimeService: CommitTimeService,
+    delimiter: String,
+    dateFormatPattern: String,
+    constantsNowDate: List<String>,
+    aliasForTaskIds: AliasForTaskIds,
 ) : JPanel() {
-    private val commitTimePanel = CommitTimePanel(tasks = tasks, commitTimeService = commitTimeService)
+    private val commitTimePanel = CommitTimePanel(
+        tasks = tasks,
+        commitTimeService = commitTimeService,
+        delimiter = delimiter,
+        dateFormatPattern = dateFormatPattern,
+        constantsNowDate = constantsNowDate,
+        aliasForTaskIds = aliasForTaskIds,
+    )
     private val dimension = calculateSize()
 
     init {
@@ -26,7 +38,17 @@ class JiraWorkLogUI(
                     addActionListener {
                         SwingUtilities.invokeLater {
                             val frame = JFrame("Внесение времени в Jira")
-                            frame.add(JiraWorkLogUI(tasks, commitTimeService), BorderLayout.CENTER)
+                            frame.add(
+                                JiraWorkLogUI(
+                                    tasks = tasks,
+                                    commitTimeService = commitTimeService,
+                                    delimiter = delimiter,
+                                    dateFormatPattern = dateFormatPattern,
+                                    constantsNowDate = constantsNowDate,
+                                    aliasForTaskIds = aliasForTaskIds,
+                                ),
+                                BorderLayout.CENTER
+                            )
 
                             frame.size = dimension
                             frame.setLocationRelativeTo(null)
@@ -47,7 +69,7 @@ class JiraWorkLogUI(
     private fun calculateSize() = Toolkit.getDefaultToolkit().screenSize.let {
         Dimension(
             (it.width * 0.4).toInt(),
-            (it.height * 0.3).toInt()
+            (it.height * 0.5).toInt()
         )
     }
 }

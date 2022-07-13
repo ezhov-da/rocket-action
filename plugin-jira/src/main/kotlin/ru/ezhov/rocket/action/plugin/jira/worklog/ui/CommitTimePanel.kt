@@ -5,6 +5,7 @@ import mu.KotlinLogging
 import ru.ezhov.rocket.action.notification.NotificationFactory
 import ru.ezhov.rocket.action.notification.NotificationType
 import ru.ezhov.rocket.action.plugin.jira.worklog.domain.CommitTimeService
+import ru.ezhov.rocket.action.plugin.jira.worklog.domain.model.AliasForTaskIds
 import ru.ezhov.rocket.action.plugin.jira.worklog.domain.model.CommitTimeTasks
 import ru.ezhov.rocket.action.plugin.jira.worklog.domain.model.Task
 import java.awt.BorderLayout
@@ -24,7 +25,11 @@ private val logger = KotlinLogging.logger {}
 
 class CommitTimePanel(
     private val tasks: List<Task> = emptyList(),
+    private val delimiter: String,
+    private val dateFormatPattern: String,
+    private val constantsNowDate: List<String>,
     private val commitTimeService: CommitTimeService,
+    private val aliasForTaskIds: AliasForTaskIds,
 ) : JPanel() {
     private val textPane: JTextPane = JTextPane()
     private val infoLabel: JTextArea = JTextArea().apply { text = "Введите данные для расчёта" }
@@ -71,7 +76,13 @@ class CommitTimePanel(
             }
 
             private fun calculateAndPrintInfo() {
-                currentCommitTimeTasks = CommitTimeTasks.of(textPane.text)
+                currentCommitTimeTasks = CommitTimeTasks.of(
+                    value = textPane.text,
+                    delimiter = delimiter,
+                    dateFormatPattern = dateFormatPattern,
+                    constantsNowDate = constantsNowDate,
+                    aliasForTaskIds = aliasForTaskIds,
+                )
                 printInfo(currentCommitTimeTasks!!)
             }
         })
@@ -112,6 +123,8 @@ class CommitTimePanel(
     private fun printInfo(tasks: CommitTimeTasks) {
         infoLabel.text = """
                 Число задач: '${tasks!!.countOfTask()}'
+                Подробно о задачах:
+                    ${tasks.detailInfoAboutInputAndOutput().joinToString(separator = "\n")}
                 Суммарное время:
                     - в минутах ${tasks!!.sumOfTimeTasksAsMinute()}
                     - в часах ${tasks!!.sumOfTimeTasksAsHours()}
