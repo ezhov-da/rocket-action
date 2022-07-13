@@ -16,31 +16,28 @@ class JiraCommitTimeService(
     private val password: String,
     private val url: URI,
 ) : CommitTimeService {
-    override fun commit(tasks: List<CommitTimeTask>): Either<CommitTimeServiceException, Unit> =
+    override fun commit(task: CommitTimeTask): Either<CommitTimeServiceException, Unit> =
         try {
             client()
                 .let { client ->
-                    tasks.map { task ->
-                        client.issueClient.getIssue(task.id).claim()?.let { issue ->
-                            client.issueClient.addWorklog(
-                                issue.worklogUri,
-                                WorklogInput.create(
-                                    issue.self,
-                                    task.comment,
-                                    task.time.let { time ->
-                                        DateTime(
-                                            time.year,
-                                            time.monthValue,
-                                            time.dayOfMonth,
-                                            time.hour,
-                                            time.minute,
-                                        )
-                                    },
-                                    task.timeSpentMinute,
-                                )
-                            ).claim()
-                        }
-
+                    client.issueClient.getIssue(task.id).claim()?.let { issue ->
+                        client.issueClient.addWorklog(
+                            issue.worklogUri,
+                            WorklogInput.create(
+                                issue.self,
+                                task.comment,
+                                task.time.let { time ->
+                                    DateTime(
+                                        time.year,
+                                        time.monthValue,
+                                        time.dayOfMonth,
+                                        time.hour,
+                                        time.minute,
+                                    )
+                                },
+                                task.timeSpentMinute,
+                            )
+                        ).claim()
                     }
                 }
             Unit.right()

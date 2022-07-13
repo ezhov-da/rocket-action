@@ -197,7 +197,11 @@ class EditorRocketActionSettingsPanel(
                                         .also { tp ->
                                             tp.syntaxEditingStyle = SyntaxConstants.SYNTAX_STYLE_NONE
                                             valueCallback = { tp.text }
-                                            tp.text = value.value
+                                            if (property.isRequired() && value.value.isEmpty()) {
+                                                tp.text = configProperty.defaultValue ?: ""
+                                            } else {
+                                                tp.text = value.value
+                                            }
                                         }
                                 ),
                                 BorderLayout.CENTER

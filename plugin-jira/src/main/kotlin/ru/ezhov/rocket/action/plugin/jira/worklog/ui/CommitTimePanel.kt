@@ -1,61 +1,104 @@
 package ru.ezhov.rocket.action.plugin.jira.worklog.ui
 
-import arrow.core.getOrHandle
+import arrow.core.flatten
 import mu.KotlinLogging
 import ru.ezhov.rocket.action.notification.NotificationFactory
 import ru.ezhov.rocket.action.notification.NotificationType
 import ru.ezhov.rocket.action.plugin.jira.worklog.domain.CommitTimeService
+import ru.ezhov.rocket.action.plugin.jira.worklog.domain.CommitTimeServiceException
+import ru.ezhov.rocket.action.plugin.jira.worklog.domain.model.AliasForTaskIds
+import ru.ezhov.rocket.action.plugin.jira.worklog.domain.model.CommitTimeTask
 import ru.ezhov.rocket.action.plugin.jira.worklog.domain.model.CommitTimeTasks
 import ru.ezhov.rocket.action.plugin.jira.worklog.domain.model.Task
 import java.awt.BorderLayout
+import java.awt.Component
+import java.awt.Desktop
+import java.awt.FlowLayout
+import java.awt.event.KeyAdapter
+import java.awt.event.KeyEvent
+import java.awt.event.MouseAdapter
+import java.awt.event.MouseEvent
+import java.io.File
+import java.net.URI
+import java.time.format.DateTimeFormatter
+import javax.swing.BorderFactory
 import javax.swing.BoxLayout
 import javax.swing.JButton
+import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.JScrollPane
-import javax.swing.JTextArea
+import javax.swing.JSplitPane
+import javax.swing.JTable
 import javax.swing.JTextField
 import javax.swing.JTextPane
 import javax.swing.SwingUtilities
 import javax.swing.SwingWorker
 import javax.swing.event.DocumentEvent
 import javax.swing.event.DocumentListener
+import javax.swing.table.DefaultTableCellRenderer
+import javax.swing.table.DefaultTableModel
 
 private val logger = KotlinLogging.logger {}
 
 class CommitTimePanel(
     private val tasks: List<Task> = emptyList(),
+    private val delimiter: String,
+    private val dateFormatPattern: String,
+    private val constantsNowDate: List<String>,
     private val commitTimeService: CommitTimeService,
+    private val aliasForTaskIds: AliasForTaskIds,
+    private val fileForSave: File,
+    linkToWorkLog: URI? = null,
 ) : JPanel() {
     private val textPane: JTextPane = JTextPane()
-    private val infoLabel: JTextArea = JTextArea().apply { text = "Введите данные для расчёта" }
-    private val buttonCommit: JButton = JButton("Зафиксировать")
     private var currentCommitTimeTasks: CommitTimeTasks? = null
+    private val tasksPanel: TasksPanel = TasksPanel(commitTimeService)
 
     init {
-        infoLabel.isEditable = false
+        ReadFile(textPane = textPane, file = fileForSave).execute()
 
         layout = BorderLayout()
         add(
-            FavoriteTasksPanel(tasks) { task ->
-                textPane.document.insertString(textPane.document.length, "${task.id}\n", null);
-            },
+            JPanel(BorderLayout())
+                .apply {
+                    linkToWorkLog?.let { ltwl ->
+                        add(
+                            JLabel(ltwl.toString()).apply {
+                                addMouseListener(object : MouseAdapter() {
+                                    override fun mouseReleased(e: MouseEvent?) {
+                                        try {
+                                            Desktop.getDesktop().browse(ltwl)
+                                        } catch (ex: Exception) {
+                                            val msg = "Error open link='$ltwl'"
+                                            logger.warn(ex) { msg }
+                                            NotificationFactory.notification.show(type = NotificationType.WARN, text = msg)
+                                        }
+                                    }
+                                })
+                            },
+                            BorderLayout.NORTH
+                        )
+                    }
+                    add(
+                        FavoriteTasksPanel(tasks) { task ->
+                            textPane.document.insertString(
+                                textPane.document.length, "${task.id}", null
+                            )
+                        },
+                        BorderLayout.CENTER
+                    )
+                    add(AliasForTaskIdsPanel(aliasForTaskIds), BorderLayout.SOUTH)
+                },
             BorderLayout.NORTH
         )
-        add(JScrollPane(textPane), BorderLayout.CENTER)
-        add(JPanel(BorderLayout()).apply {
-            add(infoLabel, BorderLayout.CENTER)
-            add(buttonCommit, BorderLayout.SOUTH)
-        }, BorderLayout.SOUTH)
 
-        buttonCommit.addActionListener {
-            currentCommitTimeTasks?.let { tasks ->
-                CommitWorker(
-                    commitTimeTasks = tasks,
-                    commitTimeService = commitTimeService,
-                    button = buttonCommit
-                ).execute()
-            }
-        }
+        val split = JSplitPane(JSplitPane.VERTICAL_SPLIT)
+        split.topComponent = JScrollPane(textPane)
+        split.bottomComponent = tasksPanel
+        split.setDividerLocation(0.8)
+        split.resizeWeight = 0.8
+
+        add(split, BorderLayout.CENTER)
 
         textPane.document.addDocumentListener(object : DocumentListener {
             override fun insertUpdate(e: DocumentEvent?) {
@@ -71,26 +114,102 @@ class CommitTimePanel(
             }
 
             private fun calculateAndPrintInfo() {
-                currentCommitTimeTasks = CommitTimeTasks.of(textPane.text)
-                printInfo(currentCommitTimeTasks!!)
+                currentCommitTimeTasks = CommitTimeTasks.of(
+                    value = textPane.text,
+                    delimiter = delimiter,
+                    dateFormatPattern = dateFormatPattern,
+                    constantsNowDate = constantsNowDate,
+                    aliasForTaskIds = aliasForTaskIds,
+                )
+                tasksPanel.setCurrentCommitTimeTasks(currentCommitTimeTasks!!)
+            }
+        })
+
+        textPane.addKeyListener(object : KeyAdapter() {
+            override fun keyReleased(e: KeyEvent) {
+                if (e.keyCode == 83 /*S*/ && e.isControlDown) {
+                    WriteFile(text = textPane.text, file = fileForSave).execute()
+                }
             }
         })
     }
 
+    fun loadText() {
+        ReadFile(textPane = textPane, file = fileForSave).execute()
+    }
+
+    class WriteFile(
+        private val text: String,
+        private val file: File
+    ) : SwingWorker<Any, Unit>() {
+        override fun doInBackground(): Unit {
+            file.parentFile?.let {
+                if (!it.exists()) {
+                    it.mkdirs()
+                }
+            }
+            file.writeText(text, charset = Charsets.UTF_8)
+        }
+
+        override fun done() {
+            try {
+                NotificationFactory.notification.show(NotificationType.INFO, "Text saved")
+            } catch (ex: Exception) {
+                logger.warn(ex) { "Error when save text" }
+                NotificationFactory.notification.show(NotificationType.WARN, "Save error")
+
+            }
+        }
+    }
+
+    class ReadFile(
+        private val textPane: JTextPane,
+        private val file: File
+    ) : SwingWorker<String, String>() {
+        override fun doInBackground(): String =
+            if (file.exists()) {
+                file.readText(charset = Charsets.UTF_8)
+            } else {
+                ""
+            }
+
+        override fun done() {
+            try {
+                val text = this.get()
+                textPane.text = text
+                NotificationFactory.notification.show(NotificationType.INFO, "Text is loaded")
+            } catch (ex: Exception) {
+                logger.warn(ex) { "Error when get text" }
+                NotificationFactory.notification.show(NotificationType.WARN, "Error loaded text")
+
+            }
+        }
+    }
+
     private class CommitWorker(
-        private val commitTimeTasks: CommitTimeTasks,
+        private val commitTimeTasks: List<TableTasksPanelTask>,
         private val commitTimeService: CommitTimeService,
         private val button: JButton,
-    ) : SwingWorker<Unit, String>() {
+        private val afterCommitCallBack: (Pair<TableTasksPanelTask, CommitTimeServiceException?>) -> Unit
+    ) : SwingWorker<Unit, Pair<TableTasksPanelTask, CommitTimeServiceException?>>() {
 
         init {
             button.isEnabled = false
         }
 
-        override fun doInBackground(): Unit =
-            commitTimeService
-                .commit(commitTimeTasks.commitTimeTask)
-                .getOrHandle { ex -> throw ex }
+        override fun doInBackground() {
+            commitTimeTasks.forEach { task ->
+                publish(
+                    commitTimeService
+                        .commit(task = task.task)
+                        .fold(ifLeft = { ex -> task to ex }, ifRight = { task to null })
+                )
+            }
+        }
+
+        override fun process(chunks: MutableList<Pair<TableTasksPanelTask, CommitTimeServiceException?>>) {
+            chunks.forEach { afterCommitCallBack(it) }
+        }
 
         override fun done() {
             try {
@@ -109,27 +228,34 @@ class CommitTimePanel(
         }
     }
 
-    private fun printInfo(tasks: CommitTimeTasks) {
-        infoLabel.text = """
-                Число задач: '${tasks!!.countOfTask()}'
-                Суммарное время:
-                    - в минутах ${tasks!!.sumOfTimeTasksAsMinute()}
-                    - в часах ${tasks!!.sumOfTimeTasksAsHours()}
-                ${if (tasks.hasErrors()) "Ошибки:" else ""}
-                ${tasks.errors.joinToString { "${it.message}\n" }}
-            """.trimIndent()
-    }
-
-
     private class FavoriteTasksPanel(
         private val tasks: List<Task>,
         private val addCallback: (task: Task) -> Unit,
     ) : JPanel() {
         init {
             layout = BoxLayout(this, BoxLayout.Y_AXIS)
+            border = BorderFactory.createTitledBorder("Избранные задачи")
             tasks.forEach {
                 add(FavoriteTaskPanel(task = it, addCallback = addCallback))
             }
+        }
+    }
+
+    private class AliasForTaskIdsPanel(
+        aliasForTaskIds: AliasForTaskIds,
+    ) : JPanel() {
+        private val textPane = JTextPane()
+
+        init {
+            layout = BorderLayout()
+            border = BorderFactory.createTitledBorder("Шаблоны подстановки")
+            textPane.isEditable = false
+            add(textPane, BorderLayout.CENTER)
+            textPane.text = aliasForTaskIds.values.map { (key, values) ->
+                values.map { "$it - $key" }
+            }
+                .flatten()
+                .joinToString(separator = "\n")
         }
     }
 
@@ -152,4 +278,121 @@ class CommitTimePanel(
             }
         }
     }
+
+    private class TasksPanel(
+        private val commitTimeService: CommitTimeService,
+    ) : JPanel() {
+        private val labelInfo: JLabel = JLabel()
+        private val errorsInfo: JTextPane = JTextPane()
+        private val tableModel = object : DefaultTableModel() {
+            override fun getColumnClass(columnIndex: Int): Class<TableTasksPanelTask> =
+                TableTasksPanelTask::class.java
+        }
+        private val table = object : JTable(tableModel) {
+            override fun isCellEditable(row: Int, column: Int): Boolean = false
+
+
+        }
+        private var currentTasks: MutableList<TableTasksPanelTask> = mutableListOf()
+        private val buttonCommit: JButton = JButton("Зафиксировать")
+
+        init {
+            layout = BorderLayout()
+            table.tableHeader.reorderingAllowed = false
+            table.setDefaultRenderer(
+                TableTasksPanelTask::class.java,
+                object : DefaultTableCellRenderer() {
+                    override fun getTableCellRendererComponent(table: JTable, value: Any?, isSelected: Boolean, hasFocus: Boolean, row: Int, column: Int): Component {
+                        val label = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column) as JLabel
+                        when (value) {
+                            is TableTasksPanelTask -> {
+                                label.let { l ->
+                                    when (column) {
+                                        0 -> l.text = value.task.id
+                                        1 -> l.text =
+                                            value.task.time.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))
+                                        2 -> l.text = value.task.timeSpentMinute.toString()
+                                        3 -> l.text = value.task.comment
+                                        4 -> l.text = value.status.name
+                                    }
+                                }
+                            }
+                        }
+
+                        return label
+                    }
+                }
+            )
+
+            tableModel.addColumn("ID")
+            tableModel.addColumn("Дата")
+            tableModel.addColumn("Время в минутах")
+            tableModel.addColumn("Комментарий")
+            tableModel.addColumn("Статус")
+
+            buttonCommit.addActionListener {
+                currentTasks
+                    .takeIf { it.isNotEmpty() }
+                    ?.let { tasks ->
+                        CommitWorker(
+                            commitTimeTasks = tasks.toList(),
+                            commitTimeService = commitTimeService,
+                            button = buttonCommit,
+
+                            ) { result ->
+                            result.second?.let { ex ->
+                                logger.warn(ex) { "Error when commit time for task ${result.first}" }
+                                result.first.status = Status.ERROR
+                            } ?: run {
+                                result.first.status = Status.SUCCESS
+                            }
+                            tableModel.fireTableDataChanged()
+                        }
+                            .execute()
+                    }
+            }
+
+            add(
+                JPanel(FlowLayout(FlowLayout.LEFT))
+                    .apply {
+                        add(labelInfo)
+                    },
+                BorderLayout.NORTH
+            )
+            add(
+                JPanel(BorderLayout())
+                    .apply {
+                        add(errorsInfo, BorderLayout.NORTH)
+                        add(JScrollPane(table), BorderLayout.CENTER)
+                    },
+                BorderLayout.CENTER
+            )
+            add(buttonCommit, BorderLayout.SOUTH)
+        }
+
+        fun setCurrentCommitTimeTasks(tasks: CommitTimeTasks) {
+            labelInfo.text = "<html>Число задач: <b>${tasks.countOfTask()}</b> " +
+                "Суммарное время: в минутах <b>${tasks!!.sumOfTimeTasksAsMinute()}</b> " +
+                "в часах <b>${tasks!!.sumOfTimeTasksAsHours()}</b>"
+
+            while (tableModel.rowCount != 0) {
+                tableModel.removeRow(tableModel.rowCount - 1)
+            }
+            currentTasks.clear()
+            currentTasks = tasks.commitTimeTask.map { TableTasksPanelTask(task = it) }.toMutableList()
+
+            currentTasks.forEach {
+                tableModel.addRow(listOf(it, it, it, it, it).toTypedArray())
+            }
+
+            errorsInfo.isEditable = false
+            errorsInfo.text = tasks.errors.takeIf { it.isNotEmpty() }
+                ?.joinToString(separator = "\n") { it.message }
+                ?: ""
+        }
+    }
+
+    private data class TableTasksPanelTask(val task: CommitTimeTask, var status: Status = Status.NONE)
+
+    private enum class Status { SUCCESS, ERROR, NONE }
 }
