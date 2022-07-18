@@ -4,5 +4,5 @@ import arrow.core.Either
 import ru.ezhov.rocket.action.plugin.jira.worklog.domain.model.CommitTimeTask
 
 interface CommitTimeService {
-    fun commit(tasks: List<CommitTimeTask>): Either<CommitTimeServiceException, Unit>
+    fun commit(task: CommitTimeTask): Either<CommitTimeServiceException, Unit>
 }

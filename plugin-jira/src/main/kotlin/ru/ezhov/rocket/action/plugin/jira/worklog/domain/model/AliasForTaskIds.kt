@@ -1,7 +1,8 @@
 package ru.ezhov.rocket.action.plugin.jira.worklog.domain.model
 
+@Suppress("DataClassPrivateConstructor")
 data class AliasForTaskIds private constructor(
-    private val values: Map<String, List<String>> = emptyMap()
+    val values: Map<String, List<String>> = emptyMap()
 ) {
     companion object {
         val EMPTY = AliasForTaskIds()

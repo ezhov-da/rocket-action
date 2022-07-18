@@ -71,7 +71,8 @@ class JiraWorklogRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
                         delimiter = settings.settings()[DELIMITER_TASK_INFO] ?: DEFAULT_DELIMITER_TASK_INFO,
                         dateFormatPattern = "yyyyMMddHHmm",
                         constantsNowDate =
-                        (settings.settings()[CONSTANTS_NOW_DATE]?.takeIf { it.isNotBlank() }
+                        (settings.settings()[CONSTANTS_NOW_DATE]
+                            ?.takeIf { it.isNotBlank() }
                             ?: DEFAULT_CONSTANTS_NOW_DATE)
                             .let {
                                 it
@@ -79,6 +80,19 @@ class JiraWorklogRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
                                     .map { it -> it.trim() }
                             },
                         aliasForTaskIds = aliasForTaskIds,
+                        linkToWorkLog =
+                        settings.settings()[LINK_TO_WORK_LOG]
+                            ?.takeIf { it.isNotBlank() }
+                            ?.let { link ->
+                                try {
+                                    URI.create(link)
+                                } catch (ex: Exception) {
+                                    val msg = "Error link $link"
+                                    logger.warn(ex) { msg }
+                                    NotificationFactory.notification.show(NotificationType.WARN, msg)
+                                    null
+                                }
+                            }
                     ),
                 )
 
@@ -165,6 +179,13 @@ class JiraWorklogRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
                 required = false,
                 property = RocketActionPropertySpec.StringPropertySpec(defaultValue = DEFAULT_CONSTANTS_NOW_DATE)
             ),
+            createRocketActionProperty(
+                key = LINK_TO_WORK_LOG,
+                name = "Ссылка на страницу учёта времени",
+                description = "Ссылка на страницу учёта времени для быстрого перехода",
+                required = false,
+                property = RocketActionPropertySpec.StringPropertySpec()
+            ),
         )
     }
 
@@ -186,5 +207,6 @@ class JiraWorklogRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
         private const val DEFAULT_CONSTANTS_NOW_DATE = "now"
 
         private val ALIAS_FOR_TASK_IDS = RocketActionConfigurationPropertyKey("aliasForTaskIds")
+        private val LINK_TO_WORK_LOG = RocketActionConfigurationPropertyKey("linkToWorkLog")
     }
 }

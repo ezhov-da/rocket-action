@@ -6,6 +6,7 @@ import ru.ezhov.rocket.action.plugin.jira.worklog.domain.model.Task
 import java.awt.BorderLayout
 import java.awt.Dimension
 import java.awt.Toolkit
+import java.net.URI
 import javax.swing.JButton
 import javax.swing.JFrame
 import javax.swing.JPanel
@@ -19,6 +20,7 @@ class JiraWorkLogUI(
     dateFormatPattern: String,
     constantsNowDate: List<String>,
     aliasForTaskIds: AliasForTaskIds,
+    linkToWorkLog: URI? = null,
 ) : JPanel() {
     private val commitTimePanel = CommitTimePanel(
         tasks = tasks,
@@ -27,6 +29,7 @@ class JiraWorkLogUI(
         dateFormatPattern = dateFormatPattern,
         constantsNowDate = constantsNowDate,
         aliasForTaskIds = aliasForTaskIds,
+        linkToWorkLog = linkToWorkLog,
     )
     private val dimension = calculateSize()
 
@@ -46,6 +49,7 @@ class JiraWorkLogUI(
                                     dateFormatPattern = dateFormatPattern,
                                     constantsNowDate = constantsNowDate,
                                     aliasForTaskIds = aliasForTaskIds,
+                                    linkToWorkLog = linkToWorkLog,
                                 ),
                                 BorderLayout.CENTER
                             )

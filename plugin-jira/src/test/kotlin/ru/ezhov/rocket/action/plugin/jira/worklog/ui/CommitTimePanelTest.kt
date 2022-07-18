@@ -7,9 +7,11 @@ import ru.ezhov.rocket.action.plugin.jira.worklog.domain.CommitTimeServiceExcept
 import ru.ezhov.rocket.action.plugin.jira.worklog.domain.model.AliasForTaskIds
 import ru.ezhov.rocket.action.plugin.jira.worklog.domain.model.CommitTimeTask
 import ru.ezhov.rocket.action.plugin.jira.worklog.domain.model.Task
+import java.net.URI
 import javax.swing.JFrame
 import javax.swing.SwingUtilities
 import javax.swing.UIManager
+import kotlin.random.Random
 
 fun main() {
     SwingUtilities.invokeLater {
@@ -32,20 +34,23 @@ fun main() {
                     ),
                 ),
                 commitTimeService = object : CommitTimeService {
-                    override fun commit(tasks: List<CommitTimeTask>): Either<CommitTimeServiceException, Unit> {
-                        println("commit")
+                    override fun commit(task: CommitTimeTask): Either<CommitTimeServiceException, Unit> {
+                        val random = Random.nextLong(2000)
+                        Thread.sleep(random)
+                        println("commit task after: $random ms")
                         return Unit.right()
                     }
                 },
                 delimiter = "_",
                 dateFormatPattern = "yyyyMMddHH",
-                constantsNowDate = listOf("n"),
+                constantsNowDate = listOf("n", "т"),
                 aliasForTaskIds = AliasForTaskIds.of(
                     """
-                      123_тру,ля
-                      123_тру,ля
+                      123_тру,ля,пв,в
+                      122_тру,ля
                     """.trimIndent()
                 ),
+                linkToWorkLog = URI.create("https://google.com")
             )
         )
 

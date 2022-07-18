@@ -62,7 +62,7 @@ class CommitTimeTasks private constructor(
             constantsNowDate: List<String>,
             aliasForTaskIds: AliasForTaskIds,
         ): Either<CommitTimeTasksError, CommitTimeTask> {
-            val error by lazy { "Для строки '$this' есть ошибки: " }
+            val error by lazy { "Для строки '${this.trim()}' есть ошибки: " }
             return this
                 .split(delimiter)
                 .let { parts ->
@@ -108,17 +108,12 @@ class CommitTimeTasks private constructor(
         }
     }
 
-    fun detailInfoAboutInputAndOutput(): List<String> = commitTimeTask.map {
-        "input: ${it.originalId}$delimiter${it.originalTime}$delimiter${it.timeSpentMinute}$delimiter${it.comment} ->" +
-            " output: ${it.id}$delimiter${it.time}$delimiter${it.timeSpentMinute}$delimiter${it.comment}"
-    }
-
     fun sumOfTimeTasksAsMinute() = commitTimeTask.sumOf { it.timeSpentMinute }
 
     fun sumOfTimeTasksAsHours(): Double =
-        (sumOfTimeTasksAsMinute() / 60)
+        (sumOfTimeTasksAsMinute() / 60.toDouble())
             .toBigDecimal()
-            .setScale(1, RoundingMode.CEILING)
+            .setScale(2, RoundingMode.CEILING)
             .toDouble()
 
     fun countOfTask() = commitTimeTask.size
