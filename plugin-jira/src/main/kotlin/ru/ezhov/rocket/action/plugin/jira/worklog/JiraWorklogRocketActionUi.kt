@@ -18,6 +18,7 @@ import ru.ezhov.rocket.action.notification.NotificationType
 import ru.ezhov.rocket.action.plugin.jira.worklog.domain.model.AliasForTaskIds
 import ru.ezhov.rocket.action.plugin.jira.worklog.domain.model.Task
 import ru.ezhov.rocket.action.plugin.jira.worklog.infrastructure.JiraCommitTimeService
+import ru.ezhov.rocket.action.plugin.jira.worklog.infrastructure.JiraCommitTimeTaskInfoRepository
 import ru.ezhov.rocket.action.plugin.jira.worklog.ui.JiraWorkLogUI
 import java.awt.Component
 import java.io.File
@@ -70,6 +71,11 @@ class JiraWorklogRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
                     JiraWorkLogUI(
                         tasks = tasks,
                         commitTimeService = JiraCommitTimeService(username = username, password = password, url = url),
+                        commitTimeTaskInfoRepository = JiraCommitTimeTaskInfoRepository(
+                            username = username,
+                            password = password,
+                            url = url
+                        ),
                         delimiter = settings.settings()[DELIMITER_TASK_INFO] ?: DEFAULT_DELIMITER_TASK_INFO,
                         dateFormatPattern = "yyyyMMddHHmm",
                         constantsNowDate =

@@ -4,8 +4,11 @@ import arrow.core.Either
 import arrow.core.right
 import ru.ezhov.rocket.action.plugin.jira.worklog.domain.CommitTimeService
 import ru.ezhov.rocket.action.plugin.jira.worklog.domain.CommitTimeServiceException
+import ru.ezhov.rocket.action.plugin.jira.worklog.domain.CommitTimeTaskInfoException
+import ru.ezhov.rocket.action.plugin.jira.worklog.domain.CommitTimeTaskInfoRepository
 import ru.ezhov.rocket.action.plugin.jira.worklog.domain.model.AliasForTaskIds
 import ru.ezhov.rocket.action.plugin.jira.worklog.domain.model.CommitTimeTask
+import ru.ezhov.rocket.action.plugin.jira.worklog.domain.model.CommitTimeTaskInfo
 import ru.ezhov.rocket.action.plugin.jira.worklog.domain.model.Task
 import java.net.URI
 import java.nio.file.Files
@@ -52,7 +55,11 @@ fun main() {
                     """.trimIndent()
                 ),
                 linkToWorkLog = URI.create("https://google.com"),
-                fileForSave = Files.createTempFile("test", "test").toFile()
+                fileForSave = Files.createTempFile("test", "test").toFile(),
+                commitTimeTaskInfoRepository = object : CommitTimeTaskInfoRepository {
+                    override fun info(id: String): Either<CommitTimeTaskInfoException, CommitTimeTaskInfo?> =
+                        CommitTimeTaskInfo(name = "$id + типа имя").right()
+                }
             )
         )
 

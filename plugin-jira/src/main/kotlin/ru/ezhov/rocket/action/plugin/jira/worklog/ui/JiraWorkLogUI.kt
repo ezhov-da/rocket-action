@@ -4,6 +4,7 @@ import ru.ezhov.rocket.action.icon.AppIcon
 import ru.ezhov.rocket.action.icon.IconRepositoryFactory
 import ru.ezhov.rocket.action.icon.toImage
 import ru.ezhov.rocket.action.plugin.jira.worklog.domain.CommitTimeService
+import ru.ezhov.rocket.action.plugin.jira.worklog.domain.CommitTimeTaskInfoRepository
 import ru.ezhov.rocket.action.plugin.jira.worklog.domain.model.AliasForTaskIds
 import ru.ezhov.rocket.action.plugin.jira.worklog.domain.model.Task
 import java.awt.BorderLayout
@@ -20,6 +21,7 @@ import javax.swing.SwingUtilities
 class JiraWorkLogUI(
     private val tasks: List<Task> = emptyList(),
     private val commitTimeService: CommitTimeService,
+    private val commitTimeTaskInfoRepository: CommitTimeTaskInfoRepository,
     delimiter: String,
     dateFormatPattern: String,
     constantsNowDate: List<String>,
@@ -36,6 +38,7 @@ class JiraWorkLogUI(
         aliasForTaskIds = aliasForTaskIds,
         linkToWorkLog = linkToWorkLog,
         fileForSave = fileForSave,
+        commitTimeTaskInfoRepository = commitTimeTaskInfoRepository,
     )
     private val dimension = calculateSize()
 
@@ -53,6 +56,7 @@ class JiraWorkLogUI(
                                 JiraWorkLogUI(
                                     tasks = tasks,
                                     commitTimeService = commitTimeService,
+                                    commitTimeTaskInfoRepository = commitTimeTaskInfoRepository,
                                     delimiter = delimiter,
                                     dateFormatPattern = dateFormatPattern,
                                     constantsNowDate = constantsNowDate,

@@ -6,8 +6,11 @@ import ru.ezhov.rocket.action.notification.NotificationFactory
 import ru.ezhov.rocket.action.notification.NotificationType
 import ru.ezhov.rocket.action.plugin.jira.worklog.domain.CommitTimeService
 import ru.ezhov.rocket.action.plugin.jira.worklog.domain.CommitTimeServiceException
+import ru.ezhov.rocket.action.plugin.jira.worklog.domain.CommitTimeTaskInfoException
+import ru.ezhov.rocket.action.plugin.jira.worklog.domain.CommitTimeTaskInfoRepository
 import ru.ezhov.rocket.action.plugin.jira.worklog.domain.model.AliasForTaskIds
 import ru.ezhov.rocket.action.plugin.jira.worklog.domain.model.CommitTimeTask
+import ru.ezhov.rocket.action.plugin.jira.worklog.domain.model.CommitTimeTaskInfo
 import ru.ezhov.rocket.action.plugin.jira.worklog.domain.model.CommitTimeTasks
 import ru.ezhov.rocket.action.plugin.jira.worklog.domain.model.Task
 import java.awt.BorderLayout
@@ -45,14 +48,19 @@ class CommitTimePanel(
     private val delimiter: String,
     private val dateFormatPattern: String,
     private val constantsNowDate: List<String>,
-    private val commitTimeService: CommitTimeService,
     private val aliasForTaskIds: AliasForTaskIds,
     private val fileForSave: File,
+    commitTimeService: CommitTimeService,
+    commitTimeTaskInfoRepository: CommitTimeTaskInfoRepository,
     linkToWorkLog: URI? = null,
 ) : JPanel() {
     private val textPane: JTextPane = JTextPane()
     private var currentCommitTimeTasks: CommitTimeTasks? = null
-    private val tasksPanel: TasksPanel = TasksPanel(commitTimeService)
+    private val tasksPanel: TasksPanel = TasksPanel(
+        preparedTasks = tasks,
+        commitTimeService = commitTimeService,
+        commitTimeTaskInfoRepository = commitTimeTaskInfoRepository,
+    )
 
     init {
         ReadFile(textPane = textPane, file = fileForSave).execute()
@@ -228,6 +236,55 @@ class CommitTimePanel(
         }
     }
 
+    private class NameWorker(
+        private val commitTimeTasks: List<TableTasksPanelTask>,
+        private val commitTimeTaskInfoRepository: CommitTimeTaskInfoRepository,
+        private val button: JButton,
+        private val afterSearchName: (Triple<TableTasksPanelTask, CommitTimeTaskInfo?, CommitTimeTaskInfoException?>) -> Unit
+    ) : SwingWorker<Unit, Triple<TableTasksPanelTask, CommitTimeTaskInfo?, CommitTimeTaskInfoException?>>() {
+
+        init {
+            button.isEnabled = false
+        }
+
+        override fun doInBackground() {
+            commitTimeTasks.forEach { task ->
+                publish(
+                    commitTimeTaskInfoRepository
+                        .info(id = task.task.id)
+                        .fold(
+                            ifLeft = { ex -> Triple(task, null, ex) },
+                            ifRight = { result ->
+                                Triple(task, result, null
+                                )
+                            })
+                )
+            }
+        }
+
+        override fun process(
+            chunks: MutableList<Triple<TableTasksPanelTask, CommitTimeTaskInfo?, CommitTimeTaskInfoException?>>
+        ) {
+            chunks.forEach { afterSearchName(it) }
+        }
+
+        override fun done() {
+            try {
+                get()
+                NotificationFactory.notification.show(
+                    type = NotificationType.INFO,
+                    text = "Names search complete"
+                )
+            } catch (ex: Exception) {
+                val text = "Names search error"
+                logger.error(ex) { text }
+                NotificationFactory.notification.show(type = NotificationType.WARN, text = text)
+            } finally {
+                button.isEnabled = true
+            }
+        }
+    }
+
     private class FavoriteTasksPanel(
         private val tasks: List<Task>,
         private val addCallback: (task: Task) -> Unit,
@@ -280,7 +337,9 @@ class CommitTimePanel(
     }
 
     private class TasksPanel(
+        private val preparedTasks: List<Task>,
         private val commitTimeService: CommitTimeService,
+        commitTimeTaskInfoRepository: CommitTimeTaskInfoRepository,
     ) : JPanel() {
         private val labelInfo: JLabel = JLabel()
         private val errorsInfo: JTextPane = JTextPane()
@@ -309,11 +368,12 @@ class CommitTimePanel(
                                 label.let { l ->
                                     when (column) {
                                         0 -> l.text = value.task.id
-                                        1 -> l.text =
+                                        1 -> l.text = value.name.orEmpty()
+                                        2 -> l.text =
                                             value.task.time.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))
-                                        2 -> l.text = value.task.timeSpentMinute.toString()
-                                        3 -> l.text = value.task.comment
-                                        4 -> l.text = value.status.name
+                                        3 -> l.text = value.task.timeSpentMinute.toString()
+                                        4 -> l.text = value.task.comment
+                                        5 -> l.text = value.status.name
                                     }
                                 }
                             }
@@ -325,6 +385,7 @@ class CommitTimePanel(
             )
 
             tableModel.addColumn("ID")
+            tableModel.addColumn("Имя")
             tableModel.addColumn("Дата")
             tableModel.addColumn("Время в минутах")
             tableModel.addColumn("Комментарий")
@@ -344,7 +405,7 @@ class CommitTimePanel(
                                 logger.warn(ex) { "Error when commit time for task ${result.first}" }
                                 result.first.status = Status.ERROR
                             } ?: run {
-                                result.first.status = Status.SUCCESS
+                                result.first.status = Status.COMMITTED
                             }
                             tableModel.fireTableDataChanged()
                         }
@@ -355,6 +416,27 @@ class CommitTimePanel(
             add(
                 JPanel(FlowLayout(FlowLayout.LEFT))
                     .apply {
+                        add(JButton("Подтянуть имена задач")
+                            .also { button ->
+                                button.addActionListener {
+                                    NameWorker(
+                                        commitTimeTasks = currentTasks,
+                                        commitTimeTaskInfoRepository = commitTimeTaskInfoRepository,
+                                        button = button,
+                                        afterSearchName = { triple ->
+                                            triple.third
+                                                ?.let { ex ->
+                                                    logger.warn(ex) { "Error get name for task ${triple.first}" }
+                                                } ?: run {
+                                                triple.second?.let { info ->
+                                                    triple.first.name = info.name
+                                                    SwingUtilities.invokeLater { tableModel.fireTableDataChanged() }
+                                                }
+                                            }
+                                        }
+                                    ).execute()
+                                }
+                            })
                         add(labelInfo)
                     },
                 BorderLayout.NORTH
@@ -379,10 +461,17 @@ class CommitTimePanel(
                 tableModel.removeRow(tableModel.rowCount - 1)
             }
             currentTasks.clear()
-            currentTasks = tasks.commitTimeTask.map { TableTasksPanelTask(task = it) }.toMutableList()
+            currentTasks = tasks
+                .commitTimeTask
+                .map { task ->
+                    TableTasksPanelTask(
+                        task = task,
+                        name = preparedTasks.find { pt -> pt.id == task.id }?.name
+                    )
+                }.toMutableList()
 
             currentTasks.forEach {
-                tableModel.addRow(listOf(it, it, it, it, it).toTypedArray())
+                tableModel.addRow(listOf(it, it, it, it, it, it).toTypedArray())
             }
 
             errorsInfo.isEditable = false
@@ -392,7 +481,11 @@ class CommitTimePanel(
         }
     }
 
-    private data class TableTasksPanelTask(val task: CommitTimeTask, var status: Status = Status.NONE)
+    private data class TableTasksPanelTask(
+        val task: CommitTimeTask,
+        var status: Status = Status.PREPARED,
+        var name: String? = null,
+    )
 
-    private enum class Status { SUCCESS, ERROR, NONE }
+    private enum class Status { COMMITTED, ERROR, PREPARED }
 }
