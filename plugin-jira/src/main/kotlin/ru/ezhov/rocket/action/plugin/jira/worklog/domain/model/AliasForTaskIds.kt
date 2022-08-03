@@ -32,6 +32,8 @@ data class AliasForTaskIds private constructor(
         }
     }
 
-    fun taskIdByAlias(id: String): String? =
-        values.filterValues { it.contains(id) }.keys.firstOrNull()
+    fun taskIdByAlias(alias: String): String? =
+        values.filterValues { it.contains(alias) }.keys.firstOrNull()
+
+    fun aliasesBy(id: String): List<String> = values[id].orEmpty()
 }

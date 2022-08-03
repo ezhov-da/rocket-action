@@ -81,11 +81,28 @@ class CommitTimeTasks private constructor(
                         val originalTimeAsString = parts[1]
                         val time = try {
                             when {
+                                originalTimeAsString.isEmpty() -> LocalDateTime.now()
+                                "^[+-]\\d+$".toRegex().matches(originalTimeAsString) -> {
+                                    val symbol = originalTimeAsString.first()
+                                    val value = originalTimeAsString.substring(1).toLong()
+                                    when (symbol) {
+                                        '+' -> LocalDateTime.now().plusDays(value)
+                                        '-' -> LocalDateTime.now().minusDays(value)
+                                        else -> LocalDateTime.now()
+                                    }
+                                }
                                 constantsNowDate.contains(originalTimeAsString) -> LocalDateTime.now()
                                 else -> LocalDateTime.parse(originalTimeAsString, dateFormat)
                             }
                         } catch (ex: DateTimeParseException) {
-                            errors.add("Некорректный формат даты и времени. Корректный '$dateFormatPattern' или '$constantsNowDate'")
+                            errors.add(
+                                "Некорректный формат даты и времени. " +
+                                    "Корректный " +
+                                    "'$dateFormatPattern' или " +
+                                    "'$constantsNowDate' или " +
+                                    "'+/-дней от текущей даты' или " +
+                                    "'не указывать дату'"
+                            )
                             null
                         }
                         val timeSpentMinute = try {

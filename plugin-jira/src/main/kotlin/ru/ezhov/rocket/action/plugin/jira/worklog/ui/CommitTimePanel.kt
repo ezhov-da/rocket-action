@@ -88,7 +88,7 @@ class CommitTimePanel(
                         )
                     }
                     add(
-                        FavoriteTasksPanel(tasks) { task ->
+                        FavoriteTasksPanel(tasks = tasks, aliasForTaskIds = aliasForTaskIds) { task ->
                             textPane.document.insertString(
                                 textPane.document.length, "${task.id}", null
                             )
@@ -286,14 +286,15 @@ class CommitTimePanel(
     }
 
     private class FavoriteTasksPanel(
-        private val tasks: List<Task>,
+        tasks: List<Task>,
+        private val aliasForTaskIds: AliasForTaskIds,
         private val addCallback: (task: Task) -> Unit,
     ) : JPanel() {
         init {
             layout = BoxLayout(this, BoxLayout.Y_AXIS)
             border = BorderFactory.createTitledBorder("Избранные задачи")
             tasks.forEach {
-                add(FavoriteTaskPanel(task = it, addCallback = addCallback))
+                add(FavoriteTaskPanel(aliasForTaskIds = aliasForTaskIds, task = it, addCallback = addCallback))
             }
         }
     }
@@ -318,6 +319,7 @@ class CommitTimePanel(
 
     private class FavoriteTaskPanel(
         private val task: Task,
+        private val aliasForTaskIds: AliasForTaskIds,
         private val addCallback: (task: Task) -> Unit,
     ) : JPanel() {
         private val textField = JTextField()
@@ -326,7 +328,12 @@ class CommitTimePanel(
         init {
             layout = BorderLayout()
             textField.isEditable = false
-            textField.text = "${task.id} - ${task.name}"
+            val aliasesText = aliasForTaskIds
+                .aliasesBy(task.id)
+                .takeIf { it.isNotEmpty() }
+                ?.joinToString(prefix = " [", postfix = "] ", separator = ", ")
+                .orEmpty()
+            textField.text = "${task.id}$aliasesText- ${task.name}"
             add(textField, BorderLayout.CENTER)
             add(addButton, BorderLayout.EAST)
 
@@ -354,6 +361,8 @@ class CommitTimePanel(
         }
         private var currentTasks: MutableList<TableTasksPanelTask> = mutableListOf()
         private val buttonCommit: JButton = JButton("Зафиксировать")
+
+        private val taskNamesCache = mutableMapOf<String, String>()
 
         init {
             layout = BorderLayout()
@@ -419,22 +428,30 @@ class CommitTimePanel(
                         add(JButton("Подтянуть имена задач")
                             .also { button ->
                                 button.addActionListener {
-                                    NameWorker(
-                                        commitTimeTasks = currentTasks,
-                                        commitTimeTaskInfoRepository = commitTimeTaskInfoRepository,
-                                        button = button,
-                                        afterSearchName = { triple ->
-                                            triple.third
-                                                ?.let { ex ->
-                                                    logger.warn(ex) { "Error get name for task ${triple.first}" }
-                                                } ?: run {
-                                                triple.second?.let { info ->
-                                                    triple.first.name = info.name
-                                                    SwingUtilities.invokeLater { tableModel.fireTableDataChanged() }
+                                    currentTasks
+                                        .filter { it.name == null }
+                                        .let { tasks ->
+                                            NameWorker(
+                                                commitTimeTasks = tasks,
+                                                commitTimeTaskInfoRepository = commitTimeTaskInfoRepository,
+                                                button = button,
+                                                afterSearchName = { triple ->
+                                                    triple.third
+                                                        ?.let { ex ->
+                                                            logger.warn(ex) { "Error get name for task ${triple.first}" }
+                                                        } ?: run {
+                                                        triple.second?.let { info ->
+                                                            taskNamesCache[triple.first.task.id] = info.name
+                                                            logger.debug {
+                                                                "Put task name to cache '${triple.first.task.id}'='${info.name}'"
+                                                            }
+                                                            triple.first.name = info.name
+                                                            SwingUtilities.invokeLater { tableModel.fireTableDataChanged() }
+                                                        }
+                                                    }
                                                 }
-                                            }
+                                            ).execute()
                                         }
-                                    ).execute()
                                 }
                             })
                         add(labelInfo)
@@ -466,7 +483,8 @@ class CommitTimePanel(
                 .map { task ->
                     TableTasksPanelTask(
                         task = task,
-                        name = preparedTasks.find { pt -> pt.id == task.id }?.name
+                        name = preparedTasks
+                            .find { pt -> pt.id == task.id }?.name ?: taskNamesCache[task.id]
                     )
                 }.toMutableList()
 
