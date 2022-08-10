@@ -17,4 +17,5 @@ plugin-text/target/*fat.jar \
 plugin-todoist/target/*fat.jar \
 plugin-url-parser/target/*fat.jar \
 plugin-jira/target/*fat.jar \
+plugin-temporary-file/target/*fat.jar \
 $DIRECTORY

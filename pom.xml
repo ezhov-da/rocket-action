@@ -57,6 +57,7 @@
         <module>plugin-todoist</module>
         <module>plugin-url-parser</module>
         <module>plugin-jira</module>
+        <module>plugin-temporary-file</module>
         <module>application-ui-swing</module>
     </modules>
 

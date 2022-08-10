@@ -219,4 +219,9 @@ actions:
     predefinedTasks: |
         123___qwe
         345___rty
+
+  - type: SAVE_TEMPORARY_FILE
+    _id: de32aba8-c229-11ec-9d64-0242ac120002
+    label: "Сохранить во временный файл"
+    description: "Описание"
 ...
