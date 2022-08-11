@@ -4,6 +4,7 @@ import mu.KotlinLogging
 import ru.ezhov.rocket.action.api.RocketActionSettings
 import ru.ezhov.rocket.action.application.configuration.ui.ConfigurationFrame
 import ru.ezhov.rocket.action.application.domain.RocketActionSettingsRepository
+import ru.ezhov.rocket.action.application.handlers.server.Server
 import ru.ezhov.rocket.action.application.infrastructure.RocketActionComponentCacheFactory
 import ru.ezhov.rocket.action.application.plugin.group.GroupRocketActionUi
 import ru.ezhov.rocket.action.application.plugin.manager.domain.RocketActionPluginRepository
@@ -32,6 +33,7 @@ import javax.swing.JMenu
 import javax.swing.JMenuBar
 import javax.swing.JMenuItem
 import javax.swing.JPanel
+import javax.swing.JSeparator
 import javax.swing.JTextArea
 import javax.swing.JTextField
 import javax.swing.SwingUtilities
@@ -193,7 +195,23 @@ class UiQuickActionService(
                             Desktop.getDesktop().browse(URI.create(text))
                         }
                     }
-                })
+                }
+        )
+
+        menuInfo.add(JSeparator())
+
+        menuInfo.add(
+            JMenuItem("Доступные обработчики")
+                .apply {
+                    addActionListener {
+                        if (Desktop.isDesktopSupported()) {
+                            Desktop.getDesktop().browse(URI.create("http://localhost:${Server.port()}"))
+                        }
+                    }
+                }
+        )
+
+        menuInfo.add(JSeparator())
         menuInfo.add(createPropertyMenu())
         menuTools.add(menuInfo)
 

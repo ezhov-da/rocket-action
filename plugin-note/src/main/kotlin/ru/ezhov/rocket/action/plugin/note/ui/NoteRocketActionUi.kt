@@ -45,6 +45,7 @@ class NoteRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
                     ?.let { pathConfig ->
                         val path = pathConfig.ifEmpty { File("").absolutePath }
                         val description = settings.settings()[DESCRIPTION]?.takeIf { it.isNotEmpty() } ?: label
+                        // TODO откорректировать на JMenuItem
                         val menu = JMenu(label)
                         settings.settings()[ICON_URL].let { icon ->
                             menu.icon = IconService().load(

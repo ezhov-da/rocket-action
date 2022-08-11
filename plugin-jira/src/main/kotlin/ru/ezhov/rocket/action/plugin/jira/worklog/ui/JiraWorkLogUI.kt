@@ -91,6 +91,10 @@ class JiraWorkLogUI(
         preferredSize = dimension
     }
 
+    fun appendTextToCurrentAndSave(text: String) {
+        commitTimePanel.appendTextToCurrentAndSave(text)
+    }
+
     private fun calculateSize() = Toolkit.getDefaultToolkit().screenSize.let {
         Dimension(
             (it.width * 0.4).toInt(),

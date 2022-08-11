@@ -8,6 +8,12 @@ import ru.ezhov.rocket.action.api.RocketActionFactoryUi
 import ru.ezhov.rocket.action.api.RocketActionPlugin
 import ru.ezhov.rocket.action.api.RocketActionSettings
 import ru.ezhov.rocket.action.api.RocketActionType
+import ru.ezhov.rocket.action.api.handler.RocketActionHandleStatus
+import ru.ezhov.rocket.action.api.handler.RocketActionHandler
+import ru.ezhov.rocket.action.api.handler.RocketActionHandlerCommand
+import ru.ezhov.rocket.action.api.handler.RocketActionHandlerCommandContract
+import ru.ezhov.rocket.action.api.handler.RocketActionHandlerFactory
+import ru.ezhov.rocket.action.api.handler.RocketActionHandlerProperty
 import ru.ezhov.rocket.action.api.support.AbstractRocketAction
 import ru.ezhov.rocket.action.icon.AppIcon
 import ru.ezhov.rocket.action.icon.IconRepositoryFactory
@@ -68,7 +74,7 @@ class OpenUrlRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
                 })
             }
 
-            object : RocketAction {
+            object : RocketAction, RocketActionHandlerFactory {
                 override fun contains(search: String): Boolean =
                     label.contains(search, ignoreCase = true)
                         .or(description.contains(search, ignoreCase = true))
@@ -78,6 +84,29 @@ class OpenUrlRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
                         settings.settings() == actionSettings.settings())
 
                 override fun component(): Component = menu
+
+                override fun handler(): RocketActionHandler = object : RocketActionHandler {
+                    override fun id(): String = settings.id()
+
+                    override fun contracts(): List<RocketActionHandlerCommandContract> = listOf(
+                        object : RocketActionHandlerCommandContract {
+                            override fun commandName(): String = "openUrl"
+
+                            override fun title(): String  = label
+
+                            override fun description(): String = "Открыть URL"
+
+                            override fun inputArguments(): List<RocketActionHandlerProperty> = emptyList()
+
+                            override fun outputParams(): List<RocketActionHandlerProperty> = emptyList()
+                        }
+                    )
+
+                    override fun handle(command: RocketActionHandlerCommand): RocketActionHandleStatus {
+                        openUrl(url)
+                        return RocketActionHandleStatus.Success()
+                    }
+                }
             }
         }
 

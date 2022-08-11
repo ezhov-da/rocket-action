@@ -53,17 +53,20 @@ class CreateRocketActionSettingsDialog(
         this.setIconImage(IconRepositoryFactory.repository.by(AppIcon.ROCKET_APP).toImage())
         val ownerSize = owner.size
         setSize((ownerSize.width * 0.7).toInt(), (ownerSize.height * 0.7).toInt())
+
         add(panelComboBox(), BorderLayout.NORTH)
+
         actionSettingsPanel.setRocketActionConfiguration(
             comboBox.selectedItem as RocketActionConfiguration
         )
+
         add(JScrollPane(actionSettingsPanel), BorderLayout.CENTER)
+
         add(createTestAndSaveDialog(), BorderLayout.SOUTH)
         defaultCloseOperation = WindowConstants.HIDE_ON_CLOSE
         setLocationRelativeTo(owner)
     }
 
-    @Throws(Exception::class)
     private fun panelComboBox(): JPanel {
         val all = rocketActionPluginRepository.all().map { it.configuration() }
         val sortedAll = all.sortedBy { it.name() }
@@ -192,6 +195,7 @@ class CreateRocketActionSettingsDialog(
                         BorderLayout.CENTER
                     )
                 }
+
                 is RocketActionPropertySpec.BooleanPropertySpec -> {
                     centerPanel.add(
                         JScrollPane(
@@ -202,6 +206,7 @@ class CreateRocketActionSettingsDialog(
                                 }
                         ), BorderLayout.CENTER)
                 }
+
                 is RocketActionPropertySpec.ListPropertySpec -> {
                     val default = configProperty.defaultValue.orEmpty()
                     val selectedValues = configProperty.valuesForSelect
@@ -217,6 +222,7 @@ class CreateRocketActionSettingsDialog(
                             }
                     ), BorderLayout.CENTER)
                 }
+
                 is RocketActionPropertySpec.IntPropertySpec -> {
                     val default = configProperty.defaultValue?.toIntOrNull() ?: 0
                     centerPanel.add(

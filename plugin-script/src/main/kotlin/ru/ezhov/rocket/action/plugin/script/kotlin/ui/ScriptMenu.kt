@@ -53,6 +53,10 @@ class ScriptMenu(
         panelExecute?.setText(it)
     }
 
+    fun executeScript() {
+        panelExecute?.executeScript()
+    }
+
     private class PanelExecute(
         private val beforeExecuteCallback: () -> Unit,
         private val afterExecuteCallback: (String) -> Unit,
@@ -72,14 +76,7 @@ class ScriptMenu(
             maximumSize = panelDimension
             textPaneScript.text = script
             buttonExecute
-                .addActionListener {
-                    ScriptSwingWorker(
-                        beforeExecuteCallback = beforeExecuteCallback,
-                        afterExecuteCallback = afterExecuteCallback,
-                        script = textPaneScript.text,
-                    )
-                        .execute()
-                }
+                .addActionListener { executeScript() }
 
             val splitPanel = JSplitPane(JSplitPane.VERTICAL_SPLIT)
             splitPanel.topComponent = JScrollPane(textPaneScript)
@@ -97,5 +94,15 @@ class ScriptMenu(
         fun setText(text: String) {
             textPaneResult.text = text
         }
+
+        fun executeScript() {
+            ScriptSwingWorker(
+                beforeExecuteCallback = beforeExecuteCallback,
+                afterExecuteCallback = afterExecuteCallback,
+                script = textPaneScript.text,
+            )
+                .execute()
+        }
     }
+
 }

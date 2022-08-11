@@ -19,6 +19,10 @@ https://www.formdev.com/flatlaf/themes/
 https://www.formdev.com/flatlaf/customizing/
 https://github.com/JFormDesigner/FlatLaf/blob/main/flatlaf-swingx/README.md
 
+## Swagger-UI
+
+https://github.com/swagger-api/swagger-ui
+
 ```bash
 mvn clean package
 ```

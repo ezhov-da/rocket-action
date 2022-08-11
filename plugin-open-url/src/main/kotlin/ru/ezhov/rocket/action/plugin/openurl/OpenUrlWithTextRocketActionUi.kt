@@ -9,6 +9,14 @@ import ru.ezhov.rocket.action.api.RocketActionPlugin
 import ru.ezhov.rocket.action.api.RocketActionPropertySpec
 import ru.ezhov.rocket.action.api.RocketActionSettings
 import ru.ezhov.rocket.action.api.RocketActionType
+import ru.ezhov.rocket.action.api.handler.RocketActionHandleStatus
+import ru.ezhov.rocket.action.api.handler.RocketActionHandler
+import ru.ezhov.rocket.action.api.handler.RocketActionHandlerCommand
+import ru.ezhov.rocket.action.api.handler.RocketActionHandlerCommandContract
+import ru.ezhov.rocket.action.api.handler.RocketActionHandlerFactory
+import ru.ezhov.rocket.action.api.handler.RocketActionHandlerProperty
+import ru.ezhov.rocket.action.api.handler.RocketActionHandlerPropertyKey
+import ru.ezhov.rocket.action.api.handler.RocketActionHandlerPropertySpec
 import ru.ezhov.rocket.action.api.support.AbstractRocketAction
 import ru.ezhov.rocket.action.icon.AppIcon
 import ru.ezhov.rocket.action.icon.IconRepositoryFactory
@@ -53,33 +61,23 @@ class OpenUrlWithTextRocketActionUi : AbstractRocketAction(), RocketActionPlugin
             textField.columns = 10
             panel.add(textField)
             textField.toolTipText = description
+            val action: (text: String) -> Unit = { text ->
+                openUrl(
+                    baseUrl = baseUrl,
+                    placeholder = placeholder,
+                    text = text,
+                    settings = settings
+                )
+            }
             textField.addActionListener {
                 textField
                     .text
                     ?.takeIf { it.isNotEmpty() }
-                    ?.let { t ->
-                        if (Desktop.isDesktopSupported()) {
-                            try {
-                                Desktop.getDesktop().browse(
-                                    URI(
-                                        baseUrl.replace(
-                                            placeholder.toRegex(),
-                                            if (settings.settings()[IS_ENCODE].toBoolean())
-                                                URLEncoder.encode(t, StandardCharsets.UTF_8.toString())
-                                            else t
-                                        )
-                                    )
-                                )
-                            } catch (ex: Exception) {
-                                ex.printStackTrace()
-                                NotificationFactory.notification.show(NotificationType.ERROR, "Ошибка открытия URL")
-                            }
-                        }
-                    }
+                    ?.let { t -> action(t) }
             }
             menu.add(textField)
 
-            object : RocketAction {
+            object : RocketAction, RocketActionHandlerFactory {
                 override fun contains(search: String): Boolean =
                     label.contains(search, ignoreCase = true)
 
@@ -88,8 +86,69 @@ class OpenUrlWithTextRocketActionUi : AbstractRocketAction(), RocketActionPlugin
                         settings.settings() == actionSettings.settings())
 
                 override fun component(): Component = menu
+
+                override fun handler(): RocketActionHandler = object : RocketActionHandler {
+                    override fun id(): String = settings.id()
+
+                    override fun contracts(): List<RocketActionHandlerCommandContract> =
+                        listOf(
+                            object : RocketActionHandlerCommandContract {
+                                override fun commandName(): String = "openUrl"
+
+                                override fun title(): String = label
+
+                                override fun description(): String = "Открыть URL с подстановкой"
+
+                                override fun inputArguments(): List<RocketActionHandlerProperty> =
+                                    listOf(
+                                        object : RocketActionHandlerProperty {
+                                            override fun key(): RocketActionHandlerPropertyKey = RocketActionHandlerPropertyKey("text")
+
+                                            override fun name(): String = "Текст для подстановки"
+
+                                            override fun description(): String =
+                                                "Текст для подстановки"
+
+                                            override fun isRequired(): Boolean = true
+
+                                            override fun property(): RocketActionHandlerPropertySpec = RocketActionHandlerPropertySpec.StringPropertySpec()
+                                        }
+                                    )
+
+                                override fun outputParams(): List<RocketActionHandlerProperty> = emptyList()
+                            }
+                        )
+
+                    override fun handle(command: RocketActionHandlerCommand): RocketActionHandleStatus {
+                        command.arguments[RocketActionConfigurationPropertyKey("text")]?.let { text ->
+                            action(text)
+                        }
+
+                        return RocketActionHandleStatus.Success()
+                    }
+                }
             }
         }
+
+    private fun openUrl(baseUrl: String, placeholder: String, text: String, settings: RocketActionSettings) {
+        if (Desktop.isDesktopSupported()) {
+            try {
+                Desktop.getDesktop().browse(
+                    URI(
+                        baseUrl.replace(
+                            placeholder.toRegex(),
+                            if (settings.settings()[IS_ENCODE].toBoolean())
+                                URLEncoder.encode(text, StandardCharsets.UTF_8.toString())
+                            else text
+                        )
+                    )
+                )
+            } catch (ex: Exception) {
+                ex.printStackTrace()
+                NotificationFactory.notification.show(NotificationType.ERROR, "Ошибка открытия URL")
+            }
+        }
+    }
 
     override fun type(): RocketActionType = RocketActionType { "OPEN_URL_WITH_TEXT" }
 

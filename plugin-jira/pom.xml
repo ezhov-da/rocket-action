@@ -10,7 +10,7 @@
     </parent>
 
     <artifactId>rocket-action-plugin-jira</artifactId>
-    <version>0.19.3</version>
+    <version>0.19.4</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

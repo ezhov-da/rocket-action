@@ -1,0 +1,21 @@
+GET http://localhost:7777/api/v1/handlers
+X-Rocket-Action-Handler-Key: 1234
+###
+
+POST http://localhost:7777/api/v1/handlers/de10aba8-c229-11ec-9d64-0242ac120002/openUrl
+Content-Type: application/json
+X-Rocket-Action-Handler-Key: 1234
+
+{
+"text":"123"
+}
+###
+
+POST http://localhost:7777/api/v1/handlers/de31aba8-c229-11ec-9d64-0242ac120002/append-text-to-end-and-save
+Content-Type: application/json
+X-Rocket-Action-Handler-Key: 1234
+
+{
+    "text":"привет"
+}
+###

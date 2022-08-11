@@ -10,6 +10,11 @@ import ru.ezhov.rocket.action.api.RocketActionFactoryUi
 import ru.ezhov.rocket.action.api.RocketActionPlugin
 import ru.ezhov.rocket.action.api.RocketActionSettings
 import ru.ezhov.rocket.action.api.RocketActionType
+import ru.ezhov.rocket.action.api.handler.RocketActionHandleStatus
+import ru.ezhov.rocket.action.api.handler.RocketActionHandler
+import ru.ezhov.rocket.action.api.handler.RocketActionHandlerCommand
+import ru.ezhov.rocket.action.api.handler.RocketActionHandlerCommandContract
+import ru.ezhov.rocket.action.api.handler.RocketActionHandlerFactory
 import ru.ezhov.rocket.action.application.plugin.group.GroupRocketActionUi
 import ru.ezhov.rocket.action.application.plugin.manager.domain.RocketActionPluginRepository
 import java.awt.Component
@@ -162,13 +167,30 @@ class PluginsReflectionRocketActionPluginRepository : RocketActionPluginReposito
         override fun create(settings: RocketActionSettings): RocketAction? =
             rocketActionFactoryUi.create(settings = settings)
                 ?.let { ra ->
-                    RocketActionDecorator(originalRocketAction = ra)
+                    when (val handlerFactory = ra as? RocketActionHandlerFactory) {
+                        null -> RocketActionDecorator(originalRocketAction = ra)
+                        else -> handlerFactory.handler()
+                            ?.let { handler ->
+                                RocketActionAndHandlerDecorator(
+                                    originalRocketAction = ra,
+                                    originalRocketActionHandler = handler,
+                                )
+                            }
+                            ?: run {
+                                logger.info {
+                                    "${ra.javaClass.name} implement " +
+                                        "${RocketActionHandlerFactory::class.java.name}, " +
+                                        "but handler is null"
+                                }
+                                RocketActionDecorator(originalRocketAction = ra)
+                            }
+                    }
                 }
 
         override fun type(): RocketActionType = rocketActionFactoryUi.type()
     }
 
-    private class RocketActionDecorator(
+    private open class RocketActionDecorator(
         private val originalRocketAction: RocketAction
     ) : RocketAction {
         companion object {
@@ -197,6 +219,17 @@ class PluginsReflectionRocketActionPluginRepository : RocketActionPluginReposito
         }
     }
 
+    private class RocketActionAndHandlerDecorator(
+        private val originalRocketActionHandler: RocketActionHandler,
+        originalRocketAction: RocketAction,
+    ) : RocketActionDecorator(originalRocketAction), RocketActionHandler {
+        override fun id(): String = originalRocketActionHandler.id()
+
+        override fun contracts(): List<RocketActionHandlerCommandContract> = originalRocketActionHandler.contracts()
+
+        override fun handle(command: RocketActionHandlerCommand): RocketActionHandleStatus =
+            originalRocketActionHandler.handle(command = command)
+    }
 }
 
 

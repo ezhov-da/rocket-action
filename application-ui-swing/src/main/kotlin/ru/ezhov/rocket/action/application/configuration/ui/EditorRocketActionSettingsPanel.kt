@@ -8,6 +8,7 @@ import ru.ezhov.rocket.action.api.RocketActionConfiguration
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
 import ru.ezhov.rocket.action.api.RocketActionConfigurationPropertyKey
 import ru.ezhov.rocket.action.api.RocketActionPropertySpec
+import ru.ezhov.rocket.action.api.RocketActionType
 import ru.ezhov.rocket.action.application.configuration.ui.event.ConfigurationUiListener
 import ru.ezhov.rocket.action.application.configuration.ui.event.ConfigurationUiObserverFactory
 import ru.ezhov.rocket.action.application.configuration.ui.event.model.ConfigurationUiEvent
@@ -30,6 +31,7 @@ import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.JScrollPane
 import javax.swing.JSpinner
+import javax.swing.JTextField
 import javax.swing.SpinnerNumberModel
 import javax.swing.SwingConstants
 
@@ -38,22 +40,14 @@ private val logger = KotlinLogging.logger {}
 class EditorRocketActionSettingsPanel(
     private val rocketActionPluginRepository: RocketActionPluginRepository
 ) : JPanel(BorderLayout()) {
+    private val infoPanel: InfoPanel = InfoPanel()
     private val rocketActionSettingsPanel = RocketActionSettingsPanel()
     private var currentSettings: TreeRocketActionSettings? = null
     private var callback: SavedRocketActionSettingsPanelCallback? = null
-    private val labelType = JLabel()
-    private val labelDescription = JLabel()
     private val testPanel: TestPanel =
         TestPanel(rocketActionPluginRepository = rocketActionPluginRepository) {
             rocketActionSettingsPanel.create()?.settings
         }
-
-    private fun top(): JPanel {
-        val panel = JPanel(BorderLayout())
-        panel.add(labelType, BorderLayout.NORTH)
-        panel.add(labelDescription, BorderLayout.CENTER)
-        return panel
-    }
 
     private fun testAndCreate(): JPanel {
         val panel = JPanel()
@@ -81,12 +75,16 @@ class EditorRocketActionSettingsPanel(
         }
         testPanel.clearTest()
         currentSettings = settings
-        labelType.text = settings.settings.type().value()
         this.callback = callback
         val configuration: RocketActionConfiguration? = rocketActionPluginRepository.by(settings.settings.type())?.configuration()
-        configuration?.let {
-            labelDescription.text = configuration.description()
+        val configurationDescription = configuration?.let {
+            configuration.description()
         }
+        infoPanel.refresh(
+            type = settings.settings.type(),
+            rocketActionId = settings.settings.id(),
+            description = configurationDescription
+        )
         val settingsFinal = settings.settings.settings()
         val values = settingsFinal
             .map { (k: RocketActionConfigurationPropertyKey, v: String) ->
@@ -130,6 +128,40 @@ class EditorRocketActionSettingsPanel(
         val value: String,
         val property: RocketActionConfigurationProperty?
     )
+
+    private class InfoPanel : JPanel() {
+        private val textFieldInfo = JTextField().apply { isEditable = false }
+        private val labelDescription = JLabel()
+
+        init {
+            layout = BorderLayout()
+            add(textFieldInfo, BorderLayout.NORTH)
+            add(labelDescription, BorderLayout.CENTER)
+        }
+
+        fun refresh(type: RocketActionType, rocketActionId: String, description: String?) {
+            textFieldInfo.text = "type: ${type.value()} id: $rocketActionId"
+            description?.let {
+                labelDescription.text = description
+            }
+            removeAll()
+            HandlerPanel.of(rocketActionId)
+                ?.let { hp ->
+                    add(
+                        JPanel(BorderLayout()).apply {
+                            add(textFieldInfo, BorderLayout.CENTER)
+                            add(hp, BorderLayout.EAST)
+                        },
+                        BorderLayout.NORTH
+                    )
+                    add(labelDescription, BorderLayout.CENTER)
+                }
+                ?: run {
+                    add(textFieldInfo, BorderLayout.NORTH)
+                    add(labelDescription, BorderLayout.CENTER)
+                }
+        }
+    }
 
     private inner class RocketActionSettingsPanel : JPanel() {
         private val settingPanels = mutableListOf<SettingPanel>()
@@ -207,6 +239,7 @@ class EditorRocketActionSettingsPanel(
                                 BorderLayout.CENTER
                             )
                         }
+
                         is RocketActionPropertySpec.BooleanPropertySpec -> {
                             centerPanel.add(JScrollPane(
                                 JCheckBox()
@@ -216,6 +249,7 @@ class EditorRocketActionSettingsPanel(
                                     }
                             ), BorderLayout.CENTER)
                         }
+
                         is RocketActionPropertySpec.ListPropertySpec -> {
                             val default = configProperty.defaultValue.orEmpty()
                             val selectedValues = configProperty.valuesForSelect
@@ -231,6 +265,7 @@ class EditorRocketActionSettingsPanel(
                                     }
                             ), BorderLayout.CENTER)
                         }
+
                         is RocketActionPropertySpec.IntPropertySpec -> {
                             val default = configProperty.defaultValue?.toIntOrNull() ?: 0
                             centerPanel.add(
@@ -263,7 +298,7 @@ class EditorRocketActionSettingsPanel(
     private var basicPanel: JPanel = JPanel(BorderLayout())
 
     init {
-        basicPanel.add(top(), BorderLayout.NORTH)
+        basicPanel.add(infoPanel, BorderLayout.NORTH)
         basicPanel.add(JScrollPane(rocketActionSettingsPanel), BorderLayout.CENTER)
 
         val southPanel = JPanel().apply {

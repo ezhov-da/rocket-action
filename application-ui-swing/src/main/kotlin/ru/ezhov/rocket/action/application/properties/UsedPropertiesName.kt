@@ -38,7 +38,7 @@ enum class UsedPropertiesName(val propertyName: String, val description: String)
             FlatLaf IntelliJ - class com.formdev.flatlaf.FlatIntelliJLaf
             FlatLaf Darcula  - com.formdev.flatlaf.FlatDarculaLaf
             Link: https://www.formdev.com/flatlaf/themes/
-            
+
             Пример: com.formdev.flatlaf.FlatLightLaf
         """.trimIndent()
     ),
@@ -46,8 +46,16 @@ enum class UsedPropertiesName(val propertyName: String, val description: String)
     UI_CONFIGURATION_FRAME_ALWAYS_ON_TOP(
         "$PREFIX.ui.configuration.frame.always_on_top",
         """
-            Отображать окно редактора конфигурации всегда поверх окон
+            Отображать окно редактора конфигурации всегда поверх окон.
             Пример: false
+        """.trimIndent()
+    ),
+
+    HANDLER_SERVER_PORT(
+        "$PREFIX.handler.server.port",
+        """
+            Порт для сервера обработчика.
+            Пример: 4567
         """.trimIndent()
     ),
 }

@@ -1,6 +1,7 @@
 package ru.ezhov.rocket.action.application.infrastructure
 
 import ru.ezhov.rocket.action.api.RocketAction
+import ru.ezhov.rocket.action.api.handler.RocketActionHandler
 import ru.ezhov.rocket.action.application.domain.RocketActionComponentCache
 import java.util.concurrent.ConcurrentHashMap
 
@@ -14,6 +15,14 @@ class InMemoryRocketActionComponentCache : RocketActionComponentCache {
     override fun by(id: String): RocketAction? = map[id]
 
     override fun all(): List<RocketAction> = map.values.toList()
+
+    override fun handlers(): List<RocketActionHandler> =
+        map
+            .values
+            .mapNotNull { it as? RocketActionHandler }
+            .toList()
+
+    override fun handlerBy(id: String): RocketActionHandler? = map[id] as? RocketActionHandler
 
     override fun clear() {
         map.clear()

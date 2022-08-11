@@ -10,6 +10,14 @@ import ru.ezhov.rocket.action.api.RocketActionPlugin
 import ru.ezhov.rocket.action.api.RocketActionPropertySpec
 import ru.ezhov.rocket.action.api.RocketActionSettings
 import ru.ezhov.rocket.action.api.RocketActionType
+import ru.ezhov.rocket.action.api.handler.RocketActionHandleStatus
+import ru.ezhov.rocket.action.api.handler.RocketActionHandler
+import ru.ezhov.rocket.action.api.handler.RocketActionHandlerCommand
+import ru.ezhov.rocket.action.api.handler.RocketActionHandlerCommandContract
+import ru.ezhov.rocket.action.api.handler.RocketActionHandlerFactory
+import ru.ezhov.rocket.action.api.handler.RocketActionHandlerProperty
+import ru.ezhov.rocket.action.api.handler.RocketActionHandlerPropertyKey
+import ru.ezhov.rocket.action.api.handler.RocketActionHandlerPropertySpec
 import ru.ezhov.rocket.action.api.support.AbstractRocketAction
 import ru.ezhov.rocket.action.icon.AppIcon
 import ru.ezhov.rocket.action.icon.IconRepositoryFactory
@@ -67,7 +75,7 @@ class JiraWorklogRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
                 val menu = JMenu(label)
                 menu.icon = icon
                 menu.toolTipText = description
-                menu.add(
+                val jiraWorkLogUI =
                     JiraWorkLogUI(
                         tasks = tasks,
                         commitTimeService = JiraCommitTimeService(username = username, password = password, url = url),
@@ -102,10 +110,10 @@ class JiraWorklogRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
                                 }
                             },
                         fileForSave = File(settings.settings()[FILE_PATH_WORK_LOG] ?: defaultFile())
-                    ),
-                )
+                    )
+                menu.add(jiraWorkLogUI)
 
-                object : RocketAction {
+                object : RocketAction, RocketActionHandlerFactory {
                     override fun contains(search: String): Boolean =
                         label.contains(search, ignoreCase = true)
                             .or(description.contains(search, ignoreCase = true))
@@ -115,6 +123,49 @@ class JiraWorklogRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
                             settings.settings() == actionSettings.settings())
 
                     override fun component(): Component = menu
+                    override fun handler(): RocketActionHandler = object : RocketActionHandler {
+                        override fun id(): String = settings.id()
+
+                        override fun contracts(): List<RocketActionHandlerCommandContract> =
+                            listOf(
+                                object : RocketActionHandlerCommandContract {
+                                    override fun commandName(): String = "append-text-to-end-and-save"
+
+                                    override fun title(): String = label
+
+                                    override fun description(): String = """Отчёт по отработанным часам.
+                                        |Добавление текста в конец и сохранение файла""".trimMargin()
+
+                                    override fun inputArguments(): List<RocketActionHandlerProperty> =
+                                        listOf(object : RocketActionHandlerProperty {
+                                            override fun key(): RocketActionHandlerPropertyKey =
+                                                RocketActionHandlerPropertyKey("text")
+
+                                            override fun name(): String = "Текст"
+
+                                            override fun description(): String = "Текст для добавления"
+
+                                            override fun isRequired(): Boolean = true
+
+                                            override fun property(): RocketActionHandlerPropertySpec =
+                                                RocketActionHandlerPropertySpec.StringPropertySpec()
+
+                                        })
+
+                                    override fun outputParams(): List<RocketActionHandlerProperty> = emptyList()
+
+                                }
+                            )
+
+                        override fun handle(command: RocketActionHandlerCommand): RocketActionHandleStatus {
+                            if (command.commandName == "append-text-to-end-and-save") {
+                                command.arguments[RocketActionConfigurationPropertyKey("text")]?.let { text ->
+                                    jiraWorkLogUI.appendTextToCurrentAndSave(text)
+                                }
+                            }
+                            return RocketActionHandleStatus.Success()
+                        }
+                    }
                 }
             }
 

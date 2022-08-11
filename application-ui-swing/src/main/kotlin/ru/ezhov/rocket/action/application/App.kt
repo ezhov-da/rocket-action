@@ -3,6 +3,7 @@ package ru.ezhov.rocket.action.application
 import com.formdev.flatlaf.FlatLightLaf
 import mu.KotlinLogging
 import ru.ezhov.rocket.action.application.domain.RocketActionSettingsRepository
+import ru.ezhov.rocket.action.application.handlers.server.Server
 import ru.ezhov.rocket.action.application.infrastructure.YmlRocketActionSettingsRepository
 import ru.ezhov.rocket.action.application.plugin.manager.infrastructure.RocketActionPluginRepositoryFactory
 import ru.ezhov.rocket.action.application.properties.GeneralPropertiesRepositoryFactory
@@ -27,6 +28,9 @@ fun main(args: Array<String>) {
                 rocketActionPluginRepository = RocketActionPluginRepositoryFactory.repository,
                 generalPropertiesRepository = GeneralPropertiesRepositoryFactory.repository
             )
+
+            runServer() // TODO оформить красиво
+
             BaseDialog.dialog.apply {
                 jMenuBar = actionService.createMenu(this)
                 isUndecorated = true
@@ -97,4 +101,8 @@ fun setUIFont(f: FontUIResource?) {
         val value = UIManager.get(key)
         if (value is FontUIResource) UIManager.put(key, f)
     }
+}
+
+private fun runServer(){
+    Server().run()
 }

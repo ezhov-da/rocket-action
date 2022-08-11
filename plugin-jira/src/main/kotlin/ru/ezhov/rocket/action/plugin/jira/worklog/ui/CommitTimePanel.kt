@@ -146,6 +146,13 @@ class CommitTimePanel(
         ReadFile(textPane = textPane, file = fileForSave).execute()
     }
 
+    fun appendTextToCurrentAndSave(text: String) {
+        SwingUtilities.invokeLater {
+            textPane.document.insertString(textPane.text.length, "\n$text", null)
+            WriteFile(text = textPane.text, file = fileForSave).execute()
+        }
+    }
+
     class WriteFile(
         private val text: String,
         private val file: File

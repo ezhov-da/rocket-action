@@ -9,6 +9,14 @@ import ru.ezhov.rocket.action.api.RocketActionPlugin
 import ru.ezhov.rocket.action.api.RocketActionPropertySpec
 import ru.ezhov.rocket.action.api.RocketActionSettings
 import ru.ezhov.rocket.action.api.RocketActionType
+import ru.ezhov.rocket.action.api.handler.RocketActionHandleStatus
+import ru.ezhov.rocket.action.api.handler.RocketActionHandler
+import ru.ezhov.rocket.action.api.handler.RocketActionHandlerCommand
+import ru.ezhov.rocket.action.api.handler.RocketActionHandlerCommandContract
+import ru.ezhov.rocket.action.api.handler.RocketActionHandlerFactory
+import ru.ezhov.rocket.action.api.handler.RocketActionHandlerProperty
+import ru.ezhov.rocket.action.api.handler.RocketActionHandlerPropertyKey
+import ru.ezhov.rocket.action.api.handler.RocketActionHandlerPropertySpec
 import ru.ezhov.rocket.action.api.support.AbstractRocketAction
 import ru.ezhov.rocket.action.icon.AppIcon
 import ru.ezhov.rocket.action.icon.IconRepositoryFactory
@@ -25,7 +33,8 @@ import javax.swing.Icon
 import javax.swing.JMenu
 import javax.swing.SwingUtilities
 
-class OpenUrlWithTextHistoryRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
+class OpenUrlWithTextHistoryRocketActionUi :
+    AbstractRocketAction(), RocketActionPlugin {
     private var label: String? = null
     private val icon = IconRepositoryFactory.repository.by(AppIcon.LINK_INTACT)
 
@@ -50,52 +59,36 @@ class OpenUrlWithTextHistoryRocketActionUi : AbstractRocketAction(), RocketActio
             textField.toolTipText = description
 
             val addedToHistory = mutableListOf<String>()
+            val action: (text: String) -> Unit =
+                { text ->
+                    doAction(
+                        baseUrl = baseUrl,
+                        placeholder = placeholder,
+                        text = text,
+                        settings = settings,
+                        menu = menu,
+                        addedToHistory = addedToHistory,
+                    )
+                }
 
             textField.addActionListener {
                 textField
                     .text
                     ?.takeIf { it.isNotEmpty() }
                     ?.let { t ->
-                        if (Desktop.isDesktopSupported()) {
-                            try {
-                                val finalT = if (settings.settings()[IS_ENCODE].toBoolean())
-                                    URLEncoder.encode(t, StandardCharsets.UTF_8.toString())
-                                else t
-
-                                val uri = URI(baseUrl.replace(placeholder.toRegex(), finalT))
-                                Desktop.getDesktop().browse(uri)
-                                if (!addedToHistory.contains(t)) {
-                                    SwingUtilities.invokeLater {
-                                        OpenUrlRocketActionUi()
-                                            .create(object : RocketActionSettings {
-                                                override fun id(): String = t
-
-                                                override fun type(): RocketActionType = RocketActionType { "" }
-
-                                                override fun settings(): MutableMap<RocketActionConfigurationPropertyKey, String> = mutableMapOf(
-                                                    RocketActionConfigurationPropertyKey("label") to t,
-                                                    RocketActionConfigurationPropertyKey("description") to "Open link",
-                                                    RocketActionConfigurationPropertyKey("url") to uri.toString(),
-                                                )
-
-                                                override fun actions(): List<RocketActionSettings> = emptyList()
-                                            })
-                                            ?.component()
-                                            ?.let { c -> addedToHistory.add(t); menu.add(c) }
-                                        menu.revalidate()
-                                        menu.repaint()
-                                    }
-                                }
-                            } catch (ex: Exception) {
-                                ex.printStackTrace()
-                                NotificationFactory.notification.show(NotificationType.ERROR, "Ошибка открытия URL")
-                            }
-                        }
+                        doAction(
+                            baseUrl = baseUrl,
+                            placeholder = placeholder,
+                            text = t,
+                            settings = settings,
+                            menu = menu,
+                            addedToHistory = addedToHistory,
+                        )
                     }
             }
             menu.add(textField)
 
-            object : RocketAction {
+            object : RocketAction, RocketActionHandlerFactory {
                 override fun contains(search: String): Boolean =
                     label.contains(search, ignoreCase = true)
                         .or(baseUrl.contains(search, ignoreCase = true))
@@ -106,8 +99,96 @@ class OpenUrlWithTextHistoryRocketActionUi : AbstractRocketAction(), RocketActio
                         settings.settings() == actionSettings.settings())
 
                 override fun component(): Component = menu
+
+                override fun handler(): RocketActionHandler = object : RocketActionHandler {
+                    override fun id(): String = settings.id()
+
+                    override fun contracts(): List<RocketActionHandlerCommandContract> = listOf(
+                        object : RocketActionHandlerCommandContract {
+                            override fun commandName(): String = "openUrl"
+
+                            override fun title(): String = label
+
+                            override fun description(): String = "Открыть URL с подставленным текстом"
+
+                            override fun inputArguments(): List<RocketActionHandlerProperty> = listOf(
+                                object : RocketActionHandlerProperty {
+                                    override fun key(): RocketActionHandlerPropertyKey = RocketActionHandlerPropertyKey("text")
+
+                                    override fun name(): String = "Текст для подстановки в URL"
+
+                                    override fun description(): String = "Текст для подстановки в URL"
+
+                                    override fun isRequired(): Boolean = true
+
+                                    override fun property(): RocketActionHandlerPropertySpec = RocketActionHandlerPropertySpec.StringPropertySpec()
+                                }
+                            )
+
+                            override fun outputParams(): List<RocketActionHandlerProperty> = emptyList()
+                        }
+                    )
+
+                    override fun handle(command: RocketActionHandlerCommand): RocketActionHandleStatus {
+                        command.arguments[RocketActionConfigurationPropertyKey("text")]?.let { text ->
+                            action(text)
+                        }
+                        return RocketActionHandleStatus.Success()
+                    }
+                }
             }
         }
+
+    private fun doAction(baseUrl: String, placeholder: String, text: String, settings: RocketActionSettings, menu: JMenu, addedToHistory: MutableList<String>) {
+        if (Desktop.isDesktopSupported()) {
+            try {
+                val uri = open(baseUrl = baseUrl, placeholder = placeholder, text = text, settings = settings)
+                saveToHistory(text = text, menu = menu, uri = uri, addedToHistory = addedToHistory)
+            } catch (ex: Exception) {
+                ex.printStackTrace()
+                NotificationFactory.notification.show(NotificationType.ERROR, "Ошибка открытия URL")
+            }
+        }
+    }
+
+    private fun open(baseUrl: String, placeholder: String, text: String, settings: RocketActionSettings): URI {
+        val finalT = if (settings.settings()[IS_ENCODE].toBoolean()) {
+            URLEncoder.encode(text, StandardCharsets.UTF_8.toString())
+        } else {
+            text
+        }
+
+        val uri = URI(baseUrl.replace(placeholder.toRegex(), finalT))
+        Desktop.getDesktop().browse(uri)
+
+        return uri
+    }
+
+    private fun saveToHistory(text: String, menu: JMenu, uri: URI, addedToHistory: MutableList<String>) {
+        if (!addedToHistory.contains(text)) {
+            SwingUtilities.invokeLater {
+                OpenUrlRocketActionUi()
+                    .create(object : RocketActionSettings {
+                        override fun id(): String = text
+
+                        override fun type(): RocketActionType = RocketActionType { "" }
+
+                        override fun settings(): MutableMap<RocketActionConfigurationPropertyKey, String> =
+                            mutableMapOf(
+                                RocketActionConfigurationPropertyKey("label") to text,
+                                RocketActionConfigurationPropertyKey("description") to "Open link",
+                                RocketActionConfigurationPropertyKey("url") to uri.toString(),
+                            )
+
+                        override fun actions(): List<RocketActionSettings> = emptyList()
+                    })
+                    ?.component()
+                    ?.let { c -> addedToHistory.add(text); menu.add(c) }
+                menu.revalidate()
+                menu.repaint()
+            }
+        }
+    }
 
     override fun type(): RocketActionType = RocketActionType { "OPEN_URL_WITH_TEXT_HISTORY" }
 
