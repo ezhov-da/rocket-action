@@ -4,6 +4,10 @@ import ru.ezhov.rocket.action.api.RocketActionConfigurationPropertyKey
 import ru.ezhov.rocket.action.api.RocketActionPlugin
 import ru.ezhov.rocket.action.api.RocketActionSettings
 import ru.ezhov.rocket.action.api.RocketActionType
+import ru.ezhov.rocket.action.api.context.RocketActionContext
+import ru.ezhov.rocket.action.api.context.cache.CacheService
+import ru.ezhov.rocket.action.api.context.icon.IconService
+import ru.ezhov.rocket.action.api.context.notification.NotificationService
 import java.awt.BorderLayout
 import javax.swing.JFrame
 import javax.swing.JMenuBar
@@ -18,7 +22,20 @@ fun main() {
         }
 
         val ui: RocketActionPlugin = KotlinScriptRocketActionUi()
-        val factory = ui.factory()
+        val factory = ui.factory(object : RocketActionContext {
+            override fun icon(): IconService {
+                TODO("Not yet implemented")
+            }
+
+            override fun notification(): NotificationService {
+                TODO("Not yet implemented")
+            }
+
+            override fun cache(): CacheService {
+                TODO("Not yet implemented")
+            }
+
+        })
         val rocketAction = factory.create(
             object : RocketActionSettings {
                 override fun id(): String = "123"
@@ -34,6 +51,20 @@ fun main() {
                     )
 
                 override fun actions(): List<RocketActionSettings> = emptyList()
+            },
+            context = object : RocketActionContext {
+                override fun icon(): IconService {
+                    TODO("Not yet implemented")
+                }
+
+                override fun notification(): NotificationService {
+                    TODO("Not yet implemented")
+                }
+
+                override fun cache(): CacheService {
+                    TODO("Not yet implemented")
+                }
+
             }
         )
         val component = rocketAction!!.component()

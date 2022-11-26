@@ -10,11 +10,13 @@ import ru.ezhov.rocket.action.api.RocketActionFactoryUi
 import ru.ezhov.rocket.action.api.RocketActionPlugin
 import ru.ezhov.rocket.action.api.RocketActionSettings
 import ru.ezhov.rocket.action.api.RocketActionType
+import ru.ezhov.rocket.action.api.context.RocketActionContext
 import ru.ezhov.rocket.action.api.handler.RocketActionHandleStatus
 import ru.ezhov.rocket.action.api.handler.RocketActionHandler
 import ru.ezhov.rocket.action.api.handler.RocketActionHandlerCommand
 import ru.ezhov.rocket.action.api.handler.RocketActionHandlerCommandContract
 import ru.ezhov.rocket.action.api.handler.RocketActionHandlerFactory
+import ru.ezhov.rocket.action.application.plugin.context.RocketActionContextFactory
 import ru.ezhov.rocket.action.application.plugin.group.GroupRocketActionUi
 import ru.ezhov.rocket.action.application.plugin.manager.domain.RocketActionPluginRepository
 import java.awt.Component
@@ -53,7 +55,7 @@ class PluginsReflectionRocketActionPluginRepository : RocketActionPluginReposito
                 .toMutableList()
 
             val extended = extendedPluginClassess()
-                .mapNotNull { clazzName ->
+                .map { clazzName ->
                     async {
                         loadPlugin(clazzName)
                     }
@@ -143,29 +145,29 @@ class PluginsReflectionRocketActionPluginRepository : RocketActionPluginReposito
 
     override fun all(): List<RocketActionPlugin> {
         if (list.isEmpty()) {
-            load();
+            load()
         }
         return list
     }
 
     override fun by(type: RocketActionType): RocketActionPlugin? =
-        all().firstOrNull { r: RocketActionPlugin -> r.configuration().type().value() == type.value() }
+        all().firstOrNull { r: RocketActionPlugin -> r.configuration(context = RocketActionContextFactory.context).type().value() == type.value() }
 
     private class RocketActionPluginDecorator(
         private val rocketActionPluginOriginal: RocketActionPlugin,
     ) : RocketActionPlugin {
-        override fun factory(): RocketActionFactoryUi = RocketActionFactoryUiDecorator(
-            rocketActionFactoryUi = rocketActionPluginOriginal.factory()
+        override fun factory(context: RocketActionContext): RocketActionFactoryUi = RocketActionFactoryUiDecorator(
+            rocketActionFactoryUi = rocketActionPluginOriginal.factory(context = context)
         )
 
-        override fun configuration(): RocketActionConfiguration = rocketActionPluginOriginal.configuration()
+        override fun configuration(context: RocketActionContext): RocketActionConfiguration = rocketActionPluginOriginal.configuration(context)
     }
 
     private class RocketActionFactoryUiDecorator(
         private val rocketActionFactoryUi: RocketActionFactoryUi
     ) : RocketActionFactoryUi {
-        override fun create(settings: RocketActionSettings): RocketAction? =
-            rocketActionFactoryUi.create(settings = settings)
+        override fun create(settings: RocketActionSettings, context: RocketActionContext): RocketAction? =
+            rocketActionFactoryUi.create(settings = settings, context = context)
                 ?.let { ra ->
                     when (val handlerFactory = ra as? RocketActionHandlerFactory) {
                         null -> RocketActionDecorator(originalRocketAction = ra)

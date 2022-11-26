@@ -10,7 +10,7 @@
     </parent>
 
     <artifactId>rocket-action-plugin-jira</artifactId>
-    <version>0.19.4</version>
+    <version>0.20.0</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -29,18 +29,6 @@
         <dependency>
             <groupId>ru.ezhov</groupId>
             <artifactId>rocket-action-plugin-api</artifactId>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>ru.ezhov</groupId>
-            <artifactId>rocket-action-icon</artifactId>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>ru.ezhov</groupId>
-            <artifactId>rocket-action-notification</artifactId>
             <scope>provided</scope>
         </dependency>
 
@@ -68,6 +56,11 @@
             <version>5.2.4</version>
         </dependency>
 
+        <dependency>
+            <groupId>ru.ezhov</groupId>
+            <artifactId>rocket-action-ui-utils</artifactId>
+            <scope>provided</scope>
+        </dependency>
 
         <dependency>
             <groupId>io.atlassian.fugue</groupId>

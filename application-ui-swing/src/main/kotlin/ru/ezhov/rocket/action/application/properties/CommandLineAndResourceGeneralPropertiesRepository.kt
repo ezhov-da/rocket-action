@@ -1,8 +1,8 @@
 package ru.ezhov.rocket.action.application.properties
 
 import mu.KotlinLogging
-import ru.ezhov.rocket.action.notification.NotificationFactory
-import ru.ezhov.rocket.action.notification.NotificationType
+import ru.ezhov.rocket.action.api.context.notification.NotificationType
+import ru.ezhov.rocket.action.application.plugin.context.RocketActionContextFactory
 import java.util.Properties
 
 private val logger = KotlinLogging.logger { }
@@ -18,7 +18,8 @@ class CommandLineAndResourceGeneralPropertiesRepository : GeneralPropertiesRepos
             "Error read general properties"
                 .let { text ->
                     logger.error(e) { text }
-                    NotificationFactory.notification.show(type = NotificationType.ERROR, text = text)
+                    RocketActionContextFactory.context.notification()
+                        .show(type = NotificationType.ERROR, text = text)
                 }
         }
     }

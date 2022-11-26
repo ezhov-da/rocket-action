@@ -8,11 +8,10 @@ import ru.ezhov.rocket.action.api.RocketActionFactoryUi
 import ru.ezhov.rocket.action.api.RocketActionPlugin
 import ru.ezhov.rocket.action.api.RocketActionSettings
 import ru.ezhov.rocket.action.api.RocketActionType
+import ru.ezhov.rocket.action.api.context.RocketActionContext
+import ru.ezhov.rocket.action.api.context.icon.AppIcon
+import ru.ezhov.rocket.action.api.context.notification.NotificationType
 import ru.ezhov.rocket.action.api.support.AbstractRocketAction
-import ru.ezhov.rocket.action.icon.AppIcon
-import ru.ezhov.rocket.action.icon.IconRepositoryFactory
-import ru.ezhov.rocket.action.notification.NotificationFactory
-import ru.ezhov.rocket.action.notification.NotificationType
 import ru.ezhov.rocket.action.plugin.todoist.model.Project
 import ru.ezhov.rocket.action.plugin.todoist.model.Task
 import java.awt.BorderLayout
@@ -37,11 +36,17 @@ import javax.swing.JTextPane
 import javax.swing.SwingWorker
 
 class TodoistRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
-    private val icon = IconRepositoryFactory.repository.by(AppIcon.BOOKMARK)
+    private var actionContext: RocketActionContext? = null
 
-    override fun factory(): RocketActionFactoryUi = this
+        override fun factory(context: RocketActionContext): RocketActionFactoryUi = this
+        .apply {
+            actionContext = context
+        }
 
-    override fun configuration(): RocketActionConfiguration = this
+        override fun configuration(context: RocketActionContext): RocketActionConfiguration = this
+        .apply {
+            actionContext = context
+        }
 
     override fun description(): String {
         return "Simple todoist client"
@@ -63,9 +68,9 @@ class TodoistRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
 
     override fun name(): String = "Работа с Todois"
 
-    override fun icon(): Icon? = icon
+    override fun icon(): Icon? = actionContext!!.icon().by(AppIcon.BOOKMARK)
 
-    override fun create(settings: RocketActionSettings): RocketAction? =
+    override fun create(settings: RocketActionSettings, context: RocketActionContext): RocketAction? =
         getToken(settings)?.takeIf { it.isNotEmpty() }?.let { token ->
             settings.settings()[LABEL]?.takeIf { it.isNotEmpty() }?.let { label ->
                 val menu = JMenu(label)
@@ -100,11 +105,11 @@ class TodoistRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
         }
 
         override fun done() {
-            menu.icon = icon
+            menu.icon = actionContext!!.icon().by(AppIcon.BOOKMARK)
             try {
                 menu.removeAll()
                 menu.add(this.get())
-                NotificationFactory.notification.show(NotificationType.INFO, "Todoist загружен")
+                actionContext!!.notification().show(NotificationType.INFO, "Todoist загружен")
             } catch (e: InterruptedException) {
                 e.printStackTrace()
             } catch (e: ExecutionException) {
@@ -114,7 +119,7 @@ class TodoistRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
 
         init {
             menu.removeAll()
-            menu.icon = ImageIcon(this.javaClass.getResource("/load_16x16.gif"))
+            menu.icon = ImageIcon(this.javaClass.getResource("/icons/load_16x16.gif"))
         }
     }
 

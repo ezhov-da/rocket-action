@@ -8,6 +8,9 @@ import ru.ezhov.rocket.action.api.RocketActionFactoryUi
 import ru.ezhov.rocket.action.api.RocketActionPlugin
 import ru.ezhov.rocket.action.api.RocketActionSettings
 import ru.ezhov.rocket.action.api.RocketActionType
+import ru.ezhov.rocket.action.api.context.RocketActionContext
+import ru.ezhov.rocket.action.api.context.icon.AppIcon
+import ru.ezhov.rocket.action.api.context.notification.NotificationType
 import ru.ezhov.rocket.action.api.handler.RocketActionHandleStatus
 import ru.ezhov.rocket.action.api.handler.RocketActionHandler
 import ru.ezhov.rocket.action.api.handler.RocketActionHandlerCommand
@@ -15,11 +18,6 @@ import ru.ezhov.rocket.action.api.handler.RocketActionHandlerCommandContract
 import ru.ezhov.rocket.action.api.handler.RocketActionHandlerFactory
 import ru.ezhov.rocket.action.api.handler.RocketActionHandlerProperty
 import ru.ezhov.rocket.action.api.support.AbstractRocketAction
-import ru.ezhov.rocket.action.icon.AppIcon
-import ru.ezhov.rocket.action.icon.IconRepositoryFactory
-import ru.ezhov.rocket.action.icon.IconService
-import ru.ezhov.rocket.action.notification.NotificationFactory
-import ru.ezhov.rocket.action.notification.NotificationType
 import java.awt.Component
 import java.awt.Desktop
 import java.awt.Toolkit
@@ -34,21 +32,27 @@ import javax.swing.event.MenuKeyEvent
 import javax.swing.event.MenuKeyListener
 
 class OpenUrlRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
-    private val iconDef = IconRepositoryFactory.repository.by(AppIcon.LINK_INTACT)
+    private var actionContext: RocketActionContext? = null
 
-    override fun factory(): RocketActionFactoryUi = this
+    override fun factory(context: RocketActionContext): RocketActionFactoryUi = this
+        .apply {
+            actionContext = context
+        }
 
-    override fun configuration(): RocketActionConfiguration = this
+    override fun configuration(context: RocketActionContext): RocketActionConfiguration = this
+        .apply {
+            actionContext = context
+        }
 
-    override fun create(settings: RocketActionSettings): RocketAction? =
+    override fun create(settings: RocketActionSettings, context: RocketActionContext): RocketAction? =
         settings.settings()[URL]?.takeIf { it.isNotEmpty() }?.let { url ->
             val label = settings.settings()[LABEL]?.takeIf { it.isNotEmpty() } ?: url
             val description = settings.settings()[DESCRIPTION]?.takeIf { it.isNotEmpty() } ?: url
             val iconUrl = settings.settings()[ICON_URL].orEmpty()
             val menu = JMenuItem(label).apply {
-                icon = IconService().load(
+                icon = context.icon().load(
                     iconUrl = iconUrl,
-                    defaultIcon = iconDef
+                    defaultIcon = context.icon().by(AppIcon.LINK_INTACT)
                 )
                 toolTipText = description
                 isFocusable = true
@@ -92,7 +96,7 @@ class OpenUrlRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
                         object : RocketActionHandlerCommandContract {
                             override fun commandName(): String = "openUrl"
 
-                            override fun title(): String  = label
+                            override fun title(): String = label
 
                             override fun description(): String = "Открыть URL"
 
@@ -114,7 +118,7 @@ class OpenUrlRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
         val defaultToolkit = Toolkit.getDefaultToolkit()
         val clipboard = defaultToolkit.systemClipboard
         clipboard.setContents(StringSelection(url), null)
-        NotificationFactory.notification.show(NotificationType.INFO, "URL скопирована в буфер")
+        actionContext!!.notification().show(NotificationType.INFO, "URL скопирована в буфер")
     }
 
     private fun openUrl(url: String) {
@@ -123,7 +127,7 @@ class OpenUrlRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
                 Desktop.getDesktop().browse(URI(url))
             } catch (ex: Exception) {
                 ex.printStackTrace()
-                NotificationFactory.notification.show(NotificationType.ERROR, "Ошибка открытия URL")
+                actionContext!!.notification().show(NotificationType.ERROR, "Ошибка открытия URL")
             }
         }
     }
@@ -145,7 +149,7 @@ class OpenUrlRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
 
     override fun name(): String = "Открыть ссылку"
 
-    override fun icon(): Icon? = iconDef
+    override fun icon(): Icon? = actionContext!!.icon().by(AppIcon.LINK_INTACT)
 
     companion object {
         private val LABEL = RocketActionConfigurationPropertyKey("label")

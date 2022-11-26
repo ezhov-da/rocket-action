@@ -9,6 +9,9 @@ import ru.ezhov.rocket.action.api.RocketActionPlugin
 import ru.ezhov.rocket.action.api.RocketActionPropertySpec
 import ru.ezhov.rocket.action.api.RocketActionSettings
 import ru.ezhov.rocket.action.api.RocketActionType
+import ru.ezhov.rocket.action.api.context.RocketActionContext
+import ru.ezhov.rocket.action.api.context.icon.AppIcon
+import ru.ezhov.rocket.action.api.context.notification.NotificationType
 import ru.ezhov.rocket.action.api.handler.RocketActionHandleStatus
 import ru.ezhov.rocket.action.api.handler.RocketActionHandler
 import ru.ezhov.rocket.action.api.handler.RocketActionHandlerCommand
@@ -18,12 +21,7 @@ import ru.ezhov.rocket.action.api.handler.RocketActionHandlerProperty
 import ru.ezhov.rocket.action.api.handler.RocketActionHandlerPropertyKey
 import ru.ezhov.rocket.action.api.handler.RocketActionHandlerPropertySpec
 import ru.ezhov.rocket.action.api.support.AbstractRocketAction
-import ru.ezhov.rocket.action.icon.AppIcon
-import ru.ezhov.rocket.action.icon.IconRepositoryFactory
-import ru.ezhov.rocket.action.icon.IconService
-import ru.ezhov.rocket.action.notification.NotificationFactory
-import ru.ezhov.rocket.action.notification.NotificationType
-import ru.ezhov.rocket.action.ui.swing.common.TextFieldWithText
+import ru.ezhov.rocket.action.ui.utils.swing.common.TextFieldWithText
 import java.awt.Component
 import java.awt.Desktop
 import java.net.URI
@@ -35,14 +33,20 @@ import javax.swing.SwingUtilities
 
 class OpenUrlWithTextHistoryRocketActionUi :
     AbstractRocketAction(), RocketActionPlugin {
-    private var label: String? = null
-    private val icon = IconRepositoryFactory.repository.by(AppIcon.LINK_INTACT)
+    private var actionContext: RocketActionContext? = null
 
-    override fun factory(): RocketActionFactoryUi = this
 
-    override fun configuration(): RocketActionConfiguration = this
+    override fun factory(context: RocketActionContext): RocketActionFactoryUi = this
+        .apply {
+            actionContext = context
+        }
 
-    override fun create(settings: RocketActionSettings): RocketAction? =
+    override fun configuration(context: RocketActionContext): RocketActionConfiguration = this
+        .apply {
+            actionContext = context
+        }
+
+    override fun create(settings: RocketActionSettings, context: RocketActionContext): RocketAction? =
         settings.settings()[BASE_URL]?.takeIf { it.isNotEmpty() }?.let { baseUrl ->
             val placeholder = settings.settings()[PLACEHOLDER].orEmpty()
             val label = settings.settings()[LABEL]?.takeIf { it.isNotEmpty() } ?: baseUrl
@@ -50,9 +54,9 @@ class OpenUrlWithTextHistoryRocketActionUi :
             val iconUrl = settings.settings()[ICON_URL].orEmpty()
 
             val menu = JMenu(label)
-            menu.icon = IconService().load(
+            menu.icon = context.icon().load(
                 iconUrl = iconUrl,
-                defaultIcon = icon
+                defaultIcon = actionContext!!.icon().by(AppIcon.LINK_INTACT)
             )
             val textField = TextFieldWithText(label)
             textField.columns = 10
@@ -146,7 +150,7 @@ class OpenUrlWithTextHistoryRocketActionUi :
                 saveToHistory(text = text, menu = menu, uri = uri, addedToHistory = addedToHistory)
             } catch (ex: Exception) {
                 ex.printStackTrace()
-                NotificationFactory.notification.show(NotificationType.ERROR, "Ошибка открытия URL")
+                actionContext!!.notification().show(NotificationType.ERROR, "Ошибка открытия URL")
             }
         }
     }
@@ -168,20 +172,23 @@ class OpenUrlWithTextHistoryRocketActionUi :
         if (!addedToHistory.contains(text)) {
             SwingUtilities.invokeLater {
                 OpenUrlRocketActionUi()
-                    .create(object : RocketActionSettings {
-                        override fun id(): String = text
+                    .create(
+                        settings = object : RocketActionSettings {
+                            override fun id(): String = text
 
-                        override fun type(): RocketActionType = RocketActionType { "" }
+                            override fun type(): RocketActionType = RocketActionType { "" }
 
-                        override fun settings(): MutableMap<RocketActionConfigurationPropertyKey, String> =
-                            mutableMapOf(
-                                RocketActionConfigurationPropertyKey("label") to text,
-                                RocketActionConfigurationPropertyKey("description") to "Open link",
-                                RocketActionConfigurationPropertyKey("url") to uri.toString(),
-                            )
+                            override fun settings(): MutableMap<RocketActionConfigurationPropertyKey, String> =
+                                mutableMapOf(
+                                    RocketActionConfigurationPropertyKey("label") to text,
+                                    RocketActionConfigurationPropertyKey("description") to "Open link",
+                                    RocketActionConfigurationPropertyKey("url") to uri.toString(),
+                                )
 
-                        override fun actions(): List<RocketActionSettings> = emptyList()
-                    })
+                            override fun actions(): List<RocketActionSettings> = emptyList()
+                        },
+                        context = actionContext!!
+                    )
                     ?.component()
                     ?.let { c -> addedToHistory.add(text); menu.add(c) }
                 menu.revalidate()
@@ -215,7 +222,7 @@ class OpenUrlWithTextHistoryRocketActionUi :
 
     override fun name(): String = "Открытие ссылки с подстановкой и с сохранением истории"
 
-    override fun icon(): Icon? = icon
+    override fun icon(): Icon? = actionContext!!.icon().by(AppIcon.LINK_INTACT)
 
     companion object {
         private val LABEL = RocketActionConfigurationPropertyKey("label")

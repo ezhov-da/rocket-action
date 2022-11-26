@@ -1,6 +1,6 @@
 package ru.ezhov.rocket.action.plugin.template
 
-import ru.ezhov.rocket.action.ui.swing.common.TextFieldWithText
+import ru.ezhov.rocket.action.ui.utils.swing.common.TextFieldWithText
 import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Cursor

@@ -10,7 +10,7 @@
     </parent>
 
     <artifactId>rocket-action-application-core</artifactId>
-    <version>0.19.0</version>
+    <version>0.20.0</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -43,21 +43,6 @@
         <dependency>
             <groupId>ru.ezhov</groupId>
             <artifactId>rocket-action-ui-utils</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>ru.ezhov</groupId>
-            <artifactId>rocket-action-icon</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>ru.ezhov</groupId>
-            <artifactId>rocket-action-notification</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>ru.ezhov</groupId>
-            <artifactId>rocket-action-cache</artifactId>
         </dependency>
 
         <!--=====================================-->

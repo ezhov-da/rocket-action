@@ -2,6 +2,8 @@ package ru.ezhov.rocket.action.application.configuration.ui
 
 import mu.KotlinLogging
 import ru.ezhov.rocket.action.api.RocketActionSettings
+import ru.ezhov.rocket.action.api.context.icon.AppIcon
+import ru.ezhov.rocket.action.api.context.notification.NotificationType
 import ru.ezhov.rocket.action.application.configuration.ui.event.ConfigurationUiListener
 import ru.ezhov.rocket.action.application.configuration.ui.event.ConfigurationUiObserverFactory
 import ru.ezhov.rocket.action.application.configuration.ui.event.model.ConfigurationUiEvent
@@ -9,15 +11,12 @@ import ru.ezhov.rocket.action.application.configuration.ui.event.model.RemoveSet
 import ru.ezhov.rocket.action.application.domain.RocketActionSettingsRepository
 import ru.ezhov.rocket.action.application.domain.RocketActionSettingsRepositoryException
 import ru.ezhov.rocket.action.application.infrastructure.MutableRocketActionSettings
+import ru.ezhov.rocket.action.application.plugin.context.RocketActionContextFactory
 import ru.ezhov.rocket.action.application.plugin.group.GroupRocketActionUi
 import ru.ezhov.rocket.action.application.plugin.manager.domain.RocketActionPluginRepository
 import ru.ezhov.rocket.action.application.properties.GeneralPropertiesRepositoryFactory
 import ru.ezhov.rocket.action.application.properties.UsedPropertiesName
-import ru.ezhov.rocket.action.icon.AppIcon
-import ru.ezhov.rocket.action.icon.IconRepositoryFactory
-import ru.ezhov.rocket.action.icon.toImage
-import ru.ezhov.rocket.action.notification.NotificationFactory
-import ru.ezhov.rocket.action.notification.NotificationType
+import ru.ezhov.rocket.action.ui.utils.swing.common.toImage
 import java.awt.BorderLayout
 import java.awt.Component
 import java.awt.Toolkit
@@ -157,7 +156,7 @@ class ConfigurationFrame(
 
                         init {
                             putValue(NAME, "Добавить выше")
-                            putValue(SMALL_ICON, IconRepositoryFactory.repository.by(AppIcon.PLUS))
+                            putValue(SMALL_ICON, RocketActionContextFactory.context.icon().by(AppIcon.PLUS))
                         }
                     }))
                     popupMenu.add(JMenuItem(
@@ -179,7 +178,7 @@ class ConfigurationFrame(
 
                             init {
                                 putValue(NAME, "Добавить ниже")
-                                putValue(SMALL_ICON, IconRepositoryFactory.repository.by(AppIcon.PLUS))
+                                putValue(SMALL_ICON, RocketActionContextFactory.context.icon().by(AppIcon.PLUS))
                             }
                         }
                     ))
@@ -200,7 +199,7 @@ class ConfigurationFrame(
 
                                 init {
                                     putValue(NAME, "Создать и добавить как потомка")
-                                    putValue(SMALL_ICON, IconRepositoryFactory.repository.by(AppIcon.PLUS))
+                                    putValue(SMALL_ICON, RocketActionContextFactory.context.icon().by(AppIcon.PLUS))
                                 }
                             }
                         ))
@@ -232,7 +231,7 @@ class ConfigurationFrame(
 
                                 init {
                                     putValue(NAME, "Дублировать")
-                                    putValue(SMALL_ICON, IconRepositoryFactory.repository.by(AppIcon.FORK))
+                                    putValue(SMALL_ICON, RocketActionContextFactory.context.icon().by(AppIcon.FORK))
                                 }
                             }
                         ))
@@ -256,7 +255,7 @@ class ConfigurationFrame(
 
                             init {
                                 putValue(NAME, "Удалить")
-                                putValue(SMALL_ICON, IconRepositoryFactory.repository.by(AppIcon.MINUS))
+                                putValue(SMALL_ICON, RocketActionContextFactory.context.icon().by(AppIcon.MINUS))
                             }
                         }
                     ))
@@ -271,7 +270,7 @@ class ConfigurationFrame(
     private fun fillTreeNodes(actions: List<RocketActionSettings>?, parent: DefaultMutableTreeNode) {
         for (rocketActionSettings in actions!!) {
             rocketActionPluginRepository.by(type = rocketActionSettings.type())
-                ?.configuration()
+                ?.configuration(RocketActionContextFactory.context)
                 ?.let { config ->
                     val current = DefaultMutableTreeNode(
                         TreeRocketActionSettings(
@@ -303,10 +302,10 @@ class ConfigurationFrame(
         }
         try {
             rocketActionSettingsRepository.save(settings)
-            NotificationFactory.notification.show(NotificationType.INFO, "Действия сохранены")
+            RocketActionContextFactory.context.notification().show(NotificationType.INFO, "Действия сохранены")
         } catch (e: RocketActionSettingsRepositoryException) {
             e.printStackTrace()
-            NotificationFactory.notification.show(NotificationType.ERROR, "Ошибка сохранения действий")
+            RocketActionContextFactory.context.notification().show(NotificationType.ERROR, "Ошибка сохранения действий")
         }
     }
 
@@ -348,7 +347,7 @@ class ConfigurationFrame(
     private var menuBar: JToolBar?
 
     init {
-        frame.iconImage = IconRepositoryFactory.repository.by(AppIcon.ROCKET_APP).toImage()
+        frame.iconImage = RocketActionContextFactory.context.icon().by(AppIcon.ROCKET_APP).toImage()
         frame.isAlwaysOnTop = GeneralPropertiesRepositoryFactory.repository
             .asBoolean(UsedPropertiesName.UI_CONFIGURATION_FRAME_ALWAYS_ON_TOP, false)
         frame.defaultCloseOperation = JFrame.HIDE_ON_CLOSE
@@ -395,7 +394,7 @@ class ConfigurationFrame(
     private fun createToolBar(): JToolBar {
         val menuBar = JToolBar()
         val buttonUpdate = JButton("Обновить")
-        buttonUpdate.icon = IconRepositoryFactory.repository.by(AppIcon.RELOAD)
+        buttonUpdate.icon = RocketActionContextFactory.context.icon().by(AppIcon.RELOAD)
         buttonUpdate.addActionListener { e: ActionEvent? ->
             SwingUtilities.invokeLater {
                 updateActionListener.actionPerformed(e)
@@ -418,7 +417,7 @@ class ConfigurationFrame(
 
     private fun createAndShowButtonCreateFirstAction(menuBar: JToolBar) {
         buttonCreateNewAction = JButton("Создать первое действие")
-        buttonCreateNewAction!!.icon = IconRepositoryFactory.repository.by(AppIcon.STAR)
+        buttonCreateNewAction!!.icon = RocketActionContextFactory.context.icon().by(AppIcon.STAR)
         buttonCreateNewAction!!.addActionListener { _: ActionEvent? ->
             createRocketActionSettingsDialog.show(object : CreatedRocketActionSettingsCallback {
                 override fun create(settings: TreeRocketActionSettings) {

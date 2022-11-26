@@ -1,5 +1,7 @@
 package ru.ezhov.rocket.action.api
 
+import ru.ezhov.rocket.action.api.context.RocketActionContext
+
 /**
  * Плагин действия
  */
@@ -7,10 +9,10 @@ interface RocketActionPlugin {
     /**
      * Фабрика по созданию UI
      */
-    fun factory(): RocketActionFactoryUi
+    fun factory(context: RocketActionContext): RocketActionFactoryUi
 
     /**
      * Конфигурация действия
      */
-    fun configuration(): RocketActionConfiguration
+    fun configuration(context: RocketActionContext): RocketActionConfiguration
 }

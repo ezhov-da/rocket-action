@@ -1,12 +1,12 @@
 package ru.ezhov.rocket.action.application.configuration.ui
 
+import ru.ezhov.rocket.action.api.context.icon.AppIcon
 import ru.ezhov.rocket.action.application.configuration.ui.event.ConfigurationUiListener
 import ru.ezhov.rocket.action.application.configuration.ui.event.ConfigurationUiObserverFactory
 import ru.ezhov.rocket.action.application.configuration.ui.event.model.ConfigurationUiEvent
 import ru.ezhov.rocket.action.application.configuration.ui.event.model.SettingMovedUiEvent
-import ru.ezhov.rocket.action.icon.AppIcon
-import ru.ezhov.rocket.action.icon.IconRepositoryFactory
-import ru.ezhov.rocket.action.ui.swing.common.TextFieldWithText
+import ru.ezhov.rocket.action.application.plugin.context.RocketActionContextFactory
+import ru.ezhov.rocket.action.ui.utils.swing.common.TextFieldWithText
 import java.awt.BorderLayout
 import java.awt.event.KeyAdapter
 import java.awt.event.KeyEvent
@@ -98,12 +98,12 @@ class SearchInTreePanel(
         private var counter = 1
         private val buttonNext = JButton()
             .apply {
-                icon = IconRepositoryFactory.repository.by(AppIcon.ARROW_BOTTOM)
+                icon = RocketActionContextFactory.context.icon().by(AppIcon.ARROW_BOTTOM)
                 toolTipText = "Далее"
             }
         private val buttonPrevious = JButton()
             .apply {
-                icon = IconRepositoryFactory.repository.by(AppIcon.ARROW_TOP)
+                icon = RocketActionContextFactory.context.icon().by(AppIcon.ARROW_TOP)
                 toolTipText = "Назад"
             }
         private val label = JLabel()

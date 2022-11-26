@@ -7,11 +7,11 @@ import ru.ezhov.rocket.action.api.RocketActionConfiguration
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
 import ru.ezhov.rocket.action.api.RocketActionConfigurationPropertyKey
 import ru.ezhov.rocket.action.api.RocketActionPropertySpec
+import ru.ezhov.rocket.action.api.context.icon.AppIcon
 import ru.ezhov.rocket.action.application.infrastructure.MutableRocketActionSettings
+import ru.ezhov.rocket.action.application.plugin.context.RocketActionContextFactory
 import ru.ezhov.rocket.action.application.plugin.manager.domain.RocketActionPluginRepository
-import ru.ezhov.rocket.action.icon.AppIcon
-import ru.ezhov.rocket.action.icon.IconRepositoryFactory
-import ru.ezhov.rocket.action.icon.toImage
+import ru.ezhov.rocket.action.ui.utils.swing.common.toImage
 import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Component
@@ -50,7 +50,7 @@ class CreateRocketActionSettingsDialog(
         }
 
     private val dialog: JDialog = JDialog(owner, "Создать действие").apply {
-        this.setIconImage(IconRepositoryFactory.repository.by(AppIcon.ROCKET_APP).toImage())
+        this.setIconImage(RocketActionContextFactory.context.icon().by(AppIcon.ROCKET_APP).toImage())
         val ownerSize = owner.size
         setSize((ownerSize.width * 0.7).toInt(), (ownerSize.height * 0.7).toInt())
 
@@ -68,7 +68,7 @@ class CreateRocketActionSettingsDialog(
     }
 
     private fun panelComboBox(): JPanel {
-        val all = rocketActionPluginRepository.all().map { it.configuration() }
+        val all = rocketActionPluginRepository.all().map { it.configuration(RocketActionContextFactory.context) }
         val sortedAll = all.sortedBy { it.name() }
         sortedAll.forEach(Consumer { anObject: RocketActionConfiguration? -> comboBoxModel.addElement(anObject) })
         val panel = JPanel(BorderLayout())
@@ -168,7 +168,7 @@ class CreateRocketActionSettingsDialog(
             this.layout = BorderLayout()
             this.border = BorderFactory.createEmptyBorder(2, 2, 2, 2)
             val labelName = JLabel(property.name())
-            val labelDescription = JLabel(IconRepositoryFactory.repository.by(AppIcon.INFO))
+            val labelDescription = JLabel(RocketActionContextFactory.context.icon().by(AppIcon.INFO))
             labelDescription.toolTipText = property.description()
 
             val topPanel = JPanel()

@@ -4,8 +4,8 @@ import arrow.core.Either
 import mu.KotlinLogging
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea
 import org.fife.ui.rtextarea.RTextScrollPane
-import ru.ezhov.rocket.action.notification.NotificationFactory
-import ru.ezhov.rocket.action.notification.NotificationType
+import ru.ezhov.rocket.action.api.context.RocketActionContext
+import ru.ezhov.rocket.action.api.context.notification.NotificationType
 import ru.ezhov.rocket.action.plugin.file.domain.TemporaryFileService
 import java.awt.BorderLayout
 import java.awt.Desktop
@@ -22,9 +22,11 @@ private val logger = KotlinLogging.logger {}
 
 class TemporaryFileUi(
     private val temporaryFileService: TemporaryFileService,
-    private val extension: String = ".txt"
+    private val extension: String = ".txt",
+    private val context: RocketActionContext,
 
-) : JPanel() {
+
+    ) : JPanel() {
     init {
         layout = BorderLayout()
         val dimensionResult = Toolkit
@@ -66,8 +68,8 @@ class TemporaryFileUi(
                                 val defaultToolkit = Toolkit.getDefaultToolkit()
                                 val clipboard = defaultToolkit.systemClipboard
                                 clipboard.setContents(StringSelection(it.absolutePath), null)
-                                NotificationFactory
-                                    .notification
+                                context
+                                    .notification()
                                     .show(type = NotificationType.INFO, text = "Absolute path copy")
                             }
                         }
@@ -96,11 +98,12 @@ class TemporaryFileUi(
         ) {
             is Either.Left -> {
                 logger.error(result.value) { "Error save temporary file" }
-                NotificationFactory
-                    .notification
+                context
+                    .notification()
                     .show(type = NotificationType.WARN, text = "Error save temporary file")
                 null
             }
+
             is Either.Right -> result.value
         }
 }

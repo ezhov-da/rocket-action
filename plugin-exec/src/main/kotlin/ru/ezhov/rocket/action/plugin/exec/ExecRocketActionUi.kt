@@ -9,12 +9,12 @@ import ru.ezhov.rocket.action.api.RocketActionFactoryUi
 import ru.ezhov.rocket.action.api.RocketActionPlugin
 import ru.ezhov.rocket.action.api.RocketActionSettings
 import ru.ezhov.rocket.action.api.RocketActionType
+import ru.ezhov.rocket.action.api.context.RocketActionContext
+import ru.ezhov.rocket.action.api.context.icon.AppIcon
+import ru.ezhov.rocket.action.api.context.icon.IconService
+import ru.ezhov.rocket.action.api.context.notification.NotificationService
+import ru.ezhov.rocket.action.api.context.notification.NotificationType
 import ru.ezhov.rocket.action.api.support.AbstractRocketAction
-import ru.ezhov.rocket.action.icon.AppIcon
-import ru.ezhov.rocket.action.icon.IconRepositoryFactory
-import ru.ezhov.rocket.action.icon.IconService
-import ru.ezhov.rocket.action.notification.NotificationFactory
-import ru.ezhov.rocket.action.notification.NotificationType
 import java.awt.Component
 import java.awt.Toolkit
 import java.awt.datatransfer.StringSelection
@@ -28,29 +28,35 @@ import javax.swing.filechooser.FileSystemView
 private val logger = KotlinLogging.logger { }
 
 class ExecRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
+    private var actionContext: RocketActionContext? = null
+    override fun factory(context: RocketActionContext): RocketActionFactoryUi = this
+        .apply {
+            actionContext = context
+        }
 
-    override fun factory(): RocketActionFactoryUi = this
+    override fun configuration(context: RocketActionContext): RocketActionConfiguration = this
+        .apply {
+            actionContext = context
+        }
 
-    override fun configuration(): RocketActionConfiguration = this
-
-    private val icon = IconRepositoryFactory.repository.by(AppIcon.FIRE)
-
-    override fun create(settings: RocketActionSettings): RocketAction? =
+    override fun create(settings: RocketActionSettings, context: RocketActionContext): RocketAction? =
         settings.settings()[COMMAND]?.takeIf { it.isNotEmpty() }?.let { command ->
+            actionContext = context
+
             val workingDir = settings.settings()[WORKING_DIR]?.takeIf { it.isNotEmpty() }
                 ?: File(".").absoluteFile.parent
             val label = settings.settings()[LABEL]?.takeIf { it.isNotEmpty() } ?: command
             val description = settings.settings()[DESCRIPTION]?.takeIf { it.isNotEmpty() } ?: command
             val iconUrl = settings.settings()[ICON_URL].orEmpty()
-            val menuIcon = icon(iconUrl, command)
+            val menuIcon = icon(iconUrl = iconUrl, command = command, iconService = context.icon())
             val menu = JMenuItem(label).apply {
                 icon = menuIcon
                 toolTipText = description
-                addActionListener { executeCommand(workingDir, command) }
+                addActionListener { executeCommand(workingDir, command, notification = context.notification()) }
                 addMouseListener(object : MouseAdapter() {
                     override fun mouseReleased(e: MouseEvent) {
                         if (e.button == MouseEvent.BUTTON3) {
-                            copyToClipboard(command)
+                            copyToClipboard(command = command, notification = context.notification())
                         }
                     }
                 })
@@ -69,10 +75,10 @@ class ExecRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
             }
         }
 
-    private fun icon(iconUrl: String, command: String): Icon {
-        var menuIcon = IconService().load(
+    private fun icon(iconUrl: String, command: String, iconService: IconService): Icon {
+        var menuIcon = iconService.load(
             iconUrl = iconUrl,
-            defaultIcon = icon
+            defaultIcon = actionContext!!.icon().by(AppIcon.FIRE)
         )
         try {
             val file = File(command)
@@ -85,14 +91,14 @@ class ExecRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
         return menuIcon
     }
 
-    private fun copyToClipboard(command: String) {
+    private fun copyToClipboard(command: String, notification: NotificationService) {
         val defaultToolkit = Toolkit.getDefaultToolkit()
         val clipboard = defaultToolkit.systemClipboard
         clipboard.setContents(StringSelection(command), null)
-        NotificationFactory.notification.show(NotificationType.INFO, "Команда '$command' скопирована в буфер")
+        notification.show(NotificationType.INFO, "Команда '$command' скопирована в буфер")
     }
 
-    private fun executeCommand(workingDir: String, command: String) {
+    private fun executeCommand(workingDir: String, command: String, notification: NotificationService) {
         try {
             if (workingDir.isEmpty()) {
                 Runtime.getRuntime().exec(command)
@@ -106,7 +112,7 @@ class ExecRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
         } catch (ex: Exception) {
             val text = "Ошибка выполнения команды '$command'"
             logger.warn(ex) { text }
-            NotificationFactory.notification.show(NotificationType.WARN, text)
+            notification.show(NotificationType.WARN, text)
         }
     }
 
@@ -130,7 +136,7 @@ class ExecRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
         )
     }
 
-    override fun icon(): Icon? = icon
+    override fun icon(): Icon = actionContext!!.icon().by(AppIcon.FIRE)
 
     companion object {
         private val LABEL = RocketActionConfigurationPropertyKey("label")

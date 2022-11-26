@@ -11,11 +11,10 @@ import ru.ezhov.rocket.action.api.RocketActionFactoryUi
 import ru.ezhov.rocket.action.api.RocketActionPlugin
 import ru.ezhov.rocket.action.api.RocketActionSettings
 import ru.ezhov.rocket.action.api.RocketActionType
+import ru.ezhov.rocket.action.api.context.RocketActionContext
+import ru.ezhov.rocket.action.api.context.icon.AppIcon
 import ru.ezhov.rocket.action.api.support.AbstractRocketAction
-import ru.ezhov.rocket.action.cache.CacheFactory
-import ru.ezhov.rocket.action.icon.AppIcon
-import ru.ezhov.rocket.action.icon.IconRepositoryFactory
-import ru.ezhov.rocket.action.icon.toImage
+import ru.ezhov.rocket.action.ui.utils.swing.common.toImage
 import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Component
@@ -49,20 +48,26 @@ import javax.swing.WindowConstants
 private val logger = KotlinLogging.logger {}
 
 class ShowImageRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
-    private val icon = IconRepositoryFactory.repository.by(AppIcon.IMAGE)
+    private var actionContext: RocketActionContext? = null
 
-    override fun factory(): RocketActionFactoryUi = this
+    override fun factory(context: RocketActionContext): RocketActionFactoryUi = this
+        .apply {
+            actionContext = context
+        }
 
-    override fun configuration(): RocketActionConfiguration = this
+    override fun configuration(context: RocketActionContext): RocketActionConfiguration = this
+        .apply {
+            actionContext = context
+        }
 
-    override fun create(settings: RocketActionSettings): RocketAction? =
+    override fun create(settings: RocketActionSettings, context: RocketActionContext): RocketAction? =
         settings.settings()[IMAGE_URL]?.takeIf { it.isNotEmpty() }?.let { imageUrl ->
             val label = settings.settings()[LABEL]?.takeIf { it.isNotEmpty() } ?: imageUrl
             val description = settings.settings()[DESCRIPTION]?.takeIf { it.isNotEmpty() } ?: imageUrl
 
             val menu = JMenu(label)
             menu.toolTipText = description
-            menu.icon = ImageIcon(this.javaClass.getResource("/load_16x16.gif"))
+            menu.icon = ImageIcon(this.javaClass.getResource("/icons/load_16x16.gif"))
             LoadImageWorker(imageUrl = imageUrl, menu = menu, settings = settings).execute()
 
             object : RocketAction {
@@ -103,12 +108,12 @@ class ShowImageRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
         @Throws(Exception::class)
         override fun doInBackground(): Image? {
             val url = imageUrl
-            val file = CacheFactory.cache.get(URL(url))
+            val file = actionContext!!.cache().get(URL(url))
             return file?.let { f -> cachedImage = f; ImageIO.read(f) }
         }
 
         override fun done() {
-            menu.icon = icon
+            menu.icon = actionContext!!.icon().by(AppIcon.IMAGE)
             try {
                 val component: Component
                 val originalImageUrl = settings.settings()[IMAGE_URL]
@@ -140,7 +145,7 @@ class ShowImageRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
                 override fun actionPerformed(e: ActionEvent) {
                     SwingUtilities.invokeLater {
                         val frame = JFrame(cachedImage.absolutePath)
-                        frame.iconImage = IconRepositoryFactory.repository.by(AppIcon.ROCKET_APP).toImage()
+                        frame.iconImage = actionContext!!.icon().by(AppIcon.ROCKET_APP).toImage()
                         frame.add(ImagePanel(originalUrl = originalUrl, image = image, cachedImage = cachedImage))
                         frame.defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
                         frame.setSize((dimension.width * 0.8).toInt(), (dimension.height * 0.8).toInt())
@@ -237,7 +242,7 @@ class ShowImageRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
         }
     }
 
-    override fun icon(): Icon? = icon
+    override fun icon(): Icon? = actionContext!!.icon().by(AppIcon.IMAGE)
 
     companion object {
         private val LABEL = RocketActionConfigurationPropertyKey("label")

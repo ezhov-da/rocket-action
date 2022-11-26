@@ -8,11 +8,10 @@ import ru.ezhov.rocket.action.api.RocketActionFactoryUi
 import ru.ezhov.rocket.action.api.RocketActionPlugin
 import ru.ezhov.rocket.action.api.RocketActionSettings
 import ru.ezhov.rocket.action.api.RocketActionType
+import ru.ezhov.rocket.action.api.context.RocketActionContext
+import ru.ezhov.rocket.action.api.context.icon.AppIcon
+import ru.ezhov.rocket.action.api.context.notification.NotificationType
 import ru.ezhov.rocket.action.api.support.AbstractRocketAction
-import ru.ezhov.rocket.action.icon.AppIcon
-import ru.ezhov.rocket.action.icon.IconRepositoryFactory
-import ru.ezhov.rocket.action.notification.NotificationFactory
-import ru.ezhov.rocket.action.notification.NotificationType
 import java.awt.Component
 import java.awt.Toolkit
 import java.awt.datatransfer.StringSelection
@@ -23,11 +22,17 @@ import javax.swing.JLabel
 import javax.swing.JTextPane
 
 class TextRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
-    private val icon = IconRepositoryFactory.repository.by(AppIcon.TEXT)
+    private var actionContext: RocketActionContext? = null
 
-    override fun factory(): RocketActionFactoryUi = this
+    override fun factory(context: RocketActionContext): RocketActionFactoryUi = this
+        .apply {
+            actionContext = context
+        }
 
-    override fun configuration(): RocketActionConfiguration = this
+    override fun configuration(context: RocketActionContext): RocketActionConfiguration = this
+        .apply {
+            actionContext = context
+        }
 
     override fun description(): String = "Show text"
 
@@ -37,7 +42,7 @@ class TextRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
             createRocketActionProperty(key = DESCRIPTION, name = DESCRIPTION.value, description = "Описание", required = false)
         )
 
-    override fun create(settings: RocketActionSettings): RocketAction? =
+    override fun create(settings: RocketActionSettings, context: RocketActionContext): RocketAction? =
         settings.settings()[LABEL]?.takeIf { it.isNotEmpty() }?.let { label ->
             val description = settings.settings()[DESCRIPTION]
             val textPane = JTextPane().apply {
@@ -53,7 +58,7 @@ class TextRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
                             val defaultToolkit = Toolkit.getDefaultToolkit()
                             val clipboard = defaultToolkit.systemClipboard
                             clipboard.setContents(StringSelection(text), null)
-                            NotificationFactory.notification.show(NotificationType.INFO, "Текст скопирован в буфер")
+                            actionContext!!.notification().show(NotificationType.INFO, "Текст скопирован в буфер")
                         }
                     }
                 })
@@ -77,7 +82,7 @@ class TextRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
 
     override fun name(): String = "Отобразить текст"
 
-    override fun icon(): Icon? = icon
+    override fun icon(): Icon? = actionContext!!.icon().by(AppIcon.TEXT)
 
     companion object {
         private val LABEL = RocketActionConfigurationPropertyKey("label")

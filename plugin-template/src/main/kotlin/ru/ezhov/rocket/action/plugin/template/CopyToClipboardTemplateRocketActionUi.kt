@@ -8,29 +8,38 @@ import ru.ezhov.rocket.action.api.RocketActionFactoryUi
 import ru.ezhov.rocket.action.api.RocketActionPlugin
 import ru.ezhov.rocket.action.api.RocketActionSettings
 import ru.ezhov.rocket.action.api.RocketActionType
+import ru.ezhov.rocket.action.api.context.RocketActionContext
+import ru.ezhov.rocket.action.api.context.icon.AppIcon
 import ru.ezhov.rocket.action.api.support.AbstractRocketAction
-import ru.ezhov.rocket.action.icon.AppIcon
-import ru.ezhov.rocket.action.icon.IconRepositoryFactory
 import ru.ezhov.rocket.action.plugin.template.infrastructure.VelocityEngineImpl
 import java.awt.Component
 import javax.swing.Icon
 import javax.swing.JMenu
 
 class CopyToClipboardTemplateRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
-    private val icon = IconRepositoryFactory.repository.by(AppIcon.CLIPBOARD)
+    private var actionContext: RocketActionContext? = null
+    override fun factory(context: RocketActionContext): RocketActionFactoryUi = this
+        .apply {
+            actionContext = context
+        }
 
-    override fun factory(): RocketActionFactoryUi = this
+    override fun configuration(context: RocketActionContext): RocketActionConfiguration = this
+        .apply {
+            actionContext = context
+        }
 
-    override fun configuration(): RocketActionConfiguration = this
-
-    override fun create(settings: RocketActionSettings): RocketAction? =
+    override fun create(settings: RocketActionSettings, context: RocketActionContext): RocketAction? =
         settings.settings()[TEXT]?.takeIf { it.isNotEmpty() }?.let { text ->
             val label = settings.settings()[LABEL]?.takeIf { it.isNotEmpty() } ?: text
             val description = settings.settings()[DESCRIPTION]?.takeIf { it.isNotEmpty() } ?: text
 
-            val notePanelEngine = NotePanelEngine(text, VelocityEngineImpl())
+            val notePanelEngine = NotePanelEngine(
+                originText = text,
+                engine = VelocityEngineImpl(),
+                context = context
+            )
             val menu = JMenu(label)
-            menu.icon = icon
+            menu.icon = actionContext!!.icon().by(AppIcon.CLIPBOARD)
             menu.toolTipText = description
             menu.add(notePanelEngine)
 
@@ -63,7 +72,7 @@ class CopyToClipboardTemplateRocketActionUi : AbstractRocketAction(), RocketActi
 
     override fun asString(): List<RocketActionConfigurationPropertyKey> = listOf(LABEL, TEXT)
 
-    override fun icon(): Icon? = icon
+    override fun icon(): Icon? = actionContext!!.icon().by(AppIcon.CLIPBOARD)
 
     companion object {
         private val LABEL = RocketActionConfigurationPropertyKey("label")

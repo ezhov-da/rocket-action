@@ -9,16 +9,15 @@ import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
 import ru.ezhov.rocket.action.api.RocketActionConfigurationPropertyKey
 import ru.ezhov.rocket.action.api.RocketActionPropertySpec
 import ru.ezhov.rocket.action.api.RocketActionType
+import ru.ezhov.rocket.action.api.context.icon.AppIcon
+import ru.ezhov.rocket.action.api.context.notification.NotificationType
 import ru.ezhov.rocket.action.application.configuration.ui.event.ConfigurationUiListener
 import ru.ezhov.rocket.action.application.configuration.ui.event.ConfigurationUiObserverFactory
 import ru.ezhov.rocket.action.application.configuration.ui.event.model.ConfigurationUiEvent
 import ru.ezhov.rocket.action.application.configuration.ui.event.model.RemoveSettingUiEvent
 import ru.ezhov.rocket.action.application.infrastructure.MutableRocketActionSettings
+import ru.ezhov.rocket.action.application.plugin.context.RocketActionContextFactory
 import ru.ezhov.rocket.action.application.plugin.manager.domain.RocketActionPluginRepository
-import ru.ezhov.rocket.action.icon.AppIcon
-import ru.ezhov.rocket.action.icon.IconRepositoryFactory
-import ru.ezhov.rocket.action.notification.NotificationFactory
-import ru.ezhov.rocket.action.notification.NotificationType
 import java.awt.BorderLayout
 import java.awt.Color
 import javax.swing.BorderFactory
@@ -55,9 +54,9 @@ class EditorRocketActionSettingsPanel(
         button.addActionListener {
             rocketActionSettingsPanel.create()?.let { rs ->
                 callback!!.saved(rs)
-                NotificationFactory.notification.show(NotificationType.INFO, "Конфигурация текущего действия сохранена")
+                RocketActionContextFactory.context.notification().show(NotificationType.INFO, "Конфигурация текущего действия сохранена")
             } ?: run {
-                NotificationFactory.notification.show(NotificationType.WARN, "Действие не выбрано")
+                RocketActionContextFactory.context.notification().show(NotificationType.WARN, "Действие не выбрано")
             }
 
         }
@@ -76,7 +75,8 @@ class EditorRocketActionSettingsPanel(
         testPanel.clearTest()
         currentSettings = settings
         this.callback = callback
-        val configuration: RocketActionConfiguration? = rocketActionPluginRepository.by(settings.settings.type())?.configuration()
+        val configuration: RocketActionConfiguration? = rocketActionPluginRepository.by(settings.settings.type())
+            ?.configuration(RocketActionContextFactory.context)
         val configurationDescription = configuration?.let {
             configuration.description()
         }
@@ -208,7 +208,7 @@ class EditorRocketActionSettingsPanel(
             value.property
                 ?.let { property ->
                     val labelName = JLabel(property.name())
-                    val labelDescription = JLabel(IconRepositoryFactory.repository.by(AppIcon.INFO))
+                    val labelDescription = JLabel(RocketActionContextFactory.context.icon().by(AppIcon.INFO))
                     labelDescription.toolTipText = property.description()
 
                     val topPanel = JPanel()
@@ -284,7 +284,7 @@ class EditorRocketActionSettingsPanel(
                 val text = "Обнаружено незарегистрированное свойство '${value.key.value}:${value.value}' " +
                     "description=${value.property?.description()}"
                 logger.warn { text }
-                NotificationFactory.notification.show(
+                RocketActionContextFactory.context.notification().show(
                     type = NotificationType.WARN,
                     text = text
                 )

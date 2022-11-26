@@ -10,15 +10,14 @@ import ru.ezhov.rocket.action.api.RocketActionPlugin
 import ru.ezhov.rocket.action.api.RocketActionPropertySpec
 import ru.ezhov.rocket.action.api.RocketActionSettings
 import ru.ezhov.rocket.action.api.RocketActionType
+import ru.ezhov.rocket.action.api.context.RocketActionContext
+import ru.ezhov.rocket.action.api.context.icon.AppIcon
+import ru.ezhov.rocket.action.api.context.notification.NotificationType
 import ru.ezhov.rocket.action.api.support.AbstractRocketAction
-import ru.ezhov.rocket.action.icon.AppIcon
-import ru.ezhov.rocket.action.icon.IconRepositoryFactory
-import ru.ezhov.rocket.action.notification.NotificationFactory
-import ru.ezhov.rocket.action.notification.NotificationType
 import ru.ezhov.rocket.action.plugin.url.parser.UrlParser
 import ru.ezhov.rocket.action.plugin.url.parser.UrlParserFilter
 import ru.ezhov.rocket.action.plugin.url.parser.UrlParserResult
-import ru.ezhov.rocket.action.ui.swing.common.TextFieldWithText
+import ru.ezhov.rocket.action.ui.utils.swing.common.TextFieldWithText
 import java.awt.BorderLayout
 import java.awt.Component
 import java.awt.Dimension
@@ -37,13 +36,19 @@ import javax.swing.SwingWorker
 private val logger = KotlinLogging.logger {}
 
 class UrlParserRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
-    private val iconDef = IconRepositoryFactory.repository.by(AppIcon.FLASH)
+    private var actionContext: RocketActionContext? = null
 
-    override fun factory(): RocketActionFactoryUi = this
+    override fun factory(context: RocketActionContext): RocketActionFactoryUi = this
+        .apply {
+            actionContext = context
+        }
 
-    override fun configuration(): RocketActionConfiguration = this
+    override fun configuration(context: RocketActionContext): RocketActionConfiguration = this
+        .apply {
+            actionContext = context
+        }
 
-    override fun create(settings: RocketActionSettings): RocketAction? =
+    override fun create(settings: RocketActionSettings, context: RocketActionContext): RocketAction? =
         settings.settings()[LABEL]
             ?.takeIf { it.isNotEmpty() && settings.type().value() == this.type().value() }
             ?.let { label ->
@@ -66,7 +71,7 @@ class UrlParserRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
 
                 val component = JMenu(label).apply {
                     val panelTop = JPanel(BorderLayout())
-                    icon = iconDef
+                    icon = actionContext!!.icon().by(AppIcon.FLASH)
                     val textField = TextFieldWithText("URL")
                     textField.columns = 15
                     val txt = JTextPane()
@@ -82,7 +87,8 @@ class UrlParserRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
                                     """.trimIndent()
                                     }
                                 },
-                                headers = headers
+                                headers = headers,
+                                context = context,
                             )
                         )
                     }
@@ -118,7 +124,7 @@ class UrlParserRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
 
     override fun asString(): List<RocketActionConfigurationPropertyKey> = listOf(LABEL)
 
-    override fun icon(): Icon? = iconDef
+    override fun icon(): Icon? = actionContext!!.icon().by(AppIcon.FLASH)
 
     override fun properties(): List<RocketActionConfigurationProperty> = listOf(
         createRocketActionProperty(
@@ -148,14 +154,16 @@ class UrlParserRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
     private class ButtonListener(
         private val callbackUrl: () -> String,
         private val callbackSetText: (value: UrlParserResult) -> Unit,
-        private val headers: Map<String, String>
+        private val headers: Map<String, String>,
+        private val context: RocketActionContext,
     ) : ActionListener {
         override fun actionPerformed(e: ActionEvent?) {
             UrlWorker(
                 button = e!!.source as JButton,
                 url = callbackUrl(),
                 callbackSetText = callbackSetText,
-                headers = headers
+                headers = headers,
+                context = context,
             ).execute()
         }
 
@@ -164,9 +172,10 @@ class UrlParserRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
             private val url: String,
             private val callbackSetText: (value: UrlParserResult) -> Unit,
             private val headers: Map<String, String>,
+            private val context: RocketActionContext,
         ) : SwingWorker<UrlParserResult, UrlParserResult>() {
             init {
-                button.icon = ImageIcon(this.javaClass.getResource("/load_16x16.gif"))
+                button.icon = ImageIcon(this.javaClass.getResource("/icons/load_16x16.gif"))
             }
 
             override fun doInBackground(): UrlParserResult =
@@ -178,7 +187,7 @@ class UrlParserRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
                 } catch (ex: Exception) {
                     logger.warn(ex) {}
 
-                    NotificationFactory.notification.show(
+                    context.notification().show(
                         type = NotificationType.ERROR,
                         text = "Ошибка получения описания для URL '$url'"
                     )

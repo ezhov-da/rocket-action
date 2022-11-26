@@ -11,9 +11,9 @@ import ru.ezhov.rocket.action.api.RocketActionPlugin
 import ru.ezhov.rocket.action.api.RocketActionPropertySpec
 import ru.ezhov.rocket.action.api.RocketActionSettings
 import ru.ezhov.rocket.action.api.RocketActionType
+import ru.ezhov.rocket.action.api.context.RocketActionContext
+import ru.ezhov.rocket.action.api.context.icon.AppIcon
 import ru.ezhov.rocket.action.api.support.AbstractRocketAction
-import ru.ezhov.rocket.action.icon.AppIcon
-import ru.ezhov.rocket.action.icon.IconRepositoryFactory
 import java.awt.Component
 import java.io.File
 import java.util.UUID
@@ -23,13 +23,19 @@ import javax.swing.JMenu
 private val logger = KotlinLogging.logger {}
 
 class NoteOnFileRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
-    private val iconDef = IconRepositoryFactory.repository.by(AppIcon.TEXT)
+    private var actionContext: RocketActionContext? = null
 
-    override fun factory(): RocketActionFactoryUi = this
+    override fun factory(context: RocketActionContext): RocketActionFactoryUi = this
+        .apply {
+            actionContext = context
+        }
 
-    override fun configuration(): RocketActionConfiguration = this
+    override fun configuration(context: RocketActionContext): RocketActionConfiguration = this
+        .apply {
+            actionContext = context
+        }
 
-    override fun create(settings: RocketActionSettings): RocketAction? =
+    override fun create(settings: RocketActionSettings, context: RocketActionContext): RocketAction? =
         settings.settings()[PATH_AND_NAME]
             ?.takeIf {
                 if (it.isEmpty()) {
@@ -38,6 +44,8 @@ class NoteOnFileRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
                 it.isNotEmpty()
             }
             ?.let { path ->
+                actionContext = context
+
                 val label = settings.settings()[LABEL]?.takeIf { it.isNotEmpty() }
                     ?: path.let { File(path).name }
                 val description = settings.settings()[DESCRIPTION]?.takeIf { it.isNotEmpty() } ?: path
@@ -48,7 +56,7 @@ class NoteOnFileRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
                 val autoSaveInSeconds = settings.settings()[AUTO_SAVE_PERIOD_IN_SECOND]?.toIntOrNull()
 
                 val component = JMenu(label).apply {
-                    this.icon = iconDef
+                    this.icon = actionContext!!.icon().by(AppIcon.TEXT)
                     this.add(
                         TextPanel(
                             path = path,
@@ -63,6 +71,7 @@ class NoteOnFileRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
                                     delayInSeconds = autoSaveInSeconds ?: DEFAULT_AUTO_SAVE_PERIOD_IN_SECOND
                                 )
                             },
+                            context = context,
                         )
                     )
                 }
@@ -169,7 +178,7 @@ class NoteOnFileRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
 
     override fun name(): String = "Записка в файле"
 
-    override fun icon(): Icon? = iconDef
+    override fun icon(): Icon? = actionContext!!.icon().by(AppIcon.TEXT)
 
     companion object {
         private val LABEL = RocketActionConfigurationPropertyKey("label")

@@ -10,6 +10,9 @@ import ru.ezhov.rocket.action.api.RocketActionPlugin
 import ru.ezhov.rocket.action.api.RocketActionPropertySpec
 import ru.ezhov.rocket.action.api.RocketActionSettings
 import ru.ezhov.rocket.action.api.RocketActionType
+import ru.ezhov.rocket.action.api.context.RocketActionContext
+import ru.ezhov.rocket.action.api.context.icon.AppIcon
+import ru.ezhov.rocket.action.api.context.notification.NotificationType
 import ru.ezhov.rocket.action.api.handler.RocketActionHandleStatus
 import ru.ezhov.rocket.action.api.handler.RocketActionHandler
 import ru.ezhov.rocket.action.api.handler.RocketActionHandlerCommand
@@ -19,10 +22,6 @@ import ru.ezhov.rocket.action.api.handler.RocketActionHandlerProperty
 import ru.ezhov.rocket.action.api.handler.RocketActionHandlerPropertyKey
 import ru.ezhov.rocket.action.api.handler.RocketActionHandlerPropertySpec
 import ru.ezhov.rocket.action.api.support.AbstractRocketAction
-import ru.ezhov.rocket.action.icon.AppIcon
-import ru.ezhov.rocket.action.icon.IconRepositoryFactory
-import ru.ezhov.rocket.action.notification.NotificationFactory
-import ru.ezhov.rocket.action.notification.NotificationType
 import ru.ezhov.rocket.action.plugin.jira.worklog.domain.model.AliasForTaskIds
 import ru.ezhov.rocket.action.plugin.jira.worklog.domain.model.Task
 import ru.ezhov.rocket.action.plugin.jira.worklog.infrastructure.JiraCommitTimeService
@@ -38,13 +37,19 @@ import javax.swing.JMenu
 private val logger = KotlinLogging.logger {}
 
 class JiraWorklogRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
-    private val icon = IconRepositoryFactory.repository.by(AppIcon.CLOCK)
+    private var actionContext: RocketActionContext? = null
 
-    override fun factory(): RocketActionFactoryUi = this
+    override fun factory(context: RocketActionContext): RocketActionFactoryUi = this
+        .apply {
+            actionContext = context
+        }
 
-    override fun configuration(): RocketActionConfiguration = this
+    override fun configuration(context: RocketActionContext): RocketActionConfiguration = this
+        .apply {
+            actionContext = context
+        }
 
-    override fun create(settings: RocketActionSettings): RocketAction? =
+    override fun create(settings: RocketActionSettings, context: RocketActionContext): RocketAction? =
         settings.settings()[LABEL]
             ?.takeIf { it.isNotEmpty() }
             ?.let { label ->
@@ -57,7 +62,7 @@ class JiraWorklogRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
                 } catch (ex: Exception) {
                     val text = "Invalid URL for Jira work log plugin"
                     logger.warn(ex) { text }
-                    NotificationFactory.notification.show(type = NotificationType.WARN, text = text)
+                    actionContext!!.notification().show(type = NotificationType.WARN, text = text)
                     return null
                 }
                 val tasks = settings.settings()[PREDEFINED_TASKS]
@@ -73,7 +78,7 @@ class JiraWorklogRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
                 val aliasForTaskIds = AliasForTaskIds.of(settings.settings()[ALIAS_FOR_TASK_IDS])
 
                 val menu = JMenu(label)
-                menu.icon = icon
+                menu.icon = actionContext!!.icon().by(AppIcon.CLOCK)
                 menu.toolTipText = description
                 val jiraWorkLogUI =
                     JiraWorkLogUI(
@@ -105,11 +110,12 @@ class JiraWorklogRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
                                 } catch (ex: Exception) {
                                     val msg = "Error link $link"
                                     logger.warn(ex) { msg }
-                                    NotificationFactory.notification.show(NotificationType.WARN, msg)
+                                    actionContext!!.notification().show(NotificationType.WARN, msg)
                                     null
                                 }
                             },
-                        fileForSave = File(settings.settings()[FILE_PATH_WORK_LOG] ?: defaultFile())
+                        fileForSave = File(settings.settings()[FILE_PATH_WORK_LOG] ?: defaultFile()),
+                        context = context,
                     )
                 menu.add(jiraWorkLogUI)
 
@@ -262,7 +268,7 @@ class JiraWorklogRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
 
     override fun name(): String = "Внесение отработанного времени в Jira"
 
-    override fun icon(): Icon? = icon
+    override fun icon(): Icon? = actionContext!!.icon().by(AppIcon.CLOCK)
 
     companion object {
         private val LABEL = RocketActionConfigurationPropertyKey("label")

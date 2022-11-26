@@ -14,7 +14,7 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
 
-        <plugin-api.version>0.19.1</plugin-api.version>
+        <plugin-api.version>0.20.0</plugin-api.version>
         <icon.version>0.17.4</icon.version>
         <notification.version>0.17.3</notification.version>
         <cache.version>0.17.3</cache.version>
@@ -37,9 +37,6 @@
         <module>application-core</module>
         <module>utils</module>
         <module>ui-utils</module>
-        <module>notification</module>
-        <module>icon</module>
-        <module>cache</module>
         <module>plugin-api</module>
         <module>plugin-note-on-file</module>
         <module>plugin-copy-to-clipboard</module>
@@ -81,24 +78,6 @@
                 <groupId>ru.ezhov</groupId>
                 <artifactId>rocket-action-ui-utils</artifactId>
                 <version>${rocket-action-ui-utils.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>ru.ezhov</groupId>
-                <artifactId>rocket-action-icon</artifactId>
-                <version>${icon.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>ru.ezhov</groupId>
-                <artifactId>rocket-action-notification</artifactId>
-                <version>${notification.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>ru.ezhov</groupId>
-                <artifactId>rocket-action-cache</artifactId>
-                <version>${cache.version}</version>
             </dependency>
 
             <!--========================================-->

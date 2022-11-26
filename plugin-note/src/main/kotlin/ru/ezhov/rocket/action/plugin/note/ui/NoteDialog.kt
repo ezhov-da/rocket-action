@@ -1,17 +1,16 @@
 package ru.ezhov.rocket.action.plugin.note.ui
 
 import mu.KotlinLogging
-import ru.ezhov.rocket.action.icon.AppIcon
-import ru.ezhov.rocket.action.icon.IconRepositoryFactory
-import ru.ezhov.rocket.action.icon.toImage
-import ru.ezhov.rocket.action.notification.NotificationFactory
-import ru.ezhov.rocket.action.notification.NotificationType
+import ru.ezhov.rocket.action.api.context.RocketActionContext
+import ru.ezhov.rocket.action.api.context.icon.AppIcon
+import ru.ezhov.rocket.action.api.context.notification.NotificationType
 import ru.ezhov.rocket.action.plugin.note.application.NoteApplicationService
 import ru.ezhov.rocket.action.plugin.note.domain.model.Note
 import ru.ezhov.rocket.action.plugin.url.parser.UrlParser
 import ru.ezhov.rocket.action.plugin.url.parser.UrlParserFilter
 import ru.ezhov.rocket.action.plugin.url.parser.UrlParserResult
-import ru.ezhov.rocket.action.ui.swing.common.MoveUtil
+import ru.ezhov.rocket.action.ui.utils.swing.common.MoveUtil
+import ru.ezhov.rocket.action.ui.utils.swing.common.toImage
 import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Dimension
@@ -46,7 +45,8 @@ import javax.swing.WindowConstants
 private val logger = KotlinLogging.logger {}
 
 class NoteDialog(
-    noteApplicationService: NoteApplicationService
+    noteApplicationService: NoteApplicationService,
+    actionContext: RocketActionContext,
 ) : JDialog() {
     companion object {
         private const val TEXT = "вставьте сюда"
@@ -55,7 +55,12 @@ class NoteDialog(
     private val labelDropDown = JLabel("<html><center>Перетащите текст<br>для сохранения<br>или</center>")
     private val textFieldPaste = JTextField(TEXT)
     private val basicPanel = JPanel(BorderLayout())
-    private val createDialog = CreateDialog(noteApplicationService = noteApplicationService, owner = this, modal = true)
+    private val createDialog = CreateDialog(
+        noteApplicationService = noteApplicationService,
+        owner = this,
+        modal = true,
+        actionContext = actionContext
+    )
 
     init {
         labelDropDown.horizontalTextPosition = SwingConstants.CENTER
@@ -150,7 +155,8 @@ class NoteDialog(
     private class CreateDialog(
         private val noteApplicationService: NoteApplicationService,
         owner: JDialog,
-        modal: Boolean
+        modal: Boolean,
+        private val actionContext: RocketActionContext,
     ) : JDialog(owner, modal) {
         private val textPaneText = JTextPane()
         private val textPaneDescription = JTextPane()
@@ -161,7 +167,7 @@ class NoteDialog(
 
             val dialog = this
 
-            dialog.setIconImage(IconRepositoryFactory.repository.by(AppIcon.ROCKET_APP).toImage())
+            dialog.setIconImage(actionContext.icon().by(AppIcon.ROCKET_APP).toImage())
 
             add(JScrollPane(textPaneText), BorderLayout.NORTH)
             add(JScrollPane(textPaneDescription), BorderLayout.CENTER)
@@ -181,15 +187,15 @@ class NoteDialog(
                     override fun done() {
                         try {
                             val note = get()
-                            NotificationFactory
-                                .notification
+                            actionContext
+                                .notification()
                                 .show(type = NotificationType.INFO, text = "Заметка сохранена. $note")
                             dialog.isVisible = false
                         } catch (ex: Exception) {
                             logger.warn(ex) { "Error when save note ${textPaneText.text} ${textPaneDescription.text}" }
 
-                            NotificationFactory
-                                .notification
+                            actionContext
+                                .notification()
                                 .show(type = NotificationType.WARN, text = "Ошибка сохранения заметки")
                         }
                     }

@@ -9,6 +9,8 @@ import ru.ezhov.rocket.action.api.RocketActionPlugin
 import ru.ezhov.rocket.action.api.RocketActionPropertySpec
 import ru.ezhov.rocket.action.api.RocketActionSettings
 import ru.ezhov.rocket.action.api.RocketActionType
+import ru.ezhov.rocket.action.api.context.RocketActionContext
+import ru.ezhov.rocket.action.api.context.icon.AppIcon
 import ru.ezhov.rocket.action.api.handler.RocketActionHandleStatus
 import ru.ezhov.rocket.action.api.handler.RocketActionHandler
 import ru.ezhov.rocket.action.api.handler.RocketActionHandlerCommand
@@ -20,11 +22,19 @@ import java.awt.Component
 import javax.swing.Icon
 
 class KotlinScriptRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
-    override fun factory(): RocketActionFactoryUi = this
+    private var actionContext: RocketActionContext? = null
 
-    override fun configuration(): RocketActionConfiguration = this
+    override fun factory(context: RocketActionContext): RocketActionFactoryUi = this
+        .apply {
+            actionContext = context
+        }
 
-    override fun create(settings: RocketActionSettings): RocketAction? =
+    override fun configuration(context: RocketActionContext): RocketActionConfiguration = this
+        .apply {
+            actionContext = context
+        }
+
+    override fun create(settings: RocketActionSettings, context: RocketActionContext): RocketAction? =
         settings.settings()[SCRIPT]
             ?.takeIf { it.isNotEmpty() }
             ?.let { script ->
@@ -37,6 +47,7 @@ class KotlinScriptRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
                             script = script,
                             description = description,
                             executeOnLoad = settings.settings()[EXECUTE_ON_LOAD].toBoolean(),
+                            context = context,
                         )
 
                         object : RocketAction, RocketActionHandlerFactory {
@@ -103,7 +114,7 @@ class KotlinScriptRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
 
     override fun name(): String = "Kotlin script"
 
-    override fun icon(): Icon? = ScriptMenu.ICON_DEFAULT
+    override fun icon(): Icon? = actionContext!!.icon().by(AppIcon.BOLT)
 
     companion object {
         internal const val TYPE = "KOTLIN_SCRIPT"

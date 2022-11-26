@@ -10,12 +10,10 @@ import ru.ezhov.rocket.action.api.RocketActionPlugin
 import ru.ezhov.rocket.action.api.RocketActionPropertySpec
 import ru.ezhov.rocket.action.api.RocketActionSettings
 import ru.ezhov.rocket.action.api.RocketActionType
+import ru.ezhov.rocket.action.api.context.RocketActionContext
+import ru.ezhov.rocket.action.api.context.icon.AppIcon
+import ru.ezhov.rocket.action.api.context.notification.NotificationType
 import ru.ezhov.rocket.action.api.support.AbstractRocketAction
-import ru.ezhov.rocket.action.icon.AppIcon
-import ru.ezhov.rocket.action.icon.IconRepositoryFactory
-import ru.ezhov.rocket.action.icon.IconService
-import ru.ezhov.rocket.action.notification.NotificationFactory
-import ru.ezhov.rocket.action.notification.NotificationType
 import ru.ezhov.rocket.action.plugin.note.application.NoteApplicationService
 import ru.ezhov.rocket.action.plugin.note.infrastructure.NoteRepositoryFactory
 import java.awt.Component
@@ -30,13 +28,19 @@ import kotlin.io.path.absolutePathString
 private val logger = KotlinLogging.logger {}
 
 class NoteRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
-    private val iconDef = IconRepositoryFactory.repository.by(AppIcon.CLIPBOARD)
+    private var actionContext: RocketActionContext? = null
 
-    override fun factory(): RocketActionFactoryUi = this
+    override fun factory(context: RocketActionContext): RocketActionFactoryUi = this
+        .apply {
+            actionContext = context
+        }
 
-    override fun configuration(): RocketActionConfiguration = this
+    override fun configuration(context: RocketActionContext): RocketActionConfiguration = this
+        .apply {
+            actionContext = context
+        }
 
-    override fun create(settings: RocketActionSettings): RocketAction? = run {
+    override fun create(settings: RocketActionSettings, context: RocketActionContext): RocketAction? = run {
 
         settings.settings()[LABEL]
             ?.takeIf { it.isNotEmpty() }
@@ -48,9 +52,9 @@ class NoteRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
                         // TODO откорректировать на JMenuItem
                         val menu = JMenu(label)
                         settings.settings()[ICON_URL].let { icon ->
-                            menu.icon = IconService().load(
+                            menu.icon = actionContext!!.icon().load(
                                 iconUrl = icon ?: "",
-                                defaultIcon = iconDef
+                                defaultIcon = actionContext!!.icon().by(AppIcon.CLIPBOARD)
                             )
                         }
                         menu.toolTipText = description
@@ -100,13 +104,16 @@ class NoteRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
                 try {
                     NoteDialog(
                         noteApplicationService = this.get(),
+                        actionContext = actionContext!!,
                     ).isVisible = true
                 } catch (ex: Exception) {
                     logger.warn(ex) { "Error when load notes by DB path '${pathToDb.absolutePathString()}'" }
-                    NotificationFactory.notification.show(
-                        NotificationType.WARN,
-                        "Ошибка создания \"Заметок\""
-                    )
+                    actionContext!!
+                        .notification()
+                        .show(
+                            NotificationType.WARN,
+                            "Ошибка создания \"Заметок\""
+                        )
                 }
             }
         }.execute()
@@ -133,7 +140,7 @@ class NoteRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
         )
     }
 
-    override fun icon(): Icon? = iconDef
+    override fun icon(): Icon? = actionContext!!.icon().by(AppIcon.CLIPBOARD)
 
     override fun name(): String = "Заметки"
 

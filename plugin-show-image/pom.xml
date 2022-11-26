@@ -10,7 +10,7 @@
     </parent>
 
     <artifactId>rocket-action-plugin-show-image</artifactId>
-    <version>0.19.0</version>
+    <version>0.20.0</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -22,18 +22,6 @@
         <dependency>
             <groupId>ru.ezhov</groupId>
             <artifactId>rocket-action-plugin-api</artifactId>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>ru.ezhov</groupId>
-            <artifactId>rocket-action-cache</artifactId>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>ru.ezhov</groupId>
-            <artifactId>rocket-action-icon</artifactId>
             <scope>provided</scope>
         </dependency>
 
@@ -52,6 +40,12 @@
         <dependency>
             <groupId>io.arrow-kt</groupId>
             <artifactId>arrow-core</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>ru.ezhov</groupId>
+            <artifactId>rocket-action-ui-utils</artifactId>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>

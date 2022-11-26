@@ -9,11 +9,10 @@ import ru.ezhov.rocket.action.api.RocketActionFactoryUi
 import ru.ezhov.rocket.action.api.RocketActionPlugin
 import ru.ezhov.rocket.action.api.RocketActionSettings
 import ru.ezhov.rocket.action.api.RocketActionType
+import ru.ezhov.rocket.action.api.context.RocketActionContext
+import ru.ezhov.rocket.action.api.context.icon.AppIcon
+import ru.ezhov.rocket.action.api.context.notification.NotificationType
 import ru.ezhov.rocket.action.api.support.AbstractRocketAction
-import ru.ezhov.rocket.action.icon.AppIcon
-import ru.ezhov.rocket.action.icon.IconRepositoryFactory
-import ru.ezhov.rocket.action.notification.NotificationFactory
-import ru.ezhov.rocket.action.notification.NotificationType
 import java.awt.Component
 import java.awt.Desktop
 import java.io.File
@@ -23,13 +22,19 @@ import javax.swing.JMenuItem
 private val logger = KotlinLogging.logger {}
 
 class OpenFileRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
-    private val icon = IconRepositoryFactory.repository.by(AppIcon.FILE)
+    private var actionContext: RocketActionContext? = null
 
-    override fun factory(): RocketActionFactoryUi = this
+    override fun factory(context: RocketActionContext): RocketActionFactoryUi = this
+        .apply {
+            actionContext = context
+        }
 
-    override fun configuration(): RocketActionConfiguration = this
+    override fun configuration(context: RocketActionContext): RocketActionConfiguration = this
+        .apply {
+            actionContext = context
+        }
 
-    override fun create(settings: RocketActionSettings): RocketAction? =
+    override fun create(settings: RocketActionSettings, context: RocketActionContext): RocketAction? =
         settings.settings()[PATH]
             ?.takeIf { it.isNotEmpty() }
             ?.let { path ->
@@ -38,7 +43,7 @@ class OpenFileRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
                 val description = settings.settings()[DESCRIPTION]?.takeIf { it.isNotEmpty() } ?: path
 
                 val menuItem = JMenuItem(label)
-                menuItem.icon = icon
+                menuItem.icon = actionContext!!.icon().by(AppIcon.FILE)
                 menuItem.toolTipText = description
                 menuItem.addActionListener {
                     if (Desktop.isDesktopSupported()) {
@@ -46,7 +51,7 @@ class OpenFileRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
                             Desktop.getDesktop().open(File(path))
                         } catch (ex: Exception) {
                             logger.warn(ex) { "Error when open file '$path'" }
-                            NotificationFactory.notification.show(NotificationType.ERROR, "Ошибка открытия файла")
+                            actionContext!!.notification().show(NotificationType.ERROR, "Ошибка открытия файла")
                         }
                     }
                 }
@@ -104,7 +109,7 @@ class OpenFileRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
 
     override fun name(): String = "Открыть файл"
 
-    override fun icon(): Icon? = icon
+    override fun icon(): Icon? = actionContext!!.icon().by(AppIcon.FILE)
 
     companion object {
         private val LABEL = RocketActionConfigurationPropertyKey("label")

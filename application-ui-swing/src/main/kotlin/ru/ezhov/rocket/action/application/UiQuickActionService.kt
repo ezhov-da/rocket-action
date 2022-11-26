@@ -2,20 +2,19 @@ package ru.ezhov.rocket.action.application
 
 import mu.KotlinLogging
 import ru.ezhov.rocket.action.api.RocketActionSettings
+import ru.ezhov.rocket.action.api.context.icon.AppIcon
+import ru.ezhov.rocket.action.api.context.notification.NotificationType
 import ru.ezhov.rocket.action.application.configuration.ui.ConfigurationFrame
 import ru.ezhov.rocket.action.application.domain.RocketActionSettingsRepository
 import ru.ezhov.rocket.action.application.handlers.server.Server
 import ru.ezhov.rocket.action.application.infrastructure.RocketActionComponentCacheFactory
+import ru.ezhov.rocket.action.application.plugin.context.RocketActionContextFactory
 import ru.ezhov.rocket.action.application.plugin.group.GroupRocketActionUi
 import ru.ezhov.rocket.action.application.plugin.manager.domain.RocketActionPluginRepository
 import ru.ezhov.rocket.action.application.properties.GeneralPropertiesRepository
 import ru.ezhov.rocket.action.application.properties.UsedPropertiesName
-import ru.ezhov.rocket.action.icon.AppIcon
-import ru.ezhov.rocket.action.icon.IconRepositoryFactory
-import ru.ezhov.rocket.action.notification.NotificationFactory
-import ru.ezhov.rocket.action.notification.NotificationType
-import ru.ezhov.rocket.action.ui.swing.common.MoveUtil
-import ru.ezhov.rocket.action.ui.swing.common.TextFieldWithText
+import ru.ezhov.rocket.action.ui.utils.swing.common.MoveUtil
+import ru.ezhov.rocket.action.ui.utils.swing.common.TextFieldWithText
 import java.awt.Color
 import java.awt.Component
 import java.awt.Desktop
@@ -61,7 +60,7 @@ class UiQuickActionService(
             //menuBar.add(createFavoriteComponent());
 
             menuBar.add(createSearchField(baseDialog, menu))
-            val moveLabel = JLabel(IconRepositoryFactory.repository.by(AppIcon.MOVE))
+            val moveLabel = JLabel(RocketActionContextFactory.context.icon().by(AppIcon.MOVE))
             MoveUtil.addMoveAction(movableComponent = baseDialog, grabbedComponent = moveLabel)
             menuBar.add(moveLabel)
             CreateMenuWorker(menu).execute()
@@ -113,7 +112,7 @@ class UiQuickActionService(
                     }
             add(textField)
             add(
-                JLabel(IconRepositoryFactory.repository.by(AppIcon.CLEAR))
+                JLabel(RocketActionContextFactory.context.icon().by(AppIcon.CLEAR))
                     .apply {
                         addMouseListener(object : MouseAdapter() {
                             override fun mouseReleased(e: MouseEvent?) {
@@ -132,7 +131,7 @@ class UiQuickActionService(
 
     private fun createTools(baseDialog: JDialog): JMenu {
         val menuTools = JMenu("Инструменты")
-        menuTools.icon = IconRepositoryFactory.repository.by(AppIcon.WRENCH)
+        menuTools.icon = RocketActionContextFactory.context.icon().by(AppIcon.WRENCH)
         val updateActionListener = ActionListener {
             SwingUtilities.invokeLater {
                 var newMenuBar: JMenuBar? = null
@@ -140,7 +139,7 @@ class UiQuickActionService(
                     newMenuBar = createMenu(baseDialog)
                 } catch (ex: UiQuickActionServiceException) {
                     ex.printStackTrace()
-                    NotificationFactory.notification.show(NotificationType.ERROR, "Ошибка создания меню инструментов")
+                    RocketActionContextFactory.context.notification().show(NotificationType.ERROR, "Ошибка создания меню инструментов")
                 }
                 if (newMenuBar != null) {
                     // пока костыль, но мы то знаем это "пока" :)
@@ -152,11 +151,11 @@ class UiQuickActionService(
             }
         }
         val menuItemUpdate = JMenuItem("Обновить")
-        menuItemUpdate.icon = IconRepositoryFactory.repository.by(AppIcon.RELOAD)
+        menuItemUpdate.icon = RocketActionContextFactory.context.icon().by(AppIcon.RELOAD)
         menuItemUpdate.addActionListener(updateActionListener)
         menuTools.add(menuItemUpdate)
         val menuItemEditor = JMenuItem("Редактор")
-        menuItemEditor.icon = IconRepositoryFactory.repository.by(AppIcon.PENCIL)
+        menuItemEditor.icon = RocketActionContextFactory.context.icon().by(AppIcon.PENCIL)
         menuItemEditor.addActionListener {
             SwingUtilities.invokeLater {
                 if (configurationFrame == null) {
@@ -168,7 +167,7 @@ class UiQuickActionService(
                         )
                     } catch (ex: Exception) {
                         ex.printStackTrace()
-                        NotificationFactory.notification.show(NotificationType.ERROR, "Ошибка создания меню конфигурирования")
+                        RocketActionContextFactory.context.notification().show(NotificationType.ERROR, "Ошибка создания меню конфигурирования")
                     }
                 }
                 if (configurationFrame != null) {
@@ -178,7 +177,7 @@ class UiQuickActionService(
         }
         menuTools.add(menuItemEditor)
         val menuInfo = JMenu("Информация")
-        menuInfo.icon = IconRepositoryFactory.repository.by(AppIcon.INFO)
+        menuInfo.icon = RocketActionContextFactory.context.icon().by(AppIcon.INFO)
         val notFound = { key: String -> "Информация по полю '$key' не найдена" }
         menuInfo.add(
             JMenuItem(generalPropertiesRepository
@@ -216,7 +215,7 @@ class UiQuickActionService(
         menuTools.add(menuInfo)
 
         menuTools.add(JMenuItem("Выход").apply {
-            icon = IconRepositoryFactory.repository.by(AppIcon.X)
+            icon = RocketActionContextFactory.context.icon().by(AppIcon.X)
             addActionListener {
                 SwingUtilities.invokeLater {
                     baseDialog.dispose()
@@ -236,7 +235,7 @@ class UiQuickActionService(
 
     private inner class CreateMenuWorker(private val menu: JMenu) : SwingWorker<List<Component>, String?>() {
         init {
-            menu.icon = IconRepositoryFactory.repository.by(AppIcon.LOADER)
+            menu.icon = RocketActionContextFactory.context.icon().by(AppIcon.LOADER)
             menu.removeAll()
         }
 
@@ -248,7 +247,7 @@ class UiQuickActionService(
             val components = mutableListOf<Component>()
             for (rocketActionSettings in actionSettings) {
                 rocketActionPluginRepository.by(rocketActionSettings.type())
-                    ?.factory()
+                    ?.factory(RocketActionContextFactory.context)
                     ?.let {
                         (
                             cache
@@ -267,7 +266,7 @@ class UiQuickActionService(
                                             "id='${rocketActionSettings.id()}. Create component"
                                     }
 
-                                    it.create(rocketActionSettings)?.component()
+                                    it.create(settings = rocketActionSettings, context = RocketActionContextFactory.context)?.component()
                                 }
                             )
                             ?.let { component ->
@@ -284,7 +283,8 @@ class UiQuickActionService(
                 .cache
                 .let { cache ->
                     for (rocketActionSettings in actionSettings) {
-                        val rau = rocketActionPluginRepository.by(rocketActionSettings.type())?.factory()
+                        val rau = rocketActionPluginRepository.by(rocketActionSettings.type())
+                            ?.factory(RocketActionContextFactory.context)
                         if (rau != null) {
                             if (rocketActionSettings.type().value() != GroupRocketActionUi.TYPE) {
                                 val mustBeCreate = cache
@@ -297,7 +297,7 @@ class UiQuickActionService(
                                 }
 
                                 if (mustBeCreate) {
-                                    rau.create(rocketActionSettings)
+                                    rau.create(settings = rocketActionSettings, context = RocketActionContextFactory.context)
                                         ?.let { action ->
                                             logger.debug {
                                                 "added to cache type='${rocketActionSettings.type().value()}'" +
@@ -323,7 +323,7 @@ class UiQuickActionService(
         override fun done() {
             val components = this.get()
             components.forEach { menu.add(it) }
-            menu.icon = IconRepositoryFactory.repository.by(AppIcon.ROCKET_APP)
+            menu.icon = RocketActionContextFactory.context.icon().by(AppIcon.ROCKET_APP)
         }
     }
 }

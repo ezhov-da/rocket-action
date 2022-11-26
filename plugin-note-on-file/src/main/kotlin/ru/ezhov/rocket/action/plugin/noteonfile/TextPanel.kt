@@ -6,11 +6,9 @@ import mu.KotlinLogging
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants
 import org.fife.ui.rtextarea.RTextScrollPane
-import ru.ezhov.rocket.action.icon.AppIcon
-import ru.ezhov.rocket.action.icon.IconRepositoryFactory
-import ru.ezhov.rocket.action.icon.toImage
-import ru.ezhov.rocket.action.notification.NotificationFactory
-import ru.ezhov.rocket.action.notification.NotificationType
+import ru.ezhov.rocket.action.api.context.RocketActionContext
+import ru.ezhov.rocket.action.api.context.icon.AppIcon
+import ru.ezhov.rocket.action.api.context.notification.NotificationType
 import ru.ezhov.rocket.action.plugin.noteonfile.command.CommandObserver
 import ru.ezhov.rocket.action.plugin.noteonfile.command.SaveTextCommand
 import ru.ezhov.rocket.action.plugin.noteonfile.command.SaveTextCommandListener
@@ -18,6 +16,8 @@ import ru.ezhov.rocket.action.plugin.noteonfile.event.EventObserver
 import java.awt.BorderLayout
 import java.awt.Desktop
 import java.awt.Dimension
+import java.awt.GraphicsEnvironment
+import java.awt.Image
 import java.awt.Toolkit
 import java.awt.datatransfer.StringSelection
 import java.awt.event.ActionEvent
@@ -30,6 +30,8 @@ import java.io.FileInputStream
 import java.io.FileOutputStream
 import javax.swing.AbstractAction
 import javax.swing.Box
+import javax.swing.Icon
+import javax.swing.ImageIcon
 import javax.swing.JButton
 import javax.swing.JComboBox
 import javax.swing.JFrame
@@ -56,6 +58,7 @@ internal class TextPanel(
     private val addStyleSelected: Boolean,
     private val delimiter: String,
     private val textAutoSave: TextAutoSave?,
+    private val context: RocketActionContext,
 ) : JPanel() {
     private val commandObserver: CommandObserver = CommandObserver()
     private val eventObserver: EventObserver = EventObserver()
@@ -92,14 +95,14 @@ internal class TextPanel(
             object : AbstractAction() {
                 init {
                     putValue(SHORT_DESCRIPTION, "Скопировать текст в буфер")
-                    putValue(SMALL_ICON, IconRepositoryFactory.repository.by(AppIcon.COPY_WRITING))
+                    putValue(SMALL_ICON, context.icon().by(AppIcon.COPY_WRITING))
                 }
 
                 override fun actionPerformed(e: ActionEvent?) {
                     val defaultToolkit = Toolkit.getDefaultToolkit()
                     val clipboard = defaultToolkit.systemClipboard
                     clipboard.setContents(StringSelection(textPane.text), null)
-                    NotificationFactory.notification.show(
+                    context.notification().show(
                         type = NotificationType.INFO,
                         text = "Текст скопирован в буфер"
                     )
@@ -110,7 +113,7 @@ internal class TextPanel(
             object : AbstractAction() {
                 init {
                     putValue(SHORT_DESCRIPTION, "Открыть в отдельном окне")
-                    putValue(SMALL_ICON, IconRepositoryFactory.repository.by(AppIcon.ARROW_TOP))
+                    putValue(SMALL_ICON, context.icon().by(AppIcon.ARROW_TOP))
                 }
 
                 override fun actionPerformed(e: ActionEvent?) {
@@ -122,7 +125,7 @@ internal class TextPanel(
             object : AbstractAction() {
                 init {
                     putValue(SHORT_DESCRIPTION, "Открыть в отдельном окне поверх всех окон")
-                    putValue(SMALL_ICON, IconRepositoryFactory.repository.by(AppIcon.BROWSER))
+                    putValue(SMALL_ICON, context.icon().by(AppIcon.BROWSER))
                 }
 
                 override fun actionPerformed(e: ActionEvent?) {
@@ -142,7 +145,8 @@ internal class TextPanel(
                     WriteSwingWorker(
                         path = path,
                         text = textPane.text,
-                        eventObserver = eventObserver
+                        eventObserver = eventObserver,
+                        context = context,
                     ).execute()
                 }
             }
@@ -161,6 +165,7 @@ internal class TextPanel(
                         textPane = textPane,
                         onLoad = { text -> pointPanel.calculate(delimiter, text) },
                         eventObserver = eventObserver,
+                        context = context,
                     ).execute()
                 }
             }
@@ -198,6 +203,7 @@ internal class TextPanel(
                     path = path,
                     text = textPane.text,
                     eventObserver = eventObserver,
+                    context = context,
                 ).execute()
             }
         })
@@ -219,6 +225,7 @@ internal class TextPanel(
                 textPane = textPane,
                 onLoad = { text -> pointPanel.calculate(delimiter, text) },
                 eventObserver = eventObserver,
+                context = context,
             ).execute()
         }
 
@@ -234,7 +241,8 @@ internal class TextPanel(
                     WriteSwingWorker(
                         path = path,
                         text = textPane.text,
-                        eventObserver = eventObserver
+                        eventObserver = eventObserver,
+                        context = context,
                     ).execute()
                 }
             }
@@ -288,6 +296,7 @@ internal class TextPanel(
                     }
                 })
             }
+
             false -> add(RTextScrollPane(textPane), BorderLayout.CENTER)
         }
     }
@@ -297,6 +306,7 @@ internal class TextPanel(
         private val textPane: RSyntaxTextArea,
         private val onLoad: (text: String) -> Unit,
         private val eventObserver: EventObserver,
+        private val context: RocketActionContext,
     ) : SwingWorker<Either<Exception, String>, String>() {
         override fun doInBackground(): Either<Exception, String> =
             try {
@@ -320,13 +330,13 @@ internal class TextPanel(
             val text = result.getOrHandle { ex ->
                 val textError = "Error when read file by '$path'"
                 logger.warn(ex) { textError }
-                NotificationFactory.notification.show(type = NotificationType.WARN, text = textError)
+                context.notification().show(type = NotificationType.WARN, text = textError)
                 ""
             }
             textPane.text = text
             onLoad(text)
             if (result.isRight()) {
-                NotificationFactory.notification.show(type = NotificationType.INFO, text = "Текст загружен")
+                context.notification().show(type = NotificationType.INFO, text = "Текст загружен")
                 eventObserver.notifyTextLoading(text)
             }
         }
@@ -336,6 +346,7 @@ internal class TextPanel(
         private val path: String,
         private val text: String,
         private val eventObserver: EventObserver,
+        private val context: RocketActionContext,
     ) : SwingWorker<Either<Exception, Unit>, String>() {
         override fun doInBackground(): Either<Exception, Unit> =
             try {
@@ -367,11 +378,11 @@ internal class TextPanel(
             result.getOrHandle { ex ->
                 val textError = "Error when write file to '$path'"
                 logger.warn(ex) { textError }
-                NotificationFactory.notification.show(type = NotificationType.WARN, text = textError)
+                context.notification().show(type = NotificationType.WARN, text = textError)
                 ""
             }
             if (result.isRight()) {
-                NotificationFactory.notification.show(type = NotificationType.INFO, text = "Текст сохранён $text")
+                context.notification().show(type = NotificationType.INFO, text = "Текст сохранён $text")
                 eventObserver.notifyTextSaving(text)
             }
         }
@@ -381,8 +392,7 @@ internal class TextPanel(
         SwingUtilities.invokeLater {
             val dimension = Toolkit.getDefaultToolkit().screenSize
             val frame = JFrame(label)
-            frame.iconImage = IconRepositoryFactory
-                .repository.by(AppIcon.ROCKET_APP).toImage()
+            frame.iconImage = context.icon().by(AppIcon.ROCKET_APP).toImage()
             frame.add(
                 TextPanel(
                     path = path,
@@ -392,6 +402,7 @@ internal class TextPanel(
                     addStyleSelected = true,
                     delimiter = delimiter,
                     textAutoSave = textAutoSave,
+                    context = context,
                 ),
                 BorderLayout.CENTER
             )
@@ -406,3 +417,20 @@ internal class TextPanel(
         }
     }
 }
+
+private fun Icon.toImage(): Image =
+    when (this is ImageIcon) {
+        true -> this.image
+        false -> {
+            val w = this.iconWidth
+            val h = this.iconHeight
+            val ge = GraphicsEnvironment.getLocalGraphicsEnvironment()
+            val gd = ge.defaultScreenDevice
+            val gc = gd.defaultConfiguration
+            val image = gc.createCompatibleImage(w, h)
+            val g = image.createGraphics()
+            this.paintIcon(null, g, 0, 0)
+            g.dispose()
+            image
+        }
+    }

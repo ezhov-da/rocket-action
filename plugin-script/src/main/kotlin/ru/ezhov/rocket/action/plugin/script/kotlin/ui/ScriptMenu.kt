@@ -1,7 +1,7 @@
 package ru.ezhov.rocket.action.plugin.script.kotlin.ui
 
-import ru.ezhov.rocket.action.icon.AppIcon
-import ru.ezhov.rocket.action.icon.IconRepositoryFactory
+import ru.ezhov.rocket.action.api.context.RocketActionContext
+import ru.ezhov.rocket.action.api.context.icon.AppIcon
 import java.awt.BorderLayout
 import java.awt.Dimension
 import java.awt.Toolkit
@@ -17,10 +17,9 @@ class ScriptMenu(
     script: String,
     description: String? = null,
     executeOnLoad: Boolean = false,
+    private val context: RocketActionContext
 ) : JMenu(label) {
-    companion object {
-        val ICON_DEFAULT = IconRepositoryFactory.repository.by(AppIcon.BOLT)
-    }
+    private val iconDefault = context.icon().by(AppIcon.BOLT)
 
     private val panelExecute: PanelExecute?
 
@@ -30,26 +29,28 @@ class ScriptMenu(
             beforeExecuteCallback = beforeExecuteCallBack(),
             afterExecuteCallback = afterExecuteCallBack(),
             script = script,
+            context = context,
         )
         add(panelExecute)
-        icon = ICON_DEFAULT
+        icon = iconDefault
 
         if (executeOnLoad) {
             ScriptSwingWorker(
                 beforeExecuteCallback = beforeExecuteCallBack(),
                 afterExecuteCallback = afterExecuteCallBack(),
                 script = script,
+                context = context,
             )
                 .execute()
         }
     }
 
     private fun beforeExecuteCallBack(): () -> Unit = {
-        icon = IconRepositoryFactory.repository.by(AppIcon.LOADER)
+        icon = context.icon().by(AppIcon.LOADER)
     }
 
     private fun afterExecuteCallBack(): (String) -> Unit = {
-        icon = ICON_DEFAULT
+        icon = iconDefault
         panelExecute?.setText(it)
     }
 
@@ -61,6 +62,7 @@ class ScriptMenu(
         private val beforeExecuteCallback: () -> Unit,
         private val afterExecuteCallback: (String) -> Unit,
         script: String,
+        private val context: RocketActionContext
     ) : JPanel() {
         val textPaneScript = JTextPane()
         val textPaneResult = JTextPane()
@@ -100,6 +102,7 @@ class ScriptMenu(
                 beforeExecuteCallback = beforeExecuteCallback,
                 afterExecuteCallback = afterExecuteCallback,
                 script = textPaneScript.text,
+                context = context,
             )
                 .execute()
         }

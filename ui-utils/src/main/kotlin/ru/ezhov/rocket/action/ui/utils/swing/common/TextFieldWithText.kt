@@ -1,4 +1,4 @@
-package ru.ezhov.rocket.action.ui.swing.common
+package ru.ezhov.rocket.action.ui.utils.swing.common
 
 import java.awt.Color
 import java.awt.Graphics

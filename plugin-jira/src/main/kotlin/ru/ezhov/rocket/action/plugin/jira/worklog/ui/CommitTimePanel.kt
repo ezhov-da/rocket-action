@@ -2,8 +2,8 @@ package ru.ezhov.rocket.action.plugin.jira.worklog.ui
 
 import arrow.core.flatten
 import mu.KotlinLogging
-import ru.ezhov.rocket.action.notification.NotificationFactory
-import ru.ezhov.rocket.action.notification.NotificationType
+import ru.ezhov.rocket.action.api.context.RocketActionContext
+import ru.ezhov.rocket.action.api.context.notification.NotificationType
 import ru.ezhov.rocket.action.plugin.jira.worklog.domain.CommitTimeService
 import ru.ezhov.rocket.action.plugin.jira.worklog.domain.CommitTimeServiceException
 import ru.ezhov.rocket.action.plugin.jira.worklog.domain.CommitTimeTaskInfoException
@@ -50,6 +50,7 @@ class CommitTimePanel(
     private val constantsNowDate: List<String>,
     private val aliasForTaskIds: AliasForTaskIds,
     private val fileForSave: File,
+    private val context: RocketActionContext,
     commitTimeService: CommitTimeService,
     commitTimeTaskInfoRepository: CommitTimeTaskInfoRepository,
     linkToWorkLog: URI? = null,
@@ -60,10 +61,11 @@ class CommitTimePanel(
         preparedTasks = tasks,
         commitTimeService = commitTimeService,
         commitTimeTaskInfoRepository = commitTimeTaskInfoRepository,
+        context = context,
     )
 
     init {
-        ReadFile(textPane = textPane, file = fileForSave).execute()
+        ReadFile(textPane = textPane, file = fileForSave, context = context).execute()
 
         layout = BorderLayout()
         add(
@@ -79,7 +81,7 @@ class CommitTimePanel(
                                         } catch (ex: Exception) {
                                             val msg = "Error open link='$ltwl'"
                                             logger.warn(ex) { msg }
-                                            NotificationFactory.notification.show(type = NotificationType.WARN, text = msg)
+                                            context!!.notification().show(type = NotificationType.WARN, text = msg)
                                         }
                                     }
                                 })
@@ -136,26 +138,27 @@ class CommitTimePanel(
         textPane.addKeyListener(object : KeyAdapter() {
             override fun keyReleased(e: KeyEvent) {
                 if (e.keyCode == 83 /*S*/ && e.isControlDown) {
-                    WriteFile(text = textPane.text, file = fileForSave).execute()
+                    WriteFile(text = textPane.text, file = fileForSave, context = context).execute()
                 }
             }
         })
     }
 
     fun loadText() {
-        ReadFile(textPane = textPane, file = fileForSave).execute()
+        ReadFile(textPane = textPane, file = fileForSave, context = context).execute()
     }
 
     fun appendTextToCurrentAndSave(text: String) {
         SwingUtilities.invokeLater {
             textPane.document.insertString(textPane.text.length, "\n$text", null)
-            WriteFile(text = textPane.text, file = fileForSave).execute()
+            WriteFile(text = textPane.text, file = fileForSave, context = context).execute()
         }
     }
 
     class WriteFile(
         private val text: String,
-        private val file: File
+        private val file: File,
+        private val context: RocketActionContext,
     ) : SwingWorker<Any, Unit>() {
         override fun doInBackground(): Unit {
             file.parentFile?.let {
@@ -168,10 +171,10 @@ class CommitTimePanel(
 
         override fun done() {
             try {
-                NotificationFactory.notification.show(NotificationType.INFO, "Text saved")
+                context.notification().show(NotificationType.INFO, "Text saved")
             } catch (ex: Exception) {
                 logger.warn(ex) { "Error when save text" }
-                NotificationFactory.notification.show(NotificationType.WARN, "Save error")
+                context.notification().show(NotificationType.WARN, "Save error")
 
             }
         }
@@ -179,7 +182,8 @@ class CommitTimePanel(
 
     class ReadFile(
         private val textPane: JTextPane,
-        private val file: File
+        private val file: File,
+        private val context: RocketActionContext,
     ) : SwingWorker<String, String>() {
         override fun doInBackground(): String =
             if (file.exists()) {
@@ -192,10 +196,10 @@ class CommitTimePanel(
             try {
                 val text = this.get()
                 textPane.text = text
-                NotificationFactory.notification.show(NotificationType.INFO, "Text is loaded")
+                context.notification().show(NotificationType.INFO, "Text is loaded")
             } catch (ex: Exception) {
                 logger.warn(ex) { "Error when get text" }
-                NotificationFactory.notification.show(NotificationType.WARN, "Error loaded text")
+                context.notification().show(NotificationType.WARN, "Error loaded text")
 
             }
         }
@@ -205,7 +209,8 @@ class CommitTimePanel(
         private val commitTimeTasks: List<TableTasksPanelTask>,
         private val commitTimeService: CommitTimeService,
         private val button: JButton,
-        private val afterCommitCallBack: (Pair<TableTasksPanelTask, CommitTimeServiceException?>) -> Unit
+        private val context: RocketActionContext,
+        private val afterCommitCallBack: (Pair<TableTasksPanelTask, CommitTimeServiceException?>) -> Unit,
     ) : SwingWorker<Unit, Pair<TableTasksPanelTask, CommitTimeServiceException?>>() {
 
         init {
@@ -229,14 +234,14 @@ class CommitTimePanel(
         override fun done() {
             try {
                 get()
-                NotificationFactory.notification.show(
+                context.notification().show(
                     type = NotificationType.INFO,
                     text = "Tasks time added to Jira"
                 )
             } catch (ex: Exception) {
                 val text = "Error when commit time"
                 logger.error(ex) { text }
-                NotificationFactory.notification.show(type = NotificationType.WARN, text = text)
+                context.notification().show(type = NotificationType.WARN, text = text)
             } finally {
                 button.isEnabled = true
             }
@@ -247,7 +252,8 @@ class CommitTimePanel(
         private val commitTimeTasks: List<TableTasksPanelTask>,
         private val commitTimeTaskInfoRepository: CommitTimeTaskInfoRepository,
         private val button: JButton,
-        private val afterSearchName: (Triple<TableTasksPanelTask, CommitTimeTaskInfo?, CommitTimeTaskInfoException?>) -> Unit
+        private val afterSearchName: (Triple<TableTasksPanelTask, CommitTimeTaskInfo?, CommitTimeTaskInfoException?>) -> Unit,
+        private val context: RocketActionContext,
     ) : SwingWorker<Unit, Triple<TableTasksPanelTask, CommitTimeTaskInfo?, CommitTimeTaskInfoException?>>() {
 
         init {
@@ -278,14 +284,14 @@ class CommitTimePanel(
         override fun done() {
             try {
                 get()
-                NotificationFactory.notification.show(
+                context.notification().show(
                     type = NotificationType.INFO,
                     text = "Names search complete"
                 )
             } catch (ex: Exception) {
                 val text = "Names search error"
                 logger.error(ex) { text }
-                NotificationFactory.notification.show(type = NotificationType.WARN, text = text)
+                context.notification().show(type = NotificationType.WARN, text = text)
             } finally {
                 button.isEnabled = true
             }
@@ -353,6 +359,7 @@ class CommitTimePanel(
     private class TasksPanel(
         private val preparedTasks: List<Task>,
         private val commitTimeService: CommitTimeService,
+        private val context: RocketActionContext,
         commitTimeTaskInfoRepository: CommitTimeTaskInfoRepository,
     ) : JPanel() {
         private val labelInfo: JLabel = JLabel()
@@ -387,6 +394,7 @@ class CommitTimePanel(
                                         1 -> l.text = value.name.orEmpty()
                                         2 -> l.text =
                                             value.task.time.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"))
+
                                         3 -> l.text = value.task.timeSpentMinute.toString()
                                         4 -> l.text = value.task.comment
                                         5 -> l.text = value.status.name
@@ -415,8 +423,8 @@ class CommitTimePanel(
                             commitTimeTasks = tasks.toList(),
                             commitTimeService = commitTimeService,
                             button = buttonCommit,
-
-                            ) { result ->
+                            context = context,
+                        ) { result ->
                             result.second?.let { ex ->
                                 logger.warn(ex) { "Error when commit time for task ${result.first}" }
                                 result.first.status = Status.ERROR
@@ -442,6 +450,7 @@ class CommitTimePanel(
                                                 commitTimeTasks = tasks,
                                                 commitTimeTaskInfoRepository = commitTimeTaskInfoRepository,
                                                 button = button,
+                                                context = context,
                                                 afterSearchName = { triple ->
                                                     triple.third
                                                         ?.let { ex ->

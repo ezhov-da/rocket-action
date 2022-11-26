@@ -1,6 +1,7 @@
 package ru.ezhov.rocket.action.application.configuration.ui
 
 import ru.ezhov.rocket.action.api.RocketActionSettings
+import ru.ezhov.rocket.action.application.plugin.context.RocketActionContextFactory
 import ru.ezhov.rocket.action.application.plugin.manager.domain.RocketActionPluginRepository
 import java.awt.BorderLayout
 import javax.swing.JButton
@@ -16,16 +17,21 @@ class TestPanel(
     private var panelTest: JPanel? = null
     private fun createTest(settings: RocketActionSettings) {
         val panel: JPanel =
-            when (val actionUi = rocketActionPluginRepository.by(settings.type())?.factory()) {
+            when (val actionUi = rocketActionPluginRepository.by(settings.type())
+                ?.factory(RocketActionContextFactory.context)) {
                 null -> {
                     val p = JPanel(BorderLayout())
                     p.add(JLabel("Не найдено действие для типа '${settings.type()}'"))
                     p
                 }
+
                 else -> {
                     val p = JPanel(BorderLayout())
                     val menuBar = JMenuBar()
-                    val component = actionUi.create(settings)?.component() ?: JLabel("Компонент не создан")
+                    val component = actionUi
+                        .create(settings = settings, context = RocketActionContextFactory.context)
+                        ?.component()
+                        ?: JLabel("Компонент не создан")
                     menuBar.add(component)
                     p.add(menuBar, BorderLayout.CENTER)
                     p

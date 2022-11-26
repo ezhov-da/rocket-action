@@ -1,12 +1,12 @@
 package ru.ezhov.rocket.action.plugin.jira.worklog.ui
 
-import ru.ezhov.rocket.action.icon.AppIcon
-import ru.ezhov.rocket.action.icon.IconRepositoryFactory
-import ru.ezhov.rocket.action.icon.toImage
+import ru.ezhov.rocket.action.api.context.RocketActionContext
+import ru.ezhov.rocket.action.api.context.icon.AppIcon
 import ru.ezhov.rocket.action.plugin.jira.worklog.domain.CommitTimeService
 import ru.ezhov.rocket.action.plugin.jira.worklog.domain.CommitTimeTaskInfoRepository
 import ru.ezhov.rocket.action.plugin.jira.worklog.domain.model.AliasForTaskIds
 import ru.ezhov.rocket.action.plugin.jira.worklog.domain.model.Task
+import ru.ezhov.rocket.action.ui.utils.swing.common.toImage
 import java.awt.BorderLayout
 import java.awt.Dimension
 import java.awt.Toolkit
@@ -22,6 +22,7 @@ class JiraWorkLogUI(
     private val tasks: List<Task> = emptyList(),
     private val commitTimeService: CommitTimeService,
     private val commitTimeTaskInfoRepository: CommitTimeTaskInfoRepository,
+    private val context: RocketActionContext,
     delimiter: String,
     dateFormatPattern: String,
     constantsNowDate: List<String>,
@@ -39,6 +40,7 @@ class JiraWorkLogUI(
         linkToWorkLog = linkToWorkLog,
         fileForSave = fileForSave,
         commitTimeTaskInfoRepository = commitTimeTaskInfoRepository,
+        context = context,
     )
     private val dimension = calculateSize()
 
@@ -50,8 +52,8 @@ class JiraWorkLogUI(
                     addActionListener {
                         SwingUtilities.invokeLater {
                             val frame = JFrame("Внесение времени в Jira")
-                            frame.iconImage = IconRepositoryFactory
-                                .repository.by(AppIcon.ROCKET_APP).toImage()
+                            frame.iconImage = context
+                                .icon().by(AppIcon.ROCKET_APP).toImage()
                             frame.add(
                                 JiraWorkLogUI(
                                     tasks = tasks,
@@ -62,7 +64,8 @@ class JiraWorkLogUI(
                                     constantsNowDate = constantsNowDate,
                                     aliasForTaskIds = aliasForTaskIds,
                                     linkToWorkLog = linkToWorkLog,
-                                    fileForSave = fileForSave
+                                    fileForSave = fileForSave,
+                                    context = context,
                                 ),
                                 BorderLayout.CENTER
                             )

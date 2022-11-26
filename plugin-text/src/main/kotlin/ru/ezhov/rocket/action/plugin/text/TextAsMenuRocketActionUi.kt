@@ -8,12 +8,11 @@ import ru.ezhov.rocket.action.api.RocketActionFactoryUi
 import ru.ezhov.rocket.action.api.RocketActionPlugin
 import ru.ezhov.rocket.action.api.RocketActionSettings
 import ru.ezhov.rocket.action.api.RocketActionType
+import ru.ezhov.rocket.action.api.context.RocketActionContext
+import ru.ezhov.rocket.action.api.context.icon.AppIcon
+import ru.ezhov.rocket.action.api.context.notification.NotificationType
 import ru.ezhov.rocket.action.api.support.AbstractRocketAction
-import ru.ezhov.rocket.action.icon.AppIcon
-import ru.ezhov.rocket.action.icon.IconRepositoryFactory
-import ru.ezhov.rocket.action.icon.toImage
-import ru.ezhov.rocket.action.notification.NotificationFactory
-import ru.ezhov.rocket.action.notification.NotificationType
+import ru.ezhov.rocket.action.ui.utils.swing.common.toImage
 import java.awt.BorderLayout
 import java.awt.Component
 import java.awt.Toolkit
@@ -33,10 +32,17 @@ import javax.swing.SwingUtilities
 import javax.swing.WindowConstants
 
 class TextAsMenuRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
-    private val iconDef = IconRepositoryFactory.repository.by(AppIcon.TEXT)
-    override fun factory(): RocketActionFactoryUi = this
+    private var actionContext: RocketActionContext? = null
 
-    override fun configuration(): RocketActionConfiguration = this
+    override fun factory(context: RocketActionContext): RocketActionFactoryUi = this
+        .apply {
+            actionContext = context
+        }
+
+    override fun configuration(context: RocketActionContext): RocketActionConfiguration = this
+        .apply {
+            actionContext = context
+        }
 
     override fun description(): String = "Show text"
 
@@ -47,12 +53,12 @@ class TextAsMenuRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
             createRocketActionProperty(key = DESCRIPTION, name = DESCRIPTION.value, description = "Описание", required = false),
         )
 
-    override fun create(settings: RocketActionSettings): RocketAction? =
+    override fun create(settings: RocketActionSettings, context: RocketActionContext): RocketAction? =
         settings.settings()[LABEL]?.takeIf { it.isNotEmpty() }?.let { label ->
             settings.settings()[TEXT]?.takeIf { it.isNotEmpty() }?.let { text ->
                 val description = settings.settings()[DESCRIPTION]
                 val menu = JMenu(label).apply {
-                    this.icon = iconDef
+                    this.icon = actionContext!!.icon().by(AppIcon.TEXT)
                     val panel = JPanel(BorderLayout())
                     panel.add(
                         JToolBar().apply {
@@ -60,14 +66,14 @@ class TextAsMenuRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
                                 object : AbstractAction() {
                                     init {
                                         putValue(SHORT_DESCRIPTION, "Скопировать текст в буфер")
-                                        putValue(SMALL_ICON, IconRepositoryFactory.repository.by(AppIcon.COPY_WRITING))
+                                        putValue(SMALL_ICON, actionContext!!.icon().by(AppIcon.COPY_WRITING))
                                     }
 
                                     override fun actionPerformed(e: ActionEvent?) {
                                         val defaultToolkit = Toolkit.getDefaultToolkit()
                                         val clipboard = defaultToolkit.systemClipboard
                                         clipboard.setContents(StringSelection(text), null)
-                                        NotificationFactory.notification.show(
+                                        actionContext!!.notification().show(
                                             type = NotificationType.INFO,
                                             text = "Текст скопирован в буфер"
                                         )
@@ -78,15 +84,16 @@ class TextAsMenuRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
                                 object : AbstractAction() {
                                     init {
                                         putValue(SHORT_DESCRIPTION, "Открыть в отдельном окне")
-                                        putValue(SMALL_ICON, IconRepositoryFactory.repository.by(AppIcon.ARROW_TOP))
+                                        putValue(SMALL_ICON, actionContext!!.icon().by(AppIcon.ARROW_TOP))
                                     }
 
                                     override fun actionPerformed(e: ActionEvent?) {
                                         SwingUtilities.invokeLater {
                                             val dimension = Toolkit.getDefaultToolkit().screenSize
                                             val frame = JFrame(label)
-                                            frame.iconImage = IconRepositoryFactory
-                                                .repository.by(AppIcon.ROCKET_APP)
+                                            frame.iconImage = actionContext!!
+                                                .icon()
+                                                .by(AppIcon.ROCKET_APP)
                                                 .toImage()
                                             frame.add(JScrollPane(JTextPane().apply {
                                                 this.text = text
@@ -137,7 +144,7 @@ class TextAsMenuRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
 
     override fun type(): RocketActionType = RocketActionType { "SHOW_TEXT_AS_MENU" }
 
-    override fun icon(): Icon? = iconDef
+    override fun icon(): Icon? = actionContext!!.icon().by(AppIcon.TEXT)
 
     companion object {
         private val LABEL = RocketActionConfigurationPropertyKey("label")

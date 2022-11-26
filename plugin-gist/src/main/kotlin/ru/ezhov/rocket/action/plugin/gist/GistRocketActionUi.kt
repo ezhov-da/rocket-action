@@ -9,11 +9,10 @@ import ru.ezhov.rocket.action.api.RocketActionFactoryUi
 import ru.ezhov.rocket.action.api.RocketActionPlugin
 import ru.ezhov.rocket.action.api.RocketActionSettings
 import ru.ezhov.rocket.action.api.RocketActionType
+import ru.ezhov.rocket.action.api.context.RocketActionContext
+import ru.ezhov.rocket.action.api.context.icon.AppIcon
+import ru.ezhov.rocket.action.api.context.notification.NotificationType
 import ru.ezhov.rocket.action.api.support.AbstractRocketAction
-import ru.ezhov.rocket.action.icon.AppIcon
-import ru.ezhov.rocket.action.icon.IconRepositoryFactory
-import ru.ezhov.rocket.action.notification.NotificationFactory
-import ru.ezhov.rocket.action.notification.NotificationType
 import java.awt.BorderLayout
 import java.awt.Component
 import java.awt.Desktop
@@ -38,11 +37,17 @@ import javax.swing.SwingUtilities
 import javax.swing.SwingWorker
 
 class GistRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
-    override fun factory(): RocketActionFactoryUi = this
+    private var actionContext: RocketActionContext? = null
 
-    override fun configuration(): RocketActionConfiguration = this
+        override fun factory(context: RocketActionContext): RocketActionFactoryUi = this
+        .apply {
+            actionContext = context
+        }
 
-    private val icon = IconRepositoryFactory.repository.by(AppIcon.BOOKMARK)
+        override fun configuration(context: RocketActionContext): RocketActionConfiguration = this
+        .apply {
+            actionContext = context
+        }
 
     override fun description(): String {
         return "Github gist loader"
@@ -71,8 +76,9 @@ class GistRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
         )
     }
 
-    override fun create(settings: RocketActionSettings): RocketAction? =
+    override fun create(settings: RocketActionSettings, context: RocketActionContext): RocketAction? =
         settings.settings()[LABEL]?.takeIf { it.isNotEmpty() }?.let { label ->
+            actionContext = context
             geToken(settings)?.takeIf { it.isNotEmpty() }?.let { token ->
                 settings.settings()[USERNAME]?.takeIf { it.isNotEmpty() }?.let { username ->
                     settings.settings()[BASE_GIST_URL]?.let { url ->
@@ -115,11 +121,11 @@ class GistRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
         }
 
         override fun done() {
-            menu.icon = icon
+            menu.icon = actionContext!!.icon().by(AppIcon.BOOKMARK)
             try {
                 menu.removeAll()
                 menu.add(this.get())
-                NotificationFactory.notification.show(NotificationType.INFO, "Gists загружены")
+                actionContext!!.notification().show(NotificationType.INFO, "Gists загружены")
             } catch (e: InterruptedException) {
                 e.printStackTrace()
             } catch (e: ExecutionException) {
@@ -129,7 +135,7 @@ class GistRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
 
         init {
             menu.removeAll()
-            menu.icon = ImageIcon(this.javaClass.getResource("/load_16x16.gif"))
+            menu.icon = ImageIcon(this.javaClass.getResource("/icons/load_16x16.gif"))
         }
     }
 
@@ -188,7 +194,7 @@ class GistRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
                 }
             })
             val panelSearchAndUpdate = JPanel(BorderLayout())
-            val buttonUpdate = JButton(IconRepositoryFactory.repository.by(AppIcon.RELOAD))
+            val buttonUpdate = JButton(actionContext!!.icon().by(AppIcon.RELOAD))
             buttonUpdate.addActionListener { GistWorker(menu, gistUrl = gistUrl, token = token, username = username).execute() }
             panelSearchAndUpdate.add(textFieldSearch, BorderLayout.CENTER)
             panelSearchAndUpdate.add(buttonUpdate, BorderLayout.EAST)
@@ -215,7 +221,7 @@ class GistRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
         }
     }
 
-    override fun icon(): Icon? = icon
+    override fun icon(): Icon? = actionContext!!.icon().by(AppIcon.BOOKMARK)
 
     companion object {
         private val LABEL = RocketActionConfigurationPropertyKey("label")

@@ -9,6 +9,9 @@ import ru.ezhov.rocket.action.api.RocketActionPlugin
 import ru.ezhov.rocket.action.api.RocketActionPropertySpec
 import ru.ezhov.rocket.action.api.RocketActionSettings
 import ru.ezhov.rocket.action.api.RocketActionType
+import ru.ezhov.rocket.action.api.context.RocketActionContext
+import ru.ezhov.rocket.action.api.context.icon.AppIcon
+import ru.ezhov.rocket.action.api.context.notification.NotificationType
 import ru.ezhov.rocket.action.api.handler.RocketActionHandleStatus
 import ru.ezhov.rocket.action.api.handler.RocketActionHandler
 import ru.ezhov.rocket.action.api.handler.RocketActionHandlerCommand
@@ -18,12 +21,7 @@ import ru.ezhov.rocket.action.api.handler.RocketActionHandlerProperty
 import ru.ezhov.rocket.action.api.handler.RocketActionHandlerPropertyKey
 import ru.ezhov.rocket.action.api.handler.RocketActionHandlerPropertySpec
 import ru.ezhov.rocket.action.api.support.AbstractRocketAction
-import ru.ezhov.rocket.action.icon.AppIcon
-import ru.ezhov.rocket.action.icon.IconRepositoryFactory
-import ru.ezhov.rocket.action.icon.IconService
-import ru.ezhov.rocket.action.notification.NotificationFactory
-import ru.ezhov.rocket.action.notification.NotificationType
-import ru.ezhov.rocket.action.ui.swing.common.TextFieldWithText
+import ru.ezhov.rocket.action.ui.utils.swing.common.TextFieldWithText
 import java.awt.Component
 import java.awt.Desktop
 import java.net.URI
@@ -36,13 +34,19 @@ import javax.swing.JMenu
 import javax.swing.JPanel
 
 class OpenUrlWithTextRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
-    private val icon = IconRepositoryFactory.repository.by(AppIcon.LINK_INTACT)
+    private var actionContext: RocketActionContext? = null
 
-    override fun factory(): RocketActionFactoryUi = this
+    override fun factory(context: RocketActionContext): RocketActionFactoryUi = this
+        .apply {
+            actionContext = context
+        }
 
-    override fun configuration(): RocketActionConfiguration = this
+    override fun configuration(context: RocketActionContext): RocketActionConfiguration = this
+        .apply {
+            actionContext = context
+        }
 
-    override fun create(settings: RocketActionSettings): RocketAction? =
+    override fun create(settings: RocketActionSettings, context: RocketActionContext): RocketAction? =
         settings.settings()[BASE_URL]?.takeIf { it.isNotEmpty() }?.let { baseUrl ->
             val placeholder = settings.settings()[PLACEHOLDER].orEmpty()
             val label = settings.settings()[LABEL]?.takeIf { it.isNotEmpty() } ?: baseUrl
@@ -50,13 +54,13 @@ class OpenUrlWithTextRocketActionUi : AbstractRocketAction(), RocketActionPlugin
             val iconUrl = settings.settings()[ICON_URL].orEmpty()
 
             val menu = JMenu(label)
-            menu.icon = IconService().load(
+            menu.icon = context.icon().load(
                 iconUrl = iconUrl,
-                defaultIcon = icon
+                defaultIcon = actionContext!!.icon().by(AppIcon.LINK_INTACT)
             )
             val panel = JPanel()
             panel.layout = BoxLayout(panel, BoxLayout.LINE_AXIS)
-            panel.add(JLabel(icon))
+            panel.add(JLabel(actionContext!!.icon().by(AppIcon.LINK_INTACT)))
             val textField = TextFieldWithText(label)
             textField.columns = 10
             panel.add(textField)
@@ -145,7 +149,7 @@ class OpenUrlWithTextRocketActionUi : AbstractRocketAction(), RocketActionPlugin
                 )
             } catch (ex: Exception) {
                 ex.printStackTrace()
-                NotificationFactory.notification.show(NotificationType.ERROR, "Ошибка открытия URL")
+                actionContext!!.notification().show(NotificationType.ERROR, "Ошибка открытия URL")
             }
         }
     }
@@ -175,7 +179,7 @@ class OpenUrlWithTextRocketActionUi : AbstractRocketAction(), RocketActionPlugin
 
     override fun name(): String = "Открыть ссылку с подстановкой"
 
-    override fun icon(): Icon? = icon
+    override fun icon(): Icon? = actionContext!!.icon().by(AppIcon.LINK_INTACT)
 
     companion object {
         private val ICON_URL = RocketActionConfigurationPropertyKey("iconUrl")

@@ -1,7 +1,7 @@
 package ru.ezhov.rocket.action.plugin.template
 
-import ru.ezhov.rocket.action.notification.NotificationFactory
-import ru.ezhov.rocket.action.notification.NotificationType
+import ru.ezhov.rocket.action.api.context.RocketActionContext
+import ru.ezhov.rocket.action.api.context.notification.NotificationType
 import ru.ezhov.rocket.action.plugin.template.domain.Engine
 import java.awt.BorderLayout
 import java.awt.Dimension
@@ -15,7 +15,11 @@ import javax.swing.JScrollPane
 import javax.swing.JTextPane
 import javax.swing.SwingUtilities
 
-class NotePanelEngine(private val originText: String, private val engine: Engine) : JPanel(BorderLayout()) {
+class NotePanelEngine(
+    private val originText: String,
+    private val engine: Engine,
+    private val context: RocketActionContext,
+    ) : JPanel(BorderLayout()) {
     private val panelEngine: PanelEngine
     private val textPane: JTextPane
     private fun apply() {
@@ -25,7 +29,7 @@ class NotePanelEngine(private val originText: String, private val engine: Engine
             val defaultToolkit = Toolkit.getDefaultToolkit()
             val clipboard = defaultToolkit.systemClipboard
             clipboard.setContents(StringSelection(finalText), null)
-            NotificationFactory.notification.show(NotificationType.INFO, "Шаблон скопирован в буфер")
+            context!!.notification().show(NotificationType.INFO, "Шаблон скопирован в буфер")
         }
     }
 

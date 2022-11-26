@@ -8,19 +8,26 @@ import ru.ezhov.rocket.action.api.RocketActionFactoryUi
 import ru.ezhov.rocket.action.api.RocketActionPlugin
 import ru.ezhov.rocket.action.api.RocketActionSettings
 import ru.ezhov.rocket.action.api.RocketActionType
+import ru.ezhov.rocket.action.api.context.RocketActionContext
+import ru.ezhov.rocket.action.api.context.icon.AppIcon
 import ru.ezhov.rocket.action.api.support.AbstractRocketAction
-import ru.ezhov.rocket.action.icon.AppIcon
-import ru.ezhov.rocket.action.icon.IconRepositoryFactory
 import java.awt.Component
 import javax.swing.Icon
 import javax.swing.JSeparator
 
 class SeparatorRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
-    override fun factory(): RocketActionFactoryUi = this
+    private var actionContext: RocketActionContext? = null
+    override fun factory(context: RocketActionContext): RocketActionFactoryUi = this
+        .apply {
+            actionContext = context
+        }
 
-    override fun configuration(): RocketActionConfiguration = this
+    override fun configuration(context: RocketActionContext): RocketActionConfiguration = this
+        .apply {
+            actionContext = context
+        }
 
-    override fun create(settings: RocketActionSettings): RocketAction =
+    override fun create(settings: RocketActionSettings, context: RocketActionContext): RocketAction =
         JSeparator().let { sep ->
             object : RocketAction {
                 override fun contains(search: String): Boolean = false
@@ -39,7 +46,7 @@ class SeparatorRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
 
     override fun description(): String = "Разделитель"
 
-    override fun icon(): Icon? = IconRepositoryFactory.repository.by(AppIcon.MINUS)
+    override fun icon(): Icon? = actionContext!!.icon().by(AppIcon.MINUS)
 
     override fun properties(): List<RocketActionConfigurationProperty> = emptyList()
 }

@@ -8,11 +8,11 @@ import ru.ezhov.rocket.action.api.RocketActionFactoryUi
 import ru.ezhov.rocket.action.api.RocketActionPlugin
 import ru.ezhov.rocket.action.api.RocketActionSettings
 import ru.ezhov.rocket.action.api.RocketActionType
+import ru.ezhov.rocket.action.api.context.RocketActionContext
+import ru.ezhov.rocket.action.api.context.icon.AppIcon
 import ru.ezhov.rocket.action.api.support.AbstractRocketAction
 import ru.ezhov.rocket.action.application.infrastructure.RocketActionComponentCacheFactory
-import ru.ezhov.rocket.action.icon.AppIcon
-import ru.ezhov.rocket.action.icon.IconRepositoryFactory
-import ru.ezhov.rocket.action.icon.IconService
+import ru.ezhov.rocket.action.application.plugin.context.RocketActionContextFactory
 import java.awt.Component
 import java.util.concurrent.ExecutionException
 import javax.swing.Icon
@@ -21,18 +21,26 @@ import javax.swing.JMenu
 import javax.swing.SwingWorker
 
 class GroupRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
-    override fun factory(): RocketActionFactoryUi = this
+    private var actionContext: RocketActionContext? = null
 
-    override fun configuration(): RocketActionConfiguration = this
+    override fun factory(context: RocketActionContext): RocketActionFactoryUi = this
+        .apply {
+            actionContext = context
+        }
 
-    private val icon = IconRepositoryFactory.repository.by(AppIcon.PROJECT)
+    override fun configuration(context: RocketActionContext): RocketActionConfiguration = this
+        .apply {
+            actionContext = context
+        }
 
-    override fun create(settings: RocketActionSettings): RocketAction? =
+    private val icon = RocketActionContextFactory.context.icon().by(AppIcon.PROJECT)
+
+    override fun create(settings: RocketActionSettings, context: RocketActionContext): RocketAction? =
         settings.settings()[LABEL]?.takeIf { it.isNotEmpty() }?.let { label ->
             val description = settings.settings()[DESCRIPTION]?.takeIf { it.isNotEmpty() } ?: label
             val iconUrl = settings.settings()[ICON_URL].orEmpty()
             val menu = JMenu(label)
-            menu.icon = ImageIcon(this.javaClass.getResource("/load_16x16.gif"))
+            menu.icon = ImageIcon(this.javaClass.getResource("/icons/load_16x16.gif"))
             menu.toolTipText = description
             GroupSwingWorker(
                 parentMenu = menu,
@@ -90,7 +98,7 @@ class GroupRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
                         val iconUrl = settings.settings()[ICON_URL].orEmpty()
 
                         val menu = JMenu(label)
-                        menu.icon = ImageIcon(this.javaClass.getResource("/load_16x16.gif"))
+                        menu.icon = ImageIcon(this.javaClass.getResource("/icons/load_16x16.gif"))
                         menu.toolTipText = description
                         GroupSwingWorker(
                             parentMenu = menu,
@@ -116,9 +124,9 @@ class GroupRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
             } catch (e: ExecutionException) {
                 e.printStackTrace()
             }
-            parentMenu.icon = IconService().load(
+            parentMenu.icon = RocketActionContextFactory.context.icon().load(
                 iconUrl,
-                IconRepositoryFactory.repository.by(AppIcon.PROJECT)
+                RocketActionContextFactory.context.icon().by(AppIcon.PROJECT)
             )
         }
     }
