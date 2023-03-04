@@ -9,7 +9,6 @@ import liquibase.database.DatabaseFactory
 import liquibase.database.jvm.JdbcConnection
 import liquibase.resource.FileSystemResourceAccessor
 import mu.KotlinLogging
-import org.junit.rules.TemporaryFolder
 import ru.ezhov.rocket.action.core.infrastructure.db.h2.H2DbCredentialsFactorySampleData
 import java.io.File
 
@@ -21,8 +20,8 @@ class LiquibaseDbPreparedService private constructor(
 ) {
 
     companion object {
-        fun prepareH2Db(tempFolder: TemporaryFolder): LiquibaseDbPreparedService {
-            val tempFile = tempFolder.newFile();
+        fun prepareH2Db(tempFolder: File): LiquibaseDbPreparedService {
+            val tempFile = File.createTempFile("tst", "", tempFolder)
             logger.debug { "Test db=${tempFile.absolutePath}" }
             val credentialFactory = H2DbCredentialsFactorySampleData.from(tempFile)
 
@@ -38,7 +37,8 @@ class LiquibaseDbPreparedService private constructor(
     private fun prepare() {
         val connection = factory
             .connection().getOrHandle { throw it }
-        val database: Database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(JdbcConnection(connection))
+        val database: Database =
+            DatabaseFactory.getInstance().findCorrectDatabaseImplementation(JdbcConnection(connection))
         val liquibase = Liquibase(
             "dbchangelog.xml",
             FileSystemResourceAccessor(File("./../liquibase")),

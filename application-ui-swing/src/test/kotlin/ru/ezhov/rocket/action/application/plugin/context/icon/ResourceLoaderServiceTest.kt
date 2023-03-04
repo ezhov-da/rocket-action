@@ -1,10 +1,10 @@
 package ru.ezhov.rocket.action.application.plugin.context.icon
 
-import org.junit.Ignore
-import org.junit.Test
+import org.junit.jupiter.api.Disabled
+import org.junit.jupiter.api.Test
 import javax.swing.ImageIcon
 
-@Ignore
+@Disabled
 class ResourceLoaderServiceTest {
     @Test
     fun `test load icon`() {

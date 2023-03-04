@@ -1,7 +1,7 @@
 package ru.ezhov.rocket.action.plugin.jira.worklog.domain.model
 
-import org.junit.Test
-
+import org.junit.jupiter.api.Test
+import ru.ezhov.rocket.action.plugin.jira.worklog.domain.validations.Validator
 
 internal class CommitTimeTasksTest {
     @Test
@@ -11,7 +11,11 @@ internal class CommitTimeTasksTest {
             delimiter = "_",
             dateFormatPattern = "yyyyMMddHHmm",
             constantsNowDate = listOf("now", "n", "с"),
-            aliasForTaskIds = AliasForTaskIds.EMPTY
+            aliasForTaskIds = AliasForTaskIds.EMPTY,
+            validator = object : Validator {
+                override fun validate(source: String): List<String> = listOf("Error")
+
+            }
         )
 
         println(commitTimeTasks)

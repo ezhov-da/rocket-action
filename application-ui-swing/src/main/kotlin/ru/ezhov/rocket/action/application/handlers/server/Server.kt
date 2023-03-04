@@ -33,13 +33,16 @@ class Server {
 
     fun run() {
         val http: Http = ignite()
-        http.port(port())
+        port().let { port ->
+            logger.info { "Server port is '$port'" }
+            http.port(port)
+        }
 
         http.staticFiles.location("/swagger");
         swaggerJson(http)
         executeHandlerEndpoint(http)
 
-        logger.info { "Server started. port=${http.port()} auth-header-name='$HEADER_NAME' auth-header-value='$HEADER_VALUE'" }
+        logger.info { "Server started. port='${http.port()}' auth-header-name='$HEADER_NAME' auth-header-value='$HEADER_VALUE'" }
     }
 
 

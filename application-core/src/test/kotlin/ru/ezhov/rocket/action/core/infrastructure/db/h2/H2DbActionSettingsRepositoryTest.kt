@@ -2,23 +2,17 @@ package ru.ezhov.rocket.action.core.infrastructure.db.h2
 
 import arrow.core.getOrHandle
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.Rule
-import org.junit.Test
-import org.junit.rules.TemporaryFolder
+import org.assertj.core.util.Files
+import org.junit.jupiter.api.Test
 import ru.ezhov.rocket.action.core.domain.model.ActionIdSampleData
 import ru.ezhov.rocket.action.core.domain.model.ActionSettingName
 import ru.ezhov.rocket.action.core.domain.model.ActionSettingValue
 import ru.ezhov.rocket.action.core.infrastructure.db.LiquibaseDbPreparedService
 
 class H2DbActionSettingsRepositoryTest {
-
-    @Rule
-    @JvmField
-    val tempFolder = TemporaryFolder()
-
     @Test
     fun `should be get all action settings when get all`() {
-        with(LiquibaseDbPreparedService.prepareH2Db(tempFolder = tempFolder)) {
+        with(LiquibaseDbPreparedService.prepareH2Db(tempFolder = Files.newTemporaryFolder())) {
             val repo = H2DbActionSettingsRepository(
                 factory = H2DbKtormDbConnectionFactorySampleData.default(factory = dbCredentialsFactory)
             )
@@ -31,7 +25,7 @@ class H2DbActionSettingsRepositoryTest {
 
     @Test
     fun `should be found action settings by id`() {
-        with(LiquibaseDbPreparedService.prepareH2Db(tempFolder = tempFolder)) {
+        with(LiquibaseDbPreparedService.prepareH2Db(tempFolder = Files.newTemporaryFolder())) {
             val repo = H2DbActionSettingsRepository(
                 factory = H2DbKtormDbConnectionFactorySampleData.default(factory = dbCredentialsFactory)
             )
@@ -45,7 +39,7 @@ class H2DbActionSettingsRepositoryTest {
 
     @Test
     fun `should be save successfully`() {
-        with(LiquibaseDbPreparedService.prepareH2Db(tempFolder = tempFolder)) {
+        with(LiquibaseDbPreparedService.prepareH2Db(tempFolder = Files.newTemporaryFolder())) {
             val repo = H2DbActionSettingsRepository(
                 factory = H2DbKtormDbConnectionFactorySampleData.default(factory = dbCredentialsFactory)
             )

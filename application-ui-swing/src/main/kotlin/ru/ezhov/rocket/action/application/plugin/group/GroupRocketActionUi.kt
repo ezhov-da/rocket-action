@@ -81,7 +81,7 @@ class GroupRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
         private val iconUrl: String,
         private val settings: RocketActionSettings,
     ) : SwingWorker<List<Component?>, String?>() {
-        @Throws(Exception::class)
+
         override fun doInBackground(): List<Component> {
             return createGroup(settings.actions())
         }
@@ -131,7 +131,7 @@ class GroupRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
         }
     }
 
-    override fun icon(): Icon? = icon
+    override fun icon(): Icon = icon
 
     companion object {
         const val TYPE = "GROUP"

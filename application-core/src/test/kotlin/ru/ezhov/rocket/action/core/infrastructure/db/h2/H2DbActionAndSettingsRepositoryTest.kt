@@ -2,9 +2,8 @@ package ru.ezhov.rocket.action.core.infrastructure.db.h2
 
 import arrow.core.getOrHandle
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.Rule
-import org.junit.Test
-import org.junit.rules.TemporaryFolder
+import org.assertj.core.util.Files
+import org.junit.jupiter.api.Test
 import ru.ezhov.rocket.action.core.domain.model.ActionIdSampleData
 import ru.ezhov.rocket.action.core.domain.model.ActionSettingName
 import ru.ezhov.rocket.action.core.domain.model.ActionSettingValue
@@ -12,13 +11,10 @@ import ru.ezhov.rocket.action.core.domain.model.NewActionSampleData
 import ru.ezhov.rocket.action.core.infrastructure.db.LiquibaseDbPreparedService
 
 class H2DbActionAndSettingsRepositoryTest {
-    @Rule
-    @JvmField
-    val tempFolder = TemporaryFolder()
 
     @Test
     fun `should be save successfully`() {
-        with(LiquibaseDbPreparedService.prepareH2Db(tempFolder = tempFolder)) {
+        with(LiquibaseDbPreparedService.prepareH2Db(tempFolder = Files.newTemporaryFolder())) {
             val repoAction = H2DbActionRepository(
                 factory = H2DbKtormDbConnectionFactorySampleData.default(factory = dbCredentialsFactory)
             )
@@ -42,7 +38,7 @@ class H2DbActionAndSettingsRepositoryTest {
 
     @Test
     fun `should be remove recursive`() {
-        with(LiquibaseDbPreparedService.prepareH2Db(tempFolder = tempFolder)) {
+        with(LiquibaseDbPreparedService.prepareH2Db(tempFolder = Files.newTemporaryFolder())) {
             val repoAction = H2DbActionRepository(
                 factory = H2DbKtormDbConnectionFactorySampleData.default(factory = dbCredentialsFactory)
             )

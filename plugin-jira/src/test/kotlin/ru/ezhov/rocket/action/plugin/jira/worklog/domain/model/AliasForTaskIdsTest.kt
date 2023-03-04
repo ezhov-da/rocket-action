@@ -1,6 +1,6 @@
 package ru.ezhov.rocket.action.plugin.jira.worklog.domain.model
 
-import org.junit.Test
+import org.junit.jupiter.api.Test
 
 class AliasForTaskIdsTest {
     @Test

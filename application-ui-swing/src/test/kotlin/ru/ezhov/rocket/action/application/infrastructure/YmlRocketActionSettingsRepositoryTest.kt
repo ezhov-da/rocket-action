@@ -1,8 +1,8 @@
 package ru.ezhov.rocket.action.application.infrastructure
 
-import org.junit.Assert
-import org.junit.Ignore
-import org.junit.Test
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Disabled
+import org.junit.jupiter.api.Test
 import ru.ezhov.rocket.action.api.RocketActionConfigurationPropertyKey
 import ru.ezhov.rocket.action.api.RocketActionSettings
 import ru.ezhov.rocket.action.api.RocketActionType
@@ -12,19 +12,17 @@ import java.net.URISyntaxException
 
 class YmlRocketActionSettingsRepositoryTest {
     @Test
-    @Throws(URISyntaxException::class, RocketActionSettingsRepositoryException::class)
     fun actions() {
         val repository = YmlRocketActionSettingsRepository(
             this.javaClass.getResource("/test-actions.yml")!!.toURI()
         )
         val actions = repository.actions()
-        Assert.assertEquals(27, actions.size.toLong())
+        assertEquals(27, actions.size.toLong())
         println(actions)
     }
 
     @Test
-    @Ignore
-    @Throws(URISyntaxException::class, RocketActionSettingsRepositoryException::class)
+    @Disabled
     fun save() {
         val repository = YmlRocketActionSettingsRepository(
             File("./test.yml").toURI()

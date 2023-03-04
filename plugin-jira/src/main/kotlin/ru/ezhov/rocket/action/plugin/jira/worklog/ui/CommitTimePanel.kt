@@ -13,10 +13,14 @@ import ru.ezhov.rocket.action.plugin.jira.worklog.domain.model.CommitTimeTask
 import ru.ezhov.rocket.action.plugin.jira.worklog.domain.model.CommitTimeTaskInfo
 import ru.ezhov.rocket.action.plugin.jira.worklog.domain.model.CommitTimeTasks
 import ru.ezhov.rocket.action.plugin.jira.worklog.domain.model.Task
+import ru.ezhov.rocket.action.plugin.jira.worklog.domain.validations.Validator
 import java.awt.BorderLayout
 import java.awt.Component
 import java.awt.Desktop
 import java.awt.FlowLayout
+import java.awt.Toolkit
+import java.awt.event.ActionEvent
+import java.awt.event.InputEvent
 import java.awt.event.KeyAdapter
 import java.awt.event.KeyEvent
 import java.awt.event.MouseAdapter
@@ -24,6 +28,8 @@ import java.awt.event.MouseEvent
 import java.io.File
 import java.net.URI
 import java.time.format.DateTimeFormatter
+import javax.swing.AbstractAction
+import javax.swing.Action
 import javax.swing.BorderFactory
 import javax.swing.BoxLayout
 import javax.swing.JButton
@@ -34,12 +40,17 @@ import javax.swing.JSplitPane
 import javax.swing.JTable
 import javax.swing.JTextField
 import javax.swing.JTextPane
+import javax.swing.KeyStroke
 import javax.swing.SwingUtilities
 import javax.swing.SwingWorker
 import javax.swing.event.DocumentEvent
 import javax.swing.event.DocumentListener
 import javax.swing.table.DefaultTableCellRenderer
 import javax.swing.table.DefaultTableModel
+import javax.swing.undo.CannotRedoException
+import javax.swing.undo.CannotUndoException
+import javax.swing.undo.UndoManager
+
 
 private val logger = KotlinLogging.logger {}
 
@@ -51,6 +62,7 @@ class CommitTimePanel(
     private val aliasForTaskIds: AliasForTaskIds,
     private val fileForSave: File,
     private val context: RocketActionContext,
+    private val validator: Validator,
     commitTimeService: CommitTimeService,
     commitTimeTaskInfoRepository: CommitTimeTaskInfoRepository,
     linkToWorkLog: URI? = null,
@@ -81,7 +93,7 @@ class CommitTimePanel(
                                         } catch (ex: Exception) {
                                             val msg = "Error open link='$ltwl'"
                                             logger.warn(ex) { msg }
-                                            context!!.notification().show(type = NotificationType.WARN, text = msg)
+                                            context.notification().show(type = NotificationType.WARN, text = msg)
                                         }
                                     }
                                 })
@@ -92,7 +104,7 @@ class CommitTimePanel(
                     add(
                         FavoriteTasksPanel(tasks = tasks, aliasForTaskIds = aliasForTaskIds) { task ->
                             textPane.document.insertString(
-                                textPane.document.length, "${task.id}", null
+                                textPane.caretPosition, task.id, null
                             )
                         },
                         BorderLayout.CENTER
@@ -101,6 +113,8 @@ class CommitTimePanel(
                 },
             BorderLayout.NORTH
         )
+
+        setUndoAndRedo()
 
         val split = JSplitPane(JSplitPane.VERTICAL_SPLIT)
         split.topComponent = JScrollPane(textPane)
@@ -130,6 +144,7 @@ class CommitTimePanel(
                     dateFormatPattern = dateFormatPattern,
                     constantsNowDate = constantsNowDate,
                     aliasForTaskIds = aliasForTaskIds,
+                    validator = validator,
                 )
                 tasksPanel.setCurrentCommitTimeTasks(currentCommitTimeTasks!!)
             }
@@ -142,6 +157,23 @@ class CommitTimePanel(
                 }
             }
         })
+    }
+
+    private fun setUndoAndRedo() {
+        val manager = UndoManager()
+        textPane.document.addUndoableEditListener(manager)
+        val undoAction: Action = UndoAction(manager)
+        val redoAction: Action = RedoAction(manager)
+        textPane.registerKeyboardAction(
+            undoAction,
+            KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.CTRL_MASK),
+            WHEN_FOCUSED
+        )
+        textPane.registerKeyboardAction(
+            redoAction,
+            KeyStroke.getKeyStroke(KeyEvent.VK_Z, InputEvent.SHIFT_MASK + InputEvent.CTRL_MASK),
+            WHEN_FOCUSED
+        )
     }
 
     fun loadText() {
@@ -268,8 +300,7 @@ class CommitTimePanel(
                         .fold(
                             ifLeft = { ex -> Triple(task, null, ex) },
                             ifRight = { result ->
-                                Triple(task, result, null
-                                )
+                                Triple(first = task, second = result, third = null)
                             })
                 )
             }
@@ -332,8 +363,8 @@ class CommitTimePanel(
 
     private class FavoriteTaskPanel(
         private val task: Task,
-        private val aliasForTaskIds: AliasForTaskIds,
         private val addCallback: (task: Task) -> Unit,
+        aliasForTaskIds: AliasForTaskIds,
     ) : JPanel() {
         private val textField = JTextField()
         private val addButton = JButton("+")
@@ -348,7 +379,7 @@ class CommitTimePanel(
                 .orEmpty()
             textField.text = "${task.id}$aliasesText- ${task.name}"
             add(textField, BorderLayout.CENTER)
-            add(addButton, BorderLayout.EAST)
+            add(addButton, BorderLayout.WEST)
 
             addButton.addActionListener {
                 SwingUtilities.invokeLater { addCallback(task) }
@@ -384,8 +415,22 @@ class CommitTimePanel(
             table.setDefaultRenderer(
                 TableTasksPanelTask::class.java,
                 object : DefaultTableCellRenderer() {
-                    override fun getTableCellRendererComponent(table: JTable, value: Any?, isSelected: Boolean, hasFocus: Boolean, row: Int, column: Int): Component {
-                        val label = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column) as JLabel
+                    override fun getTableCellRendererComponent(
+                        table: JTable,
+                        value: Any?,
+                        isSelected: Boolean,
+                        hasFocus: Boolean,
+                        row: Int,
+                        column: Int
+                    ): Component {
+                        val label = super.getTableCellRendererComponent(
+                            table,
+                            value,
+                            isSelected,
+                            hasFocus,
+                            row,
+                            column
+                        ) as JLabel
                         when (value) {
                             is TableTasksPanelTask -> {
                                 label.let { l ->
@@ -487,8 +532,8 @@ class CommitTimePanel(
 
         fun setCurrentCommitTimeTasks(tasks: CommitTimeTasks) {
             labelInfo.text = "<html>Число задач: <b>${tasks.countOfTask()}</b> " +
-                "Суммарное время: в минутах <b>${tasks!!.sumOfTimeTasksAsMinute()}</b> " +
-                "в часах <b>${tasks!!.sumOfTimeTasksAsHours()}</b>"
+                "Суммарное время: в минутах <b>${tasks.sumOfTimeTasksAsMinute()}</b> " +
+                "в часах <b>${tasks.sumOfTimeTasksAsHours()}</b>"
 
             while (tableModel.rowCount != 0) {
                 tableModel.removeRow(tableModel.rowCount - 1)
@@ -522,4 +567,24 @@ class CommitTimePanel(
     )
 
     private enum class Status { COMMITTED, ERROR, PREPARED }
+}
+
+internal class UndoAction(private val manager: UndoManager) : AbstractAction() {
+    override fun actionPerformed(evt: ActionEvent) {
+        try {
+            manager.undo()
+        } catch (e: CannotUndoException) {
+            Toolkit.getDefaultToolkit().beep()
+        }
+    }
+}
+
+internal class RedoAction(private val manager: UndoManager) : AbstractAction() {
+    override fun actionPerformed(evt: ActionEvent) {
+        try {
+            manager.redo()
+        } catch (e: CannotRedoException) {
+            Toolkit.getDefaultToolkit().beep()
+        }
+    }
 }

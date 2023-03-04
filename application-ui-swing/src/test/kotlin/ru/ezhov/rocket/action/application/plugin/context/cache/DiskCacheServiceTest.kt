@@ -1,14 +1,12 @@
 package ru.ezhov.rocket.action.application.plugin.context.cache
 
-import org.junit.Ignore
-import org.junit.Test
-import java.net.MalformedURLException
+import org.junit.jupiter.api.Disabled
+import org.junit.jupiter.api.Test
 import java.net.URL
 
-@Ignore
+@Disabled
 class DiskCacheServiceTest {
     @Test
-    @Throws(MalformedURLException::class)
     fun test() {
         val cache = DiskCacheService()
         cache.get(URL("https://www.elastic.co/favicon.ico"))?.let {

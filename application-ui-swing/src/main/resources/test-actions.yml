@@ -104,7 +104,446 @@ actions:
     description: description
     actions:
       - type: COPY_TO_CLIPBOARD
-        _id: de17aba8-c229-11ec-9d64-0242ac120002
+        _id: de17aba8-c229-11ec-9d64-02642ac120002
+        label: label1 236236236
+        description: description
+        text: text
+
+      - type: COPY_TO_CLIPBOARD
+        _id: de17aba8-c229-1dfgj1ec-9d64-02427ac120002
+        label: label1 236236236
+        description: description
+        text: text
+
+      - type: COPY_TO_CLIPBOARD
+        _id: de17aba8-c229-1dfgjdfg1ec-9d64-02427ac120002
+        label: label1 236236236
+        description: description
+        text: text
+
+      - type: COPY_TO_CLIPBOARD
+        _id: de17abasdfasdfa8-c229-1dfgj1ec-9d64-02427ac120002
+        label: label1 236236236
+        description: description
+        text: text
+
+      - type: COPY_TO_CLIPBOARD
+        _id: de17aba8-c229-11efdgc-9d64-02452ac120002
+        label: label1 236236236
+        description: description
+        text: text
+
+      - type: COPY_TO_CLIPBOARD
+        _id: de17aba8-c229-1fdgj1ec-9d64-02452ac120002
+        label: label1 236236236
+        description: description
+        text: text
+
+      - type: COPY_TO_CLIPBOARD
+        _id: de17aba8-c229-11fdgjec-9d64-02452ac120002
+        label: label1 236236236
+        description: description
+        text: text
+
+      - type: COPY_TO_CLIPBOARD
+        _id: de17aba8-c229-1dfgj1ec-9d64-02452ac120002
+        label: label1 236236236
+        description: description
+        text: text
+
+      - type: COPY_TO_CLIPBOARD
+        _id: de17aba8-c229-11dfgjec-9d64-02452ac120002
+        label: label1 236236236
+        description: description
+        text: text
+
+      - type: COPY_TO_CLIPBOARD
+        _id: de17aba8-c229-1dfgj1ec-9d64-02452ac120002
+        label: label1 236236236
+        description: description
+        text: text
+
+      - type: COPY_TO_CLIPBOARD
+        _id: de17aba8-c229-11dfjgec-9d64-02452ac120002
+        label: label1 236236236
+        description: description
+        text: text
+
+      - type: COPY_TO_CLIPBOARD
+        _id: de17aba8-c229-11dfjgec-9d64-02452ac120002
+        label: label1 236236236
+        description: description
+        text: text
+
+      - type: COPY_TO_CLIPBOARD
+        _id: de17aba8-c229-1dfgj1ec-9d64-02452ac120002
+        label: label1 236236236
+        description: description
+        text: text
+
+      - type: COPY_TO_CLIPBOARD
+        _id: de17aba8-c229-1fdgj1ec-9d64-02452ac120002
+        label: label1 236236236
+        description: description
+        text: text
+
+      - type: COPY_TO_CLIPBOARD
+        _id: de17aba8-c229-11ec-9fdgjd64-02452ac120002
+        label: label1 236236236
+        description: description
+        text: text
+
+      - type: COPY_TO_CLIPBOARD
+        _id: de17aba8-c229-11ec-9ddfgj64-02452ac120002
+        label: label1 236236236
+        description: description
+        text: text
+
+      - type: COPY_TO_CLIPBOARD
+        _id: de17aba8-c229-11ec-9d6dfjg4-02452ac120002
+        label: label1 236236236
+        description: description
+        text: text
+
+      - type: COPY_TO_CLIPBOARD
+        _id: de17aba8-c229-11ec-9d6dfgj4-02452ac120002
+        label: label1 236236236
+        description: description
+        text: text
+
+      - type: COPY_TO_CLIPBOARD
+        _id: de17aba8-c229-11ec-9ddfgj64-02452ac120002
+        label: label1 236236236
+        description: description
+        text: text
+
+      - type: COPY_TO_CLIPBOARD
+        _id: de17aba8-c229-11ec-9dfdgj64-02452ac120002
+        label: label1 236236236
+        description: description
+        text: text
+
+      - type: COPY_TO_CLIPBOARD
+        _id: de17aba8-c229-11ec-9ddfgj64-02452ac120002
+        label: label1 236236236
+        description: description
+        text: text
+
+      - type: COPY_TO_CLIPBOARD
+        _id: de17aba8-c229-11ec-9dfdgj64-02452ac120002
+        label: label1 236236236
+        description: description
+        text: text
+
+      - type: COPY_TO_CLIPBOARD
+        _id: de17aba8-c229-11ec-9dfj64-02452ac120002
+        label: label1 236236236
+        description: description
+        text: text
+
+      - type: COPY_TO_CLIPBOARD
+        _id: de17aba8-c229-11ec-9fdgjd64-02452ac120002
+        label: label1 236236236
+        description: description
+        text: text
+
+      - type: COPY_TO_CLIPBOARD
+        _id: de17aba8-c229-11ec-9dfgjd64-02452ac120002
+        label: label1 236236236
+        description: description
+        text: text
+
+      - type: COPY_TO_CLIPBOARD
+        _id: de17aba8-c229-11ec-9d64-02452dfgjac120002
+        label: label1 236236236
+        description: description
+        text: text
+
+      - type: COPY_TO_CLIPBOARD
+        _id: de17aba8-c229-11ec-9d64-02452adfgjc120002
+        label: label1 236236236
+        description: description
+        text: text
+
+      - type: COPY_TO_CLIPBOARD
+        _id: de17aba8-c229-11ec-9d64-0245fgj2ac120002
+        label: label1 236236236
+        description: description
+        text: text
+
+      - type: COPY_TO_CLIPBOARD
+        _id: de17aba8-c229-11ec-9d64-02452afgc120002
+        label: label1 236236236
+        description: description
+        text: text
+
+      - type: COPY_TO_CLIPBOARD
+        _id: de17aba8-c229-11ec-9d64-0245dfj2ac120002
+        label: label1 236236236
+        description: description
+        text: text
+
+      - type: COPY_TO_CLIPBOARD
+        _id: de17aba8-c229-11ec-9d64-0245dfgj2ac120002
+        label: label1 236236236
+        description: description
+        text: text
+
+      - type: COPY_TO_CLIPBOARD
+        _id: de17aba8-c229-11ec-9d64-02452adfgjc120002
+        label: label1 236236236
+        description: description
+        text: text
+
+      - type: COPY_TO_CLIPBOARD
+        _id: de17aba8-c229-11ec-9d64-02452ac1dfgj20002
+        label: label1 236236236
+        description: description
+        text: text
+
+      - type: COPY_TO_CLIPBOARD
+        _id: de17aba8-c229-11ec-9d64-02452acdfgj120002
+        label: label1 236236236
+        description: description
+        text: text
+
+      - type: COPY_TO_CLIPBOARD
+        _id: de17aba8-c229-11ec-9d64-02452adfgjc120002
+        label: label1 236236236
+        description: description
+        text: text
+
+      - type: COPY_TO_CLIPBOARD
+        _id: de17aba8-c229-11ec-9d64-02452dfgjac120002
+        label: label1 236236236
+        description: description
+        text: text
+
+      - type: COPY_TO_CLIPBOARD
+        _id: de17aba8-c229-11ec-9d64-0245dfg2ac120002
+        label: label1 236236236
+        description: description
+        text: text
+
+      - type: COPY_TO_CLIPBOARD
+        _id: de17aba8-c229-11ec-9d64-0245jfd2ac120002
+        label: label1 236236236
+        description: description
+        text: text
+
+      - type: COPY_TO_CLIPBOARD
+        _id: de17aba8-c229-11ec-9d64-0245dfjg2ac120002
+        label: label1 236236236
+        description: description
+        text: text
+
+      - type: COPY_TO_CLIPBOARD
+        _id: de17aba8-c229-11ec-9d64-02452dfjac120002
+        label: label1 236236236
+        description: description
+        text: text
+
+      - type: COPY_TO_CLIPBOARD
+        _id: de17aba8-c229-11ec-9d64-02452ac12dth0002
+        label: label1 236236236
+        description: description
+        text: text
+
+      - type: COPY_TO_CLIPBOARD
+        _id: de17aba8-c229-11ec-9d64-0245rtky2ac120002
+        label: label1 236236236
+        description: description
+        text: text
+
+      - type: COPY_TO_CLIPBOARD
+        _id: de17aba8-c229-11ec-9d64-0245tk2ac120002
+        label: label1 236236236
+        description: description
+        text: text
+
+      - type: COPY_TO_CLIPBOARD
+        _id: de17aba8-c229-11ec-9d64-02452tykac120002
+        label: label1 236236236
+        description: description
+        text: text
+
+      - type: COPY_TO_CLIPBOARD
+        _id: de17aba8-c229-11ec-9d64-0245yk2ac120002
+        label: label1 236236236
+        description: description
+        text: text
+
+      - type: COPY_TO_CLIPBOARD
+        _id: de17aba8-c229-11ec-9d64-0245fdj2ac120002
+        label: label1 236236236
+        description: description
+        text: text
+
+      - type: COPY_TO_CLIPBOARD
+        _id: de17aba8-c229-11ec-9d64-02h452ac120002
+        label: label1 236236236
+        description: description
+        text: text
+
+      - type: COPY_TO_CLIPBOARD
+        _id: de17aba8-c229-11ec-9d64-02247452ac120002
+        label: label1 236236236
+        description: description
+        text: text
+
+      - type: COPY_TO_CLIPBOARD
+        _id: de17aba8-c229-11ec-9d64-02456452ac120002
+        label: label1 236236236
+        description: description
+        text: text
+
+      - type: COPY_TO_CLIPBOARD
+        _id: de17aba8-c229-11ec-9d64-026452ac120002
+        label: label1 236236236
+        description: description
+        text: text
+
+
+      - type: COPY_TO_CLIPBOARD
+        _id: de17aba8-c229-11ec-9d64-02426c120002
+        label: label1 236236236
+        description: description
+        text: text
+
+      - type: COPY_TO_CLIPBOARD
+        _id: de17aba8-c229-11ec-9d64-04242ac120002
+        label: label1 236236236
+        description: description
+        text: text
+
+      - type: COPY_TO_CLIPBOARD
+        _id: de17aba8-c229-11ec-9d64-05242ac120002
+        label: label1 236236236
+        description: description
+        text: text
+
+      - type: COPY_TO_CLIPBOARD
+        _id: de17aba8-c229-11ec-9d64-03242ac120002
+        label: label1 236236236
+        description: description
+        text: text
+
+      - type: COPY_TO_CLIPBOARD
+        _id: de17aba8-c229-11ec-9d64-02442ac120002
+        label: label1 236236236
+        description: description
+        text: text
+
+      - type: COPY_TO_CLIPBOARD
+        _id: de17aba8-c229-11ec-9d64-02442ac120002
+        label: label1 236236236
+        description: description
+        text: text
+
+      - type: COPY_TO_CLIPBOARD
+        _id: de17aba8-c229-11ec-9d64-20242ac120002
+        label: label1 236236236
+        description: description
+        text: text
+
+      - type: COPY_TO_CLIPBOARD
+        _id: de17aba8-c229-11ec-9d64-02432ac120002
+        label: label1 236236236
+        description: description
+        text: text
+
+      - type: COPY_TO_CLIPBOARD
+        _id: de17aba8-c229-11ec-9d64-0242a5c120002
+        label: label1 236236236
+        description: description
+        text: text
+
+      - type: COPY_TO_CLIPBOARD
+        _id: de17aba8-c229-11ec-9d64-02432ac120002
+        label: label1 236236236
+        description: description
+        text: text
+
+      - type: COPY_TO_CLIPBOARD
+        _id: de17aba8-c229-11ec-9d64-02442ac120002
+        label: label1 236236236
+        description: description
+        text: text
+
+      - type: COPY_TO_CLIPBOARD
+        _id: de17aba8-c229-11ec-9d64-02426ac120002
+        label: label1 236236236
+        description: description
+        text: text
+
+      - type: COPY_TO_CLIPBOARD
+        _id: de17aba8-c229-11ec-9d64-02425ac120002
+        label: label1 236236236
+        description: description
+        text: text
+
+      - type: COPY_TO_CLIPBOARD
+        _id: de17aba8-c229-11ec-9d64-0242ac3120002
+        label: label1 236236236
+        description: description
+        text: text
+
+      - type: COPY_TO_CLIPBOARD
+        _id: de17aba8-c229-11ec-9d64-0242a5c120002
+        label: label1 236236236
+        description: description
+        text: text
+
+      - type: COPY_TO_CLIPBOARD
+        _id: de17aba8-c229-11ec-9d64-0242ac4120002
+        label: label1 236236236
+        description: description
+        text: text
+
+      - type: COPY_TO_CLIPBOARD
+        _id: de17aba8-c229-11ec-9d64-02426ac120002
+        label: label1 236236236
+        description: description
+        text: text
+
+      - type: COPY_TO_CLIPBOARD
+        _id: de17aba8-c229-11ec-9d64-0242a5c120002
+        label: label1 236236236
+        description: description
+        text: text
+
+      - type: COPY_TO_CLIPBOARD
+        _id: de17aba8-c229-11ec-9d64-02432ac120002
+        label: label1 236236236
+        description: description
+        text: text
+
+      - type: COPY_TO_CLIPBOARD
+        _id: de17aba8-c229-11ec-9d64-02442ac120002
+        label: label1 236236236
+        description: description
+        text: text
+
+      - type: COPY_TO_CLIPBOARD
+        _id: de17aba8-c229-11ec-9d64-0242a5c120002
+        label: label1 236236236
+        description: description
+        text: text
+
+      - type: COPY_TO_CLIPBOARD
+        _id: de17aba8-c229-11ec-9d64-0242ac3120002
+        label: label1 236236236
+        description: description
+        text: text
+
+      - type: COPY_TO_CLIPBOARD
+        _id: de17aba8-c229-11ec-9d64-0242ac2120002
+        label: label1 236236236
+        description: description
+        text: text
+
+      - type: COPY_TO_CLIPBOARD
+        _id: de17aba8-c229-11ec-9d64-0242ac1230002
         label: label1 236236236
         description: description
         text: text
@@ -216,6 +655,9 @@ actions:
     username: "123"
     password: "123"
     url: "http://localhost"
+    textValidations: |
+        MIN_LENGTH 2
+        MAX_LENGTH 10
     predefinedTasks: |
         123___qwe
         345___rty
