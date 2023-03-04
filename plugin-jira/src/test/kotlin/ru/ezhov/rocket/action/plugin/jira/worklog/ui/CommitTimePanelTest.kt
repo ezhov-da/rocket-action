@@ -14,6 +14,7 @@ import ru.ezhov.rocket.action.plugin.jira.worklog.domain.model.AliasForTaskIds
 import ru.ezhov.rocket.action.plugin.jira.worklog.domain.model.CommitTimeTask
 import ru.ezhov.rocket.action.plugin.jira.worklog.domain.model.CommitTimeTaskInfo
 import ru.ezhov.rocket.action.plugin.jira.worklog.domain.model.Task
+import ru.ezhov.rocket.action.plugin.jira.worklog.domain.validations.Validator
 import java.net.URI
 import java.nio.file.Files
 import javax.swing.JFrame
@@ -64,7 +65,7 @@ fun main() {
                     override fun info(id: String): Either<CommitTimeTaskInfoException, CommitTimeTaskInfo?> =
                         CommitTimeTaskInfo(name = "$id + типа имя").right()
                 },
-                context =  object: RocketActionContext{
+                context = object : RocketActionContext {
                     override fun icon(): IconService {
                         TODO("Not yet implemented")
                     }
@@ -77,6 +78,9 @@ fun main() {
                         TODO("Not yet implemented")
                     }
 
+                },
+                validator = object : Validator {
+                    override fun validate(source: String): List<String> = emptyList()
                 }
             )
         )

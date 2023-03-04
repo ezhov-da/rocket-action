@@ -24,13 +24,15 @@ import ru.ezhov.rocket.action.api.handler.RocketActionHandlerPropertySpec
 import ru.ezhov.rocket.action.api.support.AbstractRocketAction
 import ru.ezhov.rocket.action.plugin.jira.worklog.domain.model.AliasForTaskIds
 import ru.ezhov.rocket.action.plugin.jira.worklog.domain.model.Task
+import ru.ezhov.rocket.action.plugin.jira.worklog.domain.validations.RawTextValidator
+import ru.ezhov.rocket.action.plugin.jira.worklog.domain.validations.ValidationRule
 import ru.ezhov.rocket.action.plugin.jira.worklog.infrastructure.JiraCommitTimeService
 import ru.ezhov.rocket.action.plugin.jira.worklog.infrastructure.JiraCommitTimeTaskInfoRepository
 import ru.ezhov.rocket.action.plugin.jira.worklog.ui.JiraWorkLogUI
 import java.awt.Component
 import java.io.File
 import java.net.URI
-import java.util.UUID
+import java.util.*
 import javax.swing.Icon
 import javax.swing.JMenu
 
@@ -116,6 +118,9 @@ class JiraWorklogRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
                             },
                         fileForSave = File(settings.settings()[FILE_PATH_WORK_LOG] ?: defaultFile()),
                         context = context,
+                        validator = RawTextValidator(
+                            settings.settings()[TEXT_VALIDATIONS] ?: RawTextValidator.EMPTY_RULES
+                        )
                     )
                 menu.add(jiraWorkLogUI)
 
@@ -261,6 +266,16 @@ class JiraWorklogRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
                     defaultValue = defaultFile()
                 )
             ),
+            createRocketActionProperty(
+                key = TEXT_VALIDATIONS,
+                name = "Возможные валидации для текста",
+                description = "Доступные валидации:\n" +
+                    ValidationRule.values().joinToString(separator = "\n") { "${it.name}:${it.description}" } +
+                    "\nВведите настройки в строках, например: '${ValidationRule.MIN_LENGTH} 12' это значит, " +
+                    "что минимальная длина текста - 12",
+                required = false,
+                property = RocketActionPropertySpec.StringPropertySpec()
+            ),
         )
     }
 
@@ -286,5 +301,6 @@ class JiraWorklogRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
         private val ALIAS_FOR_TASK_IDS = RocketActionConfigurationPropertyKey("aliasForTaskIds")
         private val LINK_TO_WORK_LOG = RocketActionConfigurationPropertyKey("linkToWorkLog")
         private val FILE_PATH_WORK_LOG = RocketActionConfigurationPropertyKey("filePathWorkLog")
+        private val TEXT_VALIDATIONS = RocketActionConfigurationPropertyKey("textValidations")
     }
 }

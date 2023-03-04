@@ -4,6 +4,7 @@ import arrow.core.Either
 import arrow.core.getOrHandle
 import arrow.core.left
 import arrow.core.right
+import ru.ezhov.rocket.action.plugin.jira.worklog.domain.validations.Validator
 import java.math.RoundingMode
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -21,6 +22,7 @@ class CommitTimeTasks private constructor(
             dateFormatPattern: String,
             constantsNowDate: List<String>,
             aliasForTaskIds: AliasForTaskIds,
+            validator: Validator,
         ): CommitTimeTasks =
             if (value.isBlank()) {
                 CommitTimeTasks(
@@ -41,6 +43,7 @@ class CommitTimeTasks private constructor(
                                 dateFormatPattern = dateFormatPattern,
                                 constantsNowDate = constantsNowDate,
                                 aliasForTaskIds = aliasForTaskIds,
+                                validator = validator,
                             )
                         }
                         .let { tasks ->
@@ -61,6 +64,7 @@ class CommitTimeTasks private constructor(
             dateFormatPattern: String,
             constantsNowDate: List<String>,
             aliasForTaskIds: AliasForTaskIds,
+            validator: Validator,
         ): Either<CommitTimeTasksError, CommitTimeTask> {
             val error by lazy { "Для строки '${this.trim()}' есть ошибки: " }
             return this
@@ -91,6 +95,7 @@ class CommitTimeTasks private constructor(
                                         else -> LocalDateTime.now()
                                     }
                                 }
+
                                 constantsNowDate.contains(originalTimeAsString) -> LocalDateTime.now()
                                 else -> LocalDateTime.parse(originalTimeAsString, dateFormat)
                             }
@@ -111,7 +116,14 @@ class CommitTimeTasks private constructor(
                             errors.add("Некорректное время, должно быть число. ")
                             null
                         }
+
+                        // валидация комментария
                         val comment = parts[3]
+                        val commentErrors = validator.validate(comment)
+                        if (commentErrors.isNotEmpty()) {
+                            errors.addAll(commentErrors)
+                        }
+
                         if (errors.isNotEmpty()) {
                             CommitTimeTasksError("$error ${errors.joinToString(separator = "; ")}").left()
                         } else {
