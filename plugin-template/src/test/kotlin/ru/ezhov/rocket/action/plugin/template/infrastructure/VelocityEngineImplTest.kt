@@ -1,7 +1,7 @@
 package ru.ezhov.rocket.action.plugin.template.infrastructure
 
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.Test
+import org.junit.jupiter.api.Test
 
 class VelocityEngineImplTest {
     @Test
@@ -44,7 +44,8 @@ class VelocityEngineImplTest {
                     "test1" to "1",
                     "test2" to "2",
                     "test3" to "3",
-                ))
+                )
+            )
 
         assertThat(result)
             .isEqualTo("1 2 3")
@@ -66,11 +67,10 @@ class VelocityEngineImplTest {
                 template = text,
                 values = mapOf(
                     "ids" to "1234567",
-                ))
+                )
+            )
 
         assertThat(result)
             .isEqualTo("1234567")
     }
-
-
 }

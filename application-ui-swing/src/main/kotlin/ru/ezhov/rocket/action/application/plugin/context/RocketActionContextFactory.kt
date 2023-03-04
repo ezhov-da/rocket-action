@@ -9,11 +9,15 @@ import ru.ezhov.rocket.action.application.plugin.context.icon.ResourceIconServic
 import ru.ezhov.rocket.action.application.plugin.context.notification.PopupNotificationService
 
 object RocketActionContextFactory {
+    private val icon = ResourceIconService()
+    private val notification = PopupNotificationService()
+    private val cache = DiskCacheService()
+
     val context: RocketActionContext = object : RocketActionContext {
-        override fun icon(): IconService = ResourceIconService()
+        override fun icon(): IconService = icon
 
-        override fun notification(): NotificationService = PopupNotificationService()
+        override fun notification(): NotificationService = notification
 
-        override fun cache(): CacheService = DiskCacheService()
+        override fun cache(): CacheService = cache
     }
 }

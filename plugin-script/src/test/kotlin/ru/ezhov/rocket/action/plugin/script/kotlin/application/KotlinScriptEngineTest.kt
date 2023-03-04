@@ -2,10 +2,10 @@ package ru.ezhov.rocket.action.plugin.script.kotlin.application
 
 import arrow.core.getOrHandle
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.Ignore
-import org.junit.Test
+import org.junit.jupiter.api.Disabled
+import org.junit.jupiter.api.Test
 
-@Ignore
+@Disabled
 class KotlinScriptEngineTest {
 
     @Test

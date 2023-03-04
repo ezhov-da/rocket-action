@@ -44,3 +44,7 @@ Java 8
 
 First argument is file with actions.
 
+# Release
+
+Change version in application-ui-swing/pom.xml#version
+
