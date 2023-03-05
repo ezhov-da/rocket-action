@@ -5,9 +5,11 @@ import org.fife.ui.rsyntaxtextarea.SyntaxConstants
 import org.fife.ui.rtextarea.RTextScrollPane
 import ru.ezhov.rocket.action.api.RocketActionConfiguration
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
-import ru.ezhov.rocket.action.api.RocketActionConfigurationPropertyKey
 import ru.ezhov.rocket.action.api.RocketActionPropertySpec
 import ru.ezhov.rocket.action.api.context.icon.AppIcon
+import ru.ezhov.rocket.action.application.domain.model.RocketActionSettingsModel
+import ru.ezhov.rocket.action.application.domain.model.SettingsModel
+import ru.ezhov.rocket.action.application.domain.model.SettingsValueType
 import ru.ezhov.rocket.action.application.infrastructure.MutableRocketActionSettings
 import ru.ezhov.rocket.action.application.plugin.context.RocketActionContextFactory
 import ru.ezhov.rocket.action.application.plugin.manager.domain.RocketActionPluginRepository
@@ -20,6 +22,7 @@ import java.util.function.Consumer
 import javax.swing.BorderFactory
 import javax.swing.Box
 import javax.swing.BoxLayout
+import javax.swing.ButtonGroup
 import javax.swing.DefaultComboBoxModel
 import javax.swing.DefaultListCellRenderer
 import javax.swing.JButton
@@ -30,11 +33,13 @@ import javax.swing.JFrame
 import javax.swing.JLabel
 import javax.swing.JList
 import javax.swing.JPanel
+import javax.swing.JRadioButton
 import javax.swing.JScrollPane
 import javax.swing.JSpinner
 import javax.swing.SpinnerNumberModel
 import javax.swing.SwingUtilities
 import javax.swing.WindowConstants
+
 
 class CreateRocketActionSettingsDialog(
     owner: JFrame,
@@ -46,7 +51,7 @@ class CreateRocketActionSettingsDialog(
     private var currentCallback: CreatedRocketActionSettingsCallback? = null
     private val testPanel: TestPanel =
         TestPanel(rocketActionPluginRepository = rocketActionPluginRepository) {
-            actionSettingsPanel.create()
+            actionSettingsPanel.create().second
         }
 
     private val dialog: JDialog = JDialog(owner, "Создать действие").apply {
@@ -74,7 +79,13 @@ class CreateRocketActionSettingsDialog(
         val panel = JPanel(BorderLayout())
         comboBox.maximumRowCount = 20
         comboBox.renderer = object : DefaultListCellRenderer() {
-            override fun getListCellRendererComponent(list: JList<*>?, value: Any, index: Int, isSelected: Boolean, cellHasFocus: Boolean): Component {
+            override fun getListCellRendererComponent(
+                list: JList<*>?,
+                value: Any,
+                index: Int,
+                isSelected: Boolean,
+                cellHasFocus: Boolean
+            ): Component {
                 val label = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus) as JLabel
                 value.let {
                     val configuration = value as RocketActionConfiguration
@@ -105,13 +116,8 @@ class CreateRocketActionSettingsDialog(
             val settings = actionSettingsPanel.create()
             currentCallback!!.create(
                 TreeRocketActionSettings(
-                    configuration = settings.configuration,
-                    settings = MutableRocketActionSettings(
-                        settings.id(),
-                        settings.type(),
-                        settings.settings().toMutableMap(),
-                        settings.actions().toMutableList()
-                    )
+                    configuration = settings.first,
+                    settings = settings.second
                 )
             )
             dialog.isVisible = false
@@ -154,15 +160,19 @@ class CreateRocketActionSettingsDialog(
             revalidate()
         }
 
-        fun create(): NewRocketActionSettings = NewRocketActionSettings(
-            configuration = this.currentConfiguration!!,
-            type = currentConfiguration!!.type(),
-            settings = settingPanels.associate { panel -> panel.value() }
-        )
+        fun create() =
+            Pair(
+                first = this.currentConfiguration!!,
+                second = MutableRocketActionSettings(
+                    id = RocketActionSettingsModel.generateId(),
+                    type = currentConfiguration!!.type().value(),
+                    settings = settingPanels.map { panel -> panel.value() }.toMutableList()
+                )
+            )
     }
 
     private class SettingPanel(private val property: RocketActionConfigurationProperty) : JPanel() {
-        private val valueCallback: () -> String
+        private val valueCallback: () -> Pair<String, SettingsValueType?>
 
         init {
             this.layout = BorderLayout()
@@ -183,12 +193,34 @@ class CreateRocketActionSettingsDialog(
             val centerPanel = JPanel(BorderLayout())
             when (val configProperty = property.property()) {
                 is RocketActionPropertySpec.StringPropertySpec -> {
+                    val plainText = JRadioButton("Простой текст").apply { isSelected = true }
+                    val mustacheTemplate = JRadioButton("Шаблон Mustache")
+                    ButtonGroup().apply {
+                        add(plainText)
+                        add(mustacheTemplate)
+                    }
+
+                    centerPanel.add(JPanel().apply {
+                        add(plainText)
+                        add(mustacheTemplate)
+                    }, BorderLayout.NORTH)
+
                     centerPanel.add(
                         RTextScrollPane(
                             RSyntaxTextArea()
                                 .also { tp ->
                                     tp.syntaxEditingStyle = SyntaxConstants.SYNTAX_STYLE_NONE
-                                    valueCallback = { tp.text }
+                                    valueCallback = {
+                                        Pair(
+                                            first = tp.text,
+                                            second = when {
+                                                plainText.isSelected -> SettingsValueType.PLAIN_TEXT
+                                                mustacheTemplate.isSelected -> SettingsValueType.MUSTACHE_TEMPLATE
+                                                else -> SettingsValueType.PLAIN_TEXT
+
+                                            }
+                                        )
+                                    }
                                     tp.text = configProperty.defaultValue.orEmpty()
                                 }
                         ),
@@ -202,7 +234,7 @@ class CreateRocketActionSettingsDialog(
                             JCheckBox()
                                 .also { cb ->
                                     cb.isSelected = configProperty.defaultValue.toBoolean()
-                                    valueCallback = { cb.isSelected.toString() }
+                                    valueCallback = { Pair(cb.isSelected.toString(), null) }
                                 }
                         ), BorderLayout.CENTER)
                 }
@@ -218,7 +250,7 @@ class CreateRocketActionSettingsDialog(
                     centerPanel.add(JScrollPane(
                         list
                             .also { l ->
-                                valueCallback = { l.selectedItem.toString() }
+                                valueCallback = { Pair(l.selectedItem.toString(), null) }
                             }
                     ), BorderLayout.CENTER)
                 }
@@ -228,7 +260,7 @@ class CreateRocketActionSettingsDialog(
                     centerPanel.add(
                         JSpinner(SpinnerNumberModel(default, configProperty.min, configProperty.max, 1))
                             .also {
-                                valueCallback = { it.model.value.toString() }
+                                valueCallback = { Pair(it.model.value.toString(), null) }
                             },
                         BorderLayout.CENTER
                     )
@@ -239,7 +271,11 @@ class CreateRocketActionSettingsDialog(
             this.add(centerPanel, BorderLayout.CENTER)
         }
 
-        fun value(): Pair<RocketActionConfigurationPropertyKey, String> =
-            Pair(first = property.key(), second = valueCallback())
+        fun value(): SettingsModel =
+            SettingsModel(
+                name = property.key().value,
+                value = valueCallback().first,
+                valueType = valueCallback().second
+            )
     }
 }

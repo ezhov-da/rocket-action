@@ -3,14 +3,14 @@ package ru.ezhov.rocket.action.application
 import com.formdev.flatlaf.FlatLightLaf
 import mu.KotlinLogging
 import ru.ezhov.rocket.action.application.domain.RocketActionSettingsRepository
+import ru.ezhov.rocket.action.application.domain.model.ActionsModel
 import ru.ezhov.rocket.action.application.handlers.server.Server
-import ru.ezhov.rocket.action.application.infrastructure.YmlRocketActionSettingsRepository
-import ru.ezhov.rocket.action.application.plugin.context.RocketActionContextFactory
+import ru.ezhov.rocket.action.application.infrastructure.yml.YmlRocketActionSettingsRepository
 import ru.ezhov.rocket.action.application.plugin.manager.infrastructure.RocketActionPluginRepositoryFactory
 import ru.ezhov.rocket.action.application.properties.GeneralPropertiesRepositoryFactory
 import ru.ezhov.rocket.action.application.properties.UsedPropertiesName
 import java.io.File
-import java.util.Enumeration
+import java.util.*
 import javax.swing.LookAndFeel
 import javax.swing.SwingUtilities
 import javax.swing.UIManager
@@ -69,7 +69,7 @@ private fun rockerActionRepository(args: Array<String>): RocketActionSettingsRep
         if (file.exists()) {
             logger.info { "File '${file.absolutePath}' with actions exists" }
         } else {
-            repository.save(emptyList())
+            repository.save(ActionsModel(actions = emptyList()))
             logger.info { "File '${file.absolutePath}' with actions created" }
         }
         repository
@@ -77,8 +77,10 @@ private fun rockerActionRepository(args: Array<String>): RocketActionSettingsRep
 
 private fun lookAndFeel(): LookAndFeel {
     val className = GeneralPropertiesRepositoryFactory.repository
-        .asString(name = UsedPropertiesName.UI_CONFIGURATION_LOOK_AND_FEEL_CLASS,
-            default = "com.formdev.flatlaf.FlatLightLaf")
+        .asString(
+            name = UsedPropertiesName.UI_CONFIGURATION_LOOK_AND_FEEL_CLASS,
+            default = "com.formdev.flatlaf.FlatLightLaf"
+        )
 
     return Class.forName(className).newInstance() as LookAndFeel
 }
@@ -104,6 +106,6 @@ fun setUIFont(f: FontUIResource?) {
     }
 }
 
-private fun runServer(){
+private fun runServer() {
     Server().run()
 }

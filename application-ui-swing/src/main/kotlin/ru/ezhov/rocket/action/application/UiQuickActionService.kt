@@ -1,11 +1,12 @@
 package ru.ezhov.rocket.action.application
 
 import mu.KotlinLogging
-import ru.ezhov.rocket.action.api.RocketActionSettings
 import ru.ezhov.rocket.action.api.context.icon.AppIcon
 import ru.ezhov.rocket.action.api.context.notification.NotificationType
 import ru.ezhov.rocket.action.application.configuration.ui.ConfigurationFrame
 import ru.ezhov.rocket.action.application.domain.RocketActionSettingsRepository
+import ru.ezhov.rocket.action.application.domain.model.ActionsModel
+import ru.ezhov.rocket.action.application.domain.model.RocketActionSettingsModel
 import ru.ezhov.rocket.action.application.handlers.server.Server
 import ru.ezhov.rocket.action.application.infrastructure.RocketActionComponentCacheFactory
 import ru.ezhov.rocket.action.application.plugin.context.RocketActionContextFactory
@@ -59,9 +60,20 @@ class UiQuickActionService(
             //TODO: избранное
             //menuBar.add(createFavoriteComponent());
 
+
             menuBar.add(createSearchField(baseDialog, menu))
             val moveLabel = JLabel(RocketActionContextFactory.context.icon().by(AppIcon.MOVE))
             MoveUtil.addMoveAction(movableComponent = baseDialog, grabbedComponent = moveLabel)
+
+            val editorLabel = JLabel(RocketActionContextFactory.context.icon().by(AppIcon.PENCIL))
+            val actionOnEditor = createEditorActionListener()
+            editorLabel.addMouseListener(object : MouseAdapter() {
+                override fun mouseReleased(e: MouseEvent?) {
+                    actionOnEditor.actionPerformed(null)
+                }
+            })
+            menuBar.add(editorLabel)
+
             menuBar.add(moveLabel)
             CreateMenuWorker(menu).execute()
             menuBar
@@ -70,8 +82,7 @@ class UiQuickActionService(
         }
     }
 
-    @Throws(Exception::class)
-    private fun rocketActionSettings(): List<RocketActionSettings> = rocketActionSettingsRepository.actions()
+    private fun rocketActionSettings(): ActionsModel = rocketActionSettingsRepository.actions()
 
     private fun createSearchField(baseDialog: JDialog, menu: JMenu): Component =
         JPanel(FlowLayout(FlowLayout.LEFT, 0, 0)).apply {
@@ -132,62 +143,37 @@ class UiQuickActionService(
     private fun createTools(baseDialog: JDialog): JMenu {
         val menuTools = JMenu("Инструменты")
         menuTools.icon = RocketActionContextFactory.context.icon().by(AppIcon.WRENCH)
-        val updateActionListener = ActionListener {
-            SwingUtilities.invokeLater {
-                var newMenuBar: JMenuBar? = null
-                try {
-                    newMenuBar = createMenu(baseDialog)
-                } catch (ex: UiQuickActionServiceException) {
-                    ex.printStackTrace()
-                    RocketActionContextFactory.context.notification().show(NotificationType.ERROR, "Ошибка создания меню инструментов")
-                }
-                if (newMenuBar != null) {
-                    // пока костыль, но мы то знаем это "пока" :)
-                    baseDialog.jMenuBar.removeAll()
-                    baseDialog.jMenuBar = newMenuBar
-                    baseDialog.revalidate()
-                    baseDialog.repaint()
-                }
-            }
-        }
+
         val menuItemUpdate = JMenuItem("Обновить")
         menuItemUpdate.icon = RocketActionContextFactory.context.icon().by(AppIcon.RELOAD)
-        menuItemUpdate.addActionListener(updateActionListener)
+        menuItemUpdate.addActionListener(updateListener())
         menuTools.add(menuItemUpdate)
+
         val menuItemEditor = JMenuItem("Редактор")
         menuItemEditor.icon = RocketActionContextFactory.context.icon().by(AppIcon.PENCIL)
-        menuItemEditor.addActionListener {
-            SwingUtilities.invokeLater {
-                if (configurationFrame == null) {
-                    try {
-                        configurationFrame = ConfigurationFrame(
-                            rocketActionPluginRepository = rocketActionPluginRepository,
-                            rocketActionSettingsRepository = rocketActionSettingsRepository,
-                            updateActionListener = updateActionListener
-                        )
-                    } catch (ex: Exception) {
-                        ex.printStackTrace()
-                        RocketActionContextFactory.context.notification().show(NotificationType.ERROR, "Ошибка создания меню конфигурирования")
-                    }
-                }
-                if (configurationFrame != null) {
-                    configurationFrame!!.setVisible(true)
-                }
-            }
-        }
+        menuItemEditor.addActionListener(createEditorActionListener())
         menuTools.add(menuItemEditor)
+
         val menuInfo = JMenu("Информация")
         menuInfo.icon = RocketActionContextFactory.context.icon().by(AppIcon.INFO)
         val notFound = { key: String -> "Информация по полю '$key' не найдена" }
         menuInfo.add(
-            JMenuItem(generalPropertiesRepository
-                .asString(UsedPropertiesName.VERSION, notFound("версия"))))
+            JMenuItem(
+                generalPropertiesRepository
+                    .asString(UsedPropertiesName.VERSION, notFound("версия"))
+            )
+        )
         menuInfo.add(
-            JMenuItem(generalPropertiesRepository
-                .asString(UsedPropertiesName.INFO, notFound("информация"))))
+            JMenuItem(
+                generalPropertiesRepository
+                    .asString(UsedPropertiesName.INFO, notFound("информация"))
+            )
+        )
         menuInfo.add(
-            JMenuItem(generalPropertiesRepository
-                .asString(UsedPropertiesName.REPOSITORY, notFound("ссылка на репозиторий")))
+            JMenuItem(
+                generalPropertiesRepository
+                    .asString(UsedPropertiesName.REPOSITORY, notFound("ссылка на репозиторий"))
+            )
                 .apply {
                     addActionListener {
                         if (Desktop.isDesktopSupported()) {
@@ -226,6 +212,50 @@ class UiQuickActionService(
         return menuTools
     }
 
+    private fun createEditorActionListener(): ActionListener =
+        ActionListener {
+            SwingUtilities.invokeLater {
+                if (configurationFrame == null) {
+                    try {
+                        configurationFrame = ConfigurationFrame(
+                            rocketActionPluginRepository = rocketActionPluginRepository,
+                            rocketActionSettingsRepository = rocketActionSettingsRepository,
+                            updateActionListener = updateListener()
+                        )
+                    } catch (ex: Exception) {
+                        ex.printStackTrace()
+                        RocketActionContextFactory.context.notification()
+                            .show(NotificationType.ERROR, "Ошибка создания меню конфигурирования")
+                    }
+                }
+                if (configurationFrame != null) {
+                    configurationFrame!!.setVisible(true)
+                }
+            }
+        }
+
+    private fun updateListener() =
+        ActionListener {
+            SwingUtilities.invokeLater {
+                var newMenuBar: JMenuBar? = null
+                try {
+                    newMenuBar = createMenu(baseDialog!!)
+                } catch (ex: UiQuickActionServiceException) {
+                    ex.printStackTrace()
+                    RocketActionContextFactory.context.notification()
+                        .show(NotificationType.ERROR, "Ошибка создания меню инструментов")
+                }
+                if (newMenuBar != null) {
+                    // пока костыль, но мы то знаем это "пока" :)
+                    baseDialog!!.jMenuBar.removeAll()
+                    baseDialog!!.jMenuBar = newMenuBar
+                    baseDialog!!.revalidate()
+                    baseDialog!!.repaint()
+                }
+            }
+
+        }
+
     private fun createPropertyMenu(): JMenu =
         JMenu("Доступные свойства из командной строки").apply {
             UsedPropertiesName.values().forEach { pn ->
@@ -239,34 +269,36 @@ class UiQuickActionService(
             menu.removeAll()
         }
 
-        @Throws(Exception::class)
         override fun doInBackground(): List<Component> {
             val actionSettings = rocketActionSettings()
-            fillCache(actionSettings)
+            fillCache(actionSettings.actions)
             val cache = RocketActionComponentCacheFactory.cache
             val components = mutableListOf<Component>()
-            for (rocketActionSettings in actionSettings) {
-                rocketActionPluginRepository.by(rocketActionSettings.type())
+            for (rocketActionSettings in actionSettings.actions) {
+                rocketActionPluginRepository.by(rocketActionSettings.type)
                     ?.factory(RocketActionContextFactory.context)
                     ?.let {
                         (
                             cache
-                                .by(rocketActionSettings.id())
+                                .by(rocketActionSettings.id)
                                 ?.let { action ->
                                     logger.debug {
-                                        "found in cache type='${rocketActionSettings.type().value()}'" +
-                                            "id='${rocketActionSettings.id()}"
+                                        "found in cache type='${rocketActionSettings.type}'" +
+                                            "id='${rocketActionSettings.id}"
                                     }
 
                                     action.component()
                                 }
                                 ?: run {
                                     logger.debug {
-                                        "not found in cache type='${rocketActionSettings.type().value()}'" +
-                                            "id='${rocketActionSettings.id()}. Create component"
+                                        "not found in cache type='${rocketActionSettings.type}'" +
+                                            "id='${rocketActionSettings.id}. Create component"
                                     }
 
-                                    it.create(settings = rocketActionSettings, context = RocketActionContextFactory.context)?.component()
+                                    it.create(
+                                        settings = rocketActionSettings.to(),
+                                        context = RocketActionContextFactory.context
+                                    )?.component()
                                 }
                             )
                             ?.let { component ->
@@ -278,41 +310,44 @@ class UiQuickActionService(
             return components.toList()
         }
 
-        private fun fillCache(actionSettings: List<RocketActionSettings>) {
+        private fun fillCache(actionSettings: List<RocketActionSettingsModel>) {
             RocketActionComponentCacheFactory
                 .cache
                 .let { cache ->
                     for (rocketActionSettings in actionSettings) {
-                        val rau = rocketActionPluginRepository.by(rocketActionSettings.type())
+                        val rau = rocketActionPluginRepository.by(rocketActionSettings.type)
                             ?.factory(RocketActionContextFactory.context)
                         if (rau != null) {
-                            if (rocketActionSettings.type().value() != GroupRocketActionUi.TYPE) {
+                            if (rocketActionSettings.type != GroupRocketActionUi.TYPE) {
                                 val mustBeCreate = cache
-                                    .by(rocketActionSettings.id())
-                                    ?.isChanged(rocketActionSettings) ?: true
+                                    .by(rocketActionSettings.id)
+                                    ?.isChanged(rocketActionSettings.to()) ?: true
 
                                 logger.debug {
-                                    "must be create '$mustBeCreate' type='${rocketActionSettings.type().value()}'" +
-                                        "id='${rocketActionSettings.id()}'"
+                                    "must be create '$mustBeCreate' type='${rocketActionSettings.type}'" +
+                                        "id='${rocketActionSettings.id}'"
                                 }
 
                                 if (mustBeCreate) {
-                                    rau.create(settings = rocketActionSettings, context = RocketActionContextFactory.context)
+                                    rau.create(
+                                        settings = rocketActionSettings.to(),
+                                        context = RocketActionContextFactory.context
+                                    )
                                         ?.let { action ->
                                             logger.debug {
-                                                "added to cache type='${rocketActionSettings.type().value()}'" +
-                                                    "id='${rocketActionSettings.id()}'"
+                                                "added to cache type='${rocketActionSettings.type}'" +
+                                                    "id='${rocketActionSettings.id}'"
                                             }
 
                                             cache.add(
-                                                rocketActionSettings.id(),
+                                                rocketActionSettings.id,
                                                 action
                                             )
                                         }
                                 }
                             } else {
-                                if (rocketActionSettings.actions().isNotEmpty()) {
-                                    fillCache(rocketActionSettings.actions())
+                                if (rocketActionSettings.actions.isNotEmpty()) {
+                                    fillCache(rocketActionSettings.actions)
                                 }
                             }
                         }

@@ -150,8 +150,10 @@ class PluginsReflectionRocketActionPluginRepository : RocketActionPluginReposito
         return list
     }
 
-    override fun by(type: RocketActionType): RocketActionPlugin? =
-        all().firstOrNull { r: RocketActionPlugin -> r.configuration(context = RocketActionContextFactory.context).type().value() == type.value() }
+    override fun by(type: String): RocketActionPlugin? =
+        all().firstOrNull { r: RocketActionPlugin ->
+            r.configuration(context = RocketActionContextFactory.context).type().value() == type
+        }
 
     private class RocketActionPluginDecorator(
         private val rocketActionPluginOriginal: RocketActionPlugin,
@@ -160,7 +162,8 @@ class PluginsReflectionRocketActionPluginRepository : RocketActionPluginReposito
             rocketActionFactoryUi = rocketActionPluginOriginal.factory(context = context)
         )
 
-        override fun configuration(context: RocketActionContext): RocketActionConfiguration = rocketActionPluginOriginal.configuration(context)
+        override fun configuration(context: RocketActionContext): RocketActionConfiguration =
+            rocketActionPluginOriginal.configuration(context)
     }
 
     private class RocketActionFactoryUiDecorator(

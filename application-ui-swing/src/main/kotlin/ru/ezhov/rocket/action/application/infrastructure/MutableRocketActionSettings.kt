@@ -1,46 +1,55 @@
 package ru.ezhov.rocket.action.application.infrastructure
 
-import ru.ezhov.rocket.action.api.RocketActionConfiguration
 import ru.ezhov.rocket.action.api.RocketActionConfigurationPropertyKey
 import ru.ezhov.rocket.action.api.RocketActionSettings
 import ru.ezhov.rocket.action.api.RocketActionType
-import ru.ezhov.rocket.action.application.configuration.ui.NewRocketActionSettings
+import ru.ezhov.rocket.action.application.domain.EngineService
+import ru.ezhov.rocket.action.application.domain.model.RocketActionSettingsModel
+import ru.ezhov.rocket.action.application.domain.model.SettingsModel
 
 class MutableRocketActionSettings(
-    private val id: String,
-    private val type: RocketActionType,
-    private val settings: MutableMap<RocketActionConfigurationPropertyKey, String>,
-    private val actions: MutableList<RocketActionSettings> = ArrayList()
-) : RocketActionSettings {
+    val id: String,
+    val type: String,
+    val settings: MutableList<SettingsModel>,
+    val actions: MutableList<MutableRocketActionSettings> = mutableListOf()
+) {
 
-    override fun id(): String = id
+    fun to(): RocketActionSettings = object : RocketActionSettings {
+        override fun id(): String = id
 
-    override fun type(): RocketActionType = type
+        override fun type(): RocketActionType = RocketActionType { type }
 
-    override fun settings(): MutableMap<RocketActionConfigurationPropertyKey, String> = settings
+        override fun settings(): Map<RocketActionConfigurationPropertyKey, String> =
+            settings.associate { set ->
+                val resultVal = EngineService().processWithEngine(set)
+                RocketActionConfigurationPropertyKey(set.name) to resultVal
+            }
 
-    override fun actions(): List<RocketActionSettings> = actions
-
-    fun add(key: RocketActionConfigurationPropertyKey, value: String) {
-        settings[key] = value
+        override fun actions(): List<RocketActionSettings> = actions.map { it.to() }
     }
 
-    fun add(settings: MutableRocketActionSettings) {
-        actions.add(settings)
-    }
+    fun copy(source: MutableRocketActionSettings): MutableRocketActionSettings =
+        MutableRocketActionSettings(
+            id = RocketActionSettingsModel.generateId(),
+            type = source.type,
+            settings = settings.map { it.copy() }.toMutableList(),
+            actions = mutableListOf(),
+        )
 
-    fun copy(configuration: RocketActionConfiguration): MutableRocketActionSettings {
-        val new = NewRocketActionSettings(
-            configuration = configuration,
-            type = type,
-            settings = settings.toMap(),
-            actions = actions.toList(),
-        )
-        return MutableRocketActionSettings(
-            new.id(),
-            type = new.type(),
-            settings = new.settings().toMutableMap(),
-            actions = new.actions().toMutableList(),
-        )
+    fun toModel(): RocketActionSettingsModel = RocketActionSettingsModel(
+        id = this.id,
+        type = this.type,
+        settings = this.settings.toList(),
+        actions = this.actions.map { it.toModel() },
+    )
+
+    companion object {
+        fun from(model: RocketActionSettingsModel): MutableRocketActionSettings =
+            MutableRocketActionSettings(
+                id = model.id,
+                type = model.type,
+                settings = model.settings.toMutableList(),
+                actions = model.actions.map { from(it) }.toMutableList(),
+            )
     }
 }

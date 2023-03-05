@@ -6,5 +6,5 @@ import ru.ezhov.rocket.action.api.RocketActionType
 interface RocketActionPluginRepository {
     fun all(): List<RocketActionPlugin>
 
-    fun by(type: RocketActionType): RocketActionPlugin?
+    fun by(type: String): RocketActionPlugin?
 }
