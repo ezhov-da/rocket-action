@@ -24,35 +24,36 @@ class JsonFileVariableRepository : VariableRepository {
 
     override fun all(): Variables {
         val file = file()
-        return if (file.exists()) {
-            try {
-                Variables(
-                    (
-                        System.getenv().map {
-                            Variable(
-                                name = it.key.toString(),
-                                value = it.value.toString(),
-                                type = VariableType.ENVIRONMENT,
-                            )
-                        }.toMutableList() +
-                            System.getProperties().entries.map {
-                                Variable(
-                                    name = it.key.toString(),
-                                    value = it.value.toString(),
-                                    type = VariableType.PROPERTIES,
-                                )
-                            }.toMutableList() +
+        return Variables(
+            (
+                System.getenv().map {
+                    Variable(
+                        name = it.key.toString(),
+                        value = it.value.toString(),
+                        type = VariableType.ENVIRONMENT,
+                    )
+                }.toMutableList() +
+                    System.getProperties().entries.map {
+                        Variable(
+                            name = it.key.toString(),
+                            value = it.value.toString(),
+                            type = VariableType.PROPERTIES,
+                        )
+                    }.toMutableList() +
+                    try {
+                        if (file.exists()) {
                             mapper.readValue(file, JsonVariablesDto::class.java)
                                 .toVariables().variables.toMutableList()
-                        )
+                        } else {
+                            Variables.EMPTY.variables.toMutableList()
+                        }
+                    } catch (ex: Exception) {
+                        logger.error(ex) { "Error when read variables from file '$filePath'" }
+                        Variables.EMPTY.variables.toMutableList()
+                    }
                 )
-            } catch (ex: Exception) {
-                logger.error(ex) { "Error when read variables from file '$filePath'" }
-                Variables.EMPTY
-            }
-        } else {
-            return Variables.EMPTY
-        }
+        )
+
     }
 
     private fun file(): File {
