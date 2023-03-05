@@ -1,6 +1,6 @@
 package ru.ezhov.rocket.action.application.configuration.ui
 
-import ru.ezhov.rocket.action.application.infrastructure.YmlRocketActionSettingsRepository
+import ru.ezhov.rocket.action.application.infrastructure.yml.YmlRocketActionSettingsRepository
 import ru.ezhov.rocket.action.application.plugin.manager.infrastructure.PluginsReflectionRocketActionPluginRepository
 import javax.swing.SwingUtilities
 

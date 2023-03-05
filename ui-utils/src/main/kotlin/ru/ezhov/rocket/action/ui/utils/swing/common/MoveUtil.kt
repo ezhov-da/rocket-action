@@ -6,6 +6,7 @@ import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import javax.swing.SwingUtilities
 
+
 object MoveUtil {
     fun addMoveAction(movableComponent: Component, grabbedComponent: Component) {
         val mouseAdapter: MouseAdapter = object : MouseAdapter() {
@@ -23,6 +24,26 @@ object MoveUtil {
 
             override fun mouseReleased(e: MouseEvent) {
                 pressed = false
+
+                // TODO ezhov задел для https://github.com/ezhov-da/rocket-action/issues/7
+//                val ge = GraphicsEnvironment.getLocalGraphicsEnvironment()
+//                val gs = ge.screenDevices
+//                for (curGs in gs) {
+//                    val gc = curGs.configurations
+//                    for (curGc in gc) {
+//                        val bounds = curGc.bounds
+//                        println(
+//                            bounds.getX()
+//                                .toString() + "," +
+//                                bounds.getY() + " " +
+//                                bounds.getWidth() + "x" +
+//                                bounds.getHeight()
+//                        )
+//                    }
+//                }
+//
+//                println(Toolkit.getDefaultToolkit().screenSize)
+//                println("${movableComponent.x} ${movableComponent.y}")
             }
 
             override fun mouseDragged(e: MouseEvent) {

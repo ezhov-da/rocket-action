@@ -6,15 +6,15 @@ import org.fife.ui.rsyntaxtextarea.SyntaxConstants
 import org.fife.ui.rtextarea.RTextScrollPane
 import ru.ezhov.rocket.action.api.RocketActionConfiguration
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
-import ru.ezhov.rocket.action.api.RocketActionConfigurationPropertyKey
 import ru.ezhov.rocket.action.api.RocketActionPropertySpec
-import ru.ezhov.rocket.action.api.RocketActionType
 import ru.ezhov.rocket.action.api.context.icon.AppIcon
 import ru.ezhov.rocket.action.api.context.notification.NotificationType
 import ru.ezhov.rocket.action.application.configuration.ui.event.ConfigurationUiListener
 import ru.ezhov.rocket.action.application.configuration.ui.event.ConfigurationUiObserverFactory
 import ru.ezhov.rocket.action.application.configuration.ui.event.model.ConfigurationUiEvent
 import ru.ezhov.rocket.action.application.configuration.ui.event.model.RemoveSettingUiEvent
+import ru.ezhov.rocket.action.application.domain.model.SettingsModel
+import ru.ezhov.rocket.action.application.domain.model.SettingsValueType
 import ru.ezhov.rocket.action.application.infrastructure.MutableRocketActionSettings
 import ru.ezhov.rocket.action.application.plugin.context.RocketActionContextFactory
 import ru.ezhov.rocket.action.application.plugin.manager.domain.RocketActionPluginRepository
@@ -23,11 +23,13 @@ import java.awt.Color
 import javax.swing.BorderFactory
 import javax.swing.Box
 import javax.swing.BoxLayout
+import javax.swing.ButtonGroup
 import javax.swing.JButton
 import javax.swing.JCheckBox
 import javax.swing.JComboBox
 import javax.swing.JLabel
 import javax.swing.JPanel
+import javax.swing.JRadioButton
 import javax.swing.JScrollPane
 import javax.swing.JSpinner
 import javax.swing.JTextField
@@ -54,7 +56,8 @@ class EditorRocketActionSettingsPanel(
         button.addActionListener {
             rocketActionSettingsPanel.create()?.let { rs ->
                 callback!!.saved(rs)
-                RocketActionContextFactory.context.notification().show(NotificationType.INFO, "Конфигурация текущего действия сохранена")
+                RocketActionContextFactory.context.notification()
+                    .show(NotificationType.INFO, "Конфигурация текущего действия сохранена")
             } ?: run {
                 RocketActionContextFactory.context.notification().show(NotificationType.WARN, "Действие не выбрано")
             }
@@ -75,43 +78,49 @@ class EditorRocketActionSettingsPanel(
         testPanel.clearTest()
         currentSettings = settings
         this.callback = callback
-        val configuration: RocketActionConfiguration? = rocketActionPluginRepository.by(settings.settings.type())
-            ?.configuration(RocketActionContextFactory.context)
+        val configuration: RocketActionConfiguration? =
+            rocketActionPluginRepository.by(settings.settings.type)
+                ?.configuration(RocketActionContextFactory.context)
         val configurationDescription = configuration?.let {
             configuration.description()
         }
         infoPanel.refresh(
-            type = settings.settings.type(),
-            rocketActionId = settings.settings.id(),
+            type = settings.settings.type,
+            rocketActionId = settings.settings.id,
             description = configurationDescription
         )
-        val settingsFinal = settings.settings.settings()
+        val settingsFinal = settings.settings.settings
         val values = settingsFinal
-            .map { (k: RocketActionConfigurationPropertyKey, v: String) ->
+            .map { settingsModel ->
                 val property = configuration
                     ?.let { conf ->
                         conf
                             .properties()
-                            .firstOrNull { p: RocketActionConfigurationProperty? -> p!!.key() == k }
+                            .firstOrNull { p: RocketActionConfigurationProperty? ->
+                                p!!.key().value == settingsModel.name
+                            }
                     }
                 Value(
-                    key = k,
-                    value = v,
+                    key = settingsModel.name,
+                    value = settingsModel.value,
                     property = property,
+                    valueType = settingsModel.valueType,
                 )
             }
             .toMutableList() +
-            configuration
+            configuration // ищем те свойства, что добавились
                 ?.properties()
-                ?.filter { p: RocketActionConfigurationProperty -> !settingsFinal.containsKey(p.key()) }
+                ?.filter { p: RocketActionConfigurationProperty ->
+                    settingsFinal.firstOrNull { it.name == p.key().value } == null
+                }
                 ?.map { p: RocketActionConfigurationProperty? ->
                     Value(
-                        key = p!!.key(),
+                        key = p!!.key().value,
                         value = "",
                         property = p,
+                        valueType = null,
                     )
                 }.orEmpty()
-
 
         rocketActionSettingsPanel
             .setRocketActionConfiguration(
@@ -124,9 +133,10 @@ class EditorRocketActionSettingsPanel(
     }
 
     private data class Value(
-        val key: RocketActionConfigurationPropertyKey,
+        val key: String,
         val value: String,
-        val property: RocketActionConfigurationProperty?
+        val property: RocketActionConfigurationProperty?,
+        val valueType: SettingsValueType?,
     )
 
     private class InfoPanel : JPanel() {
@@ -139,8 +149,8 @@ class EditorRocketActionSettingsPanel(
             add(labelDescription, BorderLayout.CENTER)
         }
 
-        fun refresh(type: RocketActionType, rocketActionId: String, description: String?) {
-            textFieldInfo.text = "type: ${type.value()} id: $rocketActionId"
+        fun refresh(type: String, rocketActionId: String, description: String?) {
+            textFieldInfo.text = "type: $type id: $rocketActionId"
             description?.let {
                 labelDescription.text = description
             }
@@ -190,17 +200,17 @@ class EditorRocketActionSettingsPanel(
             TreeRocketActionSettings(
                 configuration = rs.configuration,
                 settings = MutableRocketActionSettings(
-                    rs.settings.id(),
-                    rs.settings.type(),
-                    settingPanels.associate { panel -> panel.value() }.toMutableMap(),
-                    rs.settings.actions().toMutableList()
+                    id = rs.settings.id,
+                    type = rs.settings.type,
+                    settings = settingPanels.map { panel -> panel.value() }.toMutableList(),
+                    actions = rs.settings.actions.toMutableList()
                 )
             )
         }
     }
 
     private class SettingPanel(private val value: Value) : JPanel() {
-        private var valueCallback: () -> String = { "" }
+        private var valueCallback: () -> Pair<String, SettingsValueType?> = { Pair("", null) }
 
         init {
             this.layout = BorderLayout()
@@ -223,12 +233,40 @@ class EditorRocketActionSettingsPanel(
                     val centerPanel = JPanel(BorderLayout())
                     when (val configProperty = property.property()) {
                         is RocketActionPropertySpec.StringPropertySpec -> {
+                            val plainText = JRadioButton("Простой текст").apply { }
+                            val mustacheTemplate = JRadioButton("Шаблон Mustache")
+
+                            when (value.valueType) {
+                                SettingsValueType.PLAIN_TEXT -> plainText.isSelected = true
+                                SettingsValueType.MUSTACHE_TEMPLATE -> mustacheTemplate.isSelected = true
+                                else -> plainText.isSelected = true
+                            }
+
+                            ButtonGroup().apply {
+                                add(plainText)
+                                add(mustacheTemplate)
+                            }
+
+                            centerPanel.add(JPanel().apply {
+                                add(plainText)
+                                add(mustacheTemplate)
+                            }, BorderLayout.NORTH)
+
                             centerPanel.add(
                                 RTextScrollPane(
                                     RSyntaxTextArea()
                                         .also { tp ->
                                             tp.syntaxEditingStyle = SyntaxConstants.SYNTAX_STYLE_NONE
-                                            valueCallback = { tp.text }
+                                            valueCallback = {
+                                                Pair(
+                                                    first = tp.text,
+                                                    second = when {
+                                                        plainText.isSelected -> SettingsValueType.PLAIN_TEXT
+                                                        mustacheTemplate.isSelected -> SettingsValueType.MUSTACHE_TEMPLATE
+                                                        else -> SettingsValueType.PLAIN_TEXT
+                                                    }
+                                                )
+                                            }
                                             if (property.isRequired() && value.value.isEmpty()) {
                                                 tp.text = configProperty.defaultValue ?: ""
                                             } else {
@@ -245,7 +283,7 @@ class EditorRocketActionSettingsPanel(
                                 JCheckBox()
                                     .also { cb ->
                                         cb.isSelected = value.value.toBoolean()
-                                        valueCallback = { cb.isSelected.toString() }
+                                        valueCallback = { Pair(cb.isSelected.toString(), null) }
                                     }
                             ), BorderLayout.CENTER)
                         }
@@ -261,7 +299,7 @@ class EditorRocketActionSettingsPanel(
                             centerPanel.add(JScrollPane(
                                 list
                                     .also { l ->
-                                        valueCallback = { l.selectedItem.toString() }
+                                        valueCallback = { Pair(l.selectedItem.toString(), null) }
                                     }
                             ), BorderLayout.CENTER)
                         }
@@ -271,7 +309,7 @@ class EditorRocketActionSettingsPanel(
                             centerPanel.add(
                                 JSpinner(SpinnerNumberModel(default, configProperty.min, configProperty.max, 1))
                                     .also {
-                                        valueCallback = { it.model.value.toString() }
+                                        valueCallback = { Pair(it.model.value.toString(), null) }
                                     },
                                 BorderLayout.CENTER
                             )
@@ -281,7 +319,7 @@ class EditorRocketActionSettingsPanel(
                     this.add(topPanel, BorderLayout.NORTH)
                     this.add(centerPanel, BorderLayout.CENTER)
                 } ?: run {
-                val text = "Обнаружено незарегистрированное свойство '${value.key.value}:${value.value}' " +
+                val text = "Обнаружено незарегистрированное свойство '${value.key}:${value.value}' " +
                     "description=${value.property?.description()}"
                 logger.warn { text }
                 RocketActionContextFactory.context.notification().show(
@@ -291,7 +329,12 @@ class EditorRocketActionSettingsPanel(
             }
         }
 
-        fun value(): Pair<RocketActionConfigurationPropertyKey, String> = Pair(first = value.key, valueCallback())
+        fun value(): SettingsModel = SettingsModel(
+            name = value.key,
+            value = valueCallback().first,
+            valueType = valueCallback().second
+
+        )
     }
 
     private var stubPanel: JPanel? = null

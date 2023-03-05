@@ -2,27 +2,27 @@ package ru.ezhov.rocket.action.application.configuration.ui
 
 import mu.KotlinLogging
 import ru.ezhov.rocket.action.api.RocketActionConfiguration
-import ru.ezhov.rocket.action.api.RocketActionSettings
+import ru.ezhov.rocket.action.application.infrastructure.MutableRocketActionSettings
 
 private val logger = KotlinLogging.logger {}
 
 data class TreeRocketActionSettings(
     val configuration: RocketActionConfiguration,
-    val settings: RocketActionSettings,
+    val settings: MutableRocketActionSettings,
 ) {
     fun asString(): String =
         configuration
             .asString()
             .firstNotNullOfOrNull { k ->
-                val v = settings.settings()[k]
-                if (v == null || v.isEmpty()) {
-                    null
-                } else {
+                val v = settings.settings.firstOrNull { it.name == k.value }?.value
+                if (v != null && !v.isNullOrEmpty()) {
                     v
+                } else {
+                    null
                 }
             }
             ?: run {
-                val value = settings.type().value()
+                val value = settings.type
 
                 logger.debug {
                     "The property specified for display was not found '${configuration.asString()}' " +

@@ -58,4 +58,24 @@ enum class UsedPropertiesName(val propertyName: String, val description: String)
             Пример: 4567
         """.trimIndent()
     ),
+
+    VARIABLES_FILE_REPOSITORY_PATH(
+        "$PREFIX.variables.file.repository.path",
+        """
+            Путь к файлу для хранения переменных.
+            Пример:
+            - относительный путь './folder/variables.json'
+            - абсолютный путь 'C:/folder/variables.json'
+        """.trimIndent()
+    ),
+
+    APPLICATION_CONFIGURATION_FILE_REPOSITORY_PATH(
+        "$PREFIX.application.configuration.file.repository.path",
+        """
+            Путь хранения настроек приложения.
+            Пример:
+            - относительный путь './folder/configurations.json'
+            - абсолютный путь 'C:/folder/configurations.json'
+        """.trimIndent()
+    ),
 }

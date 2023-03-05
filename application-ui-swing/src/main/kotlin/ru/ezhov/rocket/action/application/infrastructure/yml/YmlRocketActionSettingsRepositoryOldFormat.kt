@@ -1,26 +1,30 @@
-package ru.ezhov.rocket.action.application.infrastructure
+package ru.ezhov.rocket.action.application.infrastructure.yml
 
 import mu.KotlinLogging
 import org.yaml.snakeyaml.Yaml
 import ru.ezhov.rocket.action.api.RocketActionConfigurationPropertyKey
 import ru.ezhov.rocket.action.api.RocketActionSettings
-import ru.ezhov.rocket.action.application.domain.RocketActionSettingsRepository
-import ru.ezhov.rocket.action.application.domain.RocketActionSettingsRepositoryException
+import ru.ezhov.rocket.action.application.domain.model.SettingsModel
+import ru.ezhov.rocket.action.application.infrastructure.MutableRocketActionSettings
 import java.io.File
 import java.io.FileOutputStream
 import java.io.OutputStreamWriter
 import java.net.URI
 import java.nio.charset.StandardCharsets
-import java.util.UUID
+import java.util.*
 
 private val logger = KotlinLogging.logger {}
 
-class YmlRocketActionSettingsRepository(private val uri: URI) : RocketActionSettingsRepository {
-    override fun actions(): List<RocketActionSettings> {
+@Deprecated(
+    "Устаревший метод, который будет выводиться из обращения. " +
+        "Используется только для обратной соместимости"
+)
+class YmlRocketActionSettingsRepositoryOldFormat(private val uri: URI) {
+    fun actions(): List<RocketActionSettings> {
         logger.debug { "Get actions by uri='$uri'" }
 
         uri.toURL().openStream().use { inputStream ->
-            val actions: MutableList<RocketActionSettings> = ArrayList()
+            val actions: MutableList<MutableRocketActionSettings> = ArrayList()
             val yaml = Yaml()
             val obj = yaml.load<Map<String, Any>>(inputStream)
             for ((key, value) in obj) {
@@ -34,17 +38,18 @@ class YmlRocketActionSettingsRepository(private val uri: URI) : RocketActionSett
 
             logger.info { "Actions count ${actions.size}" }
 
-            return actions
+            return actions.map { it.to() }
         }
     }
 
-    override fun save(settings: List<RocketActionSettings>) {
+    fun save(settings: List<RocketActionSettings>) {
         logger.debug { "Actions settings saving started. count=${settings.size}" }
 
         val file = File(uri.path)
         OutputStreamWriter(
             FileOutputStream(file),
-            StandardCharsets.UTF_8).use { outputStreamWriter ->
+            StandardCharsets.UTF_8
+        ).use { outputStreamWriter ->
             val yaml = Yaml()
             val all: MutableList<Map<String?, Any?>> = ArrayList()
             recursiveSettings(settings, all)
@@ -61,7 +66,9 @@ class YmlRocketActionSettingsRepository(private val uri: URI) : RocketActionSett
             val objectYml: MutableMap<String?, Any?> = LinkedHashMap()
             objectYml[TYPE] = data.type().value()
             objectYml[ID] = data.id()
-            data.settings().forEach { (key: RocketActionConfigurationPropertyKey?, value: String?) -> objectYml[key.value] = value }
+            data.settings().forEach { (key: RocketActionConfigurationPropertyKey?, value: String?) ->
+                objectYml[key.value] = value
+            }
             val actionsOriginal = data.actions()
             if (actionsOriginal.isNotEmpty()) {
                 val actionsForWrite: MutableList<Map<String?, Any?>> = ArrayList()
@@ -72,7 +79,7 @@ class YmlRocketActionSettingsRepository(private val uri: URI) : RocketActionSett
         }
     }
 
-    private fun createAction(action: LinkedHashMap<String, Any?>): RocketActionSettings {
+    private fun createAction(action: LinkedHashMap<String, Any?>): MutableRocketActionSettings {
         return QuickActionFactory.create(
             getOrGenerateId(action),
             action[TYPE].toString(),
@@ -81,7 +88,7 @@ class YmlRocketActionSettingsRepository(private val uri: URI) : RocketActionSett
     }
 
     private object QuickActionFactory {
-        fun createAction(action: LinkedHashMap<String, Any?>): RocketActionSettings {
+        fun createAction(action: LinkedHashMap<String, Any?>): MutableRocketActionSettings {
             return create(
                 getOrGenerateId(action),
                 action[TYPE].toString(),
@@ -89,23 +96,40 @@ class YmlRocketActionSettingsRepository(private val uri: URI) : RocketActionSett
             )
         }
 
-        fun create(id: String, actionType: String, action: LinkedHashMap<String, Any?>): RocketActionSettings {
+        fun create(id: String, actionType: String, action: LinkedHashMap<String, Any?>): MutableRocketActionSettings {
             val actions = (action[ACTIONS] as? ArrayList<LinkedHashMap<String, Any?>>).orEmpty()
             action.remove(TYPE)
             action.remove(ID)
             action.remove(ACTIONS)
             return if (actions.isEmpty()) {
-                val map: MutableMap<RocketActionConfigurationPropertyKey, String> = HashMap()
-                action.forEach { (k: String, v: Any?) -> map[RocketActionConfigurationPropertyKey(k)] = v?.toString().orEmpty() }
-                MutableRocketActionSettings(id = id, type = { actionType }, settings = map, actions = mutableListOf())
+                val list: MutableList<SettingsModel> = mutableListOf()
+                action.forEach { (k: String, v: Any?) ->
+                    list.add(
+                        SettingsModel(
+                            name = k,
+                            value = v?.toString().orEmpty(),
+                            valueType = null,
+
+                            )
+                    )
+                }
+                MutableRocketActionSettings(id = id, type = actionType, settings = list, actions = mutableListOf())
             } else {
-                val settings: MutableList<RocketActionSettings> = ArrayList()
+                val settings: MutableList<MutableRocketActionSettings> = ArrayList()
                 for (a in actions) {
                     settings.add(createAction(a))
                 }
-                val map: MutableMap<RocketActionConfigurationPropertyKey, String> = HashMap()
-                action.forEach { (k: String, v: Any?) -> map[RocketActionConfigurationPropertyKey(k)] = v?.toString().orEmpty() }
-                MutableRocketActionSettings(id = id, type = { actionType }, settings = map, actions = settings)
+                val list: MutableList<SettingsModel> = mutableListOf()
+                action.forEach { (k: String, v: Any?) ->
+                    list.add(
+                        SettingsModel(
+                            name = k,
+                            value = v?.toString().orEmpty(),
+                            valueType = null,
+                        )
+                    )
+                }
+                MutableRocketActionSettings(id = id, type = actionType, settings = list, actions = settings)
             }
         }
     }

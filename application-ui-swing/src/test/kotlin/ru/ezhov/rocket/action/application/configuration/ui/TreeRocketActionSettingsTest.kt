@@ -5,8 +5,10 @@ import org.junit.jupiter.api.Test
 import ru.ezhov.rocket.action.api.RocketActionConfiguration
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
 import ru.ezhov.rocket.action.api.RocketActionConfigurationPropertyKey
-import ru.ezhov.rocket.action.api.RocketActionSettings
 import ru.ezhov.rocket.action.api.RocketActionType
+import ru.ezhov.rocket.action.application.domain.model.SettingsModel
+import ru.ezhov.rocket.action.application.domain.model.SettingsValueType
+import ru.ezhov.rocket.action.application.infrastructure.MutableRocketActionSettings
 import javax.swing.Icon
 
 class TreeRocketActionSettingsTest {
@@ -38,25 +40,22 @@ class TreeRocketActionSettingsTest {
                 override fun icon(): Icon? = null
 
             },
-            settings = object : RocketActionSettings {
-                override fun id(): String {
-                    TODO("Not yet implemented")
-                }
-
-                override fun type(): RocketActionType {
-                    TODO("Not yet implemented")
-                }
-
-                override fun settings(): Map<RocketActionConfigurationPropertyKey, String> = mapOf(
-                    RocketActionConfigurationPropertyKey("1") to "2",
-                    RocketActionConfigurationPropertyKey("3") to "34"
+            settings = MutableRocketActionSettings(
+                id = "123",
+                type = "123",
+                settings = mutableListOf(
+                    SettingsModel(
+                        name = "1",
+                        value = "2",
+                        valueType = SettingsValueType.PLAIN_TEXT,
+                    ),
+                    SettingsModel(
+                        name = "3",
+                        value = "34",
+                        valueType = SettingsValueType.PLAIN_TEXT,
+                    )
                 )
-
-                override fun actions(): List<RocketActionSettings> {
-                    TODO("Not yet implemented")
-                }
-
-            }
+            )
         )
 
         assertEquals("2", treeRocketActionSettings.asString())

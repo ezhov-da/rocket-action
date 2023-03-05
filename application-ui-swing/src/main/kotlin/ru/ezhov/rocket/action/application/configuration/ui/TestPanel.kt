@@ -1,6 +1,6 @@
 package ru.ezhov.rocket.action.application.configuration.ui
 
-import ru.ezhov.rocket.action.api.RocketActionSettings
+import ru.ezhov.rocket.action.application.infrastructure.MutableRocketActionSettings
 import ru.ezhov.rocket.action.application.plugin.context.RocketActionContextFactory
 import ru.ezhov.rocket.action.application.plugin.manager.domain.RocketActionPluginRepository
 import java.awt.BorderLayout
@@ -15,13 +15,13 @@ class TestPanel(
     private val callback: CreateTestCallback
 ) : JPanel(BorderLayout()) {
     private var panelTest: JPanel? = null
-    private fun createTest(settings: RocketActionSettings) {
+    private fun createTest(settings: MutableRocketActionSettings) {
         val panel: JPanel =
-            when (val actionUi = rocketActionPluginRepository.by(settings.type())
+            when (val actionUi = rocketActionPluginRepository.by(settings.type)
                 ?.factory(RocketActionContextFactory.context)) {
                 null -> {
                     val p = JPanel(BorderLayout())
-                    p.add(JLabel("Не найдено действие для типа '${settings.type()}'"))
+                    p.add(JLabel("Не найдено действие для типа '${settings.type}'"))
                     p
                 }
 
@@ -29,7 +29,7 @@ class TestPanel(
                     val p = JPanel(BorderLayout())
                     val menuBar = JMenuBar()
                     val component = actionUi
-                        .create(settings = settings, context = RocketActionContextFactory.context)
+                        .create(settings = settings.to(), context = RocketActionContextFactory.context)
                         ?.component()
                         ?: JLabel("Компонент не создан")
                     menuBar.add(component)
@@ -64,6 +64,6 @@ class TestPanel(
     }
 
     fun interface CreateTestCallback {
-        fun create(): RocketActionSettings?
+        fun create(): MutableRocketActionSettings?
     }
 }

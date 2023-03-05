@@ -1,11 +1,9 @@
 package ru.ezhov.rocket.action.application.domain
 
-import ru.ezhov.rocket.action.api.RocketActionSettings
+import ru.ezhov.rocket.action.application.domain.model.ActionsModel
 
 interface RocketActionSettingsRepository {
-    @Throws(RocketActionSettingsRepositoryException::class)
-    fun actions(): List<RocketActionSettings>
+    fun actions(): ActionsModel
 
-    @Throws(RocketActionSettingsRepositoryException::class)
-    fun save(settings: List<RocketActionSettings>)
+    fun save(actions: ActionsModel)
 }

@@ -1,7 +1,6 @@
 package ru.ezhov.rocket.action.application.configuration.ui
 
 import mu.KotlinLogging
-import ru.ezhov.rocket.action.api.RocketActionSettings
 import ru.ezhov.rocket.action.api.context.icon.AppIcon
 import ru.ezhov.rocket.action.api.context.notification.NotificationType
 import ru.ezhov.rocket.action.application.configuration.ui.event.ConfigurationUiListener
@@ -10,12 +9,15 @@ import ru.ezhov.rocket.action.application.configuration.ui.event.model.Configura
 import ru.ezhov.rocket.action.application.configuration.ui.event.model.RemoveSettingUiEvent
 import ru.ezhov.rocket.action.application.domain.RocketActionSettingsRepository
 import ru.ezhov.rocket.action.application.domain.RocketActionSettingsRepositoryException
+import ru.ezhov.rocket.action.application.domain.model.ActionsModel
+import ru.ezhov.rocket.action.application.domain.model.RocketActionSettingsModel
 import ru.ezhov.rocket.action.application.infrastructure.MutableRocketActionSettings
 import ru.ezhov.rocket.action.application.plugin.context.RocketActionContextFactory
 import ru.ezhov.rocket.action.application.plugin.group.GroupRocketActionUi
 import ru.ezhov.rocket.action.application.plugin.manager.domain.RocketActionPluginRepository
 import ru.ezhov.rocket.action.application.properties.GeneralPropertiesRepositoryFactory
 import ru.ezhov.rocket.action.application.properties.UsedPropertiesName
+import ru.ezhov.rocket.action.application.variables.interfaces.ui.VariablesFrame
 import ru.ezhov.rocket.action.ui.utils.swing.common.toImage
 import java.awt.BorderLayout
 import java.awt.Component
@@ -24,6 +26,8 @@ import java.awt.event.ActionEvent
 import java.awt.event.ActionListener
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import javax.swing.AbstractAction
 import javax.swing.DropMode
 import javax.swing.JButton
@@ -54,27 +58,26 @@ class ConfigurationFrame(
     private val rocketActionSettingsRepository: RocketActionSettingsRepository,
     updateActionListener: ActionListener
 ) {
-    private val frame: JFrame = JFrame("Конфигурирование действий")
+    private val frame: JFrame = JFrame()
     private val rocketActionPluginRepository: RocketActionPluginRepository
     private val createRocketActionSettingsDialog: CreateRocketActionSettingsDialog
     private val updateActionListener: ActionListener
     private var finalTree: JTree? = null
 
-    @Throws(Exception::class)
     private fun panel(): JPanel {
         val panel = JPanel(BorderLayout())
         panel.add(tree(), BorderLayout.CENTER)
         return panel
     }
 
-    @Throws(Exception::class)
     private fun tree(): JPanel {
         val splitPane = JSplitPane(JSplitPane.HORIZONTAL_SPLIT)
         splitPane.setDividerLocation(0.5)
         splitPane.resizeWeight = 0.5
         val actions = rocketActionSettingsRepository.actions()
         val root = DefaultMutableTreeNode(null, true)
-        fillTreeNodes(actions, root)
+        fillTreeNodes(actions.actions, root)
+        setTitle(actions.lastChangedDate)
         val defaultTreeModel = DefaultTreeModel(root)
         val rocketActionSettingsPanel = EditorRocketActionSettingsPanel(
             rocketActionPluginRepository = rocketActionPluginRepository,
@@ -182,7 +185,7 @@ class ConfigurationFrame(
                             }
                         }
                     ))
-                    if (userObject?.settings?.type()?.value() == GroupRocketActionUi.TYPE) {
+                    if (userObject?.settings?.type == GroupRocketActionUi.TYPE) {
                         popupMenu.add(JMenuItem(
                             object : AbstractAction() {
                                 override fun actionPerformed(e: ActionEvent) {
@@ -190,7 +193,8 @@ class ConfigurationFrame(
                                         override fun create(settings: TreeRocketActionSettings) {
                                             SwingUtilities.invokeLater {
                                                 mutableTreeNode.add(
-                                                    DefaultMutableTreeNode(settings, true))
+                                                    DefaultMutableTreeNode(settings, true)
+                                                )
                                                 defaultTreeModel.reload(mutableTreeNode)
                                             }
                                         }
@@ -206,14 +210,14 @@ class ConfigurationFrame(
                     }
                     if (
                         userObject != null &&
-                        userObject.settings.type().value() != GroupRocketActionUi.TYPE &&
+                        userObject.settings.type != GroupRocketActionUi.TYPE &&
                         userObject.settings is MutableRocketActionSettings
                     ) {
                         popupMenu.add(JMenuItem(
                             object : AbstractAction() {
                                 override fun actionPerformed(e: ActionEvent) {
                                     val settings = userObject.settings
-                                    val duplicate = settings.copy(userObject.configuration)
+                                    val duplicate = settings.copy(userObject.settings)
                                     SwingUtilities.invokeLater {
                                         defaultTreeModel.insertNodeInto(
                                             DefaultMutableTreeNode(
@@ -267,26 +271,33 @@ class ConfigurationFrame(
         return panel
     }
 
-    private fun fillTreeNodes(actions: List<RocketActionSettings>?, parent: DefaultMutableTreeNode) {
+    private fun setTitle(dateTime: LocalDateTime) {
+        val dateAsString = dateTime.format(
+            DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+        )
+        frame.title = "Конфигурирование действий '$dateAsString'"
+    }
+
+    private fun fillTreeNodes(actions: List<RocketActionSettingsModel>?, parent: DefaultMutableTreeNode) {
         for (rocketActionSettings in actions!!) {
-            rocketActionPluginRepository.by(type = rocketActionSettings.type())
+            rocketActionPluginRepository.by(type = rocketActionSettings.type)
                 ?.configuration(RocketActionContextFactory.context)
                 ?.let { config ->
                     val current = DefaultMutableTreeNode(
                         TreeRocketActionSettings(
                             configuration = config,
-                            settings = rocketActionSettings,
+                            settings = MutableRocketActionSettings.from(rocketActionSettings),
                         ),
                         true
                     )
                     parent.add(current)
-                    if (rocketActionSettings.actions().isNotEmpty()) {
-                        val childAction = rocketActionSettings.actions()
+                    if (rocketActionSettings.actions.isNotEmpty()) {
+                        val childAction = rocketActionSettings.actions
                         fillTreeNodes(actions = childAction, parent = current)
                     }
                 } ?: run {
                 logger.warn {
-                    "Configuration for settings '${rocketActionSettings.type().value()}' " +
+                    "Configuration for settings '${rocketActionSettings.type}' " +
                         "not found and skipped"
                 }
             }
@@ -294,14 +305,16 @@ class ConfigurationFrame(
     }
 
     private fun saveSettings(treeModel: DefaultTreeModel) {
-        val settings: MutableList<RocketActionSettings> = ArrayList()
+        val settings: MutableList<MutableRocketActionSettings> = ArrayList()
         val root = treeModel.root as DefaultMutableTreeNode
         val childCount = root.childCount
         for (i in 0 until childCount) {
             recursiveGetSettings(root.getChildAt(i) as DefaultMutableTreeNode, settings, null)
         }
         try {
-            rocketActionSettingsRepository.save(settings)
+            val actions = ActionsModel(actions = settings.map { it.toModel() })
+            rocketActionSettingsRepository.save(actions)
+            setTitle(actions.lastChangedDate)
             RocketActionContextFactory.context.notification().show(NotificationType.INFO, "Действия сохранены")
         } catch (e: RocketActionSettingsRepositoryException) {
             e.printStackTrace()
@@ -309,14 +322,18 @@ class ConfigurationFrame(
         }
     }
 
-    private fun recursiveGetSettings(node: DefaultMutableTreeNode, settings: MutableList<RocketActionSettings>, parent: MutableRocketActionSettings?) {
+    private fun recursiveGetSettings(
+        node: DefaultMutableTreeNode,
+        settings: MutableList<MutableRocketActionSettings>,
+        parent: MutableRocketActionSettings?
+    ) {
         val originalActionSettings = node.userObject as TreeRocketActionSettings
         val finalActionSettings = MutableRocketActionSettings(
-            id = originalActionSettings.settings.id(),
-            type = originalActionSettings.settings.type(),
-            settings = originalActionSettings.settings.settings().toMutableMap()
+            id = originalActionSettings.settings.id,
+            type = originalActionSettings.settings.type,
+            settings = originalActionSettings.settings.settings
         )
-        parent?.add(finalActionSettings) ?: settings.add(finalActionSettings)
+        parent?.actions?.add(finalActionSettings) ?: settings.add(finalActionSettings)
         val childCount = node.childCount
         for (i in 0 until childCount) {
             recursiveGetSettings(node.getChildAt(i) as DefaultMutableTreeNode, settings, finalActionSettings)
@@ -330,7 +347,15 @@ class ConfigurationFrame(
     }
 
     private inner class RocketActionSettingsCellRender : DefaultTreeCellRenderer() {
-        override fun getTreeCellRendererComponent(tree: JTree, value: Any, sel: Boolean, expanded: Boolean, leaf: Boolean, row: Int, hasFocus: Boolean): Component {
+        override fun getTreeCellRendererComponent(
+            tree: JTree,
+            value: Any,
+            sel: Boolean,
+            expanded: Boolean,
+            leaf: Boolean,
+            row: Int,
+            hasFocus: Boolean
+        ): Component {
             val label = super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus) as JLabel
             val node = value as DefaultMutableTreeNode
             if (node.userObject is TreeRocketActionSettings) {
@@ -358,13 +383,17 @@ class ConfigurationFrame(
         frame.setSize(
             (size.width * GeneralPropertiesRepositoryFactory
                 .repository
-                .asFloat(UsedPropertiesName.UI_CONFIGURATION_DIALOG_WIDTH_IN_PERCENT,
-                    0.6F)
+                .asFloat(
+                    UsedPropertiesName.UI_CONFIGURATION_DIALOG_WIDTH_IN_PERCENT,
+                    0.6F
+                )
                 ).toInt(),
             (size.height * GeneralPropertiesRepositoryFactory
                 .repository
-                .asFloat(UsedPropertiesName.UI_CONFIGURATION_DIALOG_HEIGHT_IN_PERCENT,
-                    0.6F)
+                .asFloat(
+                    UsedPropertiesName.UI_CONFIGURATION_DIALOG_HEIGHT_IN_PERCENT,
+                    0.6F
+                )
                 ).toInt()
         )
         frame.setLocationRelativeTo(null)
@@ -393,15 +422,29 @@ class ConfigurationFrame(
 
     private fun createToolBar(): JToolBar {
         val menuBar = JToolBar()
-        val buttonUpdate = JButton("Обновить")
-        buttonUpdate.icon = RocketActionContextFactory.context.icon().by(AppIcon.RELOAD)
-        buttonUpdate.addActionListener { e: ActionEvent? ->
-            SwingUtilities.invokeLater {
-                updateActionListener.actionPerformed(e)
-                setVisible(false)
+
+        // Обновить
+        menuBar.add(
+            JButton("Обновить").apply {
+                icon = RocketActionContextFactory.context.icon().by(AppIcon.RELOAD)
+                addActionListener { e: ActionEvent? ->
+                    SwingUtilities.invokeLater {
+                        updateActionListener.actionPerformed(e)
+                        ConfigurationFrame@ frame.isVisible = false
+                    }
+                }
+            })
+
+        // Переменные
+        menuBar.add(JButton("Переменные").apply {
+            val variablesFrame = VariablesFrame(frame)
+            icon = RocketActionContextFactory.context.icon().by(AppIcon.FORK)
+            addActionListener {
+                SwingUtilities.invokeLater {
+                    variablesFrame.isVisible = true
+                }
             }
-        }
-        menuBar.add(buttonUpdate)
+        })
 
         return menuBar
     }
@@ -410,7 +453,7 @@ class ConfigurationFrame(
     var buttonCreateNewAction: JButton? = null
 
     private fun checkEmptyActionsAndShowButtonCreate(menuBar: JToolBar) {
-        if (rocketActionSettingsRepository.actions().isEmpty() && buttonCreateNewAction == null) {
+        if (rocketActionSettingsRepository.actions().actions.isEmpty() && buttonCreateNewAction == null) {
             createAndShowButtonCreateFirstAction(menuBar = menuBar)
         }
     }
