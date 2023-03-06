@@ -8,22 +8,22 @@ import ru.ezhov.rocket.action.application.engine.domain.model.EngineVariable
 import ru.ezhov.rocket.action.application.variables.application.VariablesApplication
 
 class EngineService {
-    fun processWithEngine(settingsModel: SettingsModel): String {
-        val engine = when (settingsModel.valueType ?: SettingsValueType.PLAIN_TEXT) {
+    fun processWithEngine(settingsModel: SettingsModel): String =
+        when (settingsModel.valueType ?: SettingsValueType.PLAIN_TEXT) {
             SettingsValueType.MUSTACHE_TEMPLATE -> EngineFactory.by(EngineType.MUSTACHE)
             else -> null
         }
+            ?.let { engine ->
+                val variables =
+                    VariablesApplication().all()
+                        .variables.map { variable ->
+                            EngineVariable(
+                                name = variable.name,
+                                value = variable.value,
+                            )
 
-        val variables =
-            VariablesApplication().all().variables.map {
-                EngineVariable(
-                    name = it.name,
-                    value = it.value,
-                )
+                        }
+                engine.execute(settingsModel.value, variables)
             }
-
-        return engine
-            ?.execute(settingsModel.value, variables)
             ?: settingsModel.value
-    }
 }

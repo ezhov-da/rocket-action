@@ -21,6 +21,7 @@ class MutableRocketActionSettings(
 
         override fun settings(): Map<RocketActionConfigurationPropertyKey, String> =
             settings.associate { set ->
+                // TODO ezhov возможность для оптимизации
                 val resultVal = EngineService().processWithEngine(set)
                 RocketActionConfigurationPropertyKey(set.name) to resultVal
             }

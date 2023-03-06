@@ -8,15 +8,27 @@ import java.awt.Point
 import java.awt.Toolkit
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
-import java.util.LinkedList
+import java.util.concurrent.ConcurrentLinkedDeque
+import java.util.concurrent.Executors
 
 private val logger = KotlinLogging.logger { }
 
 internal class PopupNotificationService : NotificationService {
-    private val messages = LinkedList<Message>()
+    private val messages = ConcurrentLinkedDeque<Message>()
+    private val executorService = Executors.newFixedThreadPool(4)
+
+    init {
+        // TODO ezhov перевести на Spring и использовать его инстансы
+        Runtime.getRuntime().addShutdownHook(Thread {
+            executorService.shutdownNow()
+        })
+    }
+
     override fun show(type: NotificationType, text: String) {
-        createAndShowMessage(type, text)
-        logger.info { "Notification with type='$type' showed" }
+        executorService.submit {
+            createAndShowMessage(type, text)
+            logger.debug { "Notification with type='$type' text='$text' showed" }
+        }
     }
 
     private fun createAndShowMessage(type: NotificationType, text: String) {
@@ -24,12 +36,14 @@ internal class PopupNotificationService : NotificationService {
         val messageDimension = Dimension((screenSize.width * 0.1).toInt(), (screenSize.height * 0.07).toInt())
         val message = Message(type, 3000, text)
         val point = if (messages.isEmpty()) {
-            Point(screenSize.width - SPACE_BETWEEN_MESSAGES - messageDimension.width,
+            Point(
+                screenSize.width - SPACE_BETWEEN_MESSAGES - messageDimension.width,
                 screenSize.height - SPACE_BETWEEN_MESSAGES - messageDimension.height
             )
         } else {
             val messageLast = messages.last
-            Point(screenSize.width - SPACE_BETWEEN_MESSAGES - messageDimension.width,
+            Point(
+                screenSize.width - SPACE_BETWEEN_MESSAGES - messageDimension.width,
                 messageLast.y - SPACE_BETWEEN_MESSAGES - messageDimension.height
             )
         }

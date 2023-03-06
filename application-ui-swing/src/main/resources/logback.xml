@@ -5,7 +5,7 @@
         </encoder>
     </appender>
 
-    <logger name="ru.ezhov" level="INFO"/>
+    <logger name="${LOGGER_NAME:-ru.ezhov}" level="${LOGBACK_LOGGER_LEVEL:-INFO}"/>
 
     <root level="WARN">
         <appender-ref ref="STDOUT"/>
