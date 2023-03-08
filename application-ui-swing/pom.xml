@@ -133,6 +133,11 @@
             <artifactId>groovy</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>org.apache.groovy</groupId>
+            <artifactId>groovy-json</artifactId>
+        </dependency>
+
         <!-- ENGINES END -->
 
         <dependency>
