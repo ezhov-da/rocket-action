@@ -8,6 +8,7 @@ import ru.ezhov.rocket.action.api.context.RocketActionContext
 import ru.ezhov.rocket.action.api.context.cache.CacheService
 import ru.ezhov.rocket.action.api.context.icon.IconService
 import ru.ezhov.rocket.action.api.context.notification.NotificationService
+import ru.ezhov.rocket.action.api.context.variables.VariablesService
 import java.awt.BorderLayout
 import javax.swing.JFrame
 import javax.swing.JMenuBar
@@ -32,6 +33,10 @@ fun main() {
             }
 
             override fun cache(): CacheService {
+                TODO("Not yet implemented")
+            }
+
+            override fun variables(): VariablesService {
                 TODO("Not yet implemented")
             }
 
@@ -65,6 +70,10 @@ fun main() {
                     TODO("Not yet implemented")
                 }
 
+                override fun variables(): VariablesService = object : VariablesService {
+                    override fun variables(): Map<String, String> = emptyMap()
+                }
+
             }
         )
         val component = rocketAction!!.component()
@@ -80,3 +89,5 @@ fun main() {
         }
     }
 }
+
+internal class KotlinScriptRocketActionUiTest

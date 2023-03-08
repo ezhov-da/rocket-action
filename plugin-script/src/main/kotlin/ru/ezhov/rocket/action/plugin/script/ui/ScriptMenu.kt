@@ -1,23 +1,27 @@
-package ru.ezhov.rocket.action.plugin.script.kotlin.ui
+package ru.ezhov.rocket.action.plugin.script.ui
 
+import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea
+import org.fife.ui.rsyntaxtextarea.SyntaxConstants
+import org.fife.ui.rtextarea.RTextScrollPane
 import ru.ezhov.rocket.action.api.context.RocketActionContext
 import ru.ezhov.rocket.action.api.context.icon.AppIcon
+import ru.ezhov.rocket.action.plugin.script.ScriptEngine
+import ru.ezhov.rocket.action.plugin.script.ScriptEngineType
 import java.awt.BorderLayout
 import java.awt.Dimension
 import java.awt.Toolkit
 import javax.swing.JButton
 import javax.swing.JMenu
 import javax.swing.JPanel
-import javax.swing.JScrollPane
 import javax.swing.JSplitPane
-import javax.swing.JTextPane
 
 class ScriptMenu(
     label: String,
     script: String,
     description: String? = null,
     executeOnLoad: Boolean = false,
-    private val context: RocketActionContext
+    private val context: RocketActionContext,
+    scriptEngine: ScriptEngine,
 ) : JMenu(label) {
     private val iconDefault = context.icon().by(AppIcon.BOLT)
 
@@ -30,6 +34,8 @@ class ScriptMenu(
             afterExecuteCallback = afterExecuteCallBack(),
             script = script,
             context = context,
+            scriptEngine = scriptEngine,
+            variables = context.variables().variables(),
         )
         add(panelExecute)
         icon = iconDefault
@@ -40,6 +46,8 @@ class ScriptMenu(
                 afterExecuteCallback = afterExecuteCallBack(),
                 script = script,
                 context = context,
+                scriptEngine = scriptEngine,
+                variables = context.variables().variables(),
             )
                 .execute()
         }
@@ -62,10 +70,20 @@ class ScriptMenu(
         private val beforeExecuteCallback: () -> Unit,
         private val afterExecuteCallback: (String) -> Unit,
         script: String,
-        private val context: RocketActionContext
+        private val context: RocketActionContext,
+        private val scriptEngine: ScriptEngine,
+        private val variables: Map<String, String>,
     ) : JPanel() {
-        val textPaneScript = JTextPane()
-        val textPaneResult = JTextPane()
+        val textPaneScript = RSyntaxTextArea().apply {
+            syntaxEditingStyle = when (scriptEngine.type()) {
+                ScriptEngineType.KOTLIN -> SyntaxConstants.SYNTAX_STYLE_KOTLIN
+                ScriptEngineType.GROOVY -> SyntaxConstants.SYNTAX_STYLE_KOTLIN
+            }
+            isCodeFoldingEnabled = true
+        }
+        val textPaneResult = RSyntaxTextArea().apply {
+            isCodeFoldingEnabled = true
+        }
         val buttonExecute = JButton("Выполнить")
 
         init {
@@ -81,10 +99,10 @@ class ScriptMenu(
                 .addActionListener { executeScript() }
 
             val splitPanel = JSplitPane(JSplitPane.VERTICAL_SPLIT)
-            splitPanel.topComponent = JScrollPane(textPaneScript)
+            splitPanel.topComponent = RTextScrollPane(textPaneScript)
             val panelBottom = JPanel(BorderLayout()).apply {
                 add(buttonExecute, BorderLayout.NORTH)
-                add(JScrollPane(textPaneResult), BorderLayout.CENTER)
+                add(RTextScrollPane(textPaneResult), BorderLayout.CENTER)
             }
             splitPanel.bottomComponent = panelBottom
             splitPanel.setDividerLocation(0.3)
@@ -103,6 +121,8 @@ class ScriptMenu(
                 afterExecuteCallback = afterExecuteCallback,
                 script = textPaneScript.text,
                 context = context,
+                scriptEngine = scriptEngine,
+                variables = variables,
             )
                 .execute()
         }

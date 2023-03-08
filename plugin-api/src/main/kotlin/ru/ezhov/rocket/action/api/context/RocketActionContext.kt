@@ -3,6 +3,7 @@ package ru.ezhov.rocket.action.api.context
 import ru.ezhov.rocket.action.api.context.cache.CacheService
 import ru.ezhov.rocket.action.api.context.icon.IconService
 import ru.ezhov.rocket.action.api.context.notification.NotificationService
+import ru.ezhov.rocket.action.api.context.variables.VariablesService
 
 /**
  * Вспомогательный контекст предоставляющий функционал для удобного создания действия
@@ -22,4 +23,11 @@ interface RocketActionContext {
      * Сервис кеширования
      */
     fun cache(): CacheService
+
+    /**
+     * Сервис предоставления переменных
+     */
+    fun variables(): VariablesService = object : VariablesService {
+        override fun variables(): Map<String, String> = emptyMap()
+    }
 }
