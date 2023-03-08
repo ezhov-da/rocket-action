@@ -10,7 +10,7 @@ internal class GroovyEngineTest {
         val engine = GroovyEngine()
 
         val result = engine.execute(
-            template = "\"\$test \$test2\"",
+            template = "\"\$test \$test2 \${_variables['test2']}\"",
             variables = listOf(
                 EngineVariable(
                     name = "test",
@@ -23,7 +23,7 @@ internal class GroovyEngineTest {
             )
         )
 
-        assertThat(result).isEqualTo("Hello world!")
+        assertThat(result).isEqualTo("Hello world! world!")
     }
 
     @Test
