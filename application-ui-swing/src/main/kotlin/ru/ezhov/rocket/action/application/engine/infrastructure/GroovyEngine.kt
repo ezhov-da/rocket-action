@@ -1,30 +1,31 @@
 package ru.ezhov.rocket.action.application.engine.infrastructure
 
-import com.github.mustachejava.DefaultMustacheFactory
+import groovy.lang.Binding
+import groovy.lang.GroovyShell
 import mu.KotlinLogging
 import ru.ezhov.rocket.action.application.engine.domain.Engine
 import ru.ezhov.rocket.action.application.engine.domain.model.EngineVariable
-import java.io.StringReader
-import java.io.StringWriter
 import kotlin.system.measureTimeMillis
 
 private val logger = KotlinLogging.logger { }
 
-class MustacheEngine : Engine {
+class GroovyEngine : Engine {
+
     override fun execute(template: String, variables: List<EngineVariable>): String {
-        val result: StringWriter
+        val result: String
         val time = measureTimeMillis {
-            val factory = DefaultMustacheFactory()
-            val mustache = factory.compile(StringReader(template), "engine")
-            result = StringWriter()
-            mustache.execute(result, variables.associate { it.name to it.value }).flush()
+            val sharedData = Binding()
+            val groovyShell = GroovyShell(sharedData)
+            variables.forEach { sharedData.setProperty(it.name, it.value) }
+            result = groovyShell.evaluate(template).toString()
+
         }
 
         logger.debug {
-            "Time execute mustache script '$time'ms. " +
+            "Time execute groovy script '$time'ms. " +
                 "Template='$template', variables=${variables.associate { it.name to it.value }}"
         }
 
-        return result.toString()
+        return result
     }
 }

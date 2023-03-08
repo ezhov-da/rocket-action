@@ -235,21 +235,25 @@ class EditorRocketActionSettingsPanel(
                         is RocketActionPropertySpec.StringPropertySpec -> {
                             val plainText = JRadioButton("Простой текст").apply { }
                             val mustacheTemplate = JRadioButton("Шаблон Mustache")
+                            val groovyTemplate = JRadioButton("Шаблон Groovy")
 
                             when (value.valueType) {
                                 SettingsValueType.PLAIN_TEXT -> plainText.isSelected = true
                                 SettingsValueType.MUSTACHE_TEMPLATE -> mustacheTemplate.isSelected = true
+                                SettingsValueType.GROOVY_TEMPLATE -> groovyTemplate.isSelected = true
                                 else -> plainText.isSelected = true
                             }
 
                             ButtonGroup().apply {
                                 add(plainText)
                                 add(mustacheTemplate)
+                                add(groovyTemplate)
                             }
 
                             centerPanel.add(JPanel().apply {
                                 add(plainText)
                                 add(mustacheTemplate)
+                                add(groovyTemplate)
                             }, BorderLayout.NORTH)
 
                             centerPanel.add(
@@ -263,6 +267,7 @@ class EditorRocketActionSettingsPanel(
                                                     second = when {
                                                         plainText.isSelected -> SettingsValueType.PLAIN_TEXT
                                                         mustacheTemplate.isSelected -> SettingsValueType.MUSTACHE_TEMPLATE
+                                                        groovyTemplate.isSelected -> SettingsValueType.GROOVY_TEMPLATE
                                                         else -> SettingsValueType.PLAIN_TEXT
                                                     }
                                                 )

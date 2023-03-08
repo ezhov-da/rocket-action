@@ -1,669 +1,675 @@
 ---
 actions:
 
-  - type: TODOIST
-    _id: de1a6ba8-c229-11ec-9d64-0242ac120002
-    label: Todoist 23525245
-    todoistToken: ""
-
-  - type: SHOW_SVG_IMAGE
-    _id: de2a6ba8-c229-11ec-9d64-0242ac120002
-    label: SVG big image 2345234523466
-    description: description
-    imageUrl: http://www.plantuml.com/plantuml/svg/ZL9BRzf04BxxLsmvELA3Bpdr532eIGI9LKEJdj2iFS2g-x1srr1KzRztTi4kbAYgJzREz_ZcSUyyMDygoVAxrLIYGkrTya7eIhOrigttZVkKPHRsmutmsvQt3crbj2VSi38gQoJemBzrlfQ2P_dTRH6UblDPfi1vjFIqoea1GgCTDeHDajdesyjoiNfzN3oiPjFFq-T9UfCa1LfdT5grpXk5zYCR75z0iZ7exq9lM7wg3QWuOXsIcJNpMsISK0CIAWzah5PZq-eQx25rdE2Fci9ezBtM4JMu-Pam-lg8wHxvg6c8yOgSqPyK5NXXTF1yWXqmq3Kh6niqvb_py3n1ANQKDQPmdk0LEqs9ybpAkmQ8KH9R8YjWW-zvb9KLZOzE8xrf9SIE2sjseYOVaBBhMNHjyLDRwrPNGGgay8ShTnNCvuOB6Ns3wXiei8Ai-qADEr7Xtzm9JsiUcWKF71m6mXUKCJUhJu-ihBQe8DHARomw5Yx6NUM0HeGLDkA_9jor_bv_l_fzJt_ubBo59FpqDlnqEuuhSd6cmURcdA5qQ9nIhIqexAxZcf9Gh_rjn2NsQ--gVowtlw6bGnUq7XQBeYJS9IpAHCnLINMLJZnYuzXwqQVovJaxLrR_XaHChDSyBWzgnzRMg3ZmlHKU7VCcyYRZ_8BH3RP4JIGyZhTrfr6LyqL1y1wjz5c6j_ciZt1Fz5R9tm00
-
-  - type: SHOW_SVG_IMAGE
-    _id: de3a6ba8-c229-11ec-9d64-0242ac120002
-    label: SVG image 5734572372357
-    description: description
-    imageUrl: http://www.plantuml.com/plantuml/svg/SoWkIImgAStDuNBAJrBGjLDmpCbCJbMmKiX8pSd9vt98pKi1IW80
-
-  - type: GIST
-    _id: de4a6ba8-c229-11ec-9d64-0242ac120002
-    label: Gists 3462362346
-    baseGistUrl: https://gist.github.com/ezhov-da
-    username: ezhov-da
-
-  - type: SHOW_TEXT
-    _id: de5a6ba8-c229-11ec-9d64-0242ac120002
-    label: |
-      Lorem Ipsum is simply dummy text of the printing and typesetting industry.
-      Lorem Ipsum has been the industry's standard dummy text ever since the 1500s,
-      when an unknown printer took a galley of type and scrambled it to make a type specimen book.
-      It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.
-      It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages,
-      and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
-
-  - type: SHOW_TEXT
-    _id: de6a6ba8-c229-11ec-9d64-0242ac120002
-    label: >
-      Simple text 234623462463
-
-  - type: OPEN_URL_WITH_TEXT
-    _id: de7a6ba8-c229-11ec-9d64-0242ac120002
-    label: OPEN_URL_WITH_TEXT 23623462346
-    iconUrl: https://github.githubassets.com/favicons/favicon.png
-    description: description
-    baseUrl: https://github.com/_____/
-    placeholder: _____
-
-  - type: OPEN_URL_WITH_TEXT
-    _id: de8a6ba8-c229-11ec-9d64-0242ac120002
-    label: OPEN_URL_WITH_TEXT 234623642346
-    description: description
-    baseUrl: https://github.com/_____/
-    placeholder: _____
-
-  - type: OPEN_URL_WITH_TEXT_HISTORY
-    _id: de9a6ba8-c229-11ec-9d64-0242ac120002
-    label: OPEN_URL_WITH_TEXT_HISTORY 23462346246
-    iconUrl: https://github.githubassets.com/favicons/favicon.png
-    description: description
-    baseUrl: https://github.com/_____/
-    placeholder: _____
-
-  - type: OPEN_URL_WITH_TEXT_HISTORY
-    _id: de10aba8-c229-11ec-9d64-0242ac120002
-    label: OPEN_URL_WITH_TEXT_HISTORY 347357234572
-    description: description
-    baseUrl: https://github.com/_____/
-    placeholder: _____
-
-  - type: SEPARATOR
-    _id: de11aba8-c229-11ec-9d64-0242ac120002
-
-  - type: OPEN_URL
-    _id: de12aba8-c229-11ec-9d64-0242ac120002
-    label: OPEN_URL 26234236
-    iconUrl: https://github.githubassets.com/favicons/favicon.png
-    description: description
-    url: url
-
-  - type: COPY_TO_CLIPBOARD
-    _id: de13aba8-c229-11ec-9d64-0242ac120002
-    label: COPY_TO_CLIPBOARD 2363623462346
-    description: description
-    text: COPY_TO_CLIPBOARD
-
-  - type: OPEN_FILE
-    _id: de14aba8-c229-11ec-9d64-0242ac120002
-    label: OPEN_FILE 2362362346
-    description: description
-    path: text
-
-  - type: OPEN_FILE
-    _id: de15aba8-c229-11ec-9d64-0242ac120002
-    label:
-    description:
-    path: open file with only path
-
-  - type: GROUP
-    _id: de16aba8-c229-11ec-9d64-0242ac120002
-    label: GROUP 2342362346
-    iconUrl: https://www.elastic.co/favicon.ico
-    description: description
-    actions:
-      - type: COPY_TO_CLIPBOARD
-        _id: de17aba8-c229-11ec-9d64-02642ac120002
-        label: label1 236236236
-        description: description
-        text: text
-
-      - type: COPY_TO_CLIPBOARD
-        _id: de17aba8-c229-1dfgj1ec-9d64-02427ac120002
-        label: label1 236236236
-        description: description
-        text: text
-
-      - type: COPY_TO_CLIPBOARD
-        _id: de17aba8-c229-1dfgjdfg1ec-9d64-02427ac120002
-        label: label1 236236236
-        description: description
-        text: text
-
-      - type: COPY_TO_CLIPBOARD
-        _id: de17abasdfasdfa8-c229-1dfgj1ec-9d64-02427ac120002
-        label: label1 236236236
-        description: description
-        text: text
-
-      - type: COPY_TO_CLIPBOARD
-        _id: de17aba8-c229-11efdgc-9d64-02452ac120002
-        label: label1 236236236
-        description: description
-        text: text
-
-      - type: COPY_TO_CLIPBOARD
-        _id: de17aba8-c229-1fdgj1ec-9d64-02452ac120002
-        label: label1 236236236
-        description: description
-        text: text
-
-      - type: COPY_TO_CLIPBOARD
-        _id: de17aba8-c229-11fdgjec-9d64-02452ac120002
-        label: label1 236236236
-        description: description
-        text: text
-
-      - type: COPY_TO_CLIPBOARD
-        _id: de17aba8-c229-1dfgj1ec-9d64-02452ac120002
-        label: label1 236236236
-        description: description
-        text: text
-
-      - type: COPY_TO_CLIPBOARD
-        _id: de17aba8-c229-11dfgjec-9d64-02452ac120002
-        label: label1 236236236
-        description: description
-        text: text
-
-      - type: COPY_TO_CLIPBOARD
-        _id: de17aba8-c229-1dfgj1ec-9d64-02452ac120002
-        label: label1 236236236
-        description: description
-        text: text
-
-      - type: COPY_TO_CLIPBOARD
-        _id: de17aba8-c229-11dfjgec-9d64-02452ac120002
-        label: label1 236236236
-        description: description
-        text: text
-
-      - type: COPY_TO_CLIPBOARD
-        _id: de17aba8-c229-11dfjgec-9d64-02452ac120002
-        label: label1 236236236
-        description: description
-        text: text
-
-      - type: COPY_TO_CLIPBOARD
-        _id: de17aba8-c229-1dfgj1ec-9d64-02452ac120002
-        label: label1 236236236
-        description: description
-        text: text
-
-      - type: COPY_TO_CLIPBOARD
-        _id: de17aba8-c229-1fdgj1ec-9d64-02452ac120002
-        label: label1 236236236
-        description: description
-        text: text
-
-      - type: COPY_TO_CLIPBOARD
-        _id: de17aba8-c229-11ec-9fdgjd64-02452ac120002
-        label: label1 236236236
-        description: description
-        text: text
-
-      - type: COPY_TO_CLIPBOARD
-        _id: de17aba8-c229-11ec-9ddfgj64-02452ac120002
-        label: label1 236236236
-        description: description
-        text: text
-
-      - type: COPY_TO_CLIPBOARD
-        _id: de17aba8-c229-11ec-9d6dfjg4-02452ac120002
-        label: label1 236236236
-        description: description
-        text: text
-
-      - type: COPY_TO_CLIPBOARD
-        _id: de17aba8-c229-11ec-9d6dfgj4-02452ac120002
-        label: label1 236236236
-        description: description
-        text: text
-
-      - type: COPY_TO_CLIPBOARD
-        _id: de17aba8-c229-11ec-9ddfgj64-02452ac120002
-        label: label1 236236236
-        description: description
-        text: text
-
-      - type: COPY_TO_CLIPBOARD
-        _id: de17aba8-c229-11ec-9dfdgj64-02452ac120002
-        label: label1 236236236
-        description: description
-        text: text
-
-      - type: COPY_TO_CLIPBOARD
-        _id: de17aba8-c229-11ec-9ddfgj64-02452ac120002
-        label: label1 236236236
-        description: description
-        text: text
-
-      - type: COPY_TO_CLIPBOARD
-        _id: de17aba8-c229-11ec-9dfdgj64-02452ac120002
-        label: label1 236236236
-        description: description
-        text: text
-
-      - type: COPY_TO_CLIPBOARD
-        _id: de17aba8-c229-11ec-9dfj64-02452ac120002
-        label: label1 236236236
-        description: description
-        text: text
-
-      - type: COPY_TO_CLIPBOARD
-        _id: de17aba8-c229-11ec-9fdgjd64-02452ac120002
-        label: label1 236236236
-        description: description
-        text: text
-
-      - type: COPY_TO_CLIPBOARD
-        _id: de17aba8-c229-11ec-9dfgjd64-02452ac120002
-        label: label1 236236236
-        description: description
-        text: text
-
-      - type: COPY_TO_CLIPBOARD
-        _id: de17aba8-c229-11ec-9d64-02452dfgjac120002
-        label: label1 236236236
-        description: description
-        text: text
-
-      - type: COPY_TO_CLIPBOARD
-        _id: de17aba8-c229-11ec-9d64-02452adfgjc120002
-        label: label1 236236236
-        description: description
-        text: text
-
-      - type: COPY_TO_CLIPBOARD
-        _id: de17aba8-c229-11ec-9d64-0245fgj2ac120002
-        label: label1 236236236
-        description: description
-        text: text
-
-      - type: COPY_TO_CLIPBOARD
-        _id: de17aba8-c229-11ec-9d64-02452afgc120002
-        label: label1 236236236
-        description: description
-        text: text
-
-      - type: COPY_TO_CLIPBOARD
-        _id: de17aba8-c229-11ec-9d64-0245dfj2ac120002
-        label: label1 236236236
-        description: description
-        text: text
-
-      - type: COPY_TO_CLIPBOARD
-        _id: de17aba8-c229-11ec-9d64-0245dfgj2ac120002
-        label: label1 236236236
-        description: description
-        text: text
-
-      - type: COPY_TO_CLIPBOARD
-        _id: de17aba8-c229-11ec-9d64-02452adfgjc120002
-        label: label1 236236236
-        description: description
-        text: text
-
-      - type: COPY_TO_CLIPBOARD
-        _id: de17aba8-c229-11ec-9d64-02452ac1dfgj20002
-        label: label1 236236236
-        description: description
-        text: text
-
-      - type: COPY_TO_CLIPBOARD
-        _id: de17aba8-c229-11ec-9d64-02452acdfgj120002
-        label: label1 236236236
-        description: description
-        text: text
-
-      - type: COPY_TO_CLIPBOARD
-        _id: de17aba8-c229-11ec-9d64-02452adfgjc120002
-        label: label1 236236236
-        description: description
-        text: text
-
-      - type: COPY_TO_CLIPBOARD
-        _id: de17aba8-c229-11ec-9d64-02452dfgjac120002
-        label: label1 236236236
-        description: description
-        text: text
-
-      - type: COPY_TO_CLIPBOARD
-        _id: de17aba8-c229-11ec-9d64-0245dfg2ac120002
-        label: label1 236236236
-        description: description
-        text: text
-
-      - type: COPY_TO_CLIPBOARD
-        _id: de17aba8-c229-11ec-9d64-0245jfd2ac120002
-        label: label1 236236236
-        description: description
-        text: text
-
-      - type: COPY_TO_CLIPBOARD
-        _id: de17aba8-c229-11ec-9d64-0245dfjg2ac120002
-        label: label1 236236236
-        description: description
-        text: text
-
-      - type: COPY_TO_CLIPBOARD
-        _id: de17aba8-c229-11ec-9d64-02452dfjac120002
-        label: label1 236236236
-        description: description
-        text: text
-
-      - type: COPY_TO_CLIPBOARD
-        _id: de17aba8-c229-11ec-9d64-02452ac12dth0002
-        label: label1 236236236
-        description: description
-        text: text
-
-      - type: COPY_TO_CLIPBOARD
-        _id: de17aba8-c229-11ec-9d64-0245rtky2ac120002
-        label: label1 236236236
-        description: description
-        text: text
-
-      - type: COPY_TO_CLIPBOARD
-        _id: de17aba8-c229-11ec-9d64-0245tk2ac120002
-        label: label1 236236236
-        description: description
-        text: text
-
-      - type: COPY_TO_CLIPBOARD
-        _id: de17aba8-c229-11ec-9d64-02452tykac120002
-        label: label1 236236236
-        description: description
-        text: text
-
-      - type: COPY_TO_CLIPBOARD
-        _id: de17aba8-c229-11ec-9d64-0245yk2ac120002
-        label: label1 236236236
-        description: description
-        text: text
-
-      - type: COPY_TO_CLIPBOARD
-        _id: de17aba8-c229-11ec-9d64-0245fdj2ac120002
-        label: label1 236236236
-        description: description
-        text: text
-
-      - type: COPY_TO_CLIPBOARD
-        _id: de17aba8-c229-11ec-9d64-02h452ac120002
-        label: label1 236236236
-        description: description
-        text: text
-
-      - type: COPY_TO_CLIPBOARD
-        _id: de17aba8-c229-11ec-9d64-02247452ac120002
-        label: label1 236236236
-        description: description
-        text: text
-
-      - type: COPY_TO_CLIPBOARD
-        _id: de17aba8-c229-11ec-9d64-02456452ac120002
-        label: label1 236236236
-        description: description
-        text: text
-
-      - type: COPY_TO_CLIPBOARD
-        _id: de17aba8-c229-11ec-9d64-026452ac120002
-        label: label1 236236236
-        description: description
-        text: text
-
-
-      - type: COPY_TO_CLIPBOARD
-        _id: de17aba8-c229-11ec-9d64-02426c120002
-        label: label1 236236236
-        description: description
-        text: text
-
-      - type: COPY_TO_CLIPBOARD
-        _id: de17aba8-c229-11ec-9d64-04242ac120002
-        label: label1 236236236
-        description: description
-        text: text
-
-      - type: COPY_TO_CLIPBOARD
-        _id: de17aba8-c229-11ec-9d64-05242ac120002
-        label: label1 236236236
-        description: description
-        text: text
-
-      - type: COPY_TO_CLIPBOARD
-        _id: de17aba8-c229-11ec-9d64-03242ac120002
-        label: label1 236236236
-        description: description
-        text: text
-
-      - type: COPY_TO_CLIPBOARD
-        _id: de17aba8-c229-11ec-9d64-02442ac120002
-        label: label1 236236236
-        description: description
-        text: text
-
-      - type: COPY_TO_CLIPBOARD
-        _id: de17aba8-c229-11ec-9d64-02442ac120002
-        label: label1 236236236
-        description: description
-        text: text
-
-      - type: COPY_TO_CLIPBOARD
-        _id: de17aba8-c229-11ec-9d64-20242ac120002
-        label: label1 236236236
-        description: description
-        text: text
-
-      - type: COPY_TO_CLIPBOARD
-        _id: de17aba8-c229-11ec-9d64-02432ac120002
-        label: label1 236236236
-        description: description
-        text: text
-
-      - type: COPY_TO_CLIPBOARD
-        _id: de17aba8-c229-11ec-9d64-0242a5c120002
-        label: label1 236236236
-        description: description
-        text: text
-
-      - type: COPY_TO_CLIPBOARD
-        _id: de17aba8-c229-11ec-9d64-02432ac120002
-        label: label1 236236236
-        description: description
-        text: text
-
-      - type: COPY_TO_CLIPBOARD
-        _id: de17aba8-c229-11ec-9d64-02442ac120002
-        label: label1 236236236
-        description: description
-        text: text
-
-      - type: COPY_TO_CLIPBOARD
-        _id: de17aba8-c229-11ec-9d64-02426ac120002
-        label: label1 236236236
-        description: description
-        text: text
-
-      - type: COPY_TO_CLIPBOARD
-        _id: de17aba8-c229-11ec-9d64-02425ac120002
-        label: label1 236236236
-        description: description
-        text: text
-
-      - type: COPY_TO_CLIPBOARD
-        _id: de17aba8-c229-11ec-9d64-0242ac3120002
-        label: label1 236236236
-        description: description
-        text: text
-
-      - type: COPY_TO_CLIPBOARD
-        _id: de17aba8-c229-11ec-9d64-0242a5c120002
-        label: label1 236236236
-        description: description
-        text: text
-
-      - type: COPY_TO_CLIPBOARD
-        _id: de17aba8-c229-11ec-9d64-0242ac4120002
-        label: label1 236236236
-        description: description
-        text: text
-
-      - type: COPY_TO_CLIPBOARD
-        _id: de17aba8-c229-11ec-9d64-02426ac120002
-        label: label1 236236236
-        description: description
-        text: text
-
-      - type: COPY_TO_CLIPBOARD
-        _id: de17aba8-c229-11ec-9d64-0242a5c120002
-        label: label1 236236236
-        description: description
-        text: text
-
-      - type: COPY_TO_CLIPBOARD
-        _id: de17aba8-c229-11ec-9d64-02432ac120002
-        label: label1 236236236
-        description: description
-        text: text
-
-      - type: COPY_TO_CLIPBOARD
-        _id: de17aba8-c229-11ec-9d64-02442ac120002
-        label: label1 236236236
-        description: description
-        text: text
-
-      - type: COPY_TO_CLIPBOARD
-        _id: de17aba8-c229-11ec-9d64-0242a5c120002
-        label: label1 236236236
-        description: description
-        text: text
-
-      - type: COPY_TO_CLIPBOARD
-        _id: de17aba8-c229-11ec-9d64-0242ac3120002
-        label: label1 236236236
-        description: description
-        text: text
-
-      - type: COPY_TO_CLIPBOARD
-        _id: de17aba8-c229-11ec-9d64-0242ac2120002
-        label: label1 236236236
-        description: description
-        text: text
-
-      - type: COPY_TO_CLIPBOARD
-        _id: de17aba8-c229-11ec-9d64-0242ac1230002
-        label: label1 236236236
-        description: description
-        text: text
-
-      - type: OPEN_FILE
-        _id: de18aba8-c229-11ec-9d64-0242ac120002
-        label: label1 236236236236
+    -   type: TODOIST
+        _id: de1a6ba8-c229-11ec-9d64-0242ac120002
+        label: Todoist 23525245
+        todoistToken: ""
+
+    -   type: SHOW_SVG_IMAGE
+        _id: de2a6ba8-c229-11ec-9d64-0242ac120002
+        label: SVG big image 2345234523466
+        description: description
+        imageUrl: http://www.plantuml.com/plantuml/svg/ZL9BRzf04BxxLsmvELA3Bpdr532eIGI9LKEJdj2iFS2g-x1srr1KzRztTi4kbAYgJzREz_ZcSUyyMDygoVAxrLIYGkrTya7eIhOrigttZVkKPHRsmutmsvQt3crbj2VSi38gQoJemBzrlfQ2P_dTRH6UblDPfi1vjFIqoea1GgCTDeHDajdesyjoiNfzN3oiPjFFq-T9UfCa1LfdT5grpXk5zYCR75z0iZ7exq9lM7wg3QWuOXsIcJNpMsISK0CIAWzah5PZq-eQx25rdE2Fci9ezBtM4JMu-Pam-lg8wHxvg6c8yOgSqPyK5NXXTF1yWXqmq3Kh6niqvb_py3n1ANQKDQPmdk0LEqs9ybpAkmQ8KH9R8YjWW-zvb9KLZOzE8xrf9SIE2sjseYOVaBBhMNHjyLDRwrPNGGgay8ShTnNCvuOB6Ns3wXiei8Ai-qADEr7Xtzm9JsiUcWKF71m6mXUKCJUhJu-ihBQe8DHARomw5Yx6NUM0HeGLDkA_9jor_bv_l_fzJt_ubBo59FpqDlnqEuuhSd6cmURcdA5qQ9nIhIqexAxZcf9Gh_rjn2NsQ--gVowtlw6bGnUq7XQBeYJS9IpAHCnLINMLJZnYuzXwqQVovJaxLrR_XaHChDSyBWzgnzRMg3ZmlHKU7VCcyYRZ_8BH3RP4JIGyZhTrfr6LyqL1y1wjz5c6j_ciZt1Fz5R9tm00
+
+    -   type: SHOW_SVG_IMAGE
+        _id: de3a6ba8-c229-11ec-9d64-0242ac120002
+        label: SVG image 5734572372357
+        description: description
+        imageUrl: http://www.plantuml.com/plantuml/svg/SoWkIImgAStDuNBAJrBGjLDmpCbCJbMmKiX8pSd9vt98pKi1IW80
+
+    -   type: GIST
+        _id: de4a6ba8-c229-11ec-9d64-0242ac120002
+        label: Gists 3462362346
+        baseGistUrl: https://gist.github.com/ezhov-da
+        username: ezhov-da
+
+    -   type: SHOW_TEXT
+        _id: de5a6ba8-c229-11ec-9d64-0242ac120002
+        label: |
+            Lorem Ipsum is simply dummy text of the printing and typesetting industry.
+            Lorem Ipsum has been the industry's standard dummy text ever since the 1500s,
+            when an unknown printer took a galley of type and scrambled it to make a type specimen book.
+            It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.
+            It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages,
+            and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
+
+    -   type: SHOW_TEXT
+        _id: de6a6ba8-c229-11ec-9d64-0242ac120002
+        label: >
+            Simple text 234623462463
+
+    -   type: OPEN_URL_WITH_TEXT
+        _id: de7a6ba8-c229-11ec-9d64-0242ac120002
+        label: OPEN_URL_WITH_TEXT 23623462346
+        iconUrl: https://github.githubassets.com/favicons/favicon.png
+        description: description
+        baseUrl: https://github.com/_____/
+        placeholder: _____
+
+    -   type: OPEN_URL_WITH_TEXT
+        _id: de8a6ba8-c229-11ec-9d64-0242ac120002
+        label: OPEN_URL_WITH_TEXT 234623642346
+        description: description
+        baseUrl: https://github.com/_____/
+        placeholder: _____
+
+    -   type: OPEN_URL_WITH_TEXT_HISTORY
+        _id: de9a6ba8-c229-11ec-9d64-0242ac120002
+        label: OPEN_URL_WITH_TEXT_HISTORY 23462346246
+        iconUrl: https://github.githubassets.com/favicons/favicon.png
+        description: description
+        baseUrl: https://github.com/_____/
+        placeholder: _____
+
+    -   type: OPEN_URL_WITH_TEXT_HISTORY
+        _id: de10aba8-c229-11ec-9d64-0242ac120002
+        label: OPEN_URL_WITH_TEXT_HISTORY 347357234572
+        description: description
+        baseUrl: https://github.com/_____/
+        placeholder: _____
+
+    -   type: SEPARATOR
+        _id: de11aba8-c229-11ec-9d64-0242ac120002
+
+    -   type: OPEN_URL
+        _id: de12aba8-c229-11ec-9d64-0242ac120002
+        label: OPEN_URL 26234236
+        iconUrl: https://github.githubassets.com/favicons/favicon.png
+        description: description
+        url: url
+
+    -   type: COPY_TO_CLIPBOARD
+        _id: de13aba8-c229-11ec-9d64-0242ac120002
+        label: COPY_TO_CLIPBOARD 2363623462346
+        description: description
+        text: COPY_TO_CLIPBOARD
+
+    -   type: OPEN_FILE
+        _id: de14aba8-c229-11ec-9d64-0242ac120002
+        label: OPEN_FILE 2362362346
         description: description
         path: text
 
-      - type: GROUP
-        _id: de19aba8-c229-11ec-9d64-0242ac120002
-        label: GROUP 234623462346
+    -   type: OPEN_FILE
+        _id: de15aba8-c229-11ec-9d64-0242ac120002
+        label:
+        description:
+        path: open file with only path
+
+    -   type: GROUP
+        _id: de16aba8-c229-11ec-9d64-0242ac120002
+        label: GROUP 2342362346
+        iconUrl: https://www.elastic.co/favicon.ico
         description: description
         actions:
-          - type: COPY_TO_CLIPBOARD
-            _id: de20aba8-c229-11ec-9d64-0242ac120002
-            label: label2 23462362346
-            description: description
-            text: text
+            -   type: COPY_TO_CLIPBOARD
+                _id: de17aba8-c229-11ec-9d64-02642ac120002
+                label: label1 236236236
+                description: description
+                text: text
 
-          - type: OPEN_FILE
-            _id: de21aba8-c229-11ec-9d64-0242ac120002
-            label: label2 326423462346
-            description: description
-            path: text
-  - type: SHOW_IMAGE
-    _id: de22aba8-c229-11ec-9d64-0242ac120002
-    label: SHOW_IMAGE 2362362346
-    description: SHOW_IMAGE
-    imageUrl: http://www.plantuml.com/plantuml/png/dOvD3i8W48MleWkMTcYDMbqsquDKIeI4duQ29fxUEBCeRjsyV0mVlDdRe5oPTKbkPt9UrXj0cbxDmsPJxcNLISMGTSYDYXxqsyJdOPu04S5FDe10AQwZm5Rqyil3aP8PANlA2y_9F5VpiJAHRWVYa-WaQnjiJiSEDtBx7__JiQyMRYbP67-UT18HcwLuzm40
+            -   type: COPY_TO_CLIPBOARD
+                _id: de17aba8-c229-1dfgj1ec-9d64-02427ac120002
+                label: label1 236236236
+                description: description
+                text: text
 
-  - type: SHOW_IMAGE
-    _id: de23aba8-c229-11ec-9d64-0242ac120002
-    label: Стандарт описания задачи 236232346
-    description: Стандарт описания задачи
-    imageUrl: https://github.com/ezhov-da/notes/blob/master/uml/%D0%A1%D1%82%D0%B0%D0%BD%D0%B4%D0%B0%D1%80%D1%82%20%D0%BE%D0%BF%D0%B8%D1%81%D0%B0%D0%BD%D0%B8%D1%8F%20%D0%B7%D0%B0%D0%B4%D0%B0%D1%87%D0%B8.png?raw=true
+            -   type: COPY_TO_CLIPBOARD
+                _id: de17aba8-c229-1dfgjdfg1ec-9d64-02427ac120002
+                label: label1 236236236
+                description: description
+                text: text
 
-  - type: EXEC
-    _id: de24aba8-c229-11ec-9d64-0242ac120002
-    label: Выполнить команду 23623462346
-    description: Выполнить команду описание
-    command: D:\programs\jmc-8.0.1_windows-x64\JDK Mission Control\jmc.exe
-    workingDirectory:
-    iconUrl:
+            -   type: COPY_TO_CLIPBOARD
+                _id: de17abasdfasdfa8-c229-1dfgj1ec-9d64-02427ac120002
+                label: label1 236236236
+                description: description
+                text: text
 
-  - type: COPY_TO_CLIPBOARD_TEMPLATE
-    _id: de25aba8-c229-11ec-9d64-0242ac120002
-    label: kubectl get all -n $ns 2323462346
-    description: COPY_TO_CLIPBOARD_TEMPLATE
-    text: |
-        _>ns
-        kubectl get all -n $ns
+            -   type: COPY_TO_CLIPBOARD
+                _id: de17aba8-c229-11efdgc-9d64-02452ac120002
+                label: label1 236236236
+                description: description
+                text: text
 
-  - type: SHOW_TEXT_AS_MENU
-    _id: de26aba8-c229-11ec-9d64-0242ac120002
-    label: Text as menu
-    description: Text as menu description
-    text: |
-      А вот и текст,
-      в нём очень много строк :)
+            -   type: COPY_TO_CLIPBOARD
+                _id: de17aba8-c229-1fdgj1ec-9d64-02452ac120002
+                label: label1 236236236
+                description: description
+                text: text
 
-  - type: URL_PARSER
-    _id: de27aba8-c229-11ec-9d64-0242ac120002
-    label: URL_PARSER
-    url: https://github.com/mockito/mockito
-    headers: user-agent_____Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.61 Safari/537.36
+            -   type: COPY_TO_CLIPBOARD
+                _id: de17aba8-c229-11fdgjec-9d64-02452ac120002
+                label: label1 236236236
+                description: description
+                text: text
 
-  - type: NOTE
-    _id: de28aba8-c229-11ec-9d64-0242ac120002
-    label: NOTE_28
-    path:
+            -   type: COPY_TO_CLIPBOARD
+                _id: de17aba8-c229-1dfgj1ec-9d64-02452ac120002
+                label: label1 236236236
+                description: description
+                text: text
 
-  - type: KOTLIN_SCRIPT
-    _id: de29aba8-c229-11ec-9d64-0242ac120002
-    label: Номер спринта
-    script: |
-      import java.time.LocalDate
-      import java.time.ZoneId
-      import java.time.temporal.ChronoUnit
-      import kotlin.math.ceil
+            -   type: COPY_TO_CLIPBOARD
+                _id: de17aba8-c229-11dfgjec-9d64-02452ac120002
+                label: label1 236236236
+                description: description
+                text: text
 
-      val daysInSprint = 14
-      val firstDateFirstSprint: LocalDate = LocalDate.of(2021, 7, 26)
-      val endDateFirstSprint: LocalDate = firstDateFirstSprint.plusDays(daysInSprint.toLong())
-      val nowDate: LocalDate = LocalDate.now(ZoneId.of("UTC+3"))
-      val daysBetween = ChronoUnit.DAYS.between(endDateFirstSprint, nowDate)
-      val plusSprint = if (daysBetween < daysInSprint) 1 else ceil(daysBetween / daysInSprint.toDouble()).toInt()
-      val currentSprintNumber = plusSprint + 1 //sprint
+            -   type: COPY_TO_CLIPBOARD
+                _id: de17aba8-c229-1dfgj1ec-9d64-02452ac120002
+                label: label1 236236236
+                description: description
+                text: text
 
-      val daysBetweenStartAndCurrent = ChronoUnit.DAYS.between(firstDateFirstSprint, nowDate)
-      val daysCurrentSprint = ceil(daysBetweenStartAndCurrent / daysInSprint.toDouble()).toInt()
-      val startCurrentSprintDay = (daysCurrentSprint * daysInSprint) - daysInSprint
-      val startCurrentSprint: LocalDate = firstDateFirstSprint.plusDays(startCurrentSprintDay.toLong())
-      val endCurrentSprint: LocalDate = startCurrentSprint.plusDays(daysInSprint.toLong() - 1)
+            -   type: COPY_TO_CLIPBOARD
+                _id: de17aba8-c229-11dfjgec-9d64-02452ac120002
+                label: label1 236236236
+                description: description
+                text: text
 
-      "Sprint № $currentSprintNumber. Начало `$startCurrentSprint` окончание `$endCurrentSprint`"
+            -   type: COPY_TO_CLIPBOARD
+                _id: de17aba8-c229-11dfjgec-9d64-02452ac120002
+                label: label1 236236236
+                description: description
+                text: text
 
-  - type: NOTE_ON_FILE
-    _id: de30aba8-c229-11ec-9d64-0242ac120002
-    label: "Test File"
-    description: "Описание"
-    pathAndName: "./notes/d9530ff6-a228-11ec-b909-0242ac120002.txt"
+            -   type: COPY_TO_CLIPBOARD
+                _id: de17aba8-c229-1dfgj1ec-9d64-02452ac120002
+                label: label1 236236236
+                description: description
+                text: text
 
-  - type: JIRA_WORK_LOG
-    _id: de31aba8-c229-11ec-9d64-0242ac120002
-    label: "Jira work log"
-    description: "Описание"
-    username: "123"
-    password: "123"
-    url: "http://localhost"
-    textValidations: |
-        MIN_LENGTH 2
-        MAX_LENGTH 10
-    predefinedTasks: |
-        123___qwe
-        345___rty
+            -   type: COPY_TO_CLIPBOARD
+                _id: de17aba8-c229-1fdgj1ec-9d64-02452ac120002
+                label: label1 236236236
+                description: description
+                text: text
 
-  - type: SAVE_TEMPORARY_FILE
-    _id: de32aba8-c229-11ec-9d64-0242ac120002
-    label: "Сохранить во временный файл"
-    description: "Описание"
+            -   type: COPY_TO_CLIPBOARD
+                _id: de17aba8-c229-11ec-9fdgjd64-02452ac120002
+                label: label1 236236236
+                description: description
+                text: text
+
+            -   type: COPY_TO_CLIPBOARD
+                _id: de17aba8-c229-11ec-9ddfgj64-02452ac120002
+                label: label1 236236236
+                description: description
+                text: text
+
+            -   type: COPY_TO_CLIPBOARD
+                _id: de17aba8-c229-11ec-9d6dfjg4-02452ac120002
+                label: label1 236236236
+                description: description
+                text: text
+
+            -   type: COPY_TO_CLIPBOARD
+                _id: de17aba8-c229-11ec-9d6dfgj4-02452ac120002
+                label: label1 236236236
+                description: description
+                text: text
+
+            -   type: COPY_TO_CLIPBOARD
+                _id: de17aba8-c229-11ec-9ddfgj64-02452ac120002
+                label: label1 236236236
+                description: description
+                text: text
+
+            -   type: COPY_TO_CLIPBOARD
+                _id: de17aba8-c229-11ec-9dfdgj64-02452ac120002
+                label: label1 236236236
+                description: description
+                text: text
+
+            -   type: COPY_TO_CLIPBOARD
+                _id: de17aba8-c229-11ec-9ddfgj64-02452ac120002
+                label: label1 236236236
+                description: description
+                text: text
+
+            -   type: COPY_TO_CLIPBOARD
+                _id: de17aba8-c229-11ec-9dfdgj64-02452ac120002
+                label: label1 236236236
+                description: description
+                text: text
+
+            -   type: COPY_TO_CLIPBOARD
+                _id: de17aba8-c229-11ec-9dfj64-02452ac120002
+                label: label1 236236236
+                description: description
+                text: text
+
+            -   type: COPY_TO_CLIPBOARD
+                _id: de17aba8-c229-11ec-9fdgjd64-02452ac120002
+                label: label1 236236236
+                description: description
+                text: text
+
+            -   type: COPY_TO_CLIPBOARD
+                _id: de17aba8-c229-11ec-9dfgjd64-02452ac120002
+                label: label1 236236236
+                description: description
+                text: text
+
+            -   type: COPY_TO_CLIPBOARD
+                _id: de17aba8-c229-11ec-9d64-02452dfgjac120002
+                label: label1 236236236
+                description: description
+                text: text
+
+            -   type: COPY_TO_CLIPBOARD
+                _id: de17aba8-c229-11ec-9d64-02452adfgjc120002
+                label: label1 236236236
+                description: description
+                text: text
+
+            -   type: COPY_TO_CLIPBOARD
+                _id: de17aba8-c229-11ec-9d64-0245fgj2ac120002
+                label: label1 236236236
+                description: description
+                text: text
+
+            -   type: COPY_TO_CLIPBOARD
+                _id: de17aba8-c229-11ec-9d64-02452afgc120002
+                label: label1 236236236
+                description: description
+                text: text
+
+            -   type: COPY_TO_CLIPBOARD
+                _id: de17aba8-c229-11ec-9d64-0245dfj2ac120002
+                label: label1 236236236
+                description: description
+                text: text
+
+            -   type: COPY_TO_CLIPBOARD
+                _id: de17aba8-c229-11ec-9d64-0245dfgj2ac120002
+                label: label1 236236236
+                description: description
+                text: text
+
+            -   type: COPY_TO_CLIPBOARD
+                _id: de17aba8-c229-11ec-9d64-02452adfgjc120002
+                label: label1 236236236
+                description: description
+                text: text
+
+            -   type: COPY_TO_CLIPBOARD
+                _id: de17aba8-c229-11ec-9d64-02452ac1dfgj20002
+                label: label1 236236236
+                description: description
+                text: text
+
+            -   type: COPY_TO_CLIPBOARD
+                _id: de17aba8-c229-11ec-9d64-02452acdfgj120002
+                label: label1 236236236
+                description: description
+                text: text
+
+            -   type: COPY_TO_CLIPBOARD
+                _id: de17aba8-c229-11ec-9d64-02452adfgjc120002
+                label: label1 236236236
+                description: description
+                text: text
+
+            -   type: COPY_TO_CLIPBOARD
+                _id: de17aba8-c229-11ec-9d64-02452dfgjac120002
+                label: label1 236236236
+                description: description
+                text: text
+
+            -   type: COPY_TO_CLIPBOARD
+                _id: de17aba8-c229-11ec-9d64-0245dfg2ac120002
+                label: label1 236236236
+                description: description
+                text: text
+
+            -   type: COPY_TO_CLIPBOARD
+                _id: de17aba8-c229-11ec-9d64-0245jfd2ac120002
+                label: label1 236236236
+                description: description
+                text: text
+
+            -   type: COPY_TO_CLIPBOARD
+                _id: de17aba8-c229-11ec-9d64-0245dfjg2ac120002
+                label: label1 236236236
+                description: description
+                text: text
+
+            -   type: COPY_TO_CLIPBOARD
+                _id: de17aba8-c229-11ec-9d64-02452dfjac120002
+                label: label1 236236236
+                description: description
+                text: text
+
+            -   type: COPY_TO_CLIPBOARD
+                _id: de17aba8-c229-11ec-9d64-02452ac12dth0002
+                label: label1 236236236
+                description: description
+                text: text
+
+            -   type: COPY_TO_CLIPBOARD
+                _id: de17aba8-c229-11ec-9d64-0245rtky2ac120002
+                label: label1 236236236
+                description: description
+                text: text
+
+            -   type: COPY_TO_CLIPBOARD
+                _id: de17aba8-c229-11ec-9d64-0245tk2ac120002
+                label: label1 236236236
+                description: description
+                text: text
+
+            -   type: COPY_TO_CLIPBOARD
+                _id: de17aba8-c229-11ec-9d64-02452tykac120002
+                label: label1 236236236
+                description: description
+                text: text
+
+            -   type: COPY_TO_CLIPBOARD
+                _id: de17aba8-c229-11ec-9d64-0245yk2ac120002
+                label: label1 236236236
+                description: description
+                text: text
+
+            -   type: COPY_TO_CLIPBOARD
+                _id: de17aba8-c229-11ec-9d64-0245fdj2ac120002
+                label: label1 236236236
+                description: description
+                text: text
+
+            -   type: COPY_TO_CLIPBOARD
+                _id: de17aba8-c229-11ec-9d64-02h452ac120002
+                label: label1 236236236
+                description: description
+                text: text
+
+            -   type: COPY_TO_CLIPBOARD
+                _id: de17aba8-c229-11ec-9d64-02247452ac120002
+                label: label1 236236236
+                description: description
+                text: text
+
+            -   type: COPY_TO_CLIPBOARD
+                _id: de17aba8-c229-11ec-9d64-02456452ac120002
+                label: label1 236236236
+                description: description
+                text: text
+
+            -   type: COPY_TO_CLIPBOARD
+                _id: de17aba8-c229-11ec-9d64-026452ac120002
+                label: label1 236236236
+                description: description
+                text: text
+
+
+            -   type: COPY_TO_CLIPBOARD
+                _id: de17aba8-c229-11ec-9d64-02426c120002
+                label: label1 236236236
+                description: description
+                text: text
+
+            -   type: COPY_TO_CLIPBOARD
+                _id: de17aba8-c229-11ec-9d64-04242ac120002
+                label: label1 236236236
+                description: description
+                text: text
+
+            -   type: COPY_TO_CLIPBOARD
+                _id: de17aba8-c229-11ec-9d64-05242ac120002
+                label: label1 236236236
+                description: description
+                text: text
+
+            -   type: COPY_TO_CLIPBOARD
+                _id: de17aba8-c229-11ec-9d64-03242ac120002
+                label: label1 236236236
+                description: description
+                text: text
+
+            -   type: COPY_TO_CLIPBOARD
+                _id: de17aba8-c229-11ec-9d64-02442ac120002
+                label: label1 236236236
+                description: description
+                text: text
+
+            -   type: COPY_TO_CLIPBOARD
+                _id: de17aba8-c229-11ec-9d64-02442ac120002
+                label: label1 236236236
+                description: description
+                text: text
+
+            -   type: COPY_TO_CLIPBOARD
+                _id: de17aba8-c229-11ec-9d64-20242ac120002
+                label: label1 236236236
+                description: description
+                text: text
+
+            -   type: COPY_TO_CLIPBOARD
+                _id: de17aba8-c229-11ec-9d64-02432ac120002
+                label: label1 236236236
+                description: description
+                text: text
+
+            -   type: COPY_TO_CLIPBOARD
+                _id: de17aba8-c229-11ec-9d64-0242a5c120002
+                label: label1 236236236
+                description: description
+                text: text
+
+            -   type: COPY_TO_CLIPBOARD
+                _id: de17aba8-c229-11ec-9d64-02432ac120002
+                label: label1 236236236
+                description: description
+                text: text
+
+            -   type: COPY_TO_CLIPBOARD
+                _id: de17aba8-c229-11ec-9d64-02442ac120002
+                label: label1 236236236
+                description: description
+                text: text
+
+            -   type: COPY_TO_CLIPBOARD
+                _id: de17aba8-c229-11ec-9d64-02426ac120002
+                label: label1 236236236
+                description: description
+                text: text
+
+            -   type: COPY_TO_CLIPBOARD
+                _id: de17aba8-c229-11ec-9d64-02425ac120002
+                label: label1 236236236
+                description: description
+                text: text
+
+            -   type: COPY_TO_CLIPBOARD
+                _id: de17aba8-c229-11ec-9d64-0242ac3120002
+                label: label1 236236236
+                description: description
+                text: text
+
+            -   type: COPY_TO_CLIPBOARD
+                _id: de17aba8-c229-11ec-9d64-0242a5c120002
+                label: label1 236236236
+                description: description
+                text: text
+
+            -   type: COPY_TO_CLIPBOARD
+                _id: de17aba8-c229-11ec-9d64-0242ac4120002
+                label: label1 236236236
+                description: description
+                text: text
+
+            -   type: COPY_TO_CLIPBOARD
+                _id: de17aba8-c229-11ec-9d64-02426ac120002
+                label: label1 236236236
+                description: description
+                text: text
+
+            -   type: COPY_TO_CLIPBOARD
+                _id: de17aba8-c229-11ec-9d64-0242a5c120002
+                label: label1 236236236
+                description: description
+                text: text
+
+            -   type: COPY_TO_CLIPBOARD
+                _id: de17aba8-c229-11ec-9d64-02432ac120002
+                label: label1 236236236
+                description: description
+                text: text
+
+            -   type: COPY_TO_CLIPBOARD
+                _id: de17aba8-c229-11ec-9d64-02442ac120002
+                label: label1 236236236
+                description: description
+                text: text
+
+            -   type: COPY_TO_CLIPBOARD
+                _id: de17aba8-c229-11ec-9d64-0242a5c120002
+                label: label1 236236236
+                description: description
+                text: text
+
+            -   type: COPY_TO_CLIPBOARD
+                _id: de17aba8-c229-11ec-9d64-0242ac3120002
+                label: label1 236236236
+                description: description
+                text: text
+
+            -   type: COPY_TO_CLIPBOARD
+                _id: de17aba8-c229-11ec-9d64-0242ac2120002
+                label: label1 236236236
+                description: description
+                text: text
+
+            -   type: COPY_TO_CLIPBOARD
+                _id: de17aba8-c229-11ec-9d64-0242ac1230002
+                label: label1 236236236
+                description: description
+                text: text
+
+            -   type: OPEN_FILE
+                _id: de18aba8-c229-11ec-9d64-0242ac120002
+                label: label1 236236236236
+                description: description
+                path: text
+
+            -   type: GROUP
+                _id: de19aba8-c229-11ec-9d64-0242ac120002
+                label: GROUP 234623462346
+                description: description
+                actions:
+                    -   type: COPY_TO_CLIPBOARD
+                        _id: de20aba8-c229-11ec-9d64-0242ac120002
+                        label: label2 23462362346
+                        description: description
+                        text: text
+
+                    -   type: OPEN_FILE
+                        _id: de21aba8-c229-11ec-9d64-0242ac120002
+                        label: label2 326423462346
+                        description: description
+                        path: text
+    -   type: SHOW_IMAGE
+        _id: de22aba8-c229-11ec-9d64-0242ac120002
+        label: SHOW_IMAGE 2362362346
+        description: SHOW_IMAGE
+        imageUrl: http://www.plantuml.com/plantuml/png/dOvD3i8W48MleWkMTcYDMbqsquDKIeI4duQ29fxUEBCeRjsyV0mVlDdRe5oPTKbkPt9UrXj0cbxDmsPJxcNLISMGTSYDYXxqsyJdOPu04S5FDe10AQwZm5Rqyil3aP8PANlA2y_9F5VpiJAHRWVYa-WaQnjiJiSEDtBx7__JiQyMRYbP67-UT18HcwLuzm40
+
+    -   type: SHOW_IMAGE
+        _id: de23aba8-c229-11ec-9d64-0242ac120002
+        label: Стандарт описания задачи 236232346
+        description: Стандарт описания задачи
+        imageUrl: https://github.com/ezhov-da/notes/blob/master/uml/%D0%A1%D1%82%D0%B0%D0%BD%D0%B4%D0%B0%D1%80%D1%82%20%D0%BE%D0%BF%D0%B8%D1%81%D0%B0%D0%BD%D0%B8%D1%8F%20%D0%B7%D0%B0%D0%B4%D0%B0%D1%87%D0%B8.png?raw=true
+
+    -   type: EXEC
+        _id: de24aba8-c229-11ec-9d64-0242ac120002
+        label: Выполнить команду 23623462346
+        description: Выполнить команду описание
+        command: D:\programs\jmc-8.0.1_windows-x64\JDK Mission Control\jmc.exe
+        workingDirectory:
+        iconUrl:
+
+    -   type: COPY_TO_CLIPBOARD_TEMPLATE
+        _id: de25aba8-c229-11ec-9d64-0242ac120002
+        label: kubectl get all -n $ns 2323462346
+        description: COPY_TO_CLIPBOARD_TEMPLATE
+        text: |
+            _>ns
+            kubectl get all -n $ns
+
+    -   type: SHOW_TEXT_AS_MENU
+        _id: de26aba8-c229-11ec-9d64-0242ac120002
+        label: Text as menu
+        description: Text as menu description
+        text: |
+            А вот и текст,
+            в нём очень много строк :)
+
+    -   type: URL_PARSER
+        _id: de27aba8-c229-11ec-9d64-0242ac120002
+        label: URL_PARSER
+        url: https://github.com/mockito/mockito
+        headers: user-agent_____Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.61 Safari/537.36
+
+    -   type: NOTE
+        _id: de28aba8-c229-11ec-9d64-0242ac120002
+        label: NOTE_28
+        path:
+
+    -   type: KOTLIN_SCRIPT
+        _id: de29aba8-c229-11ec-9d64-0242ac120002
+        label: Номер спринта
+        script: |
+            import java.time.LocalDate
+            import java.time.ZoneId
+            import java.time.temporal.ChronoUnit
+            import kotlin.math.ceil
+
+            val daysInSprint = 14
+            val firstDateFirstSprint: LocalDate = LocalDate.of(2021, 7, 26)
+            val endDateFirstSprint: LocalDate = firstDateFirstSprint.plusDays(daysInSprint.toLong())
+            val nowDate: LocalDate = LocalDate.now(ZoneId.of("UTC+3"))
+            val daysBetween = ChronoUnit.DAYS.between(endDateFirstSprint, nowDate)
+            val plusSprint = if (daysBetween < daysInSprint) 1 else ceil(daysBetween / daysInSprint.toDouble()).toInt()
+            val currentSprintNumber = plusSprint + 1 //sprint
+
+            val daysBetweenStartAndCurrent = ChronoUnit.DAYS.between(firstDateFirstSprint, nowDate)
+            val daysCurrentSprint = ceil(daysBetweenStartAndCurrent / daysInSprint.toDouble()).toInt()
+            val startCurrentSprintDay = (daysCurrentSprint * daysInSprint) - daysInSprint
+            val startCurrentSprint: LocalDate = firstDateFirstSprint.plusDays(startCurrentSprintDay.toLong())
+            val endCurrentSprint: LocalDate = startCurrentSprint.plusDays(daysInSprint.toLong() - 1)
+
+            "Sprint № $currentSprintNumber. Начало `$startCurrentSprint` окончание `$endCurrentSprint`"
+
+    -   type: GROOVY_SCRIPT
+        _id: de29aba8-a229-11ec-9d64-0242ac120002
+        label: Калькулятор GROOVY
+        script: |
+            "${2 * 2}"
+
+    -   type: NOTE_ON_FILE
+        _id: de30aba8-c229-11ec-9d64-0242ac120002
+        label: "Test File"
+        description: "Описание"
+        pathAndName: "./notes/d9530ff6-a228-11ec-b909-0242ac120002.txt"
+
+    -   type: JIRA_WORK_LOG
+        _id: de31aba8-c229-11ec-9d64-0242ac120002
+        label: "Jira work log"
+        description: "Описание"
+        username: "123"
+        password: "123"
+        url: "http://localhost"
+        textValidations: |
+            MIN_LENGTH 2
+            MAX_LENGTH 10
+        predefinedTasks: |
+            123___qwe
+            345___rty
+
+    -   type: SAVE_TEMPORARY_FILE
+        _id: de32aba8-c229-11ec-9d64-0242ac120002
+        label: "Сохранить во временный файл"
+        description: "Описание"
 ...

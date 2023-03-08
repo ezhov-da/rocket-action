@@ -9,10 +9,15 @@ import ru.ezhov.rocket.action.application.variables.application.VariablesApplica
 
 class EngineService {
     fun processWithEngine(settingsModel: SettingsModel): String =
-        when (settingsModel.valueType ?: SettingsValueType.PLAIN_TEXT) {
-            SettingsValueType.MUSTACHE_TEMPLATE -> EngineFactory.by(EngineType.MUSTACHE)
-            else -> null
-        }
+        settingsModel
+            .valueType
+            ?.let { type ->
+                when (type) {
+                    SettingsValueType.GROOVY_TEMPLATE -> EngineType.GROOVY
+                    SettingsValueType.MUSTACHE_TEMPLATE -> EngineType.MUSTACHE
+                    SettingsValueType.PLAIN_TEXT -> null
+                }
+            }?.let { EngineFactory.by(it) }
             ?.let { engine ->
                 val variables =
                     VariablesApplication().all()

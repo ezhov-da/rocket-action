@@ -195,14 +195,17 @@ class CreateRocketActionSettingsDialog(
                 is RocketActionPropertySpec.StringPropertySpec -> {
                     val plainText = JRadioButton("Простой текст").apply { isSelected = true }
                     val mustacheTemplate = JRadioButton("Шаблон Mustache")
+                    val groovyTemplate = JRadioButton("Шаблон Groovy")
                     ButtonGroup().apply {
                         add(plainText)
                         add(mustacheTemplate)
+                        add(groovyTemplate)
                     }
 
                     centerPanel.add(JPanel().apply {
                         add(plainText)
                         add(mustacheTemplate)
+                        add(groovyTemplate)
                     }, BorderLayout.NORTH)
 
                     centerPanel.add(
@@ -216,6 +219,7 @@ class CreateRocketActionSettingsDialog(
                                             second = when {
                                                 plainText.isSelected -> SettingsValueType.PLAIN_TEXT
                                                 mustacheTemplate.isSelected -> SettingsValueType.MUSTACHE_TEMPLATE
+                                                groovyTemplate.isSelected -> SettingsValueType.GROOVY_TEMPLATE
                                                 else -> SettingsValueType.PLAIN_TEXT
 
                                             }

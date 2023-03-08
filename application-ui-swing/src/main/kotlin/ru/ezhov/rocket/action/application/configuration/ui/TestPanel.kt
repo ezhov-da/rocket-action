@@ -1,5 +1,7 @@
 package ru.ezhov.rocket.action.application.configuration.ui
 
+import mu.KotlinLogging
+import ru.ezhov.rocket.action.api.context.notification.NotificationType
 import ru.ezhov.rocket.action.application.infrastructure.MutableRocketActionSettings
 import ru.ezhov.rocket.action.application.plugin.context.RocketActionContextFactory
 import ru.ezhov.rocket.action.application.plugin.manager.domain.RocketActionPluginRepository
@@ -9,6 +11,8 @@ import javax.swing.JLabel
 import javax.swing.JMenuBar
 import javax.swing.JPanel
 import javax.swing.SwingUtilities
+
+private val logger = KotlinLogging.logger { }
 
 class TestPanel(
     private val rocketActionPluginRepository: RocketActionPluginRepository,
@@ -28,14 +32,21 @@ class TestPanel(
                 else -> {
                     val p = JPanel(BorderLayout())
                     val menuBar = JMenuBar()
-                    val component = actionUi
-                        .create(settings = settings.to(), context = RocketActionContextFactory.context)
-                        ?.component()
-                        ?: JLabel("Компонент не создан")
+                    val component = try {
+                        actionUi
+                            .create(settings = settings.to(), context = RocketActionContextFactory.context)
+                            ?.component()
+                            ?: JLabel("Компонент не создан")
+                    } catch (ex: Exception) {
+                        logger.error(ex) { "Error when create action" }
+                        RocketActionContextFactory.context.notification()
+                            .show(NotificationType.ERROR, "Error when create test action")
+
+                        JLabel("Ошибка создания компонента")
+                    }
                     menuBar.add(component)
                     p.add(menuBar, BorderLayout.CENTER)
                     p
-
                 }
             }
         if (panelTest != null) {
