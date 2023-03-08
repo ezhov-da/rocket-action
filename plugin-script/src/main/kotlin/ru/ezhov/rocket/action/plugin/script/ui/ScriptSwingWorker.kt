@@ -1,12 +1,12 @@
-package ru.ezhov.rocket.action.plugin.script.kotlin.ui
+package ru.ezhov.rocket.action.plugin.script.ui
 
 import arrow.core.Either
 import arrow.core.getOrHandle
 import mu.KotlinLogging
 import ru.ezhov.rocket.action.api.context.RocketActionContext
 import ru.ezhov.rocket.action.api.context.notification.NotificationType
-import ru.ezhov.rocket.action.plugin.script.kotlin.application.KotlinScriptEngine
-import ru.ezhov.rocket.action.plugin.script.kotlin.application.ScriptEngineException
+import ru.ezhov.rocket.action.plugin.script.ScriptEngine
+import ru.ezhov.rocket.action.plugin.script.ScriptEngineException
 import javax.swing.SwingWorker
 
 private val logger = KotlinLogging.logger {}
@@ -16,15 +16,16 @@ class ScriptSwingWorker(
     private val afterExecuteCallback: (String) -> Unit,
     private val script: String,
     private var context: RocketActionContext,
+    private val scriptEngine: ScriptEngine,
+    private val variables: Map<String, String>,
 ) : SwingWorker<Either<ScriptEngineException, Any?>, Any>() {
-    private val scriptEngine = KotlinScriptEngine()
 
     init {
         beforeExecuteCallback()
     }
 
     override fun doInBackground(): Either<ScriptEngineException, Any?> =
-        scriptEngine.execute(script)
+        scriptEngine.execute(script, variables)
 
     override fun done() {
         val textAsObject = this.get().getOrHandle {

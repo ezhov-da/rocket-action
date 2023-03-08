@@ -1,18 +1,25 @@
 package ru.ezhov.rocket.action.plugin.script.kotlin.application
 
 import arrow.core.getOrHandle
-import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.Disabled
+import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
 
-@Disabled
 class KotlinScriptEngineTest {
 
     @Test
     fun `should execute script`() {
         val engine = KotlinScriptEngine()
-        val result = engine.execute("val t = \"test\"; t").getOrHandle { throw it }
+        val result = engine.execute(
+            script = """
+                |val t = "test"
+                |val variables = _variables as Map<String, String>
+                |t + "-" + testT + "-" + variables.get("testT")
+            """.trimMargin(),
+            variables = mapOf("testT" to "42")
+        )
+            .getOrHandle { throw it }
 
-        assertThat(result).isEqualTo("test")
+        Assertions.assertThat(result).isEqualTo("test-42-42")
     }
 }
+

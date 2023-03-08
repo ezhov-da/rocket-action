@@ -1,4 +1,4 @@
-package ru.ezhov.rocket.action.plugin.script.kotlin.ui
+package ru.ezhov.rocket.action.plugin.script.groovy.ui
 
 import ru.ezhov.rocket.action.api.RocketAction
 import ru.ezhov.rocket.action.api.RocketActionConfiguration
@@ -18,12 +18,12 @@ import ru.ezhov.rocket.action.api.handler.RocketActionHandlerCommandContract
 import ru.ezhov.rocket.action.api.handler.RocketActionHandlerFactory
 import ru.ezhov.rocket.action.api.handler.RocketActionHandlerProperty
 import ru.ezhov.rocket.action.api.support.AbstractRocketAction
-import ru.ezhov.rocket.action.plugin.script.kotlin.application.KotlinScriptEngine
+import ru.ezhov.rocket.action.plugin.script.groovy.application.GroovyScriptEngine
 import ru.ezhov.rocket.action.plugin.script.ui.ScriptMenu
 import java.awt.Component
 import javax.swing.Icon
 
-class KotlinScriptRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
+class GroovyScriptRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
     private var actionContext: RocketActionContext? = null
 
     override fun factory(context: RocketActionContext): RocketActionFactoryUi = this
@@ -50,7 +50,7 @@ class KotlinScriptRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
                             description = description,
                             executeOnLoad = settings.settings()[EXECUTE_ON_LOAD].toBoolean(),
                             context = context,
-                            scriptEngine = KotlinScriptEngine(),
+                            scriptEngine = GroovyScriptEngine(),
                         )
 
                         object : RocketAction, RocketActionHandlerFactory {
@@ -99,7 +99,7 @@ class KotlinScriptRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
 
     override fun type(): RocketActionType = RocketActionType { TYPE }
 
-    override fun description(): String = "Выполнение скрипта Kotlin"
+    override fun description(): String = "Выполнение скрипта Groovy"
 
     override fun asString(): List<RocketActionConfigurationPropertyKey> = listOf(LABEL, SCRIPT)
 
@@ -128,12 +128,12 @@ class KotlinScriptRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
         )
     }
 
-    override fun name(): String = "Kotlin script"
+    override fun name(): String = "Groovy script"
 
     override fun icon(): Icon = actionContext!!.icon().by(AppIcon.BOLT)
 
     companion object {
-        internal const val TYPE = "KOTLIN_SCRIPT"
+        internal const val TYPE = "GROOVY_SCRIPT"
         internal val LABEL = RocketActionConfigurationPropertyKey("label")
         internal val SCRIPT = RocketActionConfigurationPropertyKey("script")
         internal val DESCRIPTION = RocketActionConfigurationPropertyKey("description")

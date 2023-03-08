@@ -2,15 +2,20 @@ package ru.ezhov.rocket.action.plugin.script.kotlin.application
 
 import arrow.core.Either
 import mu.KotlinLogging
+import ru.ezhov.rocket.action.plugin.script.ScriptEngine
+import ru.ezhov.rocket.action.plugin.script.ScriptEngine.Companion.VARIABLES_NAME
+import ru.ezhov.rocket.action.plugin.script.ScriptEngineException
+import ru.ezhov.rocket.action.plugin.script.ScriptEngineType
 import javax.script.ScriptEngineManager
-import kotlin.script.experimental.jsr223.KotlinJsr223DefaultScriptEngineFactory
 
 private val logger = KotlinLogging.logger {}
 
 class KotlinScriptEngine(
     private val classLoader: ClassLoader = Thread.currentThread().contextClassLoader,
 ) : ScriptEngine {
-    override fun execute(script: String): Either<ScriptEngineException, Any?> =
+    override fun type(): ScriptEngineType = ScriptEngineType.KOTLIN
+
+    override fun execute(script: String, variables: Map<String, String>): Either<ScriptEngineException, Any?> =
         try {
             logger.debug { "Usage class loader for script engine '${classLoader::class.qualifiedName}'" }
 
@@ -19,7 +24,10 @@ class KotlinScriptEngine(
             if (scriptEngine == null) {
                 Either.Left(ScriptEngineException(message = "Engine for 'kts' not found"))
             } else {
-                Either.Right(scriptEngine.eval(script))
+                val bindings = scriptEngine.createBindings()
+                variables.forEach { bindings[it.key] = it.value }
+                bindings[VARIABLES_NAME] = HashMap<String, String>(variables)
+                Either.Right(scriptEngine.eval(script, bindings))
             }
         } catch (e: Exception) {
             Either.Left(ScriptEngineException(message = "Error when execute script '$script'", cause = e))
