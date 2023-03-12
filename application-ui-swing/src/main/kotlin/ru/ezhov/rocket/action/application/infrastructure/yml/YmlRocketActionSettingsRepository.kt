@@ -112,7 +112,8 @@ private fun RocketActionSettingsModel.toRocketActionSettingsDto(): RocketActionS
                 valueType = when (it.valueType) {
                     SettingsValueType.PLAIN_TEXT -> SettingsValueTypeDto.PLAIN_TEXT
                     SettingsValueType.MUSTACHE_TEMPLATE -> SettingsValueTypeDto.MUSTACHE_TEMPLATE
-                    else -> null
+                    SettingsValueType.GROOVY_TEMPLATE -> SettingsValueTypeDto.GROOVY_TEMPLATE
+                    else -> throw UnsupportedOperationException("Unsupported type '$${it.valueType}' for save")
                 },
             )
         },
