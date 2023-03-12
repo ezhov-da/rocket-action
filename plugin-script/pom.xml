@@ -10,7 +10,7 @@
     </parent>
 
     <artifactId>rocket-action-plugin-script</artifactId>
-    <version>0.20.1</version>
+    <version>0.20.2</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -93,6 +93,17 @@
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
             <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>io.mockk</groupId>
+            <artifactId>mockk-jvm</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>ru.ezhov</groupId>
+            <artifactId>rocket-action-ui-utils</artifactId>
         </dependency>
     </dependencies>
 
