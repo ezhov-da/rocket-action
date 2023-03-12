@@ -2,6 +2,8 @@ package ru.ezhov.rocket.action.plugin.script.dynamic.ui
 
 import arrow.core.getOrHandle
 import mu.KotlinLogging
+import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea
+import org.fife.ui.rtextarea.RTextScrollPane
 import ru.ezhov.rocket.action.api.RocketAction
 import ru.ezhov.rocket.action.api.RocketActionSettings
 import ru.ezhov.rocket.action.api.context.RocketActionContext
@@ -10,19 +12,19 @@ import ru.ezhov.rocket.action.api.handler.RocketActionHandler
 import ru.ezhov.rocket.action.api.handler.RocketActionHandlerFactory
 import ru.ezhov.rocket.action.plugin.script.ScriptEngineFactory
 import ru.ezhov.rocket.action.plugin.script.ScriptEngineType
-import ru.ezhov.rocket.action.ui.utils.swing.common.TextFieldWithText
+import ru.ezhov.rocket.action.plugin.script.dynamic.FieldNamesService
+import ru.ezhov.rocket.action.ui.utils.swing.common.TextPaneWithText
 import java.awt.BorderLayout
 import java.awt.Component
 import java.awt.Dimension
-import java.awt.event.KeyAdapter
-import java.awt.event.KeyEvent
 import javax.swing.BoxLayout
 import javax.swing.JButton
 import javax.swing.JMenu
 import javax.swing.JPanel
 import javax.swing.JScrollPane
-import javax.swing.JTextField
+import javax.swing.JSplitPane
 import javax.swing.JTextPane
+import javax.swing.JToolBar
 import javax.swing.SwingWorker
 
 private val logger = KotlinLogging.logger { }
@@ -76,7 +78,6 @@ class UiService {
             add(
                 ScriptPanel(
                     script = script,
-                    description = description,
                     countVariables = countVariables,
                     selectedScriptLang = selectedScriptLang,
                     fieldNames = fieldNames,
@@ -90,23 +91,33 @@ class UiService {
 
     private class ScriptPanel(
         private val script: String,
-        description: String,
         countVariables: Int,
         selectedScriptLang: String,
         fieldNames: String,
         context: RocketActionContext,
     ) : JPanel(BorderLayout()) {
-        private val resultText = JTextPane()
+        private val resultText = RSyntaxTextArea()
         val engineType = ScriptEngineType.valueOf(selectedScriptLang)
         val engine = ScriptEngineFactory.engine(engineType)
 
         init {
-            val variablesField: MutableList<JTextField> = mutableListOf()
+            data class TextPaneAndDefaultValue(
+                val textPane: JTextPane,
+                val defaultValue: String,
+            ) {
+                fun restore() {
+                    textPane.text = defaultValue
+                }
+
+                fun value(): String = textPane.text
+            }
+
+            val variablesField: MutableList<TextPaneAndDefaultValue> = mutableListOf()
 
             val executeFunc = {
                 val variables = variablesField
-                    .mapIndexed { index, jTextField ->
-                        "_v${index + 1}" to jTextField.text
+                    .mapIndexed { index, variable ->
+                        "_v${index + 1}" to variable.value()
                     }.toMap()
                 executeScript(
                     variables = variables,
@@ -118,36 +129,59 @@ class UiService {
 
             val variablesPanel = JPanel().apply {
                 layout = BoxLayout(this, BoxLayout.Y_AXIS)
-                val names = fieldNames.split("\n")
+
+                val names = FieldNamesService().get(fieldNames, ":")
                 (0 until countVariables).forEach { index ->
                     variablesField.add(
-                        TextFieldWithText(names.getOrNull(index) ?: "Не задано название")
-                            .apply {
-                                addKeyListener(object : KeyAdapter() {
-                                    override fun keyPressed(e: KeyEvent) {
-                                        if (e.keyCode == KeyEvent.VK_ENTER) {
-                                            executeFunc.invoke()
-                                        }
-                                    }
-                                })
-                            }
+                        names.getOrNull(index)?.let {
+                            TextPaneAndDefaultValue(
+                                textPane = TextPaneWithText(it.name).apply { text = it.value },
+                                defaultValue = it.value,
+                            )
+                        }
+                            ?: TextPaneAndDefaultValue(
+                                textPane = TextPaneWithText("Не задано название"),
+                                defaultValue = "",
+                            )
                     )
                 }
-                variablesField.forEach { add(it) }
-                add(
-                    JButton("Execute")
-                        .apply {
-                            addActionListener {
-                                executeFunc.invoke()
-                            }
-                        }
-                )
+                variablesField.forEach { add(JScrollPane(it.textPane)) }
             }
 
-            add(variablesPanel, BorderLayout.NORTH)
-            add(JScrollPane(resultText), BorderLayout.CENTER)
+            add(
+                JToolBar().apply {
+                    isFloatable = false
+                    add(
+                        JButton("Выполнить")
+                            .apply {
+                                addActionListener {
+                                    executeFunc.invoke()
+                                }
+                            }
+                    )
 
-            val dimension = Dimension(400, 600)
+                    add(
+                        JButton("Восстановить значения по умолчанию")
+                            .apply {
+                                addActionListener {
+                                    variablesField.forEach { it.restore() }
+                                }
+                            }
+                    )
+                },
+                BorderLayout.NORTH
+            )
+
+            add(JPanel(BorderLayout()).apply {
+                add(
+                    JSplitPane(JSplitPane.VERTICAL_SPLIT).apply {
+                        topComponent = variablesPanel
+                        bottomComponent = RTextScrollPane(resultText)
+                    }, BorderLayout.CENTER
+                )
+            }, BorderLayout.CENTER)
+
+            val dimension = Dimension(700, 400)
             size = dimension
             minimumSize = dimension
             maximumSize = dimension

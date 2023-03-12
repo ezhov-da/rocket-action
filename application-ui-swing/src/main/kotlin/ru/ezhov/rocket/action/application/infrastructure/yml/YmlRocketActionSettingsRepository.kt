@@ -94,7 +94,8 @@ private fun RocketActionSettingsDto.toRocketActionSettingsModel(): RocketActionS
                 valueType = when (it.valueType) {
                     SettingsValueTypeDto.PLAIN_TEXT -> SettingsValueType.PLAIN_TEXT
                     SettingsValueTypeDto.MUSTACHE_TEMPLATE -> SettingsValueType.MUSTACHE_TEMPLATE
-                    else -> null
+                    SettingsValueTypeDto.GROOVY_TEMPLATE -> SettingsValueType.GROOVY_TEMPLATE
+                    null -> null
                 },
             )
         },
@@ -112,7 +113,8 @@ private fun RocketActionSettingsModel.toRocketActionSettingsDto(): RocketActionS
                 valueType = when (it.valueType) {
                     SettingsValueType.PLAIN_TEXT -> SettingsValueTypeDto.PLAIN_TEXT
                     SettingsValueType.MUSTACHE_TEMPLATE -> SettingsValueTypeDto.MUSTACHE_TEMPLATE
-                    else -> null
+                    SettingsValueType.GROOVY_TEMPLATE -> SettingsValueTypeDto.GROOVY_TEMPLATE
+                    null -> null
                 },
             )
         },
