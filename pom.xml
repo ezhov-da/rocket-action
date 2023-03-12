@@ -15,7 +15,7 @@
         <maven.compiler.target>1.8</maven.compiler.target>
 
         <plugin-api.version>0.20.1</plugin-api.version>
-        <rocket-action-ui-utils.version>0.0.1</rocket-action-ui-utils.version>
+        <rocket-action-ui-utils.version>0.0.2</rocket-action-ui-utils.version>
         <rocket-action-utils.version>0.20.0</rocket-action-utils.version>
 
         <kotlin.version>1.8.10</kotlin.version>
