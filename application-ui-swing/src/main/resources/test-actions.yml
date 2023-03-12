@@ -672,4 +672,25 @@ actions:
         _id: de32aba8-c229-11ec-9d64-0242ac120002
         label: "Сохранить во временный файл"
         description: "Описание"
+
+    -   type: DYNAMIC_SCRIPT
+        _id: dg32aba8-c229-11ec-9d64-0241ac120002
+        label: "Получить данные (DYNAMIC_SCRIPT)"
+        description: "Описание"
+        countVariables: 1
+        selectedScriptLang: GROOVY
+        fieldNames: Тестовая переменная
+        script: |
+            _v1
+
+    -   type: DYNAMIC_SCRIPT
+        _id: dg32aba8-c229-56ec-9d64-0241ac120002
+        label: "Получить данные (DYNAMIC_SCRIPT) KOTLIN"
+        description: "Описание"
+        countVariables: 2
+        selectedScriptLang: KOTLIN
+        fieldNames: Тестовая переменная
+        script: |
+            _v1
+            _v2
 ...
