@@ -30,6 +30,7 @@
         <swingx.version>1.6.1</swingx.version>
         <mustache.version>0.9.10</mustache.version>
         <groovy.version>4.0.9</groovy.version>
+        <mockk.version>1.13.4</mockk.version>
     </properties>
 
     <modules>
@@ -137,6 +138,12 @@
                 <version>${groovy.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>org.apache.groovy</groupId>
+                <artifactId>groovy-sql</artifactId>
+                <version>${groovy.version}</version>
+            </dependency>
+
             <!-- ENGINES END -->
 
             <dependency>
@@ -178,6 +185,13 @@
                 <groupId>org.junit.jupiter</groupId>
                 <artifactId>junit-jupiter-params</artifactId>
                 <version>${junit.version}</version>
+                <scope>test</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>io.mockk</groupId>
+                <artifactId>mockk-jvm</artifactId>
+                <version>${mockk.version}</version>
                 <scope>test</scope>
             </dependency>
         </dependencies>

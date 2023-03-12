@@ -300,7 +300,12 @@ class EditorRocketActionSettingsPanel(
                                 selectedValues.toMutableList().add(default)
                             }
                             val list = JComboBox(selectedValues.toTypedArray())
-                            list.selectedItem = default
+                            list.selectedItem =
+                                if (selectedValues.contains(value.value)) {
+                                    value.value
+                                } else {
+                                    default
+                                }
                             centerPanel.add(JScrollPane(
                                 list
                                     .also { l ->
@@ -310,7 +315,9 @@ class EditorRocketActionSettingsPanel(
                         }
 
                         is RocketActionPropertySpec.IntPropertySpec -> {
-                            val default = configProperty.defaultValue?.toIntOrNull() ?: 0
+                            val default = value.value.toIntOrNull()
+                                ?: configProperty.defaultValue?.toIntOrNull()
+                                ?: 0
                             centerPanel.add(
                                 JSpinner(SpinnerNumberModel(default, configProperty.min, configProperty.max, 1))
                                     .also {

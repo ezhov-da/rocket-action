@@ -1,4 +1,4 @@
-package ru.ezhov.rocket.action.plugin.script.kotlin.ui
+package ru.ezhov.rocket.action.plugin.script.dynamic.ui
 
 import io.mockk.every
 import io.mockk.mockk
@@ -11,12 +11,15 @@ import ru.ezhov.rocket.action.api.context.cache.CacheService
 import ru.ezhov.rocket.action.api.context.icon.IconService
 import ru.ezhov.rocket.action.api.context.notification.NotificationService
 import ru.ezhov.rocket.action.api.context.variables.VariablesService
+import ru.ezhov.rocket.action.plugin.script.kotlin.ui.KotlinScriptRocketActionUi
 import java.awt.BorderLayout
 import javax.swing.ImageIcon
 import javax.swing.JFrame
 import javax.swing.JMenuBar
 import javax.swing.SwingUtilities
 import javax.swing.UIManager
+
+internal class DynamicScriptRocketActionUiTest
 
 fun main() {
     SwingUtilities.invokeLater {
@@ -25,7 +28,7 @@ fun main() {
         } catch (ex: Throwable) {
         }
 
-        val ui: RocketActionPlugin = KotlinScriptRocketActionUi()
+        val ui: RocketActionPlugin = DynamicScriptRocketActionUi()
         val factory = ui.factory(object : RocketActionContext {
             override fun icon(): IconService {
                 TODO("Not yet implemented")
@@ -52,10 +55,12 @@ fun main() {
 
                 override fun settings(): Map<RocketActionConfigurationPropertyKey, String> =
                     mapOf(
-                        KotlinScriptRocketActionUi.LABEL to "TEST",
-                        KotlinScriptRocketActionUi.SCRIPT to "\"test\"",
-                        KotlinScriptRocketActionUi.DESCRIPTION to "Description",
-                        KotlinScriptRocketActionUi.EXECUTE_ON_LOAD to "true",
+                        DynamicScriptRocketActionUi.LABEL to "TEST",
+                        DynamicScriptRocketActionUi.SCRIPT to "\"\$_v1 \$_v2\"",
+                        DynamicScriptRocketActionUi.DESCRIPTION to "Description",
+                        DynamicScriptRocketActionUi.COUNT_VARIABLES to "2",
+                        DynamicScriptRocketActionUi.SELECTED_SCRIPT_LANG to "GROOVY",
+                        DynamicScriptRocketActionUi.FIELD_NAMES to "Первое поле\nВторое поле",
                     )
 
                 override fun actions(): List<RocketActionSettings> = emptyList()
@@ -83,10 +88,8 @@ fun main() {
             add(menu, BorderLayout.NORTH)
             setLocationRelativeTo(null)
             defaultCloseOperation = JFrame.EXIT_ON_CLOSE
-            isVisible = true
             setSize(200, 200)
+            isVisible = true
         }
     }
 }
-
-internal class KotlinScriptRocketActionUiTest

@@ -11,7 +11,7 @@
     </parent>
 
     <artifactId>rocket-action-application-ui-swing</artifactId>
-    <version>0.20.5-alfa</version>
+    <version>0.20.6-alfa</version>
 
     <name>rocket-action</name>
 
@@ -136,6 +136,11 @@
         <dependency>
             <groupId>org.apache.groovy</groupId>
             <artifactId>groovy-json</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.groovy</groupId>
+            <artifactId>groovy-sql</artifactId>
         </dependency>
 
         <!-- ENGINES END -->
