@@ -138,6 +138,11 @@
             <artifactId>groovy-json</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>org.apache.groovy</groupId>
+            <artifactId>groovy-sql</artifactId>
+        </dependency>
+
         <!-- ENGINES END -->
 
         <dependency>
