@@ -56,7 +56,12 @@ class DynamicScriptRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
             createRocketActionProperty(
                 key = FIELD_NAMES,
                 name = FIELD_NAMES.value,
-                description = "Имена полей в столбец",
+                description = """
+                    Имена полей и значения по умолчанию, если необходимо с разделителем ':' в столбец.
+                    Например:
+                    Имя:Денис
+                    Запрос:select * from test where name = 'Денис'
+                """.trimIndent(),
                 required = false
             ),
             createRocketActionProperty(
