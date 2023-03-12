@@ -94,7 +94,8 @@ private fun RocketActionSettingsDto.toRocketActionSettingsModel(): RocketActionS
                 valueType = when (it.valueType) {
                     SettingsValueTypeDto.PLAIN_TEXT -> SettingsValueType.PLAIN_TEXT
                     SettingsValueTypeDto.MUSTACHE_TEMPLATE -> SettingsValueType.MUSTACHE_TEMPLATE
-                    else -> null
+                    SettingsValueTypeDto.GROOVY_TEMPLATE -> SettingsValueType.GROOVY_TEMPLATE
+                    null -> null
                 },
             )
         },
@@ -113,7 +114,7 @@ private fun RocketActionSettingsModel.toRocketActionSettingsDto(): RocketActionS
                     SettingsValueType.PLAIN_TEXT -> SettingsValueTypeDto.PLAIN_TEXT
                     SettingsValueType.MUSTACHE_TEMPLATE -> SettingsValueTypeDto.MUSTACHE_TEMPLATE
                     SettingsValueType.GROOVY_TEMPLATE -> SettingsValueTypeDto.GROOVY_TEMPLATE
-                    else -> throw UnsupportedOperationException("Unsupported type '$${it.valueType}' for save")
+                    null -> null
                 },
             )
         },
