@@ -45,7 +45,7 @@ class SeparatorRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
 
     override fun description(): String = "Разделитель"
 
-    override fun icon(): Icon? = actionContext!!.icon().by(AppIcon.MINUS)
+    override fun icon(): Icon = actionContext!!.icon().by(AppIcon.MINUS)
 
     override fun properties(): List<RocketActionConfigurationProperty> = emptyList()
 }

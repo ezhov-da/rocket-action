@@ -5,14 +5,14 @@ import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import mu.KotlinLogging
 import ru.ezhov.rocket.action.application.applicationConfiguration.domain.ConfigurationRepository
 import ru.ezhov.rocket.action.application.applicationConfiguration.domain.model.ApplicationConfigurations
-import ru.ezhov.rocket.action.application.applicationConfiguration.domain.model.ApplicationLocationOnScreen
 import ru.ezhov.rocket.action.application.applicationConfiguration.infrastructure.model.JsonApplicationConfigurationsDto
-import ru.ezhov.rocket.action.application.applicationConfiguration.infrastructure.model.JsonApplicationLocationOnScreenDto
 import ru.ezhov.rocket.action.application.properties.GeneralPropertiesRepositoryFactory
 import ru.ezhov.rocket.action.application.properties.UsedPropertiesName
 import java.io.File
 
 private val logger = KotlinLogging.logger {}
+
+private const val DEFAULT_VARIABLES_KEY: String = "314dcf4c-e12b-11ed-b5ea-0242ac120002"
 
 class JsonFileConfigurationRepository : ConfigurationRepository {
     private val filePath =
@@ -25,9 +25,13 @@ class JsonFileConfigurationRepository : ConfigurationRepository {
     override fun configurations(): ApplicationConfigurations {
         val file = file()
         return if (file.exists()) {
+            logger.info { "Read application configuration from file '$file'" }
             mapper.readValue(file, JsonApplicationConfigurationsDto::class.java).toApplicationConfigurations()
         } else {
-            ApplicationConfigurations()
+            logger.info { "Application configurations file '$file' does not exists. Return default configuration" }
+            ApplicationConfigurations(
+                variablesKey = DEFAULT_VARIABLES_KEY,
+            )
         }
     }
 
@@ -43,26 +47,16 @@ class JsonFileConfigurationRepository : ConfigurationRepository {
 
     override fun save(applicationConfigurations: ApplicationConfigurations) {
         val file = file()
-        mapper.writeValue(file, applicationConfigurations.toJsonApplicationConfigurationsDto())
+        mapper.writerWithDefaultPrettyPrinter().writeValue(file, applicationConfigurations.toJsonApplicationConfigurationsDto())
     }
 }
 
 private fun ApplicationConfigurations.toJsonApplicationConfigurationsDto(): JsonApplicationConfigurationsDto =
     JsonApplicationConfigurationsDto(
-        applicationLocationOnScreen = this.applicationLocationOnScreen?.let {
-            JsonApplicationLocationOnScreenDto(
-                x = it.x,
-                y = it.y,
-            )
-        }
+        variablesKey = this.variablesKey
     )
 
 private fun JsonApplicationConfigurationsDto.toApplicationConfigurations(): ApplicationConfigurations =
     ApplicationConfigurations(
-        applicationLocationOnScreen = this.applicationLocationOnScreen?.let {
-            ApplicationLocationOnScreen(
-                x = it.x,
-                y = it.y,
-            )
-        }
+        variablesKey = this.variablesKey ?: DEFAULT_VARIABLES_KEY
     )

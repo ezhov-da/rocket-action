@@ -11,7 +11,7 @@
     </parent>
 
     <artifactId>rocket-action-application-ui-swing</artifactId>
-    <version>0.21.1-alfa</version>
+    <version>0.21.3-alfa</version>
 
     <name>rocket-action</name>
 
@@ -238,6 +238,13 @@
             <groupId>com.mortennobel</groupId>
             <artifactId>java-image-scaling</artifactId>
             <version>${java-image-scaling.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-params</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
         </dependency>
 
         <dependency>
