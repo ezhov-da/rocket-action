@@ -4,7 +4,6 @@ import mu.KotlinLogging
 import ru.ezhov.rocket.action.api.RocketAction
 import ru.ezhov.rocket.action.api.RocketActionConfiguration
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
-import ru.ezhov.rocket.action.api.RocketActionConfigurationPropertyKey
 import ru.ezhov.rocket.action.api.RocketActionFactoryUi
 import ru.ezhov.rocket.action.api.RocketActionPlugin
 import ru.ezhov.rocket.action.api.RocketActionPropertySpec
@@ -170,7 +169,7 @@ class JiraWorklogRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
 
                         override fun handle(command: RocketActionHandlerCommand): RocketActionHandleStatus {
                             if (command.commandName == "append-text-to-end-and-save") {
-                                command.arguments[RocketActionConfigurationPropertyKey("text")]?.let { text ->
+                                command.arguments["text"]?.let { text ->
                                     jiraWorkLogUI.appendTextToCurrentAndSave(text)
                                 }
                             }
@@ -184,7 +183,7 @@ class JiraWorklogRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
 
     override fun description(): String = "Внесение отработанного времени в Jira"
 
-    override fun asString(): List<RocketActionConfigurationPropertyKey> = listOf(LABEL)
+    override fun asString(): List<String> = listOf(LABEL)
 
     override fun properties(): List<RocketActionConfigurationProperty> {
         return listOf(
@@ -286,21 +285,21 @@ class JiraWorklogRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
     override fun icon(): Icon? = actionContext!!.icon().by(AppIcon.CLOCK)
 
     companion object {
-        private val LABEL = RocketActionConfigurationPropertyKey("label")
-        private val DESCRIPTION = RocketActionConfigurationPropertyKey("description")
-        private val USERNAME = RocketActionConfigurationPropertyKey("username")
-        private val PASSWORD = RocketActionConfigurationPropertyKey("password")
-        private val URL = RocketActionConfigurationPropertyKey("url")
+        private val LABEL = "label"
+        private val DESCRIPTION = "description"
+        private val USERNAME = "username"
+        private val PASSWORD = "password"
+        private val URL = "url"
 
-        private val PREDEFINED_TASKS = RocketActionConfigurationPropertyKey("predefinedTasks")
-        private val DELIMITER_TASK_INFO = RocketActionConfigurationPropertyKey("delimiterTaskInfo")
+        private val PREDEFINED_TASKS = "predefinedTasks"
+        private val DELIMITER_TASK_INFO = "delimiterTaskInfo"
         private const val DEFAULT_DELIMITER_TASK_INFO = "_"
-        private val CONSTANTS_NOW_DATE = RocketActionConfigurationPropertyKey("constantsNowDate")
+        private val CONSTANTS_NOW_DATE = "constantsNowDate"
         private const val DEFAULT_CONSTANTS_NOW_DATE = "now"
 
-        private val ALIAS_FOR_TASK_IDS = RocketActionConfigurationPropertyKey("aliasForTaskIds")
-        private val LINK_TO_WORK_LOG = RocketActionConfigurationPropertyKey("linkToWorkLog")
-        private val FILE_PATH_WORK_LOG = RocketActionConfigurationPropertyKey("filePathWorkLog")
-        private val TEXT_VALIDATIONS = RocketActionConfigurationPropertyKey("textValidations")
+        private val ALIAS_FOR_TASK_IDS = "aliasForTaskIds"
+        private val LINK_TO_WORK_LOG = "linkToWorkLog"
+        private val FILE_PATH_WORK_LOG = "filePathWorkLog"
+        private val TEXT_VALIDATIONS = "textValidations"
     }
 }

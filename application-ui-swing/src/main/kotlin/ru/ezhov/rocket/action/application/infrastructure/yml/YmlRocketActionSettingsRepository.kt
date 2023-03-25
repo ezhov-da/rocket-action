@@ -70,7 +70,7 @@ private fun RocketActionSettings.toRocketActionSettingsModel(): RocketActionSett
         type = this.type().value(),
         settings = this.settings().map { (k, v) ->
             SettingsModel(
-                name = k.value,
+                name = k,
                 value = v,
                 valueType = null,
             )

@@ -277,7 +277,7 @@ class CreateRocketActionSettingsDialog(
 
         fun value(): SettingsModel =
             SettingsModel(
-                name = property.key().value,
+                name = property.key(),
                 value = valueCallback().first,
                 valueType = valueCallback().second
             )

@@ -3,7 +3,6 @@ package ru.ezhov.rocket.action.plugin.separator
 import ru.ezhov.rocket.action.api.RocketAction
 import ru.ezhov.rocket.action.api.RocketActionConfiguration
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
-import ru.ezhov.rocket.action.api.RocketActionConfigurationPropertyKey
 import ru.ezhov.rocket.action.api.RocketActionFactoryUi
 import ru.ezhov.rocket.action.api.RocketActionPlugin
 import ru.ezhov.rocket.action.api.RocketActionSettings
@@ -38,7 +37,7 @@ class SeparatorRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
             }
         }
 
-    override fun asString(): List<RocketActionConfigurationPropertyKey> = emptyList()
+    override fun asString(): List<String> = emptyList()
 
     override fun type(): RocketActionType = RocketActionType { "SEPARATOR" }
 

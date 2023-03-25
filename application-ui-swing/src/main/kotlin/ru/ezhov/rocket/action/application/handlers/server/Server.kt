@@ -2,7 +2,6 @@ package ru.ezhov.rocket.action.application.handlers.server
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import mu.KotlinLogging
-import ru.ezhov.rocket.action.api.RocketActionConfigurationPropertyKey
 import ru.ezhov.rocket.action.api.handler.RocketActionHandleStatus
 import ru.ezhov.rocket.action.api.handler.RocketActionHandlerCommand
 import ru.ezhov.rocket.action.application.handlers.server.swagger.JsonSwaggerGenerator
@@ -69,7 +68,7 @@ class Server {
                         RocketActionHandlerCommand(
                             commandName = command,
                             arguments = map
-                                .map { (k, v) -> RocketActionConfigurationPropertyKey(k.toString()) to v.toString() }
+                                .map { (k, v) -> k.toString() to v.toString() }
                                 .toMap()
                         )
                     )
@@ -80,7 +79,7 @@ class Server {
                     is RocketActionHandleStatus.Success -> {
                         response.status(200)
                         mapper.writeValueAsString(
-                            status.values.map { it.key.value to it.value }.toMap()
+                            status.values.map { it.key to it.value }.toMap()
                         )
                     }
 

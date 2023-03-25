@@ -11,7 +11,7 @@
     </parent>
 
     <artifactId>rocket-action-application-ui-swing</artifactId>
-    <version>0.20.7-alfa</version>
+    <version>0.21.0-alfa</version>
 
     <name>rocket-action</name>
 
@@ -129,6 +129,12 @@
         </dependency>
 
         <dependency>
+            <groupId>org.jetbrains.kotlin</groupId>
+            <artifactId>kotlin-scripting-jsr223</artifactId>
+            <version>${kotlin.version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.apache.groovy</groupId>
             <artifactId>groovy</artifactId>
         </dependency>
@@ -141,6 +147,11 @@
         <dependency>
             <groupId>org.apache.groovy</groupId>
             <artifactId>groovy-sql</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.groovy</groupId>
+            <artifactId>groovy-swing</artifactId>
         </dependency>
 
         <!-- ENGINES END -->
@@ -205,6 +216,12 @@
             <version>${java-image-scaling.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>io.mockk</groupId>
+            <artifactId>mockk-jvm</artifactId>
+            <version>${mockk.version}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>

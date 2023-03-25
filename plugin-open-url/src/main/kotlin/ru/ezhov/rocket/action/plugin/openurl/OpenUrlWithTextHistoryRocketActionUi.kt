@@ -3,7 +3,6 @@ package ru.ezhov.rocket.action.plugin.openurl
 import ru.ezhov.rocket.action.api.RocketAction
 import ru.ezhov.rocket.action.api.RocketActionConfiguration
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
-import ru.ezhov.rocket.action.api.RocketActionConfigurationPropertyKey
 import ru.ezhov.rocket.action.api.RocketActionFactoryUi
 import ru.ezhov.rocket.action.api.RocketActionPlugin
 import ru.ezhov.rocket.action.api.RocketActionPropertySpec
@@ -117,7 +116,8 @@ class OpenUrlWithTextHistoryRocketActionUi :
 
                             override fun inputArguments(): List<RocketActionHandlerProperty> = listOf(
                                 object : RocketActionHandlerProperty {
-                                    override fun key(): RocketActionHandlerPropertyKey = RocketActionHandlerPropertyKey("text")
+                                    override fun key(): RocketActionHandlerPropertyKey =
+                                        RocketActionHandlerPropertyKey("text")
 
                                     override fun name(): String = "Текст для подстановки в URL"
 
@@ -125,7 +125,8 @@ class OpenUrlWithTextHistoryRocketActionUi :
 
                                     override fun isRequired(): Boolean = true
 
-                                    override fun property(): RocketActionHandlerPropertySpec = RocketActionHandlerPropertySpec.StringPropertySpec()
+                                    override fun property(): RocketActionHandlerPropertySpec =
+                                        RocketActionHandlerPropertySpec.StringPropertySpec()
                                 }
                             )
 
@@ -134,16 +135,21 @@ class OpenUrlWithTextHistoryRocketActionUi :
                     )
 
                     override fun handle(command: RocketActionHandlerCommand): RocketActionHandleStatus {
-                        command.arguments[RocketActionConfigurationPropertyKey("text")]?.let { text ->
-                            action(text)
-                        }
+                        command.arguments["text"]?.let { text -> action(text) }
                         return RocketActionHandleStatus.Success()
                     }
                 }
             }
         }
 
-    private fun doAction(baseUrl: String, placeholder: String, text: String, settings: RocketActionSettings, menu: JMenu, addedToHistory: MutableList<String>) {
+    private fun doAction(
+        baseUrl: String,
+        placeholder: String,
+        text: String,
+        settings: RocketActionSettings,
+        menu: JMenu,
+        addedToHistory: MutableList<String>
+    ) {
         if (Desktop.isDesktopSupported()) {
             try {
                 val uri = open(baseUrl = baseUrl, placeholder = placeholder, text = text, settings = settings)
@@ -178,11 +184,11 @@ class OpenUrlWithTextHistoryRocketActionUi :
 
                             override fun type(): RocketActionType = RocketActionType { "" }
 
-                            override fun settings(): MutableMap<RocketActionConfigurationPropertyKey, String> =
+                            override fun settings(): MutableMap<String, String> =
                                 mutableMapOf(
-                                    RocketActionConfigurationPropertyKey("label") to text,
-                                    RocketActionConfigurationPropertyKey("description") to "Open link",
-                                    RocketActionConfigurationPropertyKey("url") to uri.toString(),
+                                    "label" to text,
+                                    "description" to "Open link",
+                                    "url" to uri.toString(),
                                 )
 
                             override fun actions(): List<RocketActionSettings> = emptyList()
@@ -201,18 +207,28 @@ class OpenUrlWithTextHistoryRocketActionUi :
 
     override fun description(): String = "Открыть ссылку с подстановкой и хранением истории открытий ссылок"
 
-    override fun asString(): List<RocketActionConfigurationPropertyKey> = listOf(LABEL, BASE_URL)
+    override fun asString(): List<String> = listOf(LABEL, BASE_URL)
 
     override fun properties(): List<RocketActionConfigurationProperty> {
         return listOf(
-            createRocketActionProperty(key = BASE_URL, name = BASE_URL.value, description = "Шаблон URL", required = true),
-            createRocketActionProperty(key = PLACEHOLDER, name = PLACEHOLDER.value, description = "Строка подстановки", required = true),
-            createRocketActionProperty(key = LABEL, name = LABEL.value, description = "Заголовок", required = false),
-            createRocketActionProperty(key = DESCRIPTION, name = DESCRIPTION.value, description = "Описание", required = false),
-            createRocketActionProperty(key = ICON_URL, name = ICON_URL.value, description = "URL иконки", required = false),
+            createRocketActionProperty(key = BASE_URL, name = BASE_URL, description = "Шаблон URL", required = true),
+            createRocketActionProperty(
+                key = PLACEHOLDER,
+                name = PLACEHOLDER,
+                description = "Строка подстановки",
+                required = true
+            ),
+            createRocketActionProperty(key = LABEL, name = LABEL, description = "Заголовок", required = false),
+            createRocketActionProperty(
+                key = DESCRIPTION,
+                name = DESCRIPTION,
+                description = "Описание",
+                required = false
+            ),
+            createRocketActionProperty(key = ICON_URL, name = ICON_URL, description = "URL иконки", required = false),
             createRocketActionProperty(
                 key = IS_ENCODE,
-                name = IS_ENCODE.value,
+                name = IS_ENCODE,
                 description = "Кодировать для URL",
                 required = false,
                 property = RocketActionPropertySpec.BooleanPropertySpec(defaultValue = false),
@@ -225,11 +241,11 @@ class OpenUrlWithTextHistoryRocketActionUi :
     override fun icon(): Icon? = actionContext!!.icon().by(AppIcon.LINK_INTACT)
 
     companion object {
-        private val LABEL = RocketActionConfigurationPropertyKey("label")
-        private val IS_ENCODE = RocketActionConfigurationPropertyKey("isEncode")
-        private val DESCRIPTION = RocketActionConfigurationPropertyKey("description")
-        private val BASE_URL = RocketActionConfigurationPropertyKey("baseUrl")
-        private val ICON_URL = RocketActionConfigurationPropertyKey("iconUrl")
-        private val PLACEHOLDER = RocketActionConfigurationPropertyKey("placeholder")
+        private val LABEL = "label"
+        private val IS_ENCODE = "isEncode"
+        private val DESCRIPTION = "description"
+        private val BASE_URL = "baseUrl"
+        private val ICON_URL = "iconUrl"
+        private val PLACEHOLDER = "placeholder"
     }
 }

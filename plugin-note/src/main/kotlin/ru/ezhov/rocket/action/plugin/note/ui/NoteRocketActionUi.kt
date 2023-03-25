@@ -4,7 +4,6 @@ import mu.KotlinLogging
 import ru.ezhov.rocket.action.api.RocketAction
 import ru.ezhov.rocket.action.api.RocketActionConfiguration
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
-import ru.ezhov.rocket.action.api.RocketActionConfigurationPropertyKey
 import ru.ezhov.rocket.action.api.RocketActionFactoryUi
 import ru.ezhov.rocket.action.api.RocketActionPlugin
 import ru.ezhov.rocket.action.api.RocketActionPropertySpec
@@ -123,16 +122,16 @@ class NoteRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
 
     override fun description(): String = "Хранение небольших заметок, ссылок, кусков кода. С тегами и поиском"
 
-    override fun asString(): List<RocketActionConfigurationPropertyKey> = listOf(LABEL)
+    override fun asString(): List<String> = listOf(LABEL)
 
     override fun properties(): List<RocketActionConfigurationProperty> {
         return listOf(
-            createRocketActionProperty(key = LABEL, name = LABEL.value, description = "Заголовок", required = true, property = RocketActionPropertySpec.StringPropertySpec(defaultValue = "Заметки")),
-            createRocketActionProperty(key = DESCRIPTION, name = DESCRIPTION.value, description = "Описание", required = false),
-            createRocketActionProperty(key = ICON_URL, name = ICON_URL.value, description = "URL иконки", required = false),
+            createRocketActionProperty(key = LABEL, name = LABEL, description = "Заголовок", required = true, property = RocketActionPropertySpec.StringPropertySpec(defaultValue = "Заметки")),
+            createRocketActionProperty(key = DESCRIPTION, name = DESCRIPTION, description = "Описание", required = false),
+            createRocketActionProperty(key = ICON_URL, name = ICON_URL, description = "URL иконки", required = false),
             createRocketActionProperty(
                 key = PATH,
-                name = PATH.value,
+                name = PATH,
                 description = "Путь хранения сохраняемых данных",
                 required = true,
                 property = RocketActionPropertySpec.StringPropertySpec(defaultValue = File("").absolutePath),
@@ -146,9 +145,9 @@ class NoteRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
 
     companion object {
         const val TYPE = "NOTE"
-        private val LABEL = RocketActionConfigurationPropertyKey("label")
-        private val ICON_URL = RocketActionConfigurationPropertyKey("iconUrl")
-        private val DESCRIPTION = RocketActionConfigurationPropertyKey("description")
-        private val PATH = RocketActionConfigurationPropertyKey("path")
+        private val LABEL = "label"
+        private val ICON_URL = "iconUrl"
+        private val DESCRIPTION = "description"
+        private val PATH = "path"
     }
 }

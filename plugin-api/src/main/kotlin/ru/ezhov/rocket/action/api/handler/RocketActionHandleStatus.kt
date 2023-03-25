@@ -1,7 +1,5 @@
 package ru.ezhov.rocket.action.api.handler
 
-import ru.ezhov.rocket.action.api.RocketActionConfigurationPropertyKey
-
 /**
  * Ответ обработчика
  */
@@ -13,7 +11,7 @@ sealed class RocketActionHandleStatus {
      *
      */
     class Success(
-        val values: Map<RocketActionConfigurationPropertyKey, String?> = emptyMap()
+        val values: Map<String, String?> = emptyMap()
     ) : RocketActionHandleStatus()
 
     /**

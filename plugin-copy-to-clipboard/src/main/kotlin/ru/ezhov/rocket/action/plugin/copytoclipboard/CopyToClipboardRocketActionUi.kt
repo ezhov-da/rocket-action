@@ -3,7 +3,6 @@ package ru.ezhov.rocket.action.plugin.copytoclipboard
 import ru.ezhov.rocket.action.api.RocketAction
 import ru.ezhov.rocket.action.api.RocketActionConfiguration
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
-import ru.ezhov.rocket.action.api.RocketActionConfigurationPropertyKey
 import ru.ezhov.rocket.action.api.RocketActionFactoryUi
 import ru.ezhov.rocket.action.api.RocketActionPlugin
 import ru.ezhov.rocket.action.api.RocketActionSettings
@@ -22,9 +21,9 @@ class CopyToClipboardRocketActionUi : AbstractRocketAction(), RocketActionPlugin
     private var actionContext: RocketActionContext? = null
 
     companion object {
-        private val LABEL = RocketActionConfigurationPropertyKey("label")
-        private val DESCRIPTION = RocketActionConfigurationPropertyKey("description")
-        private val TEXT = RocketActionConfigurationPropertyKey("text")
+        private val LABEL = "label"
+        private val DESCRIPTION = "description"
+        private val TEXT = "text"
     }
 
     override fun create(settings: RocketActionSettings, context: RocketActionContext): RocketAction? =
@@ -63,33 +62,29 @@ class CopyToClipboardRocketActionUi : AbstractRocketAction(), RocketActionPlugin
 
     override fun description(): String = "Позволяет скопировать текст в буфер"
 
-    override fun asString(): List<RocketActionConfigurationPropertyKey> = listOf(LABEL, TEXT)
+    override fun asString(): List<String> = listOf(LABEL, TEXT)
 
     override fun name(): String = "Копировать в буфер"
 
     override fun properties(): List<RocketActionConfigurationProperty> {
         return listOf(
-            createRocketActionProperty(LABEL, LABEL.value, "Текст для отображения", false),
-            createRocketActionProperty(DESCRIPTION, DESCRIPTION.value, "Описание", false),
-            createRocketActionProperty(TEXT, TEXT.value, "Текст для копирования в буфер", true)
+            createRocketActionProperty(LABEL, LABEL, "Текст для отображения", false),
+            createRocketActionProperty(DESCRIPTION, DESCRIPTION, "Описание", false),
+            createRocketActionProperty(TEXT, TEXT, "Текст для копирования в буфер", true)
         )
     }
 
     override fun icon(): Icon? = actionContext!!.icon().by(AppIcon.CLIPBOARD)
 
-    override fun factory(context: RocketActionContext): RocketActionFactoryUi = this
-        .apply {
-            actionContext = context
-        }
-        .apply {
-            actionContext = context
-        }
+    override fun factory(context: RocketActionContext): RocketActionFactoryUi =
+        this
+            .apply {
+                actionContext = context
+            }
 
-    override fun configuration(context: RocketActionContext): RocketActionConfiguration = this
-        .apply {
-            actionContext = context
-        }
-        .apply {
-            actionContext = context
-        }
+    override fun configuration(context: RocketActionContext): RocketActionConfiguration =
+        this
+            .apply {
+                actionContext = context
+            }
 }

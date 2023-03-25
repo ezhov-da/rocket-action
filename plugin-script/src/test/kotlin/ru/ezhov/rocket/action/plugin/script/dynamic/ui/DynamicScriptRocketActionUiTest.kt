@@ -2,7 +2,6 @@ package ru.ezhov.rocket.action.plugin.script.dynamic.ui
 
 import io.mockk.every
 import io.mockk.mockk
-import ru.ezhov.rocket.action.api.RocketActionConfigurationPropertyKey
 import ru.ezhov.rocket.action.api.RocketActionPlugin
 import ru.ezhov.rocket.action.api.RocketActionSettings
 import ru.ezhov.rocket.action.api.RocketActionType
@@ -53,7 +52,7 @@ fun main() {
 
                 override fun type(): RocketActionType = RocketActionType { KotlinScriptRocketActionUi.TYPE }
 
-                override fun settings(): Map<RocketActionConfigurationPropertyKey, String> =
+                override fun settings(): Map<String, String> =
                     mapOf(
                         DynamicScriptRocketActionUi.LABEL to "TEST",
                         DynamicScriptRocketActionUi.SCRIPT to "\"\$_v1 \$_v2\"",

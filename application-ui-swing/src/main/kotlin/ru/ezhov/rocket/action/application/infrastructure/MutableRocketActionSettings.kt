@@ -1,6 +1,5 @@
 package ru.ezhov.rocket.action.application.infrastructure
 
-import ru.ezhov.rocket.action.api.RocketActionConfigurationPropertyKey
 import ru.ezhov.rocket.action.api.RocketActionSettings
 import ru.ezhov.rocket.action.api.RocketActionType
 import ru.ezhov.rocket.action.application.domain.EngineService
@@ -19,11 +18,11 @@ class MutableRocketActionSettings(
 
         override fun type(): RocketActionType = RocketActionType { type }
 
-        override fun settings(): Map<RocketActionConfigurationPropertyKey, String> =
+        override fun settings(): Map<String, String> =
             settings.associate { set ->
                 // TODO ezhov возможность для оптимизации
-                val resultVal = EngineService().processWithEngine(set)
-                RocketActionConfigurationPropertyKey(set.name) to resultVal
+                val resultVal = EngineService().processWithEngine(set).toString()
+                set.name to resultVal
             }
 
         override fun actions(): List<RocketActionSettings> = actions.map { it.to() }

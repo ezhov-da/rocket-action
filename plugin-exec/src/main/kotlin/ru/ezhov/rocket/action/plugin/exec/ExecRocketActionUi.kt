@@ -4,7 +4,6 @@ import mu.KotlinLogging
 import ru.ezhov.rocket.action.api.RocketAction
 import ru.ezhov.rocket.action.api.RocketActionConfiguration
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
-import ru.ezhov.rocket.action.api.RocketActionConfigurationPropertyKey
 import ru.ezhov.rocket.action.api.RocketActionFactoryUi
 import ru.ezhov.rocket.action.api.RocketActionPlugin
 import ru.ezhov.rocket.action.api.RocketActionSettings
@@ -122,27 +121,27 @@ class ExecRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
 
     override fun description(): String = "Выполнение команды"
 
-    override fun asString(): List<RocketActionConfigurationPropertyKey> = listOf(
+    override fun asString(): List<String> = listOf(
         LABEL, COMMAND
     )
 
     override fun properties(): List<RocketActionConfigurationProperty> {
         return listOf(
-            createRocketActionProperty(COMMAND, COMMAND.value, "Команда", true),
-            createRocketActionProperty(LABEL, LABEL.value, "Заголовок", false),
-            createRocketActionProperty(WORKING_DIR, WORKING_DIR.value, "Рабочий каталог", false),
-            createRocketActionProperty(DESCRIPTION, DESCRIPTION.value, "Описание", false),
-            createRocketActionProperty(ICON_URL, ICON_URL.value, "URL иконки", false)
+            createRocketActionProperty(COMMAND, COMMAND, "Команда", true),
+            createRocketActionProperty(LABEL, LABEL, "Заголовок", false),
+            createRocketActionProperty(WORKING_DIR, WORKING_DIR, "Рабочий каталог", false),
+            createRocketActionProperty(DESCRIPTION, DESCRIPTION, "Описание", false),
+            createRocketActionProperty(ICON_URL, ICON_URL, "URL иконки", false)
         )
     }
 
     override fun icon(): Icon = actionContext!!.icon().by(AppIcon.FIRE)
 
     companion object {
-        private val LABEL = RocketActionConfigurationPropertyKey("label")
-        private val DESCRIPTION = RocketActionConfigurationPropertyKey("description")
-        private val COMMAND = RocketActionConfigurationPropertyKey("command")
-        private val WORKING_DIR = RocketActionConfigurationPropertyKey("workingDirectory")
-        private val ICON_URL = RocketActionConfigurationPropertyKey("iconUrl")
+        private val LABEL = "label"
+        private val DESCRIPTION = "description"
+        private val COMMAND = "command"
+        private val WORKING_DIR = "workingDirectory"
+        private val ICON_URL = "iconUrl"
     }
 }

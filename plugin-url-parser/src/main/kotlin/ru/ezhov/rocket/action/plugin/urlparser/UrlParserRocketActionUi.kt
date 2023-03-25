@@ -4,7 +4,6 @@ import mu.KotlinLogging
 import ru.ezhov.rocket.action.api.RocketAction
 import ru.ezhov.rocket.action.api.RocketActionConfiguration
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
-import ru.ezhov.rocket.action.api.RocketActionConfigurationPropertyKey
 import ru.ezhov.rocket.action.api.RocketActionFactoryUi
 import ru.ezhov.rocket.action.api.RocketActionPlugin
 import ru.ezhov.rocket.action.api.RocketActionPropertySpec
@@ -122,7 +121,7 @@ class UrlParserRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
 
     override fun description(): String = "Получение заголовка и описания URL"
 
-    override fun asString(): List<RocketActionConfigurationPropertyKey> = listOf(LABEL)
+    override fun asString(): List<String> = listOf(LABEL)
 
     override fun icon(): Icon? = actionContext!!.icon().by(AppIcon.FLASH)
 
@@ -147,8 +146,8 @@ class UrlParserRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
 
     companion object {
         private const val DELIMITER = "_____"
-        private val LABEL = RocketActionConfigurationPropertyKey("label")
-        private val HEADERS = RocketActionConfigurationPropertyKey("headers")
+        private val LABEL = "label"
+        private val HEADERS = "headers"
     }
 
     private class ButtonListener(

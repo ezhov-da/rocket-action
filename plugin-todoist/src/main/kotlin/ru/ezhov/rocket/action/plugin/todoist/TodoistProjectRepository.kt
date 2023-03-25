@@ -5,7 +5,6 @@ import mu.KotlinLogging
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Request.Builder
-import ru.ezhov.rocket.action.api.RocketActionConfigurationPropertyKey
 import ru.ezhov.rocket.action.plugin.todoist.model.Project
 import java.util.*
 
@@ -22,7 +21,7 @@ class TodoistProjectRepository {
         logger.info { "method=projects todoistToken=$debugToken" }
         return try {
             val request: Request = Builder()
-                .url(BASE_URL.value)
+                .url(BASE_URL)
                 .header("Authorization", String.format("Bearer %s", token))
                 .build()
             val client = OkHttpClient()
@@ -49,7 +48,7 @@ class TodoistProjectRepository {
     }
 
     companion object {
-        private val TOKEN_PROPERTY = RocketActionConfigurationPropertyKey("rocket.action.toodoist.token")
-        private val BASE_URL = RocketActionConfigurationPropertyKey("https://api.todoist.com/rest/v1/projects")
+        private val TOKEN_PROPERTY = "rocket.action.toodoist.token"
+        private val BASE_URL = "https://api.todoist.com/rest/v1/projects"
     }
 }

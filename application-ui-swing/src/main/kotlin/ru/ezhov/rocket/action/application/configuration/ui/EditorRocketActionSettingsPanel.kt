@@ -97,7 +97,7 @@ class EditorRocketActionSettingsPanel(
                         conf
                             .properties()
                             .firstOrNull { p: RocketActionConfigurationProperty? ->
-                                p!!.key().value == settingsModel.name
+                                p!!.key() == settingsModel.name
                             }
                     }
                 Value(
@@ -111,11 +111,11 @@ class EditorRocketActionSettingsPanel(
             configuration // ищем те свойства, что добавились
                 ?.properties()
                 ?.filter { p: RocketActionConfigurationProperty ->
-                    settingsFinal.firstOrNull { it.name == p.key().value } == null
+                    settingsFinal.firstOrNull { it.name == p.key() } == null
                 }
                 ?.map { p: RocketActionConfigurationProperty? ->
                     Value(
-                        key = p!!.key().value,
+                        key = p!!.key(),
                         value = "",
                         property = p,
                         valueType = null,

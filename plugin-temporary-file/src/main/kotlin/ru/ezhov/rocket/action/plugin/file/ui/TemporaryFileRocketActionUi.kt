@@ -4,7 +4,6 @@ import mu.KotlinLogging
 import ru.ezhov.rocket.action.api.RocketAction
 import ru.ezhov.rocket.action.api.RocketActionConfiguration
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
-import ru.ezhov.rocket.action.api.RocketActionConfigurationPropertyKey
 import ru.ezhov.rocket.action.api.RocketActionFactoryUi
 import ru.ezhov.rocket.action.api.RocketActionPlugin
 import ru.ezhov.rocket.action.api.RocketActionSettings
@@ -61,7 +60,7 @@ class TemporaryFileRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
 
     override fun description(): String = "Сохранить во временный файл"
 
-    override fun asString(): List<RocketActionConfigurationPropertyKey> = listOf(
+    override fun asString(): List<String> = listOf(
         LABEL,
         DESCRIPTION,
     )
@@ -89,7 +88,7 @@ class TemporaryFileRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
     override fun icon(): Icon? = actionContext!!.icon().by(AppIcon.FILE)
 
     companion object {
-        private val LABEL = RocketActionConfigurationPropertyKey("label")
-        private val DESCRIPTION = RocketActionConfigurationPropertyKey("description")
+        private val LABEL = "label"
+        private val DESCRIPTION = "description"
     }
 }

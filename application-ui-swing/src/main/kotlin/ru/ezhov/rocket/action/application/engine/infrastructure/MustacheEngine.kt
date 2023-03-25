@@ -11,7 +11,7 @@ import kotlin.system.measureTimeMillis
 private val logger = KotlinLogging.logger { }
 
 class MustacheEngine : Engine {
-    override fun execute(template: String, variables: List<EngineVariable>): String {
+    override fun execute(template: String, variables: List<EngineVariable>): Any {
         val result: StringWriter
         val time = measureTimeMillis {
             val factory = DefaultMustacheFactory()
@@ -25,6 +25,6 @@ class MustacheEngine : Engine {
                 "Template='$template', variables=${variables.associate { it.name to it.value }}"
         }
 
-        return result.toString()
+        return result
     }
 }

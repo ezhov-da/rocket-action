@@ -8,7 +8,7 @@ interface RocketActionConfigurationProperty {
      * Должен быть уникальный в разрезе действия
      * @return ключ свойства
      */
-    fun key(): RocketActionConfigurationPropertyKey
+    fun key(): String
 
     /**
      * @return название свойства для отображения
