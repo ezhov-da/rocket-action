@@ -49,6 +49,9 @@ class UiService {
             context = context
         )
 
+        context.search().register(settings.id(), label)
+        context.search().register(settings.id(), description)
+
         return object : RocketAction, RocketActionHandlerFactory {
             override fun contains(search: String): Boolean =
                 label.contains(search, ignoreCase = true)

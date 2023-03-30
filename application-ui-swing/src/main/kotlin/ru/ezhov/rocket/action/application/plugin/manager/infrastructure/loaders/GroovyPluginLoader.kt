@@ -10,6 +10,7 @@ import ru.ezhov.rocket.action.application.properties.UsedPropertiesName
 import ru.ezhov.rocket.action.application.variables.application.VariablesApplication
 import java.io.File
 import java.io.FileFilter
+import kotlin.system.measureTimeMillis
 
 private val logger = KotlinLogging.logger { }
 
@@ -30,22 +31,30 @@ class GroovyPluginLoader {
             ?.toList()
             .orEmpty()
 
-    fun loadPlugin(file: File): RocketActionPlugin? =
-        try {
-            val executeResult = EngineFactory
-                .by(EngineType.GROOVY)
-                .execute(
-                    template = file.readText(),
-                    variables = variablesApplication.all().variables.map {
-                        EngineVariable(
-                            name = it.name,
-                            value = it.value,
-                        )
-                    })
+    fun loadPlugin(file: File): RocketActionPlugin? {
+        val rocketActionPlugin: RocketActionPlugin?
+        val ms = measureTimeMillis {
+            rocketActionPlugin = try {
+                val executeResult = EngineFactory
+                    .by(EngineType.GROOVY)
+                    .execute(
+                        template = file.readText(),
+                        variables = variablesApplication.all().variables.map {
+                            EngineVariable(
+                                name = it.name,
+                                value = it.value,
+                            )
+                        })
 
-            executeResult as RocketActionPlugin
-        } catch (ex: Exception) {
-            logger.error(ex) { "Error when load groovy plugin from file '${file}'" }
-            null
+                executeResult as RocketActionPlugin
+            } catch (ex: Exception) {
+                logger.error(ex) { "Error when load groovy plugin from file '${file}'" }
+                null
+            }
         }
+
+        logger.debug { "Groovy plugin is loaded from file='${file.absolutePath}' time='$ms'ms" }
+
+        return rocketActionPlugin
+    }
 }

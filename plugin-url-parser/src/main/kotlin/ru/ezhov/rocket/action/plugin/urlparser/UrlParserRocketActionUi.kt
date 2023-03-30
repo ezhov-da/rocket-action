@@ -104,6 +104,9 @@ class UrlParserRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
 
                     add(panel)
                 }
+
+                context.search().register(settings.id(), label)
+
                 object : RocketAction {
                     override fun contains(search: String): Boolean = label.contains(search)
 

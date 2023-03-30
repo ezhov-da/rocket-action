@@ -75,6 +75,10 @@ class NoteOnFileRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
                     )
                 }
 
+                context.search().register(settings.id(), path)
+                context.search().register(settings.id(), label)
+                context.search().register(settings.id(), description)
+
                 object : RocketAction {
                     override fun contains(search: String): Boolean =
                         path.contains(search, ignoreCase = true)

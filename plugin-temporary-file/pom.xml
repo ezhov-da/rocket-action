@@ -10,7 +10,7 @@
     </parent>
 
     <artifactId>rocket-action-plugin-temporary-file</artifactId>
-    <version>0.20.0-beta</version>
+    <version>${plugin-api.version}_1</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -47,6 +47,11 @@
             <groupId>io.arrow-kt</groupId>
             <artifactId>arrow-core</artifactId>
             <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>io.mockk</groupId>
+            <artifactId>mockk-jvm</artifactId>
         </dependency>
     </dependencies>
 

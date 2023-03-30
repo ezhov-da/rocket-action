@@ -14,6 +14,7 @@ import ru.ezhov.rocket.action.application.plugin.group.GroupRocketActionUi
 import ru.ezhov.rocket.action.application.plugin.manager.domain.RocketActionPluginRepository
 import ru.ezhov.rocket.action.application.properties.GeneralPropertiesRepository
 import ru.ezhov.rocket.action.application.properties.UsedPropertiesName
+import ru.ezhov.rocket.action.application.search.application.SearchInstance
 import ru.ezhov.rocket.action.ui.utils.swing.common.MoveUtil
 import ru.ezhov.rocket.action.ui.utils.swing.common.TextFieldWithText
 import java.awt.Color
@@ -97,12 +98,19 @@ class UiQuickActionService(
                                 if (e.keyCode == KeyEvent.VK_ENTER) {
                                     val cache = RocketActionComponentCacheFactory.cache
                                     if (text.isNotEmpty()) {
-                                        cache
+
+                                        val idsRA = SearchInstance.service().search(text).toSet()
+                                        val raByFullText = cache.byIds(idsRA)
+                                        val raByContains = cache
                                             .all()
                                             .filter { it.contains(text) }
+
+                                        (raByFullText + raByContains)
+                                            .toSet()
                                             .takeIf { it.isNotEmpty() }
                                             ?.let { ccl ->
-                                                logger.info { "found by search '$text': ${ccl.size}" }
+                                                logger.info { "Found by search '$text': ${ccl.size}" }
+
                                                 SwingUtilities.invokeLater {
                                                     tf.background = Color.GREEN
                                                     menu.removeAll()
@@ -356,9 +364,13 @@ class UiQuickActionService(
         }
 
         override fun done() {
-            val components = this.get()
-            components.forEach { menu.add(it) }
-            menu.icon = RocketActionContextFactory.context.icon().by(AppIcon.ROCKET_APP)
+            try {
+                val components = this.get()
+                components.forEach { menu.add(it) }
+                menu.icon = RocketActionContextFactory.context.icon().by(AppIcon.ROCKET_APP)
+            } catch (ex: Exception) {
+                logger.error(ex) { "Error when load app" }
+            }
         }
     }
 }

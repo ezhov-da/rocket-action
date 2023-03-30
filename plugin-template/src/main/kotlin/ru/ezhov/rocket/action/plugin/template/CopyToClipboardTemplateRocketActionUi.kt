@@ -42,6 +42,9 @@ class CopyToClipboardTemplateRocketActionUi : AbstractRocketAction(), RocketActi
             menu.toolTipText = description
             menu.add(notePanelEngine)
 
+            context.search().register(settings.id(), label)
+            context.search().register(settings.id(), description)
+
             object : RocketAction {
                 override fun contains(search: String): Boolean =
                     label.contains(search, ignoreCase = true)

@@ -3,6 +3,7 @@ package ru.ezhov.rocket.action.api.context
 import ru.ezhov.rocket.action.api.context.cache.CacheService
 import ru.ezhov.rocket.action.api.context.icon.IconService
 import ru.ezhov.rocket.action.api.context.notification.NotificationService
+import ru.ezhov.rocket.action.api.context.search.Search
 import ru.ezhov.rocket.action.api.context.variables.VariablesService
 
 /**
@@ -30,4 +31,9 @@ interface RocketActionContext {
     fun variables(): VariablesService = object : VariablesService {
         override fun variables(): Map<String, String> = emptyMap()
     }
+
+    /**
+     * Сервис регистрации для поиска
+     */
+    fun search(): Search
 }

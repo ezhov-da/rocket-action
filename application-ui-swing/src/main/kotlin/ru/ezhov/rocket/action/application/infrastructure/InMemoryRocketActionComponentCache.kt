@@ -13,6 +13,11 @@ class InMemoryRocketActionComponentCache : RocketActionComponentCache {
     }
 
     override fun by(id: String): RocketAction? = map[id]
+    override fun byIds(ids: Set<String>): List<RocketAction> =
+        map
+            .filter { ids.contains(it.key) }
+            .values
+            .toList()
 
     override fun all(): List<RocketAction> = map.values.toList()
 

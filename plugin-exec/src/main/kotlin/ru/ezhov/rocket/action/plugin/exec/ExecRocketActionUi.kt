@@ -61,6 +61,9 @@ class ExecRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
                 })
             }
 
+            context.search().register(settings.id(), label)
+            context.search().register(settings.id(), command)
+
             object : RocketAction {
                 override fun contains(search: String): Boolean =
                     label.contains(search, ignoreCase = true)

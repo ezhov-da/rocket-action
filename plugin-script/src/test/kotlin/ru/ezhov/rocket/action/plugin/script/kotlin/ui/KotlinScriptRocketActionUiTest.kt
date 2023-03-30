@@ -9,6 +9,7 @@ import ru.ezhov.rocket.action.api.context.RocketActionContext
 import ru.ezhov.rocket.action.api.context.cache.CacheService
 import ru.ezhov.rocket.action.api.context.icon.IconService
 import ru.ezhov.rocket.action.api.context.notification.NotificationService
+import ru.ezhov.rocket.action.api.context.search.Search
 import ru.ezhov.rocket.action.api.context.variables.VariablesService
 import java.awt.BorderLayout
 import javax.swing.ImageIcon
@@ -26,22 +27,15 @@ fun main() {
 
         val ui: RocketActionPlugin = KotlinScriptRocketActionUi()
         val factory = ui.factory(object : RocketActionContext {
-            override fun icon(): IconService {
-                TODO("Not yet implemented")
-            }
+            override fun icon(): IconService = mockk()
 
-            override fun notification(): NotificationService {
-                TODO("Not yet implemented")
-            }
+            override fun notification(): NotificationService = mockk()
 
-            override fun cache(): CacheService {
-                TODO("Not yet implemented")
-            }
+            override fun cache(): CacheService = mockk()
 
-            override fun variables(): VariablesService {
-                TODO("Not yet implemented")
-            }
+            override fun variables(): VariablesService = mockk()
 
+            override fun search(): Search = mockk()
         })
         val rocketAction = factory.create(
             object : RocketActionSettings {
@@ -71,6 +65,8 @@ fun main() {
                 override fun variables(): VariablesService = object : VariablesService {
                     override fun variables(): Map<String, String> = emptyMap()
                 }
+
+                override fun search(): Search = mockk()
 
             }
         )

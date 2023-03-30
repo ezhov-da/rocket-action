@@ -91,6 +91,10 @@ class OpenUrlWithTextHistoryRocketActionUi :
             }
             menu.add(textField)
 
+            context.search().register(settings.id(), label)
+            context.search().register(settings.id(), baseUrl)
+            context.search().register(settings.id(), description)
+
             object : RocketAction, RocketActionHandlerFactory {
                 override fun contains(search: String): Boolean =
                     label.contains(search, ignoreCase = true)

@@ -1,11 +1,13 @@
 package ru.ezhov.rocket.action.plugin.file.ui
 
+import io.mockk.mockk
 import ru.ezhov.rocket.action.api.context.RocketActionContext
 import ru.ezhov.rocket.action.api.context.cache.CacheService
 import ru.ezhov.rocket.action.api.context.icon.AppIcon
 import ru.ezhov.rocket.action.api.context.icon.IconService
 import ru.ezhov.rocket.action.api.context.notification.NotificationService
 import ru.ezhov.rocket.action.api.context.notification.NotificationType
+import ru.ezhov.rocket.action.api.context.search.Search
 import ru.ezhov.rocket.action.plugin.file.domain.TemporaryFileService
 import java.io.File
 import java.net.URL
@@ -42,6 +44,8 @@ object TemporaryFileUiTest {
                             object : CacheService {
                                 override fun get(url: URL): File? = null
                             }
+
+                        override fun search(): Search = mockk()
                     }))
 
                 pack()

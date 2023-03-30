@@ -80,6 +80,8 @@ class OpenUrlWithTextRocketActionUi : AbstractRocketAction(), RocketActionPlugin
             }
             menu.add(textField)
 
+            context.search().register(settings.id(), label)
+
             object : RocketAction, RocketActionHandlerFactory {
                 override fun contains(search: String): Boolean =
                     label.contains(search, ignoreCase = true)
