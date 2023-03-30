@@ -8,7 +8,7 @@ import ru.ezhov.rocket.action.application.engine.domain.model.EngineVariable
 import ru.ezhov.rocket.action.application.variables.application.VariablesApplication
 
 class EngineService {
-    fun processWithEngine(settingsModel: SettingsModel): String =
+    fun processWithEngine(settingsModel: SettingsModel): Any =
         settingsModel
             .valueType
             ?.let { type ->

@@ -15,14 +15,14 @@ class GroovyEngine : Engine {
         private const val VARIABLES_NAME = "_variables"
     }
 
-    override fun execute(template: String, variables: List<EngineVariable>): String {
-        val result: String
+    override fun execute(template: String, variables: List<EngineVariable>): Any {
+        val result: Any
         val time = measureTimeMillis {
             val sharedData = Binding()
             val groovyShell = GroovyShell(sharedData)
             variables.forEach { sharedData.setProperty(it.name, it.value) }
             sharedData.setProperty(VARIABLES_NAME, variables.associate { it.name to it.value })
-            result = groovyShell.evaluate(template).toString()
+            result = groovyShell.evaluate(template)
 
         }
 

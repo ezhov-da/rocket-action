@@ -3,7 +3,6 @@ package ru.ezhov.rocket.action.plugin.openurl
 import ru.ezhov.rocket.action.api.RocketAction
 import ru.ezhov.rocket.action.api.RocketActionConfiguration
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
-import ru.ezhov.rocket.action.api.RocketActionConfigurationPropertyKey
 import ru.ezhov.rocket.action.api.RocketActionFactoryUi
 import ru.ezhov.rocket.action.api.RocketActionPlugin
 import ru.ezhov.rocket.action.api.RocketActionSettings
@@ -136,14 +135,14 @@ class OpenUrlRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
 
     override fun description(): String = "Открытие ссылки"
 
-    override fun asString(): List<RocketActionConfigurationPropertyKey> = listOf(LABEL, URL)
+    override fun asString(): List<String> = listOf(LABEL, URL)
 
     override fun properties(): List<RocketActionConfigurationProperty> {
         return listOf(
-            createRocketActionProperty(LABEL, LABEL.value, "Заголовок", false),
-            createRocketActionProperty(DESCRIPTION, DESCRIPTION.value, "Описание", false),
-            createRocketActionProperty(URL, URL.value, "URL", true),
-            createRocketActionProperty(ICON_URL, ICON_URL.value, "URL иконка", false)
+            createRocketActionProperty(LABEL, LABEL, "Заголовок", false),
+            createRocketActionProperty(DESCRIPTION, DESCRIPTION, "Описание", false),
+            createRocketActionProperty(URL, URL, "URL", true),
+            createRocketActionProperty(ICON_URL, ICON_URL, "URL иконка", false)
         )
     }
 
@@ -152,9 +151,9 @@ class OpenUrlRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
     override fun icon(): Icon? = actionContext!!.icon().by(AppIcon.LINK_INTACT)
 
     companion object {
-        private val LABEL = RocketActionConfigurationPropertyKey("label")
-        private val DESCRIPTION = RocketActionConfigurationPropertyKey("description")
-        private val URL = RocketActionConfigurationPropertyKey("url")
-        private val ICON_URL = RocketActionConfigurationPropertyKey("iconUrl")
+        private val LABEL = "label"
+        private val DESCRIPTION = "description"
+        private val URL = "url"
+        private val ICON_URL = "iconUrl"
     }
 }

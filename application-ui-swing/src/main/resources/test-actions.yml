@@ -693,4 +693,14 @@ actions:
         script: |
             _v1
             _v2
+
+    -   type: SIMPLE_GROOVY_PLUGIN
+        _id: dg32aba8-c229-56ec-9d64-0241ac121112
+        key: "Key value"
+
+    -   type: COPY_TO_CLIPBOARD_KOTLIN_PLUGIN
+        _id: de13aba8-c229-11ec-9d64-1242ac120002
+        label: COPY_TO_CLIPBOARD_KOTLIN_PLUGIN asgasgasdg
+        description: description
+        text: COPY_TO_CLIPBOARD_KOTLIN_PLUGIN
 ...

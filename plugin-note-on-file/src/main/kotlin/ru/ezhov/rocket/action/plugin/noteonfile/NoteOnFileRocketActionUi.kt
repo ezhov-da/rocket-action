@@ -5,7 +5,6 @@ import org.fife.ui.rsyntaxtextarea.SyntaxConstants
 import ru.ezhov.rocket.action.api.RocketAction
 import ru.ezhov.rocket.action.api.RocketActionConfiguration
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
-import ru.ezhov.rocket.action.api.RocketActionConfigurationPropertyKey
 import ru.ezhov.rocket.action.api.RocketActionFactoryUi
 import ru.ezhov.rocket.action.api.RocketActionPlugin
 import ru.ezhov.rocket.action.api.RocketActionPropertySpec
@@ -95,7 +94,7 @@ class NoteOnFileRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
     override fun description(): String = "Записка в файле. " +
         "Позволяет сохранять информацию в файл, а так же иметь быстрый доступ к файлу"
 
-    override fun asString(): List<RocketActionConfigurationPropertyKey> = listOf(
+    override fun asString(): List<String> = listOf(
         LABEL,
         PATH_AND_NAME,
         DESCRIPTION,
@@ -181,14 +180,14 @@ class NoteOnFileRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
     override fun icon(): Icon? = actionContext!!.icon().by(AppIcon.TEXT)
 
     companion object {
-        private val LABEL = RocketActionConfigurationPropertyKey("label")
-        private val DESCRIPTION = RocketActionConfigurationPropertyKey("description")
-        private val SYNTAX_STYLE = RocketActionConfigurationPropertyKey("syntaxStyle")
-        private val LOAD_TEXT_ON_INITIALIZE = RocketActionConfigurationPropertyKey("loadTextOnInitialize")
-        private val PATH_AND_NAME = RocketActionConfigurationPropertyKey("pathAndName")
-        private val DELIMITER = RocketActionConfigurationPropertyKey("delimiter")
-        private val AUTO_SAVE = RocketActionConfigurationPropertyKey("autoSave")
-        private val AUTO_SAVE_PERIOD_IN_SECOND = RocketActionConfigurationPropertyKey("autoSavePeriodInSecond")
+        private val LABEL = "label"
+        private val DESCRIPTION = "description"
+        private val SYNTAX_STYLE = "syntaxStyle"
+        private val LOAD_TEXT_ON_INITIALIZE = "loadTextOnInitialize"
+        private val PATH_AND_NAME = "pathAndName"
+        private val DELIMITER = "delimiter"
+        private val AUTO_SAVE = "autoSave"
+        private val AUTO_SAVE_PERIOD_IN_SECOND = "autoSavePeriodInSecond"
         private const val DEFAULT_AUTO_SAVE_PERIOD_IN_SECOND = 5
     }
 }

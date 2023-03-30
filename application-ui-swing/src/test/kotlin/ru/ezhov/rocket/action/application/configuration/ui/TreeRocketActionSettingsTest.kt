@@ -4,7 +4,6 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import ru.ezhov.rocket.action.api.RocketActionConfiguration
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
-import ru.ezhov.rocket.action.api.RocketActionConfigurationPropertyKey
 import ru.ezhov.rocket.action.api.RocketActionType
 import ru.ezhov.rocket.action.application.domain.model.SettingsModel
 import ru.ezhov.rocket.action.application.domain.model.SettingsValueType
@@ -28,10 +27,7 @@ class TreeRocketActionSettingsTest {
                     TODO("Not yet implemented")
                 }
 
-                override fun asString(): List<RocketActionConfigurationPropertyKey> = listOf(
-                    RocketActionConfigurationPropertyKey("1"),
-                    RocketActionConfigurationPropertyKey("2"),
-                )
+                override fun asString(): List<String> = listOf("1", "2")
 
                 override fun properties(): List<RocketActionConfigurationProperty> {
                     TODO("Not yet implemented")

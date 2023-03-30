@@ -78,4 +78,18 @@ enum class UsedPropertiesName(val propertyName: String, val description: String)
             - абсолютный путь 'C:/folder/configurations.json'
         """.trimIndent()
     ),
+
+    GROOVY_PLUGIN_FOLDER(
+        "$PREFIX.groovy.plugin.folder",
+        """
+            Путь к папке с плагинами на Groovy
+        """.trimIndent()
+    ),
+
+    KOTLIN_PLUGIN_FOLDER(
+        "$PREFIX.kotlin.plugin.folder",
+        """
+            Путь к папке с плагинами на Kotlin
+        """.trimIndent()
+    ),
 }

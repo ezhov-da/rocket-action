@@ -3,7 +3,6 @@ package ru.ezhov.rocket.action.plugin.script.kotlin.ui
 import ru.ezhov.rocket.action.api.RocketAction
 import ru.ezhov.rocket.action.api.RocketActionConfiguration
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
-import ru.ezhov.rocket.action.api.RocketActionConfigurationPropertyKey
 import ru.ezhov.rocket.action.api.RocketActionFactoryUi
 import ru.ezhov.rocket.action.api.RocketActionPlugin
 import ru.ezhov.rocket.action.api.RocketActionPropertySpec
@@ -101,26 +100,26 @@ class KotlinScriptRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
 
     override fun description(): String = "Выполнение скрипта Kotlin"
 
-    override fun asString(): List<RocketActionConfigurationPropertyKey> = listOf(LABEL, SCRIPT)
+    override fun asString(): List<String> = listOf(LABEL, SCRIPT)
 
     override fun properties(): List<RocketActionConfigurationProperty> {
         return listOf(
             createRocketActionProperty(
                 key = SCRIPT,
-                name = SCRIPT.value,
+                name = SCRIPT,
                 description = "Скрипт для выполнения",
                 required = true
             ),
-            createRocketActionProperty(key = LABEL, name = LABEL.value, description = "Заголовок", required = true),
+            createRocketActionProperty(key = LABEL, name = LABEL, description = "Заголовок", required = true),
             createRocketActionProperty(
                 key = DESCRIPTION,
-                name = DESCRIPTION.value,
+                name = DESCRIPTION,
                 description = "Описание",
                 required = false
             ),
             createRocketActionProperty(
                 key = EXECUTE_ON_LOAD,
-                name = EXECUTE_ON_LOAD.value,
+                name = EXECUTE_ON_LOAD,
                 description = "Выполнять скрипт при загрузке",
                 required = true,
                 property = RocketActionPropertySpec.BooleanPropertySpec(defaultValue = false),
@@ -134,9 +133,9 @@ class KotlinScriptRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
 
     companion object {
         internal const val TYPE = "KOTLIN_SCRIPT"
-        internal val LABEL = RocketActionConfigurationPropertyKey("label")
-        internal val SCRIPT = RocketActionConfigurationPropertyKey("script")
-        internal val DESCRIPTION = RocketActionConfigurationPropertyKey("description")
-        internal val EXECUTE_ON_LOAD = RocketActionConfigurationPropertyKey("executeOnLoad")
+        internal val LABEL = "label"
+        internal val SCRIPT = "script"
+        internal val DESCRIPTION = "description"
+        internal val EXECUTE_ON_LOAD = "executeOnLoad"
     }
 }

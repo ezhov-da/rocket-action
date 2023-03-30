@@ -3,7 +3,6 @@ package ru.ezhov.rocket.action.plugin.template
 import ru.ezhov.rocket.action.api.RocketAction
 import ru.ezhov.rocket.action.api.RocketActionConfiguration
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
-import ru.ezhov.rocket.action.api.RocketActionConfigurationPropertyKey
 import ru.ezhov.rocket.action.api.RocketActionFactoryUi
 import ru.ezhov.rocket.action.api.RocketActionPlugin
 import ru.ezhov.rocket.action.api.RocketActionSettings
@@ -64,19 +63,19 @@ class CopyToClipboardTemplateRocketActionUi : AbstractRocketAction(), RocketActi
 
     override fun properties(): List<RocketActionConfigurationProperty> {
         return listOf(
-            createRocketActionProperty(key = LABEL, name = LABEL.value, description = "Заголовок", required = false),
-            createRocketActionProperty(key = DESCRIPTION, name = DESCRIPTION.value, description = "Описание", required = false),
-            createRocketActionProperty(key = TEXT, name = TEXT.value, description = "Шаблон для копирования", required = true)
+            createRocketActionProperty(key = LABEL, name = LABEL, description = "Заголовок", required = false),
+            createRocketActionProperty(key = DESCRIPTION, name = DESCRIPTION, description = "Описание", required = false),
+            createRocketActionProperty(key = TEXT, name = TEXT, description = "Шаблон для копирования", required = true)
         )
     }
 
-    override fun asString(): List<RocketActionConfigurationPropertyKey> = listOf(LABEL, TEXT)
+    override fun asString(): List<String> = listOf(LABEL, TEXT)
 
     override fun icon(): Icon? = actionContext!!.icon().by(AppIcon.CLIPBOARD)
 
     companion object {
-        private val LABEL = RocketActionConfigurationPropertyKey("label")
-        private val DESCRIPTION = RocketActionConfigurationPropertyKey("description")
-        private val TEXT = RocketActionConfigurationPropertyKey("text")
+        private val LABEL = "label"
+        private val DESCRIPTION = "description"
+        private val TEXT = "text"
     }
 }

@@ -3,7 +3,6 @@ package ru.ezhov.rocket.action.plugin.script.dynamic.ui
 import ru.ezhov.rocket.action.api.RocketAction
 import ru.ezhov.rocket.action.api.RocketActionConfiguration
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
-import ru.ezhov.rocket.action.api.RocketActionConfigurationPropertyKey
 import ru.ezhov.rocket.action.api.RocketActionFactoryUi
 import ru.ezhov.rocket.action.api.RocketActionPlugin
 import ru.ezhov.rocket.action.api.RocketActionPropertySpec
@@ -36,26 +35,26 @@ class DynamicScriptRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
         Например: _v1 - поле 1
         """.trimIndent()
 
-    override fun asString(): List<RocketActionConfigurationPropertyKey> = listOf(LABEL, SCRIPT)
+    override fun asString(): List<String> = listOf(LABEL, SCRIPT)
 
     override fun properties(): List<RocketActionConfigurationProperty> {
         return listOf(
             createRocketActionProperty(
                 key = SCRIPT,
-                name = SCRIPT.value,
+                name = SCRIPT,
                 description = "Скрипт для выполнения",
                 required = true
             ),
-            createRocketActionProperty(key = LABEL, name = LABEL.value, description = "Заголовок", required = true),
+            createRocketActionProperty(key = LABEL, name = LABEL, description = "Заголовок", required = true),
             createRocketActionProperty(
                 key = DESCRIPTION,
-                name = DESCRIPTION.value,
+                name = DESCRIPTION,
                 description = "Описание",
                 required = false
             ),
             createRocketActionProperty(
                 key = FIELD_NAMES,
-                name = FIELD_NAMES.value,
+                name = FIELD_NAMES,
                 description = """
                     Имена полей и значения по умолчанию, если необходимо с разделителем ':' в столбец.
                     Например:
@@ -66,14 +65,14 @@ class DynamicScriptRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
             ),
             createRocketActionProperty(
                 key = COUNT_VARIABLES,
-                name = COUNT_VARIABLES.value,
+                name = COUNT_VARIABLES,
                 description = "Количество входных параметров",
                 required = true,
                 property = RocketActionPropertySpec.IntPropertySpec(defaultValue = 1, min = 0, max = 10),
             ),
             createRocketActionProperty(
                 key = SELECTED_SCRIPT_LANG,
-                name = SELECTED_SCRIPT_LANG.value,
+                name = SELECTED_SCRIPT_LANG,
                 description = "Выбранный язык скрипта",
                 required = true,
                 property = RocketActionPropertySpec.ListPropertySpec(
@@ -90,11 +89,11 @@ class DynamicScriptRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
 
     companion object {
         internal const val TYPE = "DYNAMIC_SCRIPT"
-        internal val LABEL = RocketActionConfigurationPropertyKey("label")
-        internal val SCRIPT = RocketActionConfigurationPropertyKey("script")
-        internal val DESCRIPTION = RocketActionConfigurationPropertyKey("description")
-        internal val COUNT_VARIABLES = RocketActionConfigurationPropertyKey("countVariables")
-        internal val SELECTED_SCRIPT_LANG = RocketActionConfigurationPropertyKey("selectedScriptLang")
-        internal val FIELD_NAMES = RocketActionConfigurationPropertyKey("fieldNames")
+        internal val LABEL = "label"
+        internal val SCRIPT = "script"
+        internal val DESCRIPTION = "description"
+        internal val COUNT_VARIABLES = "countVariables"
+        internal val SELECTED_SCRIPT_LANG = "selectedScriptLang"
+        internal val FIELD_NAMES = "fieldNames"
     }
 }

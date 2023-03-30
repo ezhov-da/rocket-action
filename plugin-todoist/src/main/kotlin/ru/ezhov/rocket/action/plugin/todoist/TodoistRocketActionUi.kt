@@ -3,7 +3,6 @@ package ru.ezhov.rocket.action.plugin.todoist
 import ru.ezhov.rocket.action.api.RocketAction
 import ru.ezhov.rocket.action.api.RocketActionConfiguration
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
-import ru.ezhov.rocket.action.api.RocketActionConfigurationPropertyKey
 import ru.ezhov.rocket.action.api.RocketActionFactoryUi
 import ru.ezhov.rocket.action.api.RocketActionPlugin
 import ru.ezhov.rocket.action.api.RocketActionSettings
@@ -54,17 +53,17 @@ class TodoistRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
 
     override fun properties(): List<RocketActionConfigurationProperty> {
         return listOf(
-            createRocketActionProperty(key = LABEL, name = LABEL.value, description = "Заголовок", required = true),
+            createRocketActionProperty(key = LABEL, name = LABEL, description = "Заголовок", required = true),
             createRocketActionProperty(
                 key = TOKEN,
-                name = TOKEN.value,
-                description = "Используйте это свойство или свойство Java из командной строки -D${TOKEN_PROPERTY.value}",
+                name = TOKEN,
+                description = "Используйте это свойство или свойство Java из командной строки -D${TOKEN_PROPERTY}",
                 required = true
             )
         )
     }
 
-    override fun asString(): List<RocketActionConfigurationPropertyKey> = listOf(LABEL)
+    override fun asString(): List<String> = listOf(LABEL)
 
     override fun name(): String = "Работа с Todois"
 
@@ -90,7 +89,7 @@ class TodoistRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
 
     private fun getToken(settings: RocketActionSettings) =
         settings.settings()[TOKEN]?.takeIf { it.isNotEmpty() }
-            ?: System.getProperty(TOKEN_PROPERTY.value, "").takeIf { it.isNotEmpty() }
+            ?: System.getProperty(TOKEN_PROPERTY, "").takeIf { it.isNotEmpty() }
 
     override fun type(): RocketActionType = RocketActionType { "TODOIST" }
 
@@ -195,8 +194,8 @@ class TodoistRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
     }
 
     companion object {
-        private val LABEL = RocketActionConfigurationPropertyKey("label")
-        private val TOKEN = RocketActionConfigurationPropertyKey("todoistToken")
-        private val TOKEN_PROPERTY = RocketActionConfigurationPropertyKey("rocket.action.toodoist.token")
+        private val LABEL = "label"
+        private val TOKEN = "todoistToken"
+        private val TOKEN_PROPERTY = "rocket.action.toodoist.token"
     }
 }

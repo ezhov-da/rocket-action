@@ -2,7 +2,6 @@ package ru.ezhov.rocket.action.application.infrastructure.yml
 
 import mu.KotlinLogging
 import org.yaml.snakeyaml.Yaml
-import ru.ezhov.rocket.action.api.RocketActionConfigurationPropertyKey
 import ru.ezhov.rocket.action.api.RocketActionSettings
 import ru.ezhov.rocket.action.application.domain.model.SettingsModel
 import ru.ezhov.rocket.action.application.infrastructure.MutableRocketActionSettings
@@ -66,8 +65,8 @@ class YmlRocketActionSettingsRepositoryOldFormat(private val uri: URI) {
             val objectYml: MutableMap<String?, Any?> = LinkedHashMap()
             objectYml[TYPE] = data.type().value()
             objectYml[ID] = data.id()
-            data.settings().forEach { (key: RocketActionConfigurationPropertyKey?, value: String?) ->
-                objectYml[key.value] = value
+            data.settings().forEach { (key: String?, value: String?) ->
+                objectYml[key] = value
             }
             val actionsOriginal = data.actions()
             if (actionsOriginal.isNotEmpty()) {

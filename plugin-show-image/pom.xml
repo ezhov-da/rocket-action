@@ -10,7 +10,7 @@
     </parent>
 
     <artifactId>rocket-action-plugin-show-image</artifactId>
-    <version>0.20.0</version>
+    <version>0.21.0</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

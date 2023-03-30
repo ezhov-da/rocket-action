@@ -14,7 +14,7 @@ data class TreeRocketActionSettings(
         configuration
             .asString()
             .firstNotNullOfOrNull { k ->
-                val v = settings.settings.firstOrNull { it.name == k.value }?.value
+                val v = settings.settings.firstOrNull { it.name == k }?.value
                 if (v != null && !v.isNullOrEmpty()) {
                     v
                 } else {

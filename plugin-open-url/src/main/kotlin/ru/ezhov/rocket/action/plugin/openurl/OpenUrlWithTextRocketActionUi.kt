@@ -3,7 +3,6 @@ package ru.ezhov.rocket.action.plugin.openurl
 import ru.ezhov.rocket.action.api.RocketAction
 import ru.ezhov.rocket.action.api.RocketActionConfiguration
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
-import ru.ezhov.rocket.action.api.RocketActionConfigurationPropertyKey
 import ru.ezhov.rocket.action.api.RocketActionFactoryUi
 import ru.ezhov.rocket.action.api.RocketActionPlugin
 import ru.ezhov.rocket.action.api.RocketActionPropertySpec
@@ -124,7 +123,7 @@ class OpenUrlWithTextRocketActionUi : AbstractRocketAction(), RocketActionPlugin
                         )
 
                     override fun handle(command: RocketActionHandlerCommand): RocketActionHandleStatus {
-                        command.arguments[RocketActionConfigurationPropertyKey("text")]?.let { text ->
+                        command.arguments["text"]?.let { text ->
                             action(text)
                         }
 
@@ -158,18 +157,18 @@ class OpenUrlWithTextRocketActionUi : AbstractRocketAction(), RocketActionPlugin
 
     override fun description(): String = "Открытие шаблонной ссылки с подставленным значением"
 
-    override fun asString(): List<RocketActionConfigurationPropertyKey> = listOf(LABEL, BASE_URL)
+    override fun asString(): List<String> = listOf(LABEL, BASE_URL)
 
     override fun properties(): List<RocketActionConfigurationProperty> {
         return listOf(
-            createRocketActionProperty(LABEL, LABEL.value, "Заголовок", false),
-            createRocketActionProperty(DESCRIPTION, DESCRIPTION.value, "Описание", false),
-            createRocketActionProperty(BASE_URL, BASE_URL.value, "Шаблон URL", true),
-            createRocketActionProperty(PLACEHOLDER, PLACEHOLDER.value, "Строка подстановки", true),
-            createRocketActionProperty(ICON_URL, ICON_URL.value, "URL иконки", false),
+            createRocketActionProperty(LABEL, LABEL, "Заголовок", false),
+            createRocketActionProperty(DESCRIPTION, DESCRIPTION, "Описание", false),
+            createRocketActionProperty(BASE_URL, BASE_URL, "Шаблон URL", true),
+            createRocketActionProperty(PLACEHOLDER, PLACEHOLDER, "Строка подстановки", true),
+            createRocketActionProperty(ICON_URL, ICON_URL, "URL иконки", false),
             createRocketActionProperty(
                 key = IS_ENCODE,
-                name = IS_ENCODE.value,
+                name = IS_ENCODE,
                 description = "Кодировать для URL",
                 required = false,
                 property = RocketActionPropertySpec.BooleanPropertySpec(defaultValue = false),
@@ -182,11 +181,11 @@ class OpenUrlWithTextRocketActionUi : AbstractRocketAction(), RocketActionPlugin
     override fun icon(): Icon? = actionContext!!.icon().by(AppIcon.LINK_INTACT)
 
     companion object {
-        private val ICON_URL = RocketActionConfigurationPropertyKey("iconUrl")
-        private val LABEL = RocketActionConfigurationPropertyKey("label")
-        private val IS_ENCODE = RocketActionConfigurationPropertyKey("isEncode")
-        private val DESCRIPTION = RocketActionConfigurationPropertyKey("description")
-        private val BASE_URL = RocketActionConfigurationPropertyKey("baseUrl")
-        private val PLACEHOLDER = RocketActionConfigurationPropertyKey("placeholder")
+        private val ICON_URL = "iconUrl"
+        private val LABEL = "label"
+        private val IS_ENCODE = "isEncode"
+        private val DESCRIPTION = "description"
+        private val BASE_URL = "baseUrl"
+        private val PLACEHOLDER = "placeholder"
     }
 }

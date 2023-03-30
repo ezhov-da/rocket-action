@@ -3,7 +3,6 @@ package ru.ezhov.rocket.action.plugin.text
 import ru.ezhov.rocket.action.api.RocketAction
 import ru.ezhov.rocket.action.api.RocketActionConfiguration
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
-import ru.ezhov.rocket.action.api.RocketActionConfigurationPropertyKey
 import ru.ezhov.rocket.action.api.RocketActionFactoryUi
 import ru.ezhov.rocket.action.api.RocketActionPlugin
 import ru.ezhov.rocket.action.api.RocketActionSettings
@@ -38,8 +37,8 @@ class TextRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
 
     override fun properties(): List<RocketActionConfigurationProperty> =
         listOf(
-            createRocketActionProperty(key = LABEL, name = LABEL.value, description = "Текст для отображения", required = true),
-            createRocketActionProperty(key = DESCRIPTION, name = DESCRIPTION.value, description = "Описание", required = false)
+            createRocketActionProperty(key = LABEL, name = LABEL, description = "Текст для отображения", required = true),
+            createRocketActionProperty(key = DESCRIPTION, name = DESCRIPTION, description = "Описание", required = false)
         )
 
     override fun create(settings: RocketActionSettings, context: RocketActionContext): RocketAction? =
@@ -78,15 +77,15 @@ class TextRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
 
     override fun type(): RocketActionType = RocketActionType { "SHOW_TEXT" }
 
-    override fun asString(): List<RocketActionConfigurationPropertyKey> = listOf(LABEL)
+    override fun asString(): List<String> = listOf(LABEL)
 
     override fun name(): String = "Отобразить текст"
 
     override fun icon(): Icon? = actionContext!!.icon().by(AppIcon.TEXT)
 
     companion object {
-        private val LABEL = RocketActionConfigurationPropertyKey("label")
-        private val DESCRIPTION = RocketActionConfigurationPropertyKey("description")
+        private val LABEL = "label"
+        private val DESCRIPTION = "description"
     }
 
 }

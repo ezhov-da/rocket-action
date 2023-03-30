@@ -14,7 +14,7 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
 
-        <plugin-api.version>0.20.1</plugin-api.version>
+        <plugin-api.version>0.21.0</plugin-api.version>
         <rocket-action-ui-utils.version>0.0.2</rocket-action-ui-utils.version>
         <rocket-action-utils.version>0.20.0</rocket-action-utils.version>
 
@@ -141,6 +141,12 @@
             <dependency>
                 <groupId>org.apache.groovy</groupId>
                 <artifactId>groovy-sql</artifactId>
+                <version>${groovy.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.groovy</groupId>
+                <artifactId>groovy-swing</artifactId>
                 <version>${groovy.version}</version>
             </dependency>
 

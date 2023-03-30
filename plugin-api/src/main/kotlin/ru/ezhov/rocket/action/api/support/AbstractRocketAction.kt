@@ -2,7 +2,6 @@ package ru.ezhov.rocket.action.api.support
 
 import ru.ezhov.rocket.action.api.RocketActionConfiguration
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
-import ru.ezhov.rocket.action.api.RocketActionConfigurationPropertyKey
 import ru.ezhov.rocket.action.api.RocketActionFactoryUi
 import ru.ezhov.rocket.action.api.RocketActionPropertySpec
 
@@ -11,14 +10,14 @@ import ru.ezhov.rocket.action.api.RocketActionPropertySpec
  */
 abstract class AbstractRocketAction : RocketActionFactoryUi, RocketActionConfiguration {
     protected fun createRocketActionProperty(
-        key: RocketActionConfigurationPropertyKey,
+        key: String,
         name: String,
         description: String,
         required: Boolean,
         property: RocketActionPropertySpec = RocketActionPropertySpec.StringPropertySpec(),
     ): RocketActionConfigurationProperty =
         object : RocketActionConfigurationProperty {
-            override fun key(): RocketActionConfigurationPropertyKey = key
+            override fun key(): String = key
             override fun name(): String = name
             override fun description(): String = description
             override fun isRequired(): Boolean = required
