@@ -8,6 +8,8 @@ interface RocketActionComponentCache {
 
     fun by(id: String): RocketAction?
 
+    fun byIds(ids: Set<String>): List<RocketAction>
+
     fun all(): List<RocketAction>
 
     fun handlers(): List<RocketActionHandler>

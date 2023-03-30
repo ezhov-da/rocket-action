@@ -44,6 +44,9 @@ class CopyToClipboardRocketActionUi : AbstractRocketAction(), RocketActionPlugin
                 context.notification().show(NotificationType.INFO, "Текст скопирован в буфер")
             }
 
+            context.search().register(settings.id(), text)
+            context.search().register(settings.id(), label)
+            context.search().register(settings.id(), description)
             object : RocketAction {
                 override fun contains(search: String): Boolean =
                     text.contains(search, ignoreCase = true)

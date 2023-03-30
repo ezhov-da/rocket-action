@@ -1,10 +1,13 @@
 package ru.ezhov.rocket.action.application.infrastructure
 
+import mu.KotlinLogging
 import ru.ezhov.rocket.action.api.RocketActionSettings
 import ru.ezhov.rocket.action.api.RocketActionType
 import ru.ezhov.rocket.action.application.domain.EngineService
 import ru.ezhov.rocket.action.application.domain.model.RocketActionSettingsModel
 import ru.ezhov.rocket.action.application.domain.model.SettingsModel
+
+private val logger = KotlinLogging.logger { }
 
 class MutableRocketActionSettings(
     val id: String,
@@ -19,10 +22,15 @@ class MutableRocketActionSettings(
         override fun type(): RocketActionType = RocketActionType { type }
 
         override fun settings(): Map<String, String> =
-            settings.associate { set ->
-                // TODO ezhov возможность для оптимизации
-                val resultVal = EngineService().processWithEngine(set).toString()
-                set.name to resultVal
+            try {
+                settings.associate { set ->
+                    // TODO ezhov возможность для оптимизации
+                    val resultVal = EngineService().processWithEngine(set).toString()
+                    set.name to resultVal
+                }
+            } catch (ex: Exception) {
+                logger.warn(ex) { "Error when get settings for action with id='$id'" }
+                emptyMap()
             }
 
         override fun actions(): List<RocketActionSettings> = actions.map { it.to() }

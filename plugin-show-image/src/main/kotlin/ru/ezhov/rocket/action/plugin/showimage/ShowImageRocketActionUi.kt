@@ -69,6 +69,9 @@ class ShowImageRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
             menu.icon = ImageIcon(this.javaClass.getResource("/icons/load_16x16.gif"))
             LoadImageWorker(imageUrl = imageUrl, menu = menu, settings = settings).execute()
 
+            context.search().register(settings.id(), label)
+            context.search().register(settings.id(), description)
+
             object : RocketAction {
                 override fun contains(search: String): Boolean =
                     label.contains(search, ignoreCase = true)

@@ -11,7 +11,7 @@
     </parent>
 
     <artifactId>rocket-action-application-ui-swing</artifactId>
-    <version>0.21.0-alfa</version>
+    <version>0.21.1-alfa</version>
 
     <name>rocket-action</name>
 
@@ -36,6 +36,8 @@
 
         <java-image-scaling.version>0.8.6</java-image-scaling.version>
         <webp-imageio.version>0.1.6</webp-imageio.version>
+
+        <lucene.version>8.11.2</lucene.version>
     </properties>
 
     <dependencies>
@@ -155,6 +157,28 @@
         </dependency>
 
         <!-- ENGINES END -->
+
+        <!--SEARCH-->
+
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-core</artifactId>
+            <version>${lucene.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-queryparser</artifactId>
+            <version>${lucene.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.lucene</groupId>
+            <artifactId>lucene-analyzers-common</artifactId>
+            <version>${lucene.version}</version>
+        </dependency>
+
+        <!--END SEARCH-->
 
         <dependency>
             <groupId>ch.qos.logback</groupId>

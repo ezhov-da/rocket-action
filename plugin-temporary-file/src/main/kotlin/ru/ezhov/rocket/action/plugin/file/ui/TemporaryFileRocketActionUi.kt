@@ -42,10 +42,12 @@ class TemporaryFileRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
                 menu.toolTipText = description
                 menu.add(TemporaryFileUi(temporaryFileService = TemporaryFileService(), context = context))
 
+                context.search().register(settings.id(), label)
+                context.search().register(settings.id(), description)
+
                 object : RocketAction {
                     override fun contains(search: String): Boolean =
                         label.contains(search, ignoreCase = true)
-                            .or(label.contains(search, ignoreCase = true))
                             .or(description.contains(search, ignoreCase = true))
 
                     override fun isChanged(actionSettings: RocketActionSettings): Boolean =

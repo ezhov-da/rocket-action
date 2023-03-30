@@ -124,6 +124,11 @@ class TextAsMenuRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
 
                     this.add(panel)
                 }
+
+                context.search().register(settings.id(), label)
+                context.search().register(settings.id(), text)
+                description?.let { context.search().register(settings.id(), it) }
+
                 object : RocketAction {
                     override fun contains(search: String): Boolean =
                         label.contains(search, ignoreCase = true)

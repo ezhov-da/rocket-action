@@ -52,6 +52,9 @@ class GroovyScriptRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
                             scriptEngine = GroovyScriptEngine(),
                         )
 
+                        context.search().register(settings.id(), label)
+                        context.search().register(settings.id(), description)
+
                         object : RocketAction, RocketActionHandlerFactory {
                             override fun contains(search: String): Boolean =
                                 label.contains(search, ignoreCase = true)

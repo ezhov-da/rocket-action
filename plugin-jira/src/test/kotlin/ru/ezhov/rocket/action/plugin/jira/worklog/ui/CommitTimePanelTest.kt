@@ -6,6 +6,7 @@ import ru.ezhov.rocket.action.api.context.RocketActionContext
 import ru.ezhov.rocket.action.api.context.cache.CacheService
 import ru.ezhov.rocket.action.api.context.icon.IconService
 import ru.ezhov.rocket.action.api.context.notification.NotificationService
+import ru.ezhov.rocket.action.api.context.search.Search
 import ru.ezhov.rocket.action.plugin.jira.worklog.domain.CommitTimeService
 import ru.ezhov.rocket.action.plugin.jira.worklog.domain.CommitTimeServiceException
 import ru.ezhov.rocket.action.plugin.jira.worklog.domain.CommitTimeTaskInfoException
@@ -78,6 +79,9 @@ fun main() {
                         TODO("Not yet implemented")
                     }
 
+                    override fun search(): Search {
+                        TODO("Not yet implemented")
+                    }
                 },
                 validator = object : Validator {
                     override fun validate(source: String): List<String> = emptyList()

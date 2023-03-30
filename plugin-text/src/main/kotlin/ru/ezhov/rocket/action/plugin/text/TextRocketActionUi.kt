@@ -37,8 +37,18 @@ class TextRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
 
     override fun properties(): List<RocketActionConfigurationProperty> =
         listOf(
-            createRocketActionProperty(key = LABEL, name = LABEL, description = "Текст для отображения", required = true),
-            createRocketActionProperty(key = DESCRIPTION, name = DESCRIPTION, description = "Описание", required = false)
+            createRocketActionProperty(
+                key = LABEL,
+                name = LABEL,
+                description = "Текст для отображения",
+                required = true
+            ),
+            createRocketActionProperty(
+                key = DESCRIPTION,
+                name = DESCRIPTION,
+                description = "Описание",
+                required = false
+            )
         )
 
     override fun create(settings: RocketActionSettings, context: RocketActionContext): RocketAction? =
@@ -62,6 +72,10 @@ class TextRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
                     }
                 })
             }
+
+            context.search().register(settings.id(), label)
+            description?.let { context.search().register(settings.id(), it) }
+
             object : RocketAction {
                 override fun contains(search: String): Boolean =
                     label.contains(search, ignoreCase = true)
