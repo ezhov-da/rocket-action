@@ -6,9 +6,11 @@ import mu.KotlinLogging
 import ru.ezhov.rocket.action.application.properties.GeneralPropertiesRepositoryFactory
 import ru.ezhov.rocket.action.application.properties.UsedPropertiesName
 import ru.ezhov.rocket.action.application.variables.domain.VariableRepository
+import ru.ezhov.rocket.action.application.variables.domain.model.Encryption
 import ru.ezhov.rocket.action.application.variables.domain.model.Variable
 import ru.ezhov.rocket.action.application.variables.domain.model.VariableType
 import ru.ezhov.rocket.action.application.variables.domain.model.Variables
+import ru.ezhov.rocket.action.application.variables.infrastructure.model.JsonEncryptionDto
 import ru.ezhov.rocket.action.application.variables.infrastructure.model.JsonVariablesDto
 import java.io.File
 
@@ -24,36 +26,36 @@ class JsonFileVariableRepository : VariableRepository {
 
     override fun all(): Variables {
         val file = file()
-        return Variables(
-            (
-                System.getenv().map {
-                    Variable(
-                        name = it.key.toString(),
-                        value = it.value.toString(),
-                        type = VariableType.ENVIRONMENT,
-                    )
-                }.toMutableList() +
-                    System.getProperties().entries.map {
-                        Variable(
-                            name = it.key.toString(),
-                            value = it.value.toString(),
-                            type = VariableType.PROPERTIES,
-                        )
-                    }.toMutableList() +
-                    try {
-                        if (file.exists()) {
-                            mapper.readValue(file, JsonVariablesDto::class.java)
-                                .toVariables().variables.toMutableList()
-                        } else {
-                            Variables.EMPTY.variables.toMutableList()
-                        }
-                    } catch (ex: Exception) {
-                        logger.error(ex) { "Error when read variables from file '$filePath'" }
-                        Variables.EMPTY.variables.toMutableList()
-                    }
-                )
-        )
 
+        val systemEnv = System.getenv().map {
+            Variable(
+                name = it.key.toString(),
+                value = it.value.toString(),
+                type = VariableType.ENVIRONMENT,
+            )
+        }
+
+        val systemProp = System.getProperties().entries.map {
+            Variable(
+                name = it.key.toString(),
+                value = it.value.toString(),
+                type = VariableType.PROPERTIES,
+            )
+        }
+
+        val userVar = try {
+            if (file.exists()) {
+                mapper.readValue(file, JsonVariablesDto::class.java).toVariables()
+            } else {
+                Variables.EMPTY
+            }
+        } catch (ex: Exception) {
+            logger.error(ex) { "Error when read variables from file '$filePath'. Empty list returned" }
+            Variables.EMPTY
+        }
+
+        val variables = systemEnv.toMutableList() + systemProp.toMutableList() + userVar.variables.toMutableList()
+        return Variables(encryption = userVar.encryption, variables = variables)
     }
 
     private fun file(): File {
@@ -68,12 +70,13 @@ class JsonFileVariableRepository : VariableRepository {
 
     override fun save(variables: Variables) {
         val file = file()
-        mapper.writeValue(file, variables)
+        mapper.writerWithDefaultPrettyPrinter().writeValue(file, variables)
     }
 }
 
 private fun JsonVariablesDto.toVariables() =
     Variables(
+        encryption = this.encryption?.toEncryption(),
         variables = this.variables.map {
             Variable(
                 name = it.name,
@@ -83,3 +86,6 @@ private fun JsonVariablesDto.toVariables() =
             )
         }
     )
+
+private fun JsonEncryptionDto.toEncryption() =
+    Encryption(algorithm = this.algorithm)

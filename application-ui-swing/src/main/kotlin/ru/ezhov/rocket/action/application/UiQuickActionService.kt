@@ -266,9 +266,14 @@ class UiQuickActionService(
 
     private fun createPropertyMenu(): JMenu =
         JMenu("Доступные свойства из командной строки").apply {
-            UsedPropertiesName.values().forEach { pn ->
-                this.add(JTextArea("${pn.propertyName}\n${pn.description}").apply { isEditable = false })
-            }
+            UsedPropertiesName.values()
+                .forEach { pn ->
+                    this.add(
+                        JTextArea(
+                            "${pn.propertyName}\n${pn.description}"
+                        ).apply { isEditable = false }
+                    )
+                }
         }
 
     private inner class CreateMenuWorker(private val menu: JMenu) : SwingWorker<List<Component>, String?>() {
