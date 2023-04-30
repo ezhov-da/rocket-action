@@ -4,5 +4,6 @@ data class RocketActionSettingsDto(
     val id: String,
     val type: String,
     val settings: List<SettingsDto>,
-    val actions: List<RocketActionSettingsDto>
+    val actions: List<RocketActionSettingsDto>,
+    val tags: List<String> = emptyList(),
 )

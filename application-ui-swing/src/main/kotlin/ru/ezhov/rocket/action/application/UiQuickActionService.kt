@@ -1,6 +1,7 @@
 package ru.ezhov.rocket.action.application
 
 import mu.KotlinLogging
+import ru.ezhov.rocket.action.api.RocketAction
 import ru.ezhov.rocket.action.api.context.icon.AppIcon
 import ru.ezhov.rocket.action.api.context.notification.NotificationType
 import ru.ezhov.rocket.action.application.configuration.ui.ConfigurationFrame
@@ -15,6 +16,8 @@ import ru.ezhov.rocket.action.application.plugin.manager.domain.RocketActionPlug
 import ru.ezhov.rocket.action.application.properties.GeneralPropertiesRepository
 import ru.ezhov.rocket.action.application.properties.UsedPropertiesName
 import ru.ezhov.rocket.action.application.search.application.SearchInstance
+import ru.ezhov.rocket.action.application.tags.application.TagsService
+import ru.ezhov.rocket.action.application.tags.domain.TagNode
 import ru.ezhov.rocket.action.ui.utils.swing.common.MoveUtil
 import ru.ezhov.rocket.action.ui.utils.swing.common.TextFieldWithText
 import java.awt.Color
@@ -28,6 +31,7 @@ import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import java.net.URI
 import javax.swing.BorderFactory
+import javax.swing.ImageIcon
 import javax.swing.JDialog
 import javax.swing.JLabel
 import javax.swing.JMenu
@@ -47,11 +51,11 @@ class UiQuickActionService(
     private val rocketActionSettingsRepository: RocketActionSettingsRepository,
     private val rocketActionPluginRepository: RocketActionPluginRepository,
     private val generalPropertiesRepository: GeneralPropertiesRepository,
+    private val tagsService: TagsService,
 ) {
     private var configurationFrame: ConfigurationFrame? = null
     private var baseDialog: JDialog? = null
 
-    @Throws(UiQuickActionServiceException::class)
     fun createMenu(baseDialog: JDialog): JMenuBar {
         this.baseDialog = baseDialog
         return try {
@@ -61,8 +65,9 @@ class UiQuickActionService(
             //TODO: избранное
             //menuBar.add(createFavoriteComponent());
 
+            menuBar.add(createTagsMenu(menu));
 
-            menuBar.add(createSearchField(baseDialog, menu))
+            menuBar.add(createSearchField(menu))
             val moveLabel = JLabel(RocketActionContextFactory.context.icon().by(AppIcon.MOVE))
             MoveUtil.addMoveAction(movableComponent = baseDialog, grabbedComponent = moveLabel)
 
@@ -85,7 +90,7 @@ class UiQuickActionService(
 
     private fun rocketActionSettings(): ActionsModel = rocketActionSettingsRepository.actions()
 
-    private fun createSearchField(baseDialog: JDialog, menu: JMenu): Component =
+    private fun createSearchField(menu: JMenu): Component =
         JPanel(FlowLayout(FlowLayout.LEFT, 0, 0)).apply {
             border = BorderFactory.createEmptyBorder()
             val textField =
@@ -108,16 +113,10 @@ class UiQuickActionService(
                                         (raByFullText + raByContains)
                                             .toSet()
                                             .takeIf { it.isNotEmpty() }
-                                            ?.let { ccl ->
-                                                logger.info { "Found by search '$text': ${ccl.size}" }
-
-                                                SwingUtilities.invokeLater {
-                                                    tf.background = Color.GREEN
-                                                    menu.removeAll()
-                                                    ccl.forEach { menu.add(it.component()) }
-                                                    menu.add(createTools(baseDialog))
-                                                    menu.doClick()
-                                                }
+                                            ?.let { ra ->
+                                                logger.info { "Found by search '$text': ${ra.size}" }
+                                                tf.background = Color.GREEN
+                                                fillMenuByRocketAction(ra, menu)
                                             }
                                     } else {
                                         SwingUtilities.invokeLater { tf.background = Color.WHITE }
@@ -141,6 +140,84 @@ class UiQuickActionService(
                     }
             )
         }
+
+    private fun fillMenuByRocketAction(rocketActions: Set<RocketAction>, menu: JMenu) {
+        rocketActions.takeIf { it.isNotEmpty() }
+            ?.let { ccl ->
+                SwingUtilities.invokeLater {
+                    menu.removeAll()
+                    ccl.forEach { menu.add(it.component()) }
+                    menu.add(createTools(baseDialog!!))
+                    menu.doClick()
+                }
+            }
+    }
+
+    private fun createTagsMenu(baseMenu: JMenu): JMenu {
+        // TODO ezhov перенести в хранилище
+        val iconTree = ImageIcon(this::class.java.getResource("/icons/tree_16x16.png"))
+        val iconTag = ImageIcon(this::class.java.getResource("/icons/tag_16x16.png"))
+
+        val menu = JMenu().apply { icon = iconTag }
+        val menuTree = JMenu("Tags tree").apply { icon = iconTree }
+
+        val invokeSearch: (keys: Set<String>) -> Unit = { keys ->
+            val cache = RocketActionComponentCacheFactory.cache
+            val actions = cache.byIds(keys).toSet()
+
+            fillMenuByRocketAction(rocketActions = actions, menu = baseMenu)
+        }
+
+        fun recursive(parent: JMenu, child: TagNode) {
+            if (child.children.isEmpty()) {
+                parent.add(JMenuItem("${child.name} (${child.keys.size})")
+                    .apply {
+                        icon = iconTag
+                        addActionListener {
+                            invokeSearch(child.keys.toSet())
+                        }
+                    }
+                )
+            } else {
+                parent.add(
+                    JMenuItem("${child.name} (${child.keys.size})")
+                        .apply {
+                            icon = iconTag
+                            addActionListener {
+                                invokeSearch(child.keys.toSet())
+                            }
+                        })
+                val parentInner = JMenu(child.name).apply {
+                    icon = iconTree
+                }
+                parent.add(parentInner)
+                child.children.forEach { ch ->
+                    recursive(parentInner, ch)
+                }
+            }
+        }
+
+        tagsService.tagsTree().forEach { node ->
+            recursive(menuTree, node)
+
+        }
+
+        menu.add(menuTree)
+
+        tagsService.tagAndKeys().forEach { t ->
+            menu.add(
+                JMenuItem("${t.name} (${t.keys.size})")
+                    .apply {
+                        icon = iconTag
+                        addActionListener {
+                            invokeSearch(t.keys)
+                        }
+                    }
+            )
+        }
+
+        return menu
+    }
 
     private fun resetSearch(textField: JTextField, menu: JMenu) {
         textField.text = ""

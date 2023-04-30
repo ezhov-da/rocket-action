@@ -39,6 +39,7 @@ class YmlRocketActionSettingsRepositoryTest {
                             )
                         ),
                         actions = emptyList(),
+                        tags = emptyList(),
                     ),
                     RocketActionSettingsModel(
                         id = "id2",
@@ -49,6 +50,7 @@ class YmlRocketActionSettingsRepositoryTest {
                                 value = "2"
                             )
                         ),
+                        tags = emptyList(),
                         actions = listOf(
                             RocketActionSettingsModel(
                                 id = "id4",
@@ -60,6 +62,7 @@ class YmlRocketActionSettingsRepositoryTest {
                                     )
                                 ),
                                 actions = emptyList(),
+                                tags = emptyList(),
                             ),
                             RocketActionSettingsModel(
                                 id = "id5",
@@ -71,6 +74,7 @@ class YmlRocketActionSettingsRepositoryTest {
                                     )
                                 ),
                                 actions = emptyList(),
+                                tags = emptyList(),
                             ),
                         ),
                     ),

@@ -18,8 +18,8 @@ import ru.ezhov.rocket.action.application.domain.model.SettingsValueType
 import ru.ezhov.rocket.action.application.infrastructure.MutableRocketActionSettings
 import ru.ezhov.rocket.action.application.plugin.context.RocketActionContextFactory
 import ru.ezhov.rocket.action.application.plugin.manager.domain.RocketActionPluginRepository
+import ru.ezhov.rocket.action.application.tags.ui.TagsPanelFactory
 import java.awt.BorderLayout
-import java.awt.Color
 import javax.swing.BorderFactory
 import javax.swing.Box
 import javax.swing.BoxLayout
@@ -124,11 +124,12 @@ class EditorRocketActionSettingsPanel(
 
         rocketActionSettingsPanel
             .setRocketActionConfiguration(
-                values
+                list = values
                     .sortedWith(
                         compareByDescending<Value> { it.property?.isRequired() }
                             .thenBy { it.property?.name() }
-                    )
+                    ),
+                tags = settings.settings.tags,
             )
     }
 
@@ -176,12 +177,13 @@ class EditorRocketActionSettingsPanel(
     private inner class RocketActionSettingsPanel : JPanel() {
         private val settingPanels = mutableListOf<SettingPanel>()
         private var values: List<Value>? = null
+        private val tagsPanel = TagsPanelFactory.panel()
 
         init {
             this.layout = BoxLayout(this, BoxLayout.Y_AXIS)
         }
 
-        fun setRocketActionConfiguration(list: List<Value>) {
+        fun setRocketActionConfiguration(list: List<Value>, tags: List<String>) {
             removeAll()
             settingPanels.clear()
             this.values = list
@@ -191,6 +193,12 @@ class EditorRocketActionSettingsPanel(
                     this.add(panel)
                     settingPanels.add(panel)
                 }
+            tagsPanel.setTags(tags)
+            tagsPanel.border = BorderFactory.createCompoundBorder(
+                BorderFactory.createEmptyBorder(5, 5, 5, 5),
+                BorderFactory.createTitledBorder("Tags")
+            )
+            this.add(tagsPanel)
             this.add(Box.createVerticalBox())
             repaint()
             revalidate()
@@ -203,31 +211,39 @@ class EditorRocketActionSettingsPanel(
                     id = rs.settings.id,
                     type = rs.settings.type,
                     settings = settingPanels.map { panel -> panel.value() }.toMutableList(),
-                    actions = rs.settings.actions.toMutableList()
+                    actions = rs.settings.actions.toMutableList(),
+                    tags = tagsPanel.tags(),
                 )
             )
         }
     }
 
+    /**
+     * Панель с одной настройкой
+     */
     private class SettingPanel(private val value: Value) : JPanel() {
         private var valueCallback: () -> Pair<String, SettingsValueType?> = { Pair("", null) }
 
         init {
             this.layout = BorderLayout()
-            this.border = BorderFactory.createEmptyBorder(2, 2, 2, 2)
             value.property
                 ?.let { property ->
-                    val labelName = JLabel(property.name())
+                    val text = if (property.isRequired()) {
+                        """<html><p>${property.name()} <font color="red">*</font></p>"""
+                    } else {
+                        """<html><p>${property.name()}</p>"""
+                    }
+                    border = BorderFactory.createCompoundBorder(
+                        BorderFactory.createEmptyBorder(5, 5, 5, 5),
+                        BorderFactory.createTitledBorder(text)
+                    )
+
                     val labelDescription = JLabel(RocketActionContextFactory.context.icon().by(AppIcon.INFO))
                     labelDescription.toolTipText = property.description()
 
                     val topPanel = JPanel()
                     topPanel.layout = BoxLayout(topPanel, BoxLayout.X_AXIS)
                     topPanel.border = BorderFactory.createEmptyBorder(0, 0, 1, 0)
-                    topPanel.add(labelName)
-                    if (property.isRequired()) {
-                        topPanel.add(JLabel("*").apply { foreground = Color.RED })
-                    }
                     topPanel.add(labelDescription)
 
                     val centerPanel = JPanel(BorderLayout())

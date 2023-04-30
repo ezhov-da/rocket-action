@@ -112,7 +112,13 @@ class YmlRocketActionSettingsRepositoryOldFormat(private val uri: URI) {
                             )
                     )
                 }
-                MutableRocketActionSettings(id = id, type = actionType, settings = list, actions = mutableListOf())
+                MutableRocketActionSettings(
+                    id = id,
+                    type = actionType,
+                    settings = list,
+                    actions = mutableListOf(),
+                    tags = emptyList()
+                )
             } else {
                 val settings: MutableList<MutableRocketActionSettings> = ArrayList()
                 for (a in actions) {
@@ -128,7 +134,13 @@ class YmlRocketActionSettingsRepositoryOldFormat(private val uri: URI) {
                         )
                     )
                 }
-                MutableRocketActionSettings(id = id, type = actionType, settings = list, actions = settings)
+                MutableRocketActionSettings(
+                    id = id,
+                    type = actionType,
+                    settings = list,
+                    actions = settings,
+                    tags = emptyList()
+                )
             }
         }
     }

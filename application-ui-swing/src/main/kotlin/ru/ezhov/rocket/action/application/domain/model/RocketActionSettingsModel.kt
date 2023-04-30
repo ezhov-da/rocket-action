@@ -12,7 +12,8 @@ data class RocketActionSettingsModel(
     val id: String,
     val type: String,
     val settings: List<SettingsModel>,
-    val actions: List<RocketActionSettingsModel>
+    val actions: List<RocketActionSettingsModel>,
+    val tags: List<String>,
 ) {
     fun to(): RocketActionSettings = object : RocketActionSettings {
         override fun id(): String = id

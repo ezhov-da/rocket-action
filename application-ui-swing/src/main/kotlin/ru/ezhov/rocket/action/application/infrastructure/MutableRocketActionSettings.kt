@@ -13,7 +13,8 @@ class MutableRocketActionSettings(
     val id: String,
     val type: String,
     val settings: MutableList<SettingsModel>,
-    val actions: MutableList<MutableRocketActionSettings> = mutableListOf()
+    val actions: MutableList<MutableRocketActionSettings> = mutableListOf(),
+    val tags: List<String>,
 ) {
 
     fun to(): RocketActionSettings = object : RocketActionSettings {
@@ -42,6 +43,7 @@ class MutableRocketActionSettings(
             type = source.type,
             settings = settings.map { it.copy() }.toMutableList(),
             actions = mutableListOf(),
+            tags = source.tags
         )
 
     fun toModel(): RocketActionSettingsModel = RocketActionSettingsModel(
@@ -49,6 +51,7 @@ class MutableRocketActionSettings(
         type = this.type,
         settings = this.settings.toList(),
         actions = this.actions.map { it.toModel() },
+        tags = this.tags,
     )
 
     companion object {
@@ -58,6 +61,7 @@ class MutableRocketActionSettings(
                 type = model.type,
                 settings = model.settings.toMutableList(),
                 actions = model.actions.map { from(it) }.toMutableList(),
+                tags = model.tags,
             )
     }
 }

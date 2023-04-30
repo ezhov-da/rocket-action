@@ -331,7 +331,8 @@ class ConfigurationFrame(
         val finalActionSettings = MutableRocketActionSettings(
             id = originalActionSettings.settings.id,
             type = originalActionSettings.settings.type,
-            settings = originalActionSettings.settings.settings
+            settings = originalActionSettings.settings.settings,
+            tags = originalActionSettings.settings.tags,
         )
         parent?.actions?.add(finalActionSettings) ?: settings.add(finalActionSettings)
         val childCount = node.childCount

@@ -9,6 +9,7 @@ import ru.ezhov.rocket.action.application.infrastructure.yml.YmlRocketActionSett
 import ru.ezhov.rocket.action.application.plugin.manager.infrastructure.RocketActionPluginRepositoryFactory
 import ru.ezhov.rocket.action.application.properties.GeneralPropertiesRepositoryFactory
 import ru.ezhov.rocket.action.application.properties.UsedPropertiesName
+import ru.ezhov.rocket.action.application.tags.application.TagServiceFactory
 import java.io.File
 import java.util.*
 import javax.swing.LookAndFeel
@@ -27,7 +28,8 @@ fun main(args: Array<String>) {
             val actionService = UiQuickActionService(
                 rocketActionSettingsRepository = rockerActionRepository(args),
                 rocketActionPluginRepository = RocketActionPluginRepositoryFactory.repository,
-                generalPropertiesRepository = GeneralPropertiesRepositoryFactory.repository
+                generalPropertiesRepository = GeneralPropertiesRepositoryFactory.repository,
+                tagsService = TagServiceFactory.tagsService,
             )
 
             runServer() // TODO оформить красиво
@@ -74,6 +76,7 @@ private fun rockerActionRepository(args: Array<String>): RocketActionSettingsRep
         }
         repository
     }
+        .apply { load() }
 
 private fun lookAndFeel(): LookAndFeel {
     val className = GeneralPropertiesRepositoryFactory.repository
