@@ -85,7 +85,8 @@ fun main() {
                 },
                 validator = object : Validator {
                     override fun validate(source: String): List<String> = emptyList()
-                }
+                },
+                maxTimeInMinutes = 480,
             )
         )
 

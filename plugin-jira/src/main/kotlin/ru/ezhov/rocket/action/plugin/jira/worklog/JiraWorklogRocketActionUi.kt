@@ -119,7 +119,8 @@ class JiraWorklogRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
                         context = context,
                         validator = RawTextValidator(
                             settings.settings()[TEXT_VALIDATIONS] ?: RawTextValidator.EMPTY_RULES
-                        )
+                        ),
+                        maxTimeInMinutes = settings.settings()[MAX_TIME_IN_MINUTES]?.toIntOrNull()
                     )
                 menu.add(jiraWorkLogUI)
 
@@ -278,6 +279,13 @@ class JiraWorklogRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
                 required = false,
                 property = RocketActionPropertySpec.StringPropertySpec()
             ),
+            createRocketActionProperty(
+                key = MAX_TIME_IN_MINUTES,
+                name = "Максимальное время в минутах",
+                description = "Используется для вычисления оставшегося времени для внесения",
+                required = false,
+                property = RocketActionPropertySpec.IntPropertySpec()
+            ),
         )
     }
 
@@ -288,21 +296,22 @@ class JiraWorklogRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
     override fun icon(): Icon? = actionContext!!.icon().by(AppIcon.CLOCK)
 
     companion object {
-        private val LABEL = "label"
-        private val DESCRIPTION = "description"
-        private val USERNAME = "username"
-        private val PASSWORD = "password"
-        private val URL = "url"
+        private const val LABEL = "label"
+        private const val DESCRIPTION = "description"
+        private const val USERNAME = "username"
+        private const val PASSWORD = "password"
+        private const val URL = "url"
 
-        private val PREDEFINED_TASKS = "predefinedTasks"
-        private val DELIMITER_TASK_INFO = "delimiterTaskInfo"
+        private const val PREDEFINED_TASKS = "predefinedTasks"
+        private const val DELIMITER_TASK_INFO = "delimiterTaskInfo"
         private const val DEFAULT_DELIMITER_TASK_INFO = "_"
-        private val CONSTANTS_NOW_DATE = "constantsNowDate"
+        private const val CONSTANTS_NOW_DATE = "constantsNowDate"
         private const val DEFAULT_CONSTANTS_NOW_DATE = "now"
 
-        private val ALIAS_FOR_TASK_IDS = "aliasForTaskIds"
-        private val LINK_TO_WORK_LOG = "linkToWorkLog"
-        private val FILE_PATH_WORK_LOG = "filePathWorkLog"
-        private val TEXT_VALIDATIONS = "textValidations"
+        private const val ALIAS_FOR_TASK_IDS = "aliasForTaskIds"
+        private const val LINK_TO_WORK_LOG = "linkToWorkLog"
+        private const val FILE_PATH_WORK_LOG = "filePathWorkLog"
+        private const val TEXT_VALIDATIONS = "textValidations"
+        private const val MAX_TIME_IN_MINUTES = "maxTimeInMinutes"
     }
 }

@@ -31,6 +31,7 @@ class JiraWorkLogUI(
     aliasForTaskIds: AliasForTaskIds,
     linkToWorkLog: URI? = null,
     fileForSave: File,
+    maxTimeInMinutes: Int?,
 ) : JPanel() {
     private val commitTimePanel = CommitTimePanel(
         tasks = tasks,
@@ -44,6 +45,7 @@ class JiraWorkLogUI(
         commitTimeTaskInfoRepository = commitTimeTaskInfoRepository,
         context = context,
         validator = validator,
+        maxTimeInMinutes = maxTimeInMinutes,
     )
     private val dimension = calculateSize()
 
@@ -70,6 +72,7 @@ class JiraWorkLogUI(
                                     fileForSave = fileForSave,
                                     context = context,
                                     validator = validator,
+                                    maxTimeInMinutes = maxTimeInMinutes,
                                 ),
                                 BorderLayout.CENTER
                             )

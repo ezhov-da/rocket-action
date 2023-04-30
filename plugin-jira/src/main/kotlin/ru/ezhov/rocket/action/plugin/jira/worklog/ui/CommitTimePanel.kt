@@ -66,6 +66,7 @@ class CommitTimePanel(
     commitTimeService: CommitTimeService,
     commitTimeTaskInfoRepository: CommitTimeTaskInfoRepository,
     linkToWorkLog: URI? = null,
+    maxTimeInMinutes: Int?,
 ) : JPanel() {
     private val textPane: JTextPane = JTextPane()
     private var currentCommitTimeTasks: CommitTimeTasks? = null
@@ -74,6 +75,7 @@ class CommitTimePanel(
         commitTimeService = commitTimeService,
         commitTimeTaskInfoRepository = commitTimeTaskInfoRepository,
         context = context,
+        maxTimeInMinutes = maxTimeInMinutes,
     )
 
     init {
@@ -392,6 +394,7 @@ class CommitTimePanel(
         private val commitTimeService: CommitTimeService,
         private val context: RocketActionContext,
         commitTimeTaskInfoRepository: CommitTimeTaskInfoRepository,
+        private val maxTimeInMinutes: Int?,
     ) : JPanel() {
         private val labelInfo: JLabel = JLabel()
         private val errorsInfo: JTextPane = JTextPane()
@@ -531,9 +534,16 @@ class CommitTimePanel(
         }
 
         fun setCurrentCommitTimeTasks(tasks: CommitTimeTasks) {
-            labelInfo.text = "<html>Число задач: <b>${tasks.countOfTask()}</b> " +
-                "Суммарное время: в минутах <b>${tasks.sumOfTimeTasksAsMinute()}</b> " +
-                "в часах <b>${tasks.sumOfTimeTasksAsHours()}</b>"
+            val textDiff = if (maxTimeInMinutes != null) {
+                " Осталось указать <b>'${maxTimeInMinutes - tasks.sumOfTimeTasksAsMinute()}'</b> " +
+                    "минут из <b>'$maxTimeInMinutes'</b>."
+            } else {
+                ""
+            }
+
+            labelInfo.text = "<html>Число задач: <b>${tasks.countOfTask()}</b>. " +
+                "Суммарное время: в минутах <b>${tasks.sumOfTimeTasksAsMinute()}</b>, " +
+                "в часах <b>${tasks.sumOfTimeTasksAsHours()}</b>. $textDiff"
 
             while (tableModel.rowCount != 0) {
                 tableModel.removeRow(tableModel.rowCount - 1)
