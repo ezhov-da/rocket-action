@@ -7,14 +7,15 @@ import ru.ezhov.rocket.action.application.configuration.ui.event.ConfigurationUi
 import ru.ezhov.rocket.action.application.configuration.ui.event.ConfigurationUiObserverFactory
 import ru.ezhov.rocket.action.application.configuration.ui.event.model.ConfigurationUiEvent
 import ru.ezhov.rocket.action.application.configuration.ui.event.model.RemoveSettingUiEvent
-import ru.ezhov.rocket.action.application.domain.RocketActionSettingsRepository
-import ru.ezhov.rocket.action.application.domain.RocketActionSettingsRepositoryException
-import ru.ezhov.rocket.action.application.domain.model.ActionsModel
-import ru.ezhov.rocket.action.application.domain.model.RocketActionSettingsModel
-import ru.ezhov.rocket.action.application.infrastructure.MutableRocketActionSettings
+import ru.ezhov.rocket.action.application.core.domain.RocketActionSettingsRepository
+import ru.ezhov.rocket.action.application.core.domain.RocketActionSettingsRepositoryException
+import ru.ezhov.rocket.action.application.core.domain.model.ActionsModel
+import ru.ezhov.rocket.action.application.core.domain.model.RocketActionSettingsModel
+import ru.ezhov.rocket.action.application.core.infrastructure.MutableRocketActionSettings
 import ru.ezhov.rocket.action.application.plugin.context.RocketActionContextFactory
 import ru.ezhov.rocket.action.application.plugin.group.GroupRocketActionUi
-import ru.ezhov.rocket.action.application.plugin.manager.domain.RocketActionPluginRepository
+import ru.ezhov.rocket.action.application.plugin.manager.application.RocketActionPluginApplicationService
+import ru.ezhov.rocket.action.application.plugin.manager.ui.PluginManagerFrame
 import ru.ezhov.rocket.action.application.properties.GeneralPropertiesRepositoryFactory
 import ru.ezhov.rocket.action.application.properties.UsedPropertiesName
 import ru.ezhov.rocket.action.application.variables.interfaces.ui.VariablesFrame
@@ -54,12 +55,12 @@ import javax.swing.tree.TreeSelectionModel
 private val logger = KotlinLogging.logger { }
 
 class ConfigurationFrame(
-    rocketActionPluginRepository: RocketActionPluginRepository,
+    rocketActionPluginApplicationService: RocketActionPluginApplicationService,
     private val rocketActionSettingsRepository: RocketActionSettingsRepository,
     updateActionListener: ActionListener
 ) {
     private val frame: JFrame = JFrame()
-    private val rocketActionPluginRepository: RocketActionPluginRepository
+    private val rocketActionPluginApplicationService: RocketActionPluginApplicationService
     private val createRocketActionSettingsDialog: CreateRocketActionSettingsDialog
     private val updateActionListener: ActionListener
     private var finalTree: JTree? = null
@@ -80,7 +81,7 @@ class ConfigurationFrame(
         setTitle(actions.lastChangedDate)
         val defaultTreeModel = DefaultTreeModel(root)
         val rocketActionSettingsPanel = EditorRocketActionSettingsPanel(
-            rocketActionPluginRepository = rocketActionPluginRepository,
+            rocketActionPluginApplicationService = rocketActionPluginApplicationService,
         )
         val panel = JPanel(BorderLayout())
         val tree = JTree(defaultTreeModel)
@@ -280,7 +281,7 @@ class ConfigurationFrame(
 
     private fun fillTreeNodes(actions: List<RocketActionSettingsModel>?, parent: DefaultMutableTreeNode) {
         for (rocketActionSettings in actions!!) {
-            rocketActionPluginRepository.by(type = rocketActionSettings.type)
+            rocketActionPluginApplicationService.by(type = rocketActionSettings.type)
                 ?.configuration(RocketActionContextFactory.context)
                 ?.let { config ->
                     val current = DefaultMutableTreeNode(
@@ -378,7 +379,7 @@ class ConfigurationFrame(
             .asBoolean(UsedPropertiesName.UI_CONFIGURATION_FRAME_ALWAYS_ON_TOP, false)
         frame.defaultCloseOperation = JFrame.HIDE_ON_CLOSE
         this.updateActionListener = updateActionListener
-        this.rocketActionPluginRepository = rocketActionPluginRepository
+        this.rocketActionPluginApplicationService = rocketActionPluginApplicationService
 
         val size = Toolkit.getDefaultToolkit().screenSize
         frame.setSize(
@@ -400,7 +401,7 @@ class ConfigurationFrame(
         frame.setLocationRelativeTo(null)
         createRocketActionSettingsDialog = CreateRocketActionSettingsDialog(
             owner = frame,
-            rocketActionPluginRepository = rocketActionPluginRepository,
+            rocketActionPluginApplicationService = rocketActionPluginApplicationService,
         )
 
         val basePanel = JPanel(BorderLayout())
@@ -443,6 +444,20 @@ class ConfigurationFrame(
             addActionListener {
                 SwingUtilities.invokeLater {
                     variablesFrame.isVisible = true
+                }
+            }
+        })
+
+        // Информация о загрузке плагинов
+        menuBar.add(JButton("Информация о загрузке плагинов").apply {
+            val pluginManagerFrame = PluginManagerFrame(
+                rocketActionPluginApplicationService = rocketActionPluginApplicationService,
+                parent = frame
+            )
+            icon = RocketActionContextFactory.context.icon().by(AppIcon.INFO)
+            addActionListener {
+                SwingUtilities.invokeLater {
+                    pluginManagerFrame.isVisible = true
                 }
             }
         })

@@ -1,6 +1,6 @@
 package ru.ezhov.rocket.action.application.configuration.ui
 
-import ru.ezhov.rocket.action.application.plugin.manager.infrastructure.PluginsReflectionRocketActionPluginRepository
+import ru.ezhov.rocket.action.application.plugin.manager.application.RocketActionPluginApplicationServiceFactory
 import javax.swing.JFrame
 import javax.swing.SwingUtilities
 
@@ -10,11 +10,11 @@ object CreateRocketActionSettingsDialogTest {
         SwingUtilities.invokeLater {
             val dialog = JFrame()
             dialog.setSize(1000, 900)
-            val rocketActionPluginRepository = PluginsReflectionRocketActionPluginRepository()
+            val rocketActionPluginApplicationService = RocketActionPluginApplicationServiceFactory.service
             try {
                 CreateRocketActionSettingsDialog(
                     owner = dialog,
-                    rocketActionPluginRepository = rocketActionPluginRepository,
+                    rocketActionPluginApplicationService = rocketActionPluginApplicationService,
                 )
                     .show(object : CreatedRocketActionSettingsCallback {
                         override fun create(settings: TreeRocketActionSettings) {

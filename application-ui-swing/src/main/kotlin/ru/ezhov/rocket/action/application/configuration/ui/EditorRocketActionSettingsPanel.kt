@@ -13,11 +13,11 @@ import ru.ezhov.rocket.action.application.configuration.ui.event.ConfigurationUi
 import ru.ezhov.rocket.action.application.configuration.ui.event.ConfigurationUiObserverFactory
 import ru.ezhov.rocket.action.application.configuration.ui.event.model.ConfigurationUiEvent
 import ru.ezhov.rocket.action.application.configuration.ui.event.model.RemoveSettingUiEvent
-import ru.ezhov.rocket.action.application.domain.model.SettingsModel
-import ru.ezhov.rocket.action.application.domain.model.SettingsValueType
-import ru.ezhov.rocket.action.application.infrastructure.MutableRocketActionSettings
+import ru.ezhov.rocket.action.application.core.domain.model.SettingsModel
+import ru.ezhov.rocket.action.application.core.domain.model.SettingsValueType
+import ru.ezhov.rocket.action.application.core.infrastructure.MutableRocketActionSettings
 import ru.ezhov.rocket.action.application.plugin.context.RocketActionContextFactory
-import ru.ezhov.rocket.action.application.plugin.manager.domain.RocketActionPluginRepository
+import ru.ezhov.rocket.action.application.plugin.manager.application.RocketActionPluginApplicationService
 import ru.ezhov.rocket.action.application.tags.ui.TagsPanelFactory
 import java.awt.BorderLayout
 import javax.swing.BorderFactory
@@ -39,14 +39,14 @@ import javax.swing.SwingConstants
 private val logger = KotlinLogging.logger {}
 
 class EditorRocketActionSettingsPanel(
-    private val rocketActionPluginRepository: RocketActionPluginRepository
+    private val rocketActionPluginApplicationService: RocketActionPluginApplicationService
 ) : JPanel(BorderLayout()) {
     private val infoPanel: InfoPanel = InfoPanel()
     private val rocketActionSettingsPanel = RocketActionSettingsPanel()
     private var currentSettings: TreeRocketActionSettings? = null
     private var callback: SavedRocketActionSettingsPanelCallback? = null
     private val testPanel: TestPanel =
-        TestPanel(rocketActionPluginRepository = rocketActionPluginRepository) {
+        TestPanel(rocketActionPluginApplicationService = rocketActionPluginApplicationService) {
             rocketActionSettingsPanel.create()?.settings
         }
 
@@ -79,7 +79,7 @@ class EditorRocketActionSettingsPanel(
         currentSettings = settings
         this.callback = callback
         val configuration: RocketActionConfiguration? =
-            rocketActionPluginRepository.by(settings.settings.type)
+            rocketActionPluginApplicationService.by(settings.settings.type)
                 ?.configuration(RocketActionContextFactory.context)
         val configurationDescription = configuration?.let {
             configuration.description()

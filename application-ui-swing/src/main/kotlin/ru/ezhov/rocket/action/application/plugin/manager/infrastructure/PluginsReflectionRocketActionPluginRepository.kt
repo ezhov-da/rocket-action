@@ -4,10 +4,10 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
-import ru.ezhov.rocket.action.api.RocketActionPlugin
 import ru.ezhov.rocket.action.application.plugin.context.RocketActionContextFactory
 import ru.ezhov.rocket.action.application.plugin.manager.domain.RocketActionPluginRepository
-import ru.ezhov.rocket.action.application.plugin.manager.infrastructure.loaders.ExtendedClassesPluginLoader
+import ru.ezhov.rocket.action.application.plugin.manager.domain.RocketActionPluginSpec
+import ru.ezhov.rocket.action.application.plugin.manager.infrastructure.loaders.ClassPathPluginLoader
 import ru.ezhov.rocket.action.application.plugin.manager.infrastructure.loaders.GroovyPluginLoader
 import ru.ezhov.rocket.action.application.plugin.manager.infrastructure.loaders.InnerPluginLoader
 import ru.ezhov.rocket.action.application.plugin.manager.infrastructure.loaders.JarsPluginLoader
@@ -17,11 +17,11 @@ import kotlin.system.measureTimeMillis
 private val logger = KotlinLogging.logger {}
 
 class PluginsReflectionRocketActionPluginRepository : RocketActionPluginRepository {
-    private var list: MutableList<RocketActionPlugin> = mutableListOf()
+    private var list: MutableList<RocketActionPluginSpec> = mutableListOf()
 
     private val innerPluginLoader: InnerPluginLoader = InnerPluginLoader()
     private val jarsPluginLoader: JarsPluginLoader = JarsPluginLoader()
-    private val extendedClassesPluginLoader: ExtendedClassesPluginLoader = ExtendedClassesPluginLoader()
+    private val classPathPluginLoader: ClassPathPluginLoader = ClassPathPluginLoader()
     private val groovyPluginLoader: GroovyPluginLoader = GroovyPluginLoader()
     private val kotlinPluginLoader: KotlinPluginLoader = KotlinPluginLoader()
 
@@ -41,23 +41,21 @@ class PluginsReflectionRocketActionPluginRepository : RocketActionPluginReposito
             // внутренние
             val inner = innerPluginLoader
                 .plugins()
-                .mapNotNull { clazzName ->
+                .map { clazzName ->
                     async { innerPluginLoader.loadPlugin(clazzName) }
                 }
                 .awaitAll()
-                .filterNotNull()
                 .toList()
 
             // из class path
-            val extended = extendedClassesPluginLoader
+            val extended = classPathPluginLoader
                 .plugins()
                 .map { clazzName ->
                     async {
-                        innerPluginLoader.loadPlugin(clazzName)
+                        classPathPluginLoader.loadPlugin(clazzName)
                     }
                 }
                 .awaitAll()
-                .filterNotNull()
                 .toList()
 
             // из groovy плагина
@@ -69,7 +67,6 @@ class PluginsReflectionRocketActionPluginRepository : RocketActionPluginReposito
                     }
                 }
                 .awaitAll()
-                .filterNotNull()
                 .toList()
 
             // из kotlin плагина
@@ -81,7 +78,6 @@ class PluginsReflectionRocketActionPluginRepository : RocketActionPluginReposito
                     }
                 }
                 .awaitAll()
-                .filterNotNull()
                 .toList()
 
             logger.info {
@@ -93,7 +89,7 @@ class PluginsReflectionRocketActionPluginRepository : RocketActionPluginReposito
                     "kotlin='${fromKotlin.size}' "
             }
 
-            val allPlugins = mutableListOf<RocketActionPlugin>()
+            val allPlugins = mutableListOf<RocketActionPluginSpec>()
             allPlugins.addAll(fromJars)
             allPlugins.addAll(inner)
             allPlugins.addAll(extended)
@@ -105,17 +101,21 @@ class PluginsReflectionRocketActionPluginRepository : RocketActionPluginReposito
         logger.info { "Configuration rocket action repository initialize successful. timeMs=$times count=${list.size}" }
     }
 
-    override fun all(): List<RocketActionPlugin> {
+    override fun all(): List<RocketActionPluginSpec> {
         if (list.isEmpty()) {
             load()
         }
         return list
     }
 
-    override fun by(type: String): RocketActionPlugin? =
-        all().firstOrNull { r: RocketActionPlugin ->
-            r.configuration(context = RocketActionContextFactory.context).type().value() == type
-        }
+    override fun by(type: String): RocketActionPluginSpec.Success? =
+        all()
+            .filterIsInstance(RocketActionPluginSpec.Success::class.java)
+            .firstOrNull { r: RocketActionPluginSpec.Success ->
+                r.rocketActionPlugin.configuration(context = RocketActionContextFactory.context)
+                    .type()
+                    .value() == type
+            }
 }
 
 

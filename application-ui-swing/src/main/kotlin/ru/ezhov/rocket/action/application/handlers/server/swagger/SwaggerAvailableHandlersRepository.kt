@@ -3,7 +3,7 @@ package ru.ezhov.rocket.action.application.handlers.server.swagger
 import ru.ezhov.rocket.action.application.handlers.server.AvailableHandlersRepository
 import ru.ezhov.rocket.action.application.handlers.server.Server
 import ru.ezhov.rocket.action.application.handlers.server.model.AvailableHandler
-import ru.ezhov.rocket.action.application.infrastructure.RocketActionComponentCacheFactory
+import ru.ezhov.rocket.action.application.core.infrastructure.RocketActionComponentCacheFactory
 import java.net.URI
 
 class SwaggerAvailableHandlersRepository : AvailableHandlersRepository {

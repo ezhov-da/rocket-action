@@ -1,4 +1,4 @@
-package ru.ezhov.rocket.action.application.infrastructure.yml.model
+package ru.ezhov.rocket.action.application.core.infrastructure.yml.model
 
 data class SettingsDto(
     val name: String,

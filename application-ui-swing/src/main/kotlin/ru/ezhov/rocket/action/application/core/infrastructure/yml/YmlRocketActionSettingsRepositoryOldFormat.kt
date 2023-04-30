@@ -1,10 +1,10 @@
-package ru.ezhov.rocket.action.application.infrastructure.yml
+package ru.ezhov.rocket.action.application.core.infrastructure.yml
 
 import mu.KotlinLogging
 import org.yaml.snakeyaml.Yaml
 import ru.ezhov.rocket.action.api.RocketActionSettings
-import ru.ezhov.rocket.action.application.domain.model.SettingsModel
-import ru.ezhov.rocket.action.application.infrastructure.MutableRocketActionSettings
+import ru.ezhov.rocket.action.application.core.domain.model.SettingsModel
+import ru.ezhov.rocket.action.application.core.infrastructure.MutableRocketActionSettings
 import java.io.File
 import java.io.FileOutputStream
 import java.io.OutputStreamWriter

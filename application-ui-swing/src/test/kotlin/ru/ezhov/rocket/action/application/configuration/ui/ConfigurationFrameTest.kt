@@ -1,7 +1,7 @@
 package ru.ezhov.rocket.action.application.configuration.ui
 
-import ru.ezhov.rocket.action.application.infrastructure.yml.YmlRocketActionSettingsRepository
-import ru.ezhov.rocket.action.application.plugin.manager.infrastructure.PluginsReflectionRocketActionPluginRepository
+import ru.ezhov.rocket.action.application.core.infrastructure.yml.YmlRocketActionSettingsRepository
+import ru.ezhov.rocket.action.application.plugin.manager.application.RocketActionPluginApplicationServiceFactory
 import javax.swing.SwingUtilities
 
 object ConfigurationFrameTest {
@@ -10,7 +10,7 @@ object ConfigurationFrameTest {
         SwingUtilities.invokeLater {
             try {
                 ConfigurationFrame(
-                    rocketActionPluginRepository = PluginsReflectionRocketActionPluginRepository(),
+                    rocketActionPluginApplicationService = RocketActionPluginApplicationServiceFactory.service,
                     rocketActionSettingsRepository = YmlRocketActionSettingsRepository(
                         uri = ConfigurationFrameTest::class.java.getResource("/test-actions.yml").toURI()
                     )

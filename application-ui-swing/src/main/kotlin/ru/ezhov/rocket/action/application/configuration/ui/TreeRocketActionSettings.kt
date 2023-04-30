@@ -2,7 +2,7 @@ package ru.ezhov.rocket.action.application.configuration.ui
 
 import mu.KotlinLogging
 import ru.ezhov.rocket.action.api.RocketActionConfiguration
-import ru.ezhov.rocket.action.application.infrastructure.MutableRocketActionSettings
+import ru.ezhov.rocket.action.application.core.infrastructure.MutableRocketActionSettings
 
 private val logger = KotlinLogging.logger {}
 

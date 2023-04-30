@@ -1,4 +1,4 @@
-package ru.ezhov.rocket.action.application.infrastructure.yml.model
+package ru.ezhov.rocket.action.application.core.infrastructure.yml.model
 
 import com.fasterxml.jackson.annotation.JsonFormat
 import java.time.LocalDateTime

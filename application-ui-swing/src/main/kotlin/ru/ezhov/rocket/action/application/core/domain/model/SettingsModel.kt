@@ -1,4 +1,4 @@
-package ru.ezhov.rocket.action.application.domain.model
+package ru.ezhov.rocket.action.application.core.domain.model
 
 data class SettingsModel(
     val name: String,

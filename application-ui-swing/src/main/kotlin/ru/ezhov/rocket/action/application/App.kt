@@ -2,11 +2,11 @@ package ru.ezhov.rocket.action.application
 
 import com.formdev.flatlaf.FlatLightLaf
 import mu.KotlinLogging
-import ru.ezhov.rocket.action.application.domain.RocketActionSettingsRepository
-import ru.ezhov.rocket.action.application.domain.model.ActionsModel
+import ru.ezhov.rocket.action.application.core.domain.RocketActionSettingsRepository
+import ru.ezhov.rocket.action.application.core.domain.model.ActionsModel
 import ru.ezhov.rocket.action.application.handlers.server.Server
-import ru.ezhov.rocket.action.application.infrastructure.yml.YmlRocketActionSettingsRepository
-import ru.ezhov.rocket.action.application.plugin.manager.infrastructure.RocketActionPluginRepositoryFactory
+import ru.ezhov.rocket.action.application.core.infrastructure.yml.YmlRocketActionSettingsRepository
+import ru.ezhov.rocket.action.application.plugin.manager.application.RocketActionPluginApplicationServiceFactory
 import ru.ezhov.rocket.action.application.properties.GeneralPropertiesRepositoryFactory
 import ru.ezhov.rocket.action.application.properties.UsedPropertiesName
 import ru.ezhov.rocket.action.application.tags.application.TagServiceFactory
@@ -27,7 +27,7 @@ fun main(args: Array<String>) {
 
             val actionService = UiQuickActionService(
                 rocketActionSettingsRepository = rockerActionRepository(args),
-                rocketActionPluginRepository = RocketActionPluginRepositoryFactory.repository,
+                rocketActionPluginApplicationService = RocketActionPluginApplicationServiceFactory.service,
                 generalPropertiesRepository = GeneralPropertiesRepositoryFactory.repository,
                 tagsService = TagServiceFactory.tagsService,
             )

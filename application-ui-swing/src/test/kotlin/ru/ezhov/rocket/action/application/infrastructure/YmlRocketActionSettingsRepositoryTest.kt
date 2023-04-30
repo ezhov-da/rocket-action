@@ -3,10 +3,10 @@ package ru.ezhov.rocket.action.application.infrastructure
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
-import ru.ezhov.rocket.action.application.domain.model.ActionsModel
-import ru.ezhov.rocket.action.application.domain.model.RocketActionSettingsModel
-import ru.ezhov.rocket.action.application.domain.model.SettingsModel
-import ru.ezhov.rocket.action.application.infrastructure.yml.YmlRocketActionSettingsRepository
+import ru.ezhov.rocket.action.application.core.domain.model.ActionsModel
+import ru.ezhov.rocket.action.application.core.domain.model.RocketActionSettingsModel
+import ru.ezhov.rocket.action.application.core.domain.model.SettingsModel
+import ru.ezhov.rocket.action.application.core.infrastructure.yml.YmlRocketActionSettingsRepository
 import java.io.File
 
 class YmlRocketActionSettingsRepositoryTest {
