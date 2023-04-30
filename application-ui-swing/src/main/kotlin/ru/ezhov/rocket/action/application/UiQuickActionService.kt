@@ -5,14 +5,14 @@ import ru.ezhov.rocket.action.api.RocketAction
 import ru.ezhov.rocket.action.api.context.icon.AppIcon
 import ru.ezhov.rocket.action.api.context.notification.NotificationType
 import ru.ezhov.rocket.action.application.configuration.ui.ConfigurationFrame
-import ru.ezhov.rocket.action.application.domain.RocketActionSettingsRepository
-import ru.ezhov.rocket.action.application.domain.model.ActionsModel
-import ru.ezhov.rocket.action.application.domain.model.RocketActionSettingsModel
+import ru.ezhov.rocket.action.application.core.domain.RocketActionSettingsRepository
+import ru.ezhov.rocket.action.application.core.domain.model.ActionsModel
+import ru.ezhov.rocket.action.application.core.domain.model.RocketActionSettingsModel
+import ru.ezhov.rocket.action.application.core.infrastructure.RocketActionComponentCacheFactory
 import ru.ezhov.rocket.action.application.handlers.server.Server
-import ru.ezhov.rocket.action.application.infrastructure.RocketActionComponentCacheFactory
 import ru.ezhov.rocket.action.application.plugin.context.RocketActionContextFactory
 import ru.ezhov.rocket.action.application.plugin.group.GroupRocketActionUi
-import ru.ezhov.rocket.action.application.plugin.manager.domain.RocketActionPluginRepository
+import ru.ezhov.rocket.action.application.plugin.manager.application.RocketActionPluginApplicationService
 import ru.ezhov.rocket.action.application.properties.GeneralPropertiesRepository
 import ru.ezhov.rocket.action.application.properties.UsedPropertiesName
 import ru.ezhov.rocket.action.application.search.application.SearchInstance
@@ -49,7 +49,7 @@ private val logger = KotlinLogging.logger { }
 
 class UiQuickActionService(
     private val rocketActionSettingsRepository: RocketActionSettingsRepository,
-    private val rocketActionPluginRepository: RocketActionPluginRepository,
+    private val rocketActionPluginApplicationService: RocketActionPluginApplicationService,
     private val generalPropertiesRepository: GeneralPropertiesRepository,
     private val tagsService: TagsService,
 ) {
@@ -303,7 +303,7 @@ class UiQuickActionService(
                 if (configurationFrame == null) {
                     try {
                         configurationFrame = ConfigurationFrame(
-                            rocketActionPluginRepository = rocketActionPluginRepository,
+                            rocketActionPluginApplicationService = rocketActionPluginApplicationService,
                             rocketActionSettingsRepository = rocketActionSettingsRepository,
                             updateActionListener = updateListener()
                         )
@@ -365,7 +365,7 @@ class UiQuickActionService(
             val cache = RocketActionComponentCacheFactory.cache
             val components = mutableListOf<Component>()
             for (rocketActionSettings in actionSettings.actions) {
-                rocketActionPluginRepository.by(rocketActionSettings.type)
+                rocketActionPluginApplicationService.by(rocketActionSettings.type)
                     ?.factory(RocketActionContextFactory.context)
                     ?.let {
                         (
@@ -405,7 +405,7 @@ class UiQuickActionService(
                 .cache
                 .let { cache ->
                     for (rocketActionSettings in actionSettings) {
-                        val rau = rocketActionPluginRepository.by(rocketActionSettings.type)
+                        val rau = rocketActionPluginApplicationService.by(rocketActionSettings.type)
                             ?.factory(RocketActionContextFactory.context)
                         if (rau != null) {
                             if (rocketActionSettings.type != GroupRocketActionUi.TYPE) {

@@ -1,9 +1,9 @@
-package ru.ezhov.rocket.action.application.domain.model
+package ru.ezhov.rocket.action.application.core.domain.model
 
 import mu.KotlinLogging
 import ru.ezhov.rocket.action.api.RocketActionSettings
 import ru.ezhov.rocket.action.api.RocketActionType
-import ru.ezhov.rocket.action.application.domain.EngineService
+import ru.ezhov.rocket.action.application.core.domain.EngineService
 import java.util.*
 
 private val logger = KotlinLogging.logger { }

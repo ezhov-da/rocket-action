@@ -7,11 +7,12 @@ import ru.ezhov.rocket.action.api.RocketActionConfiguration
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
 import ru.ezhov.rocket.action.api.RocketActionPropertySpec
 import ru.ezhov.rocket.action.api.context.icon.AppIcon
-import ru.ezhov.rocket.action.application.domain.model.RocketActionSettingsModel
-import ru.ezhov.rocket.action.application.domain.model.SettingsModel
-import ru.ezhov.rocket.action.application.domain.model.SettingsValueType
-import ru.ezhov.rocket.action.application.infrastructure.MutableRocketActionSettings
+import ru.ezhov.rocket.action.application.core.domain.model.RocketActionSettingsModel
+import ru.ezhov.rocket.action.application.core.domain.model.SettingsModel
+import ru.ezhov.rocket.action.application.core.domain.model.SettingsValueType
+import ru.ezhov.rocket.action.application.core.infrastructure.MutableRocketActionSettings
 import ru.ezhov.rocket.action.application.plugin.context.RocketActionContextFactory
+import ru.ezhov.rocket.action.application.plugin.manager.application.RocketActionPluginApplicationService
 import ru.ezhov.rocket.action.application.plugin.manager.domain.RocketActionPluginRepository
 import ru.ezhov.rocket.action.application.tags.ui.TagsPanelFactory
 import ru.ezhov.rocket.action.ui.utils.swing.common.toImage
@@ -43,14 +44,14 @@ import javax.swing.WindowConstants
 
 class CreateRocketActionSettingsDialog(
     owner: JFrame,
-    private val rocketActionPluginRepository: RocketActionPluginRepository,
+    private val rocketActionPluginApplicationService: RocketActionPluginApplicationService,
 ) {
     private val comboBoxModel = DefaultComboBoxModel<RocketActionConfiguration>()
     private var comboBox: JComboBox<RocketActionConfiguration> = JComboBox(comboBoxModel)
     private val actionSettingsPanel: RocketActionSettingsPanel = RocketActionSettingsPanel()
     private var currentCallback: CreatedRocketActionSettingsCallback? = null
     private val testPanel: TestPanel =
-        TestPanel(rocketActionPluginRepository = rocketActionPluginRepository) {
+        TestPanel(rocketActionPluginApplicationService = rocketActionPluginApplicationService) {
             actionSettingsPanel.create().second
         }
 
@@ -73,7 +74,7 @@ class CreateRocketActionSettingsDialog(
     }
 
     private fun panelComboBox(): JPanel {
-        val all = rocketActionPluginRepository.all().map { it.configuration(RocketActionContextFactory.context) }
+        val all = rocketActionPluginApplicationService.all().map { it.configuration(RocketActionContextFactory.context) }
         val sortedAll = all.sortedBy { it.name() }
         sortedAll.forEach(Consumer { anObject: RocketActionConfiguration? -> comboBoxModel.addElement(anObject) })
         val panel = JPanel(BorderLayout())

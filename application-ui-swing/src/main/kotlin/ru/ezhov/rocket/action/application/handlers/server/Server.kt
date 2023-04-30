@@ -5,7 +5,7 @@ import mu.KotlinLogging
 import ru.ezhov.rocket.action.api.handler.RocketActionHandleStatus
 import ru.ezhov.rocket.action.api.handler.RocketActionHandlerCommand
 import ru.ezhov.rocket.action.application.handlers.server.swagger.JsonSwaggerGenerator
-import ru.ezhov.rocket.action.application.infrastructure.RocketActionComponentCacheFactory
+import ru.ezhov.rocket.action.application.core.infrastructure.RocketActionComponentCacheFactory
 import ru.ezhov.rocket.action.application.properties.GeneralPropertiesRepositoryFactory
 import ru.ezhov.rocket.action.application.properties.UsedPropertiesName
 import spark.kotlin.Http

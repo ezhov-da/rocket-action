@@ -1,7 +1,7 @@
-package ru.ezhov.rocket.action.application.domain
+package ru.ezhov.rocket.action.application.core.domain
 
-import ru.ezhov.rocket.action.application.domain.model.SettingsModel
-import ru.ezhov.rocket.action.application.domain.model.SettingsValueType
+import ru.ezhov.rocket.action.application.core.domain.model.SettingsModel
+import ru.ezhov.rocket.action.application.core.domain.model.SettingsValueType
 import ru.ezhov.rocket.action.application.engine.application.EngineFactory
 import ru.ezhov.rocket.action.application.engine.domain.model.EngineType
 import ru.ezhov.rocket.action.application.engine.domain.model.EngineVariable

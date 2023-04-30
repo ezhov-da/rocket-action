@@ -1,8 +1,8 @@
-package ru.ezhov.rocket.action.application.infrastructure
+package ru.ezhov.rocket.action.application.core.infrastructure
 
 import ru.ezhov.rocket.action.api.RocketAction
 import ru.ezhov.rocket.action.api.handler.RocketActionHandler
-import ru.ezhov.rocket.action.application.domain.RocketActionComponentCache
+import ru.ezhov.rocket.action.application.core.domain.RocketActionComponentCache
 import java.util.concurrent.ConcurrentHashMap
 
 class InMemoryRocketActionComponentCache : RocketActionComponentCache {

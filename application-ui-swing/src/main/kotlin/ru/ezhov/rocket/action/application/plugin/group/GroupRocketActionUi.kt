@@ -10,7 +10,7 @@ import ru.ezhov.rocket.action.api.RocketActionType
 import ru.ezhov.rocket.action.api.context.RocketActionContext
 import ru.ezhov.rocket.action.api.context.icon.AppIcon
 import ru.ezhov.rocket.action.api.support.AbstractRocketAction
-import ru.ezhov.rocket.action.application.infrastructure.RocketActionComponentCacheFactory
+import ru.ezhov.rocket.action.application.core.infrastructure.RocketActionComponentCacheFactory
 import ru.ezhov.rocket.action.application.plugin.context.RocketActionContextFactory
 import java.awt.Component
 import java.util.concurrent.ExecutionException

@@ -1,4 +1,4 @@
-package ru.ezhov.rocket.action.application.domain.model
+package ru.ezhov.rocket.action.application.core.domain.model
 
 enum class SettingsValueType {
     PLAIN_TEXT,

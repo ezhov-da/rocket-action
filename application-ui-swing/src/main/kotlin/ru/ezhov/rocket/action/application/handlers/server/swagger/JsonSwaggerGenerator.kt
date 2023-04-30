@@ -23,7 +23,7 @@ import ru.ezhov.rocket.action.api.handler.RocketActionHandler
 import ru.ezhov.rocket.action.api.handler.RocketActionHandlerProperty
 import ru.ezhov.rocket.action.api.handler.RocketActionHandlerPropertySpec
 import ru.ezhov.rocket.action.application.handlers.server.BASE_API_PATH
-import ru.ezhov.rocket.action.application.infrastructure.RocketActionComponentCacheFactory
+import ru.ezhov.rocket.action.application.core.infrastructure.RocketActionComponentCacheFactory
 
 
 class JsonSwaggerGenerator : SwaggerGenerator {

@@ -2,7 +2,6 @@ package ru.ezhov.rocket.action.application.plugin.manager.infrastructure.loaders
 
 import mu.KotlinLogging
 import ru.ezhov.rocket.action.api.RocketActionPlugin
-import ru.ezhov.rocket.action.application.plugin.group.GroupRocketActionUi
 import ru.ezhov.rocket.action.application.plugin.manager.domain.RocketActionPluginSourceType
 import ru.ezhov.rocket.action.application.plugin.manager.domain.RocketActionPluginSpec
 import ru.ezhov.rocket.action.application.plugin.manager.infrastructure.RocketActionPluginDecorator
@@ -11,16 +10,24 @@ import kotlin.system.measureTimeMillis
 
 private val logger = KotlinLogging.logger {}
 
-class InnerPluginLoader {
+class ClassPathPluginLoader {
+    companion object {
+        private const val PROPERTY_NAME = "rocket.action.extended.plugin.classess"
+        private const val DELIMITER = ";"
+    }
+
     fun plugins(): List<String> =
-        listOf(GroupRocketActionUi::class.java.canonicalName)
+        System.getProperty(PROPERTY_NAME)
+            ?.split(DELIMITER)
+            ?.map { it.trimIndent().trim() }
+            ?: emptyList()
 
     fun loadPlugin(classAsName: String): RocketActionPluginSpec {
-        val from = "From class '$classAsName'"
-        val sourceType = RocketActionPluginSourceType.INNER
+        val from = "Property name '$PROPERTY_NAME', delimiter '$DELIMITER', class name '$classAsName'"
+        val sourceType = RocketActionPluginSourceType.CLASS_PATH
 
         return try {
-            val rocketActionPlugin: RocketActionPlugin
+            var rocketActionPlugin: RocketActionPlugin
             val initTimeClass = measureTimeMillis {
                 logger.debug { "Initialize class='$classAsName'} run..." }
 
