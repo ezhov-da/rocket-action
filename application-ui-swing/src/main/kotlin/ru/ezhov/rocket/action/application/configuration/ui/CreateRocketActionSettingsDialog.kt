@@ -13,9 +13,9 @@ import ru.ezhov.rocket.action.application.domain.model.SettingsValueType
 import ru.ezhov.rocket.action.application.infrastructure.MutableRocketActionSettings
 import ru.ezhov.rocket.action.application.plugin.context.RocketActionContextFactory
 import ru.ezhov.rocket.action.application.plugin.manager.domain.RocketActionPluginRepository
+import ru.ezhov.rocket.action.application.tags.ui.TagsPanelFactory
 import ru.ezhov.rocket.action.ui.utils.swing.common.toImage
 import java.awt.BorderLayout
-import java.awt.Color
 import java.awt.Component
 import java.awt.event.ItemEvent
 import java.util.function.Consumer
@@ -135,6 +135,7 @@ class CreateRocketActionSettingsDialog(
     private inner class RocketActionSettingsPanel : JPanel() {
         private val settingPanels = mutableListOf<SettingPanel>()
         private var currentConfiguration: RocketActionConfiguration? = null
+        private val tagsPanel = TagsPanelFactory.panel()
 
         init {
             this.layout = BoxLayout(this, BoxLayout.Y_AXIS)
@@ -155,6 +156,11 @@ class CreateRocketActionSettingsDialog(
                     this.add(panel)
                     settingPanels.add(panel)
                 }
+            tagsPanel.border = BorderFactory.createCompoundBorder(
+                BorderFactory.createEmptyBorder(5, 5, 5, 5),
+                BorderFactory.createTitledBorder("Tags")
+            )
+            this.add(tagsPanel)
             this.add(Box.createVerticalBox())
             repaint()
             revalidate()
@@ -166,7 +172,8 @@ class CreateRocketActionSettingsDialog(
                 second = MutableRocketActionSettings(
                     id = RocketActionSettingsModel.generateId(),
                     type = currentConfiguration!!.type().value(),
-                    settings = settingPanels.map { panel -> panel.value() }.toMutableList()
+                    settings = settingPanels.map { panel -> panel.value() }.toMutableList(),
+                    tags = tagsPanel.tags(),
                 )
             )
     }
@@ -177,17 +184,22 @@ class CreateRocketActionSettingsDialog(
         init {
             this.layout = BorderLayout()
             this.border = BorderFactory.createEmptyBorder(2, 2, 2, 2)
-            val labelName = JLabel(property.name())
             val labelDescription = JLabel(RocketActionContextFactory.context.icon().by(AppIcon.INFO))
             labelDescription.toolTipText = property.description()
+
+            val text = if (property.isRequired()) {
+                """<html><p>${property.name()} <font color="red">*</font></p>"""
+            } else {
+                """<html><p>${property.name()}</p>"""
+            }
+            border = BorderFactory.createCompoundBorder(
+                BorderFactory.createEmptyBorder(5, 5, 5, 5),
+                BorderFactory.createTitledBorder(text)
+            )
 
             val topPanel = JPanel()
             topPanel.layout = BoxLayout(topPanel, BoxLayout.X_AXIS)
             topPanel.border = BorderFactory.createEmptyBorder(0, 0, 1, 0)
-            topPanel.add(labelName)
-            if (property.isRequired()) {
-                topPanel.add(JLabel("*").apply { foreground = Color.RED })
-            }
             topPanel.add(labelDescription)
 
             val centerPanel = JPanel(BorderLayout())
@@ -270,7 +282,6 @@ class CreateRocketActionSettingsDialog(
                     )
                 }
             }
-
             this.add(topPanel, BorderLayout.NORTH)
             this.add(centerPanel, BorderLayout.CENTER)
         }

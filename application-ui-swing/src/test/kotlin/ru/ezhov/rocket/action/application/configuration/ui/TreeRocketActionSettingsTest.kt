@@ -50,7 +50,8 @@ class TreeRocketActionSettingsTest {
                         value = "34",
                         valueType = SettingsValueType.PLAIN_TEXT,
                     )
-                )
+                ),
+                tags = emptyList(),
             )
         )
 

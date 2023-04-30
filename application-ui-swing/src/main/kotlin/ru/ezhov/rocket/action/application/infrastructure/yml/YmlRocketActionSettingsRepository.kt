@@ -15,18 +15,26 @@ import ru.ezhov.rocket.action.application.infrastructure.yml.model.ActionsDto
 import ru.ezhov.rocket.action.application.infrastructure.yml.model.RocketActionSettingsDto
 import ru.ezhov.rocket.action.application.infrastructure.yml.model.SettingsDto
 import ru.ezhov.rocket.action.application.infrastructure.yml.model.SettingsValueTypeDto
+import ru.ezhov.rocket.action.application.tags.application.TagServiceFactory
 import java.io.File
 import java.net.URI
+import kotlin.system.measureTimeMillis
 
 private val logger = KotlinLogging.logger {}
 
 class YmlRocketActionSettingsRepository(
     private val uri: URI
 ) : RocketActionSettingsRepository {
+    // TODO ezhov временное использование, будет перенесено в сервис после рефакторнига
+    private val tagsService = TagServiceFactory.tagsService
     private val ymlRocketActionSettingsRepositoryOldFormat = YmlRocketActionSettingsRepositoryOldFormat(uri)
     private val mapper = ObjectMapper(YAMLFactory())
         .registerKotlinModule()
         .registerModule(JavaTimeModule())
+
+    override fun load() {
+        actions()
+    }
 
     override fun actions(): ActionsModel {
         logger.debug { "Get actions by uri='$uri'" }
@@ -48,7 +56,28 @@ class YmlRocketActionSettingsRepository(
 
             logger.info { "Actions count ${actions.actions.size}" }
 
+            fillTags(actions)
             return actions
+        }
+    }
+
+    private fun fillTags(actionsModel: ActionsModel) {
+        fun recursion(actions: List<RocketActionSettingsModel>) {
+            actions.forEach { action ->
+                tagsService.add(action.id, action.tags)
+                if (action.actions.isNotEmpty()) {
+                    recursion(action.actions)
+                }
+            }
+        }
+
+        val time = measureTimeMillis {
+            recursion(actionsModel.actions)
+        }
+
+        logger.info {
+            "Tags filling for '${actionsModel.actions.size}' actions in '$time'ms. " +
+                "Tags count is '${tagsService.count()}'"
         }
     }
 
@@ -59,6 +88,8 @@ class YmlRocketActionSettingsRepository(
             lastChangedDate = actions.lastChangedDate,
             actions = actions.actions.map { it.toRocketActionSettingsDto() }
         ))
+
+        fillTags(actions)
 
         logger.info { "Actions settings saving completed. count=${actions.actions.size}" }
     }
@@ -76,6 +107,7 @@ private fun RocketActionSettings.toRocketActionSettingsModel(): RocketActionSett
             )
         },
         actions = this.actions().map { it.toRocketActionSettingsModel() },
+        tags = emptyList(),
     )
 
 private fun ActionsDto.toActionsModel() = ActionsModel(
@@ -100,6 +132,7 @@ private fun RocketActionSettingsDto.toRocketActionSettingsModel(): RocketActionS
             )
         },
         actions = this.actions.map { it.toRocketActionSettingsModel() },
+        tags = this.tags,
     )
 
 private fun RocketActionSettingsModel.toRocketActionSettingsDto(): RocketActionSettingsDto =
@@ -119,4 +152,5 @@ private fun RocketActionSettingsModel.toRocketActionSettingsDto(): RocketActionS
             )
         },
         actions = this.actions.map { it.toRocketActionSettingsDto() },
+        tags = this.tags,
     )
