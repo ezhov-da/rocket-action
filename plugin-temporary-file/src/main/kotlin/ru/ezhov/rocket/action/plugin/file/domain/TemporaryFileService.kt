@@ -9,15 +9,15 @@ import java.nio.charset.Charset
 class TemporaryFileService {
     fun createTemporaryFile(
         text: String,
+        prefix: String,
+        extension: String,
         encoding: String = "UTF-8",
-        extension: String = ".txt"
     ): Either<TemporaryFileServiceException, File> =
-        File.createTempFile("tmp", extension)
+        File.createTempFile(prefix, extension)
             .let { file ->
                 try {
-                    file.bufferedWriter(charset = Charset.forName(encoding)).use { bw ->
-                        bw.write(text)
-                    }
+                    file.bufferedWriter(charset = Charset.forName(encoding))
+                        .use { bw -> bw.write(text) }
                     file.right()
                 } catch (ex: Exception) {
                     TemporaryFileServiceException("Error when write temporary file", ex).left()

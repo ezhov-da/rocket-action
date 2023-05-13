@@ -10,7 +10,7 @@
     </parent>
 
     <artifactId>rocket-action-plugin-temporary-file</artifactId>
-    <version>${plugin-api.version}_1</version>
+    <version>${plugin-api.version}_2</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -22,6 +22,12 @@
         <dependency>
             <groupId>ru.ezhov</groupId>
             <artifactId>rocket-action-plugin-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>ru.ezhov</groupId>
+            <artifactId>rocket-action-ui-utils</artifactId>
             <scope>provided</scope>
         </dependency>
 

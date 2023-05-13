@@ -7,6 +7,7 @@ import org.fife.ui.rtextarea.RTextScrollPane
 import ru.ezhov.rocket.action.api.context.RocketActionContext
 import ru.ezhov.rocket.action.api.context.notification.NotificationType
 import ru.ezhov.rocket.action.plugin.file.domain.TemporaryFileService
+import ru.ezhov.rocket.action.ui.utils.swing.common.TextFieldWithText
 import java.awt.BorderLayout
 import java.awt.Desktop
 import java.awt.Dimension
@@ -15,16 +16,18 @@ import java.awt.datatransfer.StringSelection
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import java.io.File
+import javax.swing.BorderFactory
+import javax.swing.BoxLayout
 import javax.swing.JButton
 import javax.swing.JPanel
 
 private val logger = KotlinLogging.logger {}
+private const val DEFAULT_FILENAME: String = "tmp"
+private const val DEFAULT_EXTENSION: String = ".txt"
 
 class TemporaryFileUi(
     private val temporaryFileService: TemporaryFileService,
-    private val extension: String = ".txt",
     private val context: RocketActionContext,
-
 
     ) : JPanel() {
     init {
@@ -44,6 +47,19 @@ class TemporaryFileUi(
         minimumSize = dimensionResult
         maximumSize = dimensionResult
 
+        val fileNameTextField = TextFieldWithText("Название файла").apply { text = DEFAULT_FILENAME }
+        val fileExtensionTextField = TextFieldWithText("Расширение файла").apply { text = DEFAULT_EXTENSION }
+
+        add(
+            JPanel().apply {
+                layout = BoxLayout(this, BoxLayout.Y_AXIS)
+                border = BorderFactory.createEmptyBorder(5, 5, 5, 5)
+                add(fileNameTextField)
+                add(fileExtensionTextField)
+            },
+            BorderLayout.NORTH
+        )
+
         val textArea = RSyntaxTextArea()
         add(
             JPanel(BorderLayout()).apply {
@@ -51,6 +67,23 @@ class TemporaryFileUi(
             },
             BorderLayout.CENTER
         )
+
+        fun prefixAndExtension(): Pair<String, String> {
+            val fileName = fileNameTextField.text.takeIf { it.isNotBlank() }
+                ?.let {
+                    val minLen = 3
+                    if (it.length < minLen) {
+                        val lastChar = it.toCharArray()[it.length - 1].toString()
+                        it + lastChar.repeat(minLen - it.length)
+                    } else {
+                        it
+                    }
+                }
+                ?: DEFAULT_FILENAME
+            val fileExtension = fileExtensionTextField.text.takeIf { it.isNotBlank() } ?: DEFAULT_EXTENSION
+
+            return Pair(fileName, fileExtension)
+        }
 
         add(
             JPanel().apply {
@@ -64,7 +97,12 @@ class TemporaryFileUi(
                 add(JButton("Сохранить и скопировать абсолютный путь в буфер обмена").apply {
                     addMouseListener(object : MouseAdapter() {
                         override fun mouseReleased(e: MouseEvent?) {
-                            save(textArea.text)?.let {
+                            val prefixAndExtension = prefixAndExtension()
+                            save(
+                                text = textArea.text,
+                                prefix = prefixAndExtension.first,
+                                extension = prefixAndExtension.second
+                            )?.let {
                                 val defaultToolkit = Toolkit.getDefaultToolkit()
                                 val clipboard = defaultToolkit.systemClipboard
                                 clipboard.setContents(StringSelection(it.absolutePath), null)
@@ -78,7 +116,12 @@ class TemporaryFileUi(
                 add(JButton("Сохранить и открыть файл").apply {
                     addMouseListener(object : MouseAdapter() {
                         override fun mouseReleased(e: MouseEvent) {
-                            save(textArea.text)?.let {
+                            val prefixAndExtension = prefixAndExtension()
+                            save(
+                                text = textArea.text,
+                                prefix = prefixAndExtension.first,
+                                extension = prefixAndExtension.second
+                            )?.let {
                                 Desktop.getDesktop().open(it)
                             }
                         }
@@ -89,11 +132,16 @@ class TemporaryFileUi(
         )
     }
 
-    private fun save(text: String): File? =
+    private fun save(
+        text: String,
+        prefix: String,
+        extension: String
+    ): File? =
         when (
             val result = temporaryFileService.createTemporaryFile(
                 text = text,
-                extension = extension
+                prefix = prefix,
+                extension = extension,
             )
         ) {
             is Either.Left -> {
