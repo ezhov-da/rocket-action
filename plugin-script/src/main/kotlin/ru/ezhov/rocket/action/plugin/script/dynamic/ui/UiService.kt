@@ -8,6 +8,7 @@ import ru.ezhov.rocket.action.api.RocketAction
 import ru.ezhov.rocket.action.api.RocketActionSettings
 import ru.ezhov.rocket.action.api.context.RocketActionContext
 import ru.ezhov.rocket.action.api.context.icon.AppIcon
+import ru.ezhov.rocket.action.api.context.notification.NotificationType
 import ru.ezhov.rocket.action.api.handler.RocketActionHandler
 import ru.ezhov.rocket.action.api.handler.RocketActionHandlerFactory
 import ru.ezhov.rocket.action.plugin.script.ScriptEngineFactory
@@ -17,6 +18,8 @@ import ru.ezhov.rocket.action.ui.utils.swing.common.TextPaneWithText
 import java.awt.BorderLayout
 import java.awt.Component
 import java.awt.Dimension
+import java.awt.Toolkit
+import java.awt.datatransfer.StringSelection
 import javax.swing.BoxLayout
 import javax.swing.JButton
 import javax.swing.JMenu
@@ -42,7 +45,6 @@ class UiService {
         val menu = buildMenu(
             label = label,
             script = script,
-            description = description,
             countVariables = countVariables,
             selectedScriptLang = selectedScriptLang,
             fieldNames = fieldNames,
@@ -70,7 +72,6 @@ class UiService {
     private fun buildMenu(
         label: String,
         script: String,
-        description: String,
         countVariables: Int,
         selectedScriptLang: String,
         fieldNames: String,
@@ -168,6 +169,28 @@ class UiService {
                             .apply {
                                 addActionListener {
                                     variablesField.forEach { it.restore() }
+                                }
+                            }
+                    )
+
+                    add(
+                        JButton("Копировать результат в буфер")
+                            .apply {
+                                addActionListener {
+                                    if (resultText.text.isNotBlank()) {
+                                        val defaultToolkit = Toolkit.getDefaultToolkit()
+                                        val clipboard = defaultToolkit.systemClipboard
+                                        clipboard.setContents(StringSelection(resultText.text), null)
+                                        context.notification().show(
+                                            type = NotificationType.INFO,
+                                            text = "Текст скопирован в буфер"
+                                        )
+                                    } else {
+                                        context.notification().show(
+                                            type = NotificationType.WARN,
+                                            text = "Отсутствует текст для копирования"
+                                        )
+                                    }
                                 }
                             }
                     )
