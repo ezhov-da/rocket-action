@@ -89,11 +89,11 @@ class DynamicScriptRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
 
     companion object {
         internal const val TYPE = "DYNAMIC_SCRIPT"
-        internal val LABEL = "label"
-        internal val SCRIPT = "script"
-        internal val DESCRIPTION = "description"
-        internal val COUNT_VARIABLES = "countVariables"
-        internal val SELECTED_SCRIPT_LANG = "selectedScriptLang"
-        internal val FIELD_NAMES = "fieldNames"
+        internal const val LABEL = "label"
+        internal const val SCRIPT = "script"
+        internal const val DESCRIPTION = "description"
+        internal const val COUNT_VARIABLES = "countVariables"
+        internal const val SELECTED_SCRIPT_LANG = "selectedScriptLang"
+        internal const val FIELD_NAMES = "fieldNames"
     }
 }
