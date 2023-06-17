@@ -61,19 +61,19 @@ class GroupRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
 
     override fun type(): RocketActionType = RocketActionType { TYPE }
 
-    override fun description(): String = "Позволяет создать иерархию действий"
+    override fun description(): String = "Allows you to create a hierarchy of actions"
 
     override fun asString(): List<String> = listOf(LABEL)
 
     override fun properties(): List<RocketActionConfigurationProperty> {
         return listOf(
-            createRocketActionProperty(LABEL, LABEL, "Заголовок", true),
-            createRocketActionProperty(DESCRIPTION, DESCRIPTION, "Описание", false),
-            createRocketActionProperty(ICON_URL, ICON_URL, "URL иконки", false)
+            createRocketActionProperty(LABEL, LABEL, "Header", true),
+            createRocketActionProperty(DESCRIPTION, DESCRIPTION, "Description", false),
+            createRocketActionProperty(ICON_URL, ICON_URL, "Icon URL", false)
         )
     }
 
-    override fun name(): String = "Группа"
+    override fun name(): String = "Group"
 
     private class GroupSwingWorker(
         private val parentMenu: JMenu,

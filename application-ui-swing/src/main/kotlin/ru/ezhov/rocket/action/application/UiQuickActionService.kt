@@ -62,7 +62,7 @@ class UiQuickActionService(
             val menuBar = JMenuBar()
             val menu = JMenu()
             menuBar.add(menu)
-            //TODO: избранное
+            //TODO: favorites
             //menuBar.add(createFavoriteComponent());
 
             menuBar.add(createTagsMenu(menu));
@@ -84,7 +84,7 @@ class UiQuickActionService(
             CreateMenuWorker(menu).execute()
             menuBar
         } catch (e: Exception) {
-            throw UiQuickActionServiceException("Ошибка", e)
+            throw UiQuickActionServiceException("Error", e)
         }
     }
 
@@ -94,7 +94,7 @@ class UiQuickActionService(
         JPanel(FlowLayout(FlowLayout.LEFT, 0, 0)).apply {
             border = BorderFactory.createEmptyBorder()
             val textField =
-                TextFieldWithText("Поиск")
+                TextFieldWithText("Search")
                     .apply { ->
                         val tf = this
                         columns = 5
@@ -154,7 +154,7 @@ class UiQuickActionService(
     }
 
     private fun createTagsMenu(baseMenu: JMenu): JMenu {
-        // TODO ezhov перенести в хранилище
+        // TODO ezhov move to storage
         val iconTree = ImageIcon(this::class.java.getResource("/icons/tree_16x16.png"))
         val iconTag = ImageIcon(this::class.java.getResource("/icons/tag_16x16.png"))
 
@@ -226,38 +226,38 @@ class UiQuickActionService(
     }
 
     private fun createTools(baseDialog: JDialog): JMenu {
-        val menuTools = JMenu("Инструменты")
+        val menuTools = JMenu("Tools")
         menuTools.icon = RocketActionContextFactory.context.icon().by(AppIcon.WRENCH)
 
-        val menuItemUpdate = JMenuItem("Обновить")
+        val menuItemUpdate = JMenuItem("Refresh")
         menuItemUpdate.icon = RocketActionContextFactory.context.icon().by(AppIcon.RELOAD)
         menuItemUpdate.addActionListener(updateListener())
         menuTools.add(menuItemUpdate)
 
-        val menuItemEditor = JMenuItem("Редактор")
+        val menuItemEditor = JMenuItem("Editor")
         menuItemEditor.icon = RocketActionContextFactory.context.icon().by(AppIcon.PENCIL)
         menuItemEditor.addActionListener(createEditorActionListener())
         menuTools.add(menuItemEditor)
 
-        val menuInfo = JMenu("Информация")
+        val menuInfo = JMenu("Information")
         menuInfo.icon = RocketActionContextFactory.context.icon().by(AppIcon.INFO)
-        val notFound = { key: String -> "Информация по полю '$key' не найдена" }
+        val notFound = { key: String -> "Information on field '$key' not found" }
         menuInfo.add(
             JMenuItem(
                 generalPropertiesRepository
-                    .asString(UsedPropertiesName.VERSION, notFound("версия"))
+                    .asString(UsedPropertiesName.VERSION, notFound("version"))
             )
         )
         menuInfo.add(
             JMenuItem(
                 generalPropertiesRepository
-                    .asString(UsedPropertiesName.INFO, notFound("информация"))
+                    .asString(UsedPropertiesName.INFO, notFound("information"))
             )
         )
         menuInfo.add(
             JMenuItem(
                 generalPropertiesRepository
-                    .asString(UsedPropertiesName.REPOSITORY, notFound("ссылка на репозиторий"))
+                    .asString(UsedPropertiesName.REPOSITORY, notFound("link to repository"))
             )
                 .apply {
                     addActionListener {
@@ -271,7 +271,7 @@ class UiQuickActionService(
         menuInfo.add(JSeparator())
 
         menuInfo.add(
-            JMenuItem("Доступные обработчики")
+            JMenuItem("Available Handlers")
                 .apply {
                     addActionListener {
                         if (Desktop.isDesktopSupported()) {
@@ -285,7 +285,7 @@ class UiQuickActionService(
         menuInfo.add(createPropertyMenu())
         menuTools.add(menuInfo)
 
-        menuTools.add(JMenuItem("Выход").apply {
+        menuTools.add(JMenuItem("Exit").apply {
             icon = RocketActionContextFactory.context.icon().by(AppIcon.X)
             addActionListener {
                 SwingUtilities.invokeLater {
@@ -310,7 +310,7 @@ class UiQuickActionService(
                     } catch (ex: Exception) {
                         ex.printStackTrace()
                         RocketActionContextFactory.context.notification()
-                            .show(NotificationType.ERROR, "Ошибка создания меню конфигурирования")
+                            .show(NotificationType.ERROR, "Error creating configuration menu")
                     }
                 }
                 if (configurationFrame != null) {
@@ -328,10 +328,10 @@ class UiQuickActionService(
                 } catch (ex: UiQuickActionServiceException) {
                     ex.printStackTrace()
                     RocketActionContextFactory.context.notification()
-                        .show(NotificationType.ERROR, "Ошибка создания меню инструментов")
+                        .show(NotificationType.ERROR, "Error creating tool menu")
                 }
                 if (newMenuBar != null) {
-                    // пока костыль, но мы то знаем это "пока" :)
+                    // while a crutch, but we know that "yet" :)
                     baseDialog!!.jMenuBar.removeAll()
                     baseDialog!!.jMenuBar = newMenuBar
                     baseDialog!!.revalidate()
@@ -342,7 +342,7 @@ class UiQuickActionService(
         }
 
     private fun createPropertyMenu(): JMenu =
-        JMenu("Доступные свойства из командной строки").apply {
+        JMenu("Available properties from the command line").apply {
             UsedPropertiesName.values()
                 .forEach { pn ->
                     this.add(

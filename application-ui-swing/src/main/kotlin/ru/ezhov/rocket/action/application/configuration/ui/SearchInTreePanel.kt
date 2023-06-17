@@ -26,7 +26,7 @@ class SearchInTreePanel(
     private val treeModel: DefaultTreeModel,
     private val tree: JTree,
 ) : JPanel() {
-    private val textField = TextFieldWithText("Поиск")
+    private val textField = TextFieldWithText("Search")
     private var currentResultPanel: ResultPanel? = null
 
     init {
@@ -99,12 +99,12 @@ class SearchInTreePanel(
         private val buttonNext = JButton()
             .apply {
                 icon = RocketActionContextFactory.context.icon().by(AppIcon.ARROW_BOTTOM)
-                toolTipText = "Далее"
+                toolTipText = "Next"
             }
         private val buttonPrevious = JButton()
             .apply {
                 icon = RocketActionContextFactory.context.icon().by(AppIcon.ARROW_TOP)
-                toolTipText = "Назад"
+                toolTipText = "Previous"
             }
         private val label = JLabel()
 

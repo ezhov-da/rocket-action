@@ -40,13 +40,13 @@ class TextRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
             createRocketActionProperty(
                 key = LABEL,
                 name = LABEL,
-                description = "Текст для отображения",
+                description = "Text to display",
                 required = true
             ),
             createRocketActionProperty(
                 key = DESCRIPTION,
                 name = DESCRIPTION,
-                description = "Описание",
+                description = "Description",
                 required = false
             )
         )
@@ -67,7 +67,7 @@ class TextRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
                             val defaultToolkit = Toolkit.getDefaultToolkit()
                             val clipboard = defaultToolkit.systemClipboard
                             clipboard.setContents(StringSelection(text), null)
-                            actionContext!!.notification().show(NotificationType.INFO, "Текст скопирован в буфер")
+                            actionContext!!.notification().show(NotificationType.INFO, "Text copied to clipboard")
                         }
                     }
                 })
@@ -93,7 +93,7 @@ class TextRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
 
     override fun asString(): List<String> = listOf(LABEL)
 
-    override fun name(): String = "Отобразить текст"
+    override fun name(): String = "Display text"
 
     override fun icon(): Icon? = actionContext!!.icon().by(AppIcon.TEXT)
 

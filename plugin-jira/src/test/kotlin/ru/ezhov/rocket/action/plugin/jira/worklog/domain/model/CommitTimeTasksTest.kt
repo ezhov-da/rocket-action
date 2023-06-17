@@ -7,7 +7,7 @@ internal class CommitTimeTasksTest {
     @Test
     fun test() {
         val commitTimeTasks = CommitTimeTasks.of(
-            value = "какая-то задача_с_40_А это описание",
+            value = "some task_s_40_A this description",
             delimiter = "_",
             dateFormatPattern = "yyyyMMddHHmm",
             constantsNowDate = listOf("now", "n", "с"),

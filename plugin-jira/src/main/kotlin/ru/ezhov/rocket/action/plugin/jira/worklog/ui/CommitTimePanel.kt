@@ -338,7 +338,7 @@ class CommitTimePanel(
     ) : JPanel() {
         init {
             layout = BoxLayout(this, BoxLayout.Y_AXIS)
-            border = BorderFactory.createTitledBorder("Избранные задачи")
+            border = BorderFactory.createTitledBorder("Favorite tasks")
             tasks.forEach {
                 add(FavoriteTaskPanel(aliasForTaskIds = aliasForTaskIds, task = it, addCallback = addCallback))
             }
@@ -352,7 +352,7 @@ class CommitTimePanel(
 
         init {
             layout = BorderLayout()
-            border = BorderFactory.createTitledBorder("Шаблоны подстановки")
+            border = BorderFactory.createTitledBorder("Substitution patterns")
             textPane.isEditable = false
             add(textPane, BorderLayout.CENTER)
             textPane.text = aliasForTaskIds.values.map { (key, values) ->
@@ -408,7 +408,7 @@ class CommitTimePanel(
 
         }
         private var currentTasks: MutableList<TableTasksPanelTask> = mutableListOf()
-        private val buttonCommit: JButton = JButton("Зафиксировать")
+        private val buttonCommit: JButton = JButton("Contribute")
 
         private val taskNamesCache = mutableMapOf<String, String>()
 
@@ -457,11 +457,11 @@ class CommitTimePanel(
             )
 
             tableModel.addColumn("ID")
-            tableModel.addColumn("Имя")
-            tableModel.addColumn("Дата")
-            tableModel.addColumn("Время в минутах")
-            tableModel.addColumn("Комментарий")
-            tableModel.addColumn("Статус")
+            tableModel.addColumn("Name")
+            tableModel.addColumn("Date")
+            tableModel.addColumn("Time in minutes")
+            tableModel.addColumn("A comment")
+            tableModel.addColumn("Status")
 
             buttonCommit.addActionListener {
                 currentTasks
@@ -488,7 +488,7 @@ class CommitTimePanel(
             add(
                 JPanel(FlowLayout(FlowLayout.LEFT))
                     .apply {
-                        add(JButton("Подтянуть имена задач")
+                        add(JButton("Pull up task names")
                             .also { button ->
                                 button.addActionListener {
                                     currentTasks
@@ -535,15 +535,15 @@ class CommitTimePanel(
 
         fun setCurrentCommitTimeTasks(tasks: CommitTimeTasks) {
             val textDiff = if (maxTimeInMinutes != null) {
-                " Осталось указать <b>'${maxTimeInMinutes - tasks.sumOfTimeTasksAsMinute()}'</b> " +
-                    "минут из <b>'$maxTimeInMinutes'</b>."
+                " It remains to specify <b>'${maxTimeInMinutes - tasks.sumOfTimeTasksAsMinute()}'</b> " +
+                    "minutes from <b>'$maxTimeInMinutes'</b>."
             } else {
                 ""
             }
 
-            labelInfo.text = "<html>Число задач: <b>${tasks.countOfTask()}</b>. " +
-                "Суммарное время: в минутах <b>${tasks.sumOfTimeTasksAsMinute()}</b>, " +
-                "в часах <b>${tasks.sumOfTimeTasksAsHours()}</b>. $textDiff"
+            labelInfo.text = "<html>Number of tasks: <b>${tasks.countOfTask()}</b>. " +
+                "Total time: in minutes <b>${tasks.sumOfTimeTasksAsMinute()}</b>, " +
+                "in hours <b>${tasks.sumOfTimeTasksAsHours()}</b>. $textDiff"
 
             while (tableModel.rowCount != 0) {
                 tableModel.removeRow(tableModel.rowCount - 1)

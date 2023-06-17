@@ -25,7 +25,7 @@ private val logger = KotlinLogging.logger {}
 class YmlRocketActionSettingsRepository(
     private val uri: URI
 ) : RocketActionSettingsRepository {
-    // TODO ezhov временное использование, будет перенесено в сервис после рефакторнига
+    // TODO ezhov temporary use, will be transferred to the service after refactoring
     private val tagsService = TagServiceFactory.tagsService
     private val ymlRocketActionSettingsRepositoryOldFormat = YmlRocketActionSettingsRepositoryOldFormat(uri)
     private val mapper = ObjectMapper(YAMLFactory())

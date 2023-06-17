@@ -1,12 +1,12 @@
 package ru.ezhov.rocket.action.api
 
 /**
- * Тип действия
+ * Action type
  */
 fun interface RocketActionType {
 
     /**
-     * Уникальный тип действия
+     * Unique action type
      */
     fun value(): String
 }

@@ -111,7 +111,7 @@ class ConfigurationFrame(
         panelTree.add(SearchInTreePanel(root = root, treeModel = defaultTreeModel, tree = tree), BorderLayout.NORTH)
         panelTree.add(JScrollPane(tree), BorderLayout.CENTER)
         val panelSaveTree = JPanel()
-        val buttonSaveTree = JButton("Сохранить всю конфигурацию")
+        val buttonSaveTree = JButton("Save all configuration")
         buttonSaveTree.addActionListener { saveSettings(defaultTreeModel) }
         panelSaveTree.add(buttonSaveTree)
         panelTree.add(panelSaveTree, BorderLayout.SOUTH)
@@ -159,7 +159,7 @@ class ConfigurationFrame(
                         }
 
                         init {
-                            putValue(NAME, "Добавить выше")
+                            putValue(NAME, "Add above")
                             putValue(SMALL_ICON, RocketActionContextFactory.context.icon().by(AppIcon.PLUS))
                         }
                     }))
@@ -181,7 +181,7 @@ class ConfigurationFrame(
                             }
 
                             init {
-                                putValue(NAME, "Добавить ниже")
+                                putValue(NAME, "Add below")
                                 putValue(SMALL_ICON, RocketActionContextFactory.context.icon().by(AppIcon.PLUS))
                             }
                         }
@@ -203,7 +203,7 @@ class ConfigurationFrame(
                                 }
 
                                 init {
-                                    putValue(NAME, "Создать и добавить как потомка")
+                                    putValue(NAME, "Create and add as child")
                                     putValue(SMALL_ICON, RocketActionContextFactory.context.icon().by(AppIcon.PLUS))
                                 }
                             }
@@ -235,7 +235,7 @@ class ConfigurationFrame(
                                 }
 
                                 init {
-                                    putValue(NAME, "Дублировать")
+                                    putValue(NAME, "Duplicate")
                                     putValue(SMALL_ICON, RocketActionContextFactory.context.icon().by(AppIcon.FORK))
                                 }
                             }
@@ -259,7 +259,7 @@ class ConfigurationFrame(
                             }
 
                             init {
-                                putValue(NAME, "Удалить")
+                                putValue(NAME, "Delete")
                                 putValue(SMALL_ICON, RocketActionContextFactory.context.icon().by(AppIcon.MINUS))
                             }
                         }
@@ -276,7 +276,7 @@ class ConfigurationFrame(
         val dateAsString = dateTime.format(
             DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
         )
-        frame.title = "Конфигурирование действий '$dateAsString'"
+        frame.title = "Configuring actions '$dateAsString'"
     }
 
     private fun fillTreeNodes(actions: List<RocketActionSettingsModel>?, parent: DefaultMutableTreeNode) {
@@ -316,10 +316,10 @@ class ConfigurationFrame(
             val actions = ActionsModel(actions = settings.map { it.toModel() })
             rocketActionSettingsRepository.save(actions)
             setTitle(actions.lastChangedDate)
-            RocketActionContextFactory.context.notification().show(NotificationType.INFO, "Действия сохранены")
+            RocketActionContextFactory.context.notification().show(NotificationType.INFO, "Actions saved")
         } catch (e: RocketActionSettingsRepositoryException) {
             e.printStackTrace()
-            RocketActionContextFactory.context.notification().show(NotificationType.ERROR, "Ошибка сохранения действий")
+            RocketActionContextFactory.context.notification().show(NotificationType.ERROR, "Error saving actions")
         }
     }
 
@@ -425,9 +425,9 @@ class ConfigurationFrame(
     private fun createToolBar(): JToolBar {
         val menuBar = JToolBar()
 
-        // Обновить
+        // Refresh
         menuBar.add(
-            JButton("Обновить").apply {
+            JButton("Refresh").apply {
                 icon = RocketActionContextFactory.context.icon().by(AppIcon.RELOAD)
                 addActionListener { e: ActionEvent? ->
                     SwingUtilities.invokeLater {
@@ -437,8 +437,8 @@ class ConfigurationFrame(
                 }
             })
 
-        // Переменные
-        menuBar.add(JButton("Переменные").apply {
+        // Variables
+        menuBar.add(JButton("Variables").apply {
             val variablesFrame = VariablesFrame(frame)
             icon = RocketActionContextFactory.context.icon().by(AppIcon.FORK)
             addActionListener {
@@ -448,8 +448,8 @@ class ConfigurationFrame(
             }
         })
 
-        // Информация о загрузке плагинов
-        menuBar.add(JButton("Информация о загрузке плагинов").apply {
+        // Plugin Download Information
+        menuBar.add(JButton("Plugin Download Information").apply {
             val pluginManagerFrame = PluginManagerFrame(
                 rocketActionPluginApplicationService = rocketActionPluginApplicationService,
                 parent = frame
@@ -475,7 +475,7 @@ class ConfigurationFrame(
     }
 
     private fun createAndShowButtonCreateFirstAction(menuBar: JToolBar) {
-        buttonCreateNewAction = JButton("Создать первое действие")
+        buttonCreateNewAction = JButton("Create first action")
         buttonCreateNewAction!!.icon = RocketActionContextFactory.context.icon().by(AppIcon.STAR)
         buttonCreateNewAction!!.addActionListener { _: ActionEvent? ->
             createRocketActionSettingsDialog.show(object : CreatedRocketActionSettingsCallback {

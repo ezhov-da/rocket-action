@@ -27,14 +27,14 @@ class CommitTimeTasks private constructor(
             if (value.isBlank()) {
                 CommitTimeTasks(
                     errors = listOf(
-                        CommitTimeTasksError("Данные не могут быть пустыми")
+                        CommitTimeTasksError("Data cannot be empty")
                     ),
                     delimiter = delimiter
                 )
             } else {
                 val rows = value.split("\n")
                 if (rows.isEmpty()) {
-                    CommitTimeTasks(errors = listOf(CommitTimeTasksError("Нет данных")), delimiter = delimiter)
+                    CommitTimeTasks(errors = listOf(CommitTimeTasksError("No data")), delimiter = delimiter)
                 } else {
                     rows
                         .map {
@@ -66,15 +66,15 @@ class CommitTimeTasks private constructor(
             aliasForTaskIds: AliasForTaskIds,
             validator: Validator,
         ): Either<CommitTimeTasksError, CommitTimeTask> {
-            val error by lazy { "Для строки '${this.trim()}' есть ошибки: " }
+            val error by lazy { "For string '${this.trim()}' there are mistakes: " }
             return this
                 .split(delimiter)
                 .let { parts ->
                     if (parts.size != 4) {
                         CommitTimeTasksError(
-                            "$error Данные должны состоять из четырёх столбцов разделённых '$delimiter'. " +
-                                "ID$delimiter'$dateFormatPattern' или '$constantsNowDate'" +
-                                "${delimiter}Время в минутах${delimiter}Описание"
+                            "$error The data must consist of four columns separated by '$delimiter'. " +
+                                "ID$delimiter'$dateFormatPattern' or '$constantsNowDate'" +
+                                "${delimiter}Time in minutes${delimiter}Description"
                         ).left()
                     } else {
                         val errors = mutableListOf<String>()
@@ -101,23 +101,23 @@ class CommitTimeTasks private constructor(
                             }
                         } catch (ex: DateTimeParseException) {
                             errors.add(
-                                "Некорректный формат даты и времени. " +
-                                    "Корректный " +
-                                    "'$dateFormatPattern' или " +
-                                    "'$constantsNowDate' или " +
-                                    "'+/-дней от текущей даты' или " +
-                                    "'не указывать дату'"
+                                "Incorrect date and time format. " +
+                                    "Correct " +
+                                    "'$dateFormatPattern' or " +
+                                    "'$constantsNowDate' or " +
+                                    "'+/-days from the current date' or " +
+                                    "'do not set a date'"
                             )
                             null
                         }
                         val timeSpentMinute = try {
                             parts[2].toInt()
                         } catch (ex: NumberFormatException) {
-                            errors.add("Некорректное время, должно быть число. ")
+                            errors.add("Invalid time, must be a number. ")
                             null
                         }
 
-                        // валидация комментария
+                        // comment validation
                         val comment = parts[3]
                         val commentErrors = validator.validate(comment)
                         if (commentErrors.isNotEmpty()) {

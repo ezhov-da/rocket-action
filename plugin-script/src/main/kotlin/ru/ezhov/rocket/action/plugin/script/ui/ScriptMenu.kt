@@ -84,7 +84,7 @@ class ScriptMenu(
         val textPaneResult = RSyntaxTextArea().apply {
             isCodeFoldingEnabled = true
         }
-        val buttonExecute = JButton("Выполнить")
+        val buttonExecute = JButton("Run")
 
         init {
             layout = BorderLayout()

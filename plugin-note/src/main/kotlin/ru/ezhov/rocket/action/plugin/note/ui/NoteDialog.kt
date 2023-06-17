@@ -49,10 +49,10 @@ class NoteDialog(
     actionContext: RocketActionContext,
 ) : JDialog() {
     companion object {
-        private const val TEXT = "вставьте сюда"
+        private const val TEXT = "paste here"
     }
 
-    private val labelDropDown = JLabel("<html><center>Перетащите текст<br>для сохранения<br>или</center>")
+    private val labelDropDown = JLabel("<html><center>Drag text<br>to save<br>or</center>")
     private val textFieldPaste = JTextField(TEXT)
     private val basicPanel = JPanel(BorderLayout())
     private val createDialog = CreateDialog(
@@ -160,7 +160,7 @@ class NoteDialog(
     ) : JDialog(owner, modal) {
         private val textPaneText = JTextPane()
         private val textPaneDescription = JTextPane()
-        private val buttonSave = JButton("Сохранить")
+        private val buttonSave = JButton("Save")
 
         init {
             layout = BorderLayout()
@@ -189,14 +189,14 @@ class NoteDialog(
                             val note = get()
                             actionContext
                                 .notification()
-                                .show(type = NotificationType.INFO, text = "Заметка сохранена. $note")
+                                .show(type = NotificationType.INFO, text = "The note has been saved. $note")
                             dialog.isVisible = false
                         } catch (ex: Exception) {
                             logger.warn(ex) { "Error when save note ${textPaneText.text} ${textPaneDescription.text}" }
 
                             actionContext
                                 .notification()
-                                .show(type = NotificationType.WARN, text = "Ошибка сохранения заметки")
+                                .show(type = NotificationType.WARN, text = "Error saving note")
                         }
                     }
                 }.execute()

@@ -6,7 +6,7 @@ import ru.ezhov.rocket.action.api.RocketActionFactoryUi
 import ru.ezhov.rocket.action.api.RocketActionPropertySpec
 
 /**
- * Базовый класс для создания UI действия
+ * Base class for creating a UI action
  */
 abstract class AbstractRocketAction : RocketActionFactoryUi, RocketActionConfiguration {
     protected fun createRocketActionProperty(

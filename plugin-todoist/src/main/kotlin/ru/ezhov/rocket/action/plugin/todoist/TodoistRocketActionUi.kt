@@ -53,11 +53,11 @@ class TodoistRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
 
     override fun properties(): List<RocketActionConfigurationProperty> {
         return listOf(
-            createRocketActionProperty(key = LABEL, name = LABEL, description = "Заголовок", required = true),
+            createRocketActionProperty(key = LABEL, name = LABEL, description = "Header", required = true),
             createRocketActionProperty(
                 key = TOKEN,
                 name = TOKEN,
-                description = "Используйте это свойство или свойство Java из командной строки -D${TOKEN_PROPERTY}",
+                description = "Use this property or Java property from command line -D${TOKEN_PROPERTY}",
                 required = true
             )
         )
@@ -65,7 +65,7 @@ class TodoistRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
 
     override fun asString(): List<String> = listOf(LABEL)
 
-    override fun name(): String = "Работа с Todois"
+    override fun name(): String = "Working with Todoist"
 
     override fun icon(): Icon? = actionContext!!.icon().by(AppIcon.BOOKMARK)
 
@@ -108,7 +108,7 @@ class TodoistRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
             try {
                 menu.removeAll()
                 menu.add(this.get())
-                actionContext!!.notification().show(NotificationType.INFO, "Todoist загружен")
+                actionContext!!.notification().show(NotificationType.INFO, "Todoist loaded")
             } catch (e: InterruptedException) {
                 e.printStackTrace()
             } catch (e: ExecutionException) {

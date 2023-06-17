@@ -1,22 +1,22 @@
 package ru.ezhov.rocket.action.api.handler
 
 /**
- * Обработчик действий.
- * Позволяет расширить набор действий не ограничиваясь UI интерфейсом.
+ * Action handler.
+ * Allows you to expand the set of actions not limited to the UI interface.
  */
 interface RocketActionHandler {
     /**
-     * Идентификатор обработчика
+     * Handler ID
      */
     fun id(): String
 
     /**
-     * Контракты поддерживаемые обработчиком
+     * Contracts supported by handler
      */
     fun contracts(): List<RocketActionHandlerCommandContract>
 
     /**
-     * Обработка команды
+     * Command processing
      */
     fun handle(command: RocketActionHandlerCommand): RocketActionHandleStatus
 }

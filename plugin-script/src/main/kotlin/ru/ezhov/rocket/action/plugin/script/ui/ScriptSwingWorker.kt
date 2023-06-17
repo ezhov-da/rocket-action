@@ -32,7 +32,7 @@ class ScriptSwingWorker(
             logger.warn(it) { "Error script executed. Script $script" }
             context.notification().show(
                 type = NotificationType.WARN,
-                text = "Ошибка выполнения скрипта"
+                text = "Script execution error"
             )
             it.message ?: "Error"
         }

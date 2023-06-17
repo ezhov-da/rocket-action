@@ -3,16 +3,16 @@ package ru.ezhov.rocket.action.api
 import ru.ezhov.rocket.action.api.context.RocketActionContext
 
 /**
- * Плагин действия
+ * Action Plugin
  */
 interface RocketActionPlugin {
     /**
-     * Фабрика по созданию UI
+     * UI Factory
      */
     fun factory(context: RocketActionContext): RocketActionFactoryUi
 
     /**
-     * Конфигурация действия
+     * Action Configuration
      */
     fun configuration(context: RocketActionContext): RocketActionConfiguration
 }

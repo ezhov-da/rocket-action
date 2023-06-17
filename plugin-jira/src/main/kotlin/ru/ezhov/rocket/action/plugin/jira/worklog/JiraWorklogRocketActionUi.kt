@@ -147,17 +147,16 @@ class JiraWorklogRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
 
                                     override fun title(): String = label
 
-                                    override fun description(): String = """Отчёт по отработанным часам.
-                                        |Добавление текста в конец и сохранение файла""".trimMargin()
+                                    override fun description(): String = "Hours worked report. Adding text to the end and saving the file"
 
                                     override fun inputArguments(): List<RocketActionHandlerProperty> =
                                         listOf(object : RocketActionHandlerProperty {
                                             override fun key(): RocketActionHandlerPropertyKey =
                                                 RocketActionHandlerPropertyKey("text")
 
-                                            override fun name(): String = "Текст"
+                                            override fun name(): String = "Text"
 
-                                            override fun description(): String = "Текст для добавления"
+                                            override fun description(): String = "Text to add"
 
                                             override fun isRequired(): Boolean = true
 
@@ -185,7 +184,7 @@ class JiraWorklogRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
 
     override fun type(): RocketActionType = RocketActionType { "JIRA_WORK_LOG" }
 
-    override fun description(): String = "Внесение отработанного времени в Jira"
+    override fun description(): String = "Hours tracking in Jira"
 
     override fun asString(): List<String> = listOf(LABEL)
 
@@ -193,77 +192,75 @@ class JiraWorklogRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
         return listOf(
             createRocketActionProperty(
                 key = LABEL,
-                name = "Заголовок",
-                description = "Заголовок, который будет отображаться",
+                name = "Title",
+                description = "Title to be displayed",
                 required = true
             ),
             createRocketActionProperty(
                 key = DESCRIPTION,
-                name = "Описание",
-                description = """Описание, которое будет всплывать при наведении,
-                            |в случае отсутствия будет отображаться путь""".trimMargin(),
+                name = "Description",
+                description = "A description that will pop up on hover, otherwise the path will be displayed",
                 required = false
             ),
             createRocketActionProperty(
                 key = URL,
-                name = "URL для Jira",
-                description = "URL для Jira",
+                name = "Jira URL",
+                description = "Jira URL",
                 required = true
             ),
             createRocketActionProperty(
                 key = USERNAME,
-                name = "Имя пользователя",
-                description = "Имя пользователя",
+                name = "Username",
+                description = "Username",
                 required = true
             ),
             createRocketActionProperty(
                 key = PASSWORD,
-                name = "Пароль",
-                description = "Пароль",
+                name = "Password",
+                description = "Password",
                 required = true
             ),
             createRocketActionProperty(
                 key = PREDEFINED_TASKS,
-                name = "Предустановленные задачи для быстрого выбора",
-                description = "Формат: ID задачи___Название",
+                name = "Preset tasks for quick selection",
+                description = "Format: Task ID___Title",
                 required = false
             ),
             createRocketActionProperty(
                 key = DELIMITER_TASK_INFO,
-                name = "Разделитель информации о задаче",
-                description = "Этот разделитель будет использоваться для внесения данных в текстовое поле",
+                name = "Task information delimiter",
+                description = "This delimiter will be used to enter data into the text field",
                 required = true,
                 property = RocketActionPropertySpec.StringPropertySpec(defaultValue = DEFAULT_DELIMITER_TASK_INFO)
             ),
             createRocketActionProperty(
                 key = CONSTANTS_NOW_DATE,
-                name = "Константы, для обозначения текущего времени",
-                description = "Через запятую. Используется для замены при внесении " +
-                    "данных на текущее время. Пример: now,n,сейчас",
+                name = "Constants to indicate the current time",
+                description = "Through a comma. Used to replace when entering data for the current time. Example: now,n",
                 required = false,
                 property = RocketActionPropertySpec.StringPropertySpec(defaultValue = DEFAULT_CONSTANTS_NOW_DATE)
             ),
             createRocketActionProperty(
                 key = ALIAS_FOR_TASK_IDS,
-                name = "Псевдонимы для идентификаторов задач",
-                description = """Используется для замены псевдонима на ID задачи.
-                    |Пример:
-                    |TASK-12_внеп,проп
-                    |TASK-15_что,col""".trimMargin(),
+                name = "Aliases for task IDs",
+                description = """Used to replace the alias with the task ID.
+                    |Example:
+                    |TASK-day,org
+                    |TASK-15_col,d""".trimMargin(),
                 required = false,
                 property = RocketActionPropertySpec.StringPropertySpec(defaultValue = DEFAULT_CONSTANTS_NOW_DATE)
             ),
             createRocketActionProperty(
                 key = LINK_TO_WORK_LOG,
-                name = "Ссылка на страницу учёта времени",
-                description = "Ссылка на страницу учёта времени для быстрого перехода",
+                name = "Link to time tracking page",
+                description = "Link to the time tracking page for a quick transition",
                 required = false,
                 property = RocketActionPropertySpec.StringPropertySpec()
             ),
             createRocketActionProperty(
                 key = FILE_PATH_WORK_LOG,
-                name = "Путь к файлу сохранения отчёта по списанию времени",
-                description = "Путь к файлу сохранения отчёта по списанию времени",
+                name = "Path to the file to save the report on the write-off of time",
+                description = "Path to the file to save the report on the write-off of time",
                 required = true,
                 property = RocketActionPropertySpec.StringPropertySpec(
                     defaultValue = defaultFile()
@@ -271,18 +268,18 @@ class JiraWorklogRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
             ),
             createRocketActionProperty(
                 key = TEXT_VALIDATIONS,
-                name = "Возможные валидации для текста",
-                description = "Доступные валидации:\n" +
+                name = "Possible validations for text",
+                description = "Available validations:\n" +
                     ValidationRule.values().joinToString(separator = "\n") { "${it.name}:${it.description}" } +
-                    "\nВведите настройки в строках, например: '${ValidationRule.MIN_LENGTH} 12' это значит, " +
-                    "что минимальная длина текста - 12",
+                    "\nEnter settings in lines, for example: '${ValidationRule.MIN_LENGTH} 12' this means, " +
+                    "that the minimum text length is 12",
                 required = false,
                 property = RocketActionPropertySpec.StringPropertySpec()
             ),
             createRocketActionProperty(
                 key = MAX_TIME_IN_MINUTES,
-                name = "Максимальное время в минутах",
-                description = "Используется для вычисления оставшегося времени для внесения",
+                name = "Maximum time in minutes",
+                description = "Used to calculate the remaining time for making",
                 required = false,
                 property = RocketActionPropertySpec.IntPropertySpec()
             ),
@@ -291,7 +288,7 @@ class JiraWorklogRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
 
     private fun defaultFile() = "./.jira-plugin/worklog/worklog-${UUID.randomUUID()}.txt"
 
-    override fun name(): String = "Внесение отработанного времени в Jira"
+    override fun name(): String = "Hours tracking in Jira"
 
     override fun icon(): Icon? = actionContext!!.icon().by(AppIcon.CLOCK)
 

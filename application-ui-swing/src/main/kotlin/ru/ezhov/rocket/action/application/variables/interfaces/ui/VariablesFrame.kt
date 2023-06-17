@@ -28,18 +28,18 @@ private val logger = KotlinLogging.logger { }
 class VariablesFrame(parent: JFrame? = null) : JFrame() {
     private val variablesApplication = VariablesApplication()
     private val applicationTableModel = DefaultTableModel().apply {
-        addColumn("*Имя")
-        addColumn("*Значение")
-        addColumn("*Описание")
+        addColumn("*Name")
+        addColumn("*Value")
+        addColumn("*Description")
     }
 
     private val propertiesEnableModel = DefaultTableModel().apply {
-        addColumn("*Имя")
-        addColumn("*Значение")
+        addColumn("*Name")
+        addColumn("*Value")
     }
     private val environmentEnableModel = DefaultTableModel().apply {
-        addColumn("*Имя")
-        addColumn("*Значение")
+        addColumn("*Name")
+        addColumn("*Value")
     }
 
     private val applicationTable = JTable(applicationTableModel).apply {
@@ -52,24 +52,24 @@ class VariablesFrame(parent: JFrame? = null) : JFrame() {
         tableHeader.reorderingAllowed = false
     }
 
-    private val keyTextField = TextFieldWithText("Ключ для кодирования переменных")
+    private val keyTextField = TextFieldWithText("Key to encode variables")
 
-    private val addRowButton = JButton("Добавить строку")
-    private val removeRowButton = JButton("Удалить строку")
+    private val addRowButton = JButton("Add line")
+    private val removeRowButton = JButton("Delete line")
 
-    private val saveButton = JButton("Сохранить")
-    private val refreshButton = JButton("Обновить")
+    private val saveButton = JButton("Save")
+    private val refreshButton = JButton("Refresh")
 
     private val tabbedPane = JTabbedPane()
 
     init {
         val variables = variablesApplication.all()
-        tabbedPane.addTab("Приложение", applicationPanel(variables))
+        tabbedPane.addTab("Application", applicationPanel(variables))
 
-        tabbedPane.addTab("Java свойства", JPanel(BorderLayout()).apply {
+        tabbedPane.addTab("Java properties", JPanel(BorderLayout()).apply {
             add(JScrollPane(propertiesTable), BorderLayout.CENTER)
         })
-        tabbedPane.addTab("Окружение", JPanel(BorderLayout()).apply {
+        tabbedPane.addTab("Environment", JPanel(BorderLayout()).apply {
             add(JScrollPane(environmentTable), BorderLayout.CENTER)
         })
 
@@ -99,7 +99,7 @@ class VariablesFrame(parent: JFrame? = null) : JFrame() {
         }, BorderLayout.NORTH)
 
         add(tabbedPane, BorderLayout.CENTER)
-        title = "Переменные"
+        title = "Variables"
 
         setLocationRelativeTo(parent)
     }

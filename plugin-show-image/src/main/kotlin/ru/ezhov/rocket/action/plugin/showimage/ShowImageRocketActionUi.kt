@@ -87,19 +87,19 @@ class ShowImageRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
 
     override fun type(): RocketActionType = RocketActionType { "SHOW_IMAGE" }
 
-    override fun description(): String = "Показать изображения *.png и *.jpg"
+    override fun description(): String = "Show *.png and *.jpg images"
 
     override fun asString(): List<String> = listOf(LABEL, IMAGE_URL)
 
     override fun properties(): List<RocketActionConfigurationProperty> {
         return listOf(
-            createRocketActionProperty(key = LABEL, name = LABEL, description = "Заголовок", required = false),
-            createRocketActionProperty(key = DESCRIPTION, name = DESCRIPTION, description = "Описание", required = false),
-            createRocketActionProperty(key = IMAGE_URL, name = IMAGE_URL, description = "URL изображения", required = true)
+            createRocketActionProperty(key = LABEL, name = LABEL, description = "Title", required = false),
+            createRocketActionProperty(key = DESCRIPTION, name = DESCRIPTION, description = "Description", required = false),
+            createRocketActionProperty(key = IMAGE_URL, name = IMAGE_URL, description = "Image URL", required = true)
         )
     }
 
-    override fun name(): String = "Показать изображение *.png и *.jpg"
+    override fun name(): String = "Show image *.png and *.jpg"
 
     private inner class LoadImageWorker(
         private val imageUrl: String,
@@ -157,7 +157,7 @@ class ShowImageRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
                 }
 
                 init {
-                    putValue(NAME, "Открыть в отдельном окне")
+                    putValue(NAME, "Open in a separate window")
                 }
             })
             preferredSize = newDimension

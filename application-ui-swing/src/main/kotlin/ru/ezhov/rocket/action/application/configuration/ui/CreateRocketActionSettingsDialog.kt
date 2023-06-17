@@ -55,7 +55,7 @@ class CreateRocketActionSettingsDialog(
             actionSettingsPanel.create().second
         }
 
-    private val dialog: JDialog = JDialog(owner, "Создать действие").apply {
+    private val dialog: JDialog = JDialog(owner, "Create action").apply {
         this.setIconImage(RocketActionContextFactory.context.icon().by(AppIcon.ROCKET_APP).toImage())
         val ownerSize = owner.size
         setSize((ownerSize.width * 0.7).toInt(), (ownerSize.height * 0.7).toInt())
@@ -111,7 +111,7 @@ class CreateRocketActionSettingsDialog(
     private fun createTestAndSaveDialog(): JPanel {
         val panel = JPanel(BorderLayout())
         val panelCreateButton = JPanel()
-        val buttonCreate = JButton("Создать")
+        val buttonCreate = JButton("Create")
         panelCreateButton.add(buttonCreate)
         buttonCreate.addActionListener {
             val settings = actionSettingsPanel.create()
@@ -206,9 +206,9 @@ class CreateRocketActionSettingsDialog(
             val centerPanel = JPanel(BorderLayout())
             when (val configProperty = property.property()) {
                 is RocketActionPropertySpec.StringPropertySpec -> {
-                    val plainText = JRadioButton("Простой текст").apply { isSelected = true }
-                    val mustacheTemplate = JRadioButton("Шаблон Mustache")
-                    val groovyTemplate = JRadioButton("Шаблон Groovy")
+                    val plainText = JRadioButton("Plain text").apply { isSelected = true }
+                    val mustacheTemplate = JRadioButton("Mustache template")
+                    val groovyTemplate = JRadioButton("Groovy template")
                     ButtonGroup().apply {
                         add(plainText)
                         add(mustacheTemplate)

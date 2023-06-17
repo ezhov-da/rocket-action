@@ -64,7 +64,7 @@ fun main() {
                 fileForSave = Files.createTempFile("test", "test").toFile(),
                 commitTimeTaskInfoRepository = object : CommitTimeTaskInfoRepository {
                     override fun info(id: String): Either<CommitTimeTaskInfoException, CommitTimeTaskInfo?> =
-                        CommitTimeTaskInfo(name = "$id + типа имя").right()
+                        CommitTimeTaskInfo(name = "$id + type name").right()
                 },
                 context = object : RocketActionContext {
                     override fun icon(): IconService {

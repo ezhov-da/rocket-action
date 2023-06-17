@@ -30,9 +30,9 @@ class DynamicScriptRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
 
     override fun description(): String =
         """
-        Выполнение скрипта с входными параметрами.
-        Каждый параметр является переменной '_v[номер поля]'.
-        Например: _v1 - поле 1
+        Executing a script with input parameters.
+        Each parameter is a variable '_v[field number]'.
+        For example: _v1 - field 1
         """.trimIndent()
 
     override fun asString(): List<String> = listOf(LABEL, SCRIPT)
@@ -42,38 +42,38 @@ class DynamicScriptRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
             createRocketActionProperty(
                 key = SCRIPT,
                 name = SCRIPT,
-                description = "Скрипт для выполнения",
+                description = "Script to execute",
                 required = true
             ),
-            createRocketActionProperty(key = LABEL, name = LABEL, description = "Заголовок", required = true),
+            createRocketActionProperty(key = LABEL, name = LABEL, description = "Title", required = true),
             createRocketActionProperty(
                 key = DESCRIPTION,
                 name = DESCRIPTION,
-                description = "Описание",
+                description = "Description",
                 required = false
             ),
             createRocketActionProperty(
                 key = FIELD_NAMES,
                 name = FIELD_NAMES,
                 description = """
-                    Имена полей и значения по умолчанию, если необходимо с разделителем ':' в столбец.
-                    Например:
-                    Имя:Денис
-                    Запрос:select * from test where name = 'Денис'
+                    Field names and default values, if necessary, with a ':' delimiter in the column.
+                    For example:
+                    Name: Denis
+                    Query: select * from test where name = 'Denis'
                 """.trimIndent(),
                 required = false
             ),
             createRocketActionProperty(
                 key = COUNT_VARIABLES,
                 name = COUNT_VARIABLES,
-                description = "Количество входных параметров",
+                description = "Number of input parameters",
                 required = true,
                 property = RocketActionPropertySpec.IntPropertySpec(defaultValue = 1, min = 0, max = 10),
             ),
             createRocketActionProperty(
                 key = SELECTED_SCRIPT_LANG,
                 name = SELECTED_SCRIPT_LANG,
-                description = "Выбранный язык скрипта",
+                description = "Selected script language",
                 required = true,
                 property = RocketActionPropertySpec.ListPropertySpec(
                     ScriptEngineType.GROOVY.name,
@@ -83,7 +83,7 @@ class DynamicScriptRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
         )
     }
 
-    override fun name(): String = "Скрипт с переменными (alfa)"
+    override fun name(): String = "Script with variables (alfa)"
 
     override fun icon(): Icon = actionContext!!.icon().by(AppIcon.BOLT)
 

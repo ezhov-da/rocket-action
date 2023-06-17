@@ -3,26 +3,26 @@ package ru.ezhov.rocket.action.api
 import java.awt.Component
 
 /**
- * Созданное и готовое к работе действие
+ * Created and ready to work action
  */
 interface RocketAction {
     /**
-     * Определяет необходимость отображения этого действия в результатах поиска
+     * Specifies whether this action should be displayed in search results
 
-     * @return true если действие необходимо отразить в результатах поиска
+     * @return true if the action should be reflected in the search results
      */
     fun contains(search: String): Boolean
 
     /**
-     * Изменились ли настройки действия и нужно ли его пересоздать.
-     * Используется для кеширования действия
+     * Whether the settings of the action have changed and whether it needs to be recreated.
+     * Used to cache the action
      */
     fun isChanged(actionSettings: RocketActionSettings): Boolean
 
     /**
-     * Компонент действия для отображения.
-     * Важно. Данный метод не должен создавать компонент.
-     * Должен возвращаться компонент созданный методом [RocketActionFactoryUi.create].
+     * The action component to display.
+     * Important. This method must not create a component.
+     * The component created by the [RocketActionFactoryUi.create] method should be returned.
      */
     fun component(): Component
 }

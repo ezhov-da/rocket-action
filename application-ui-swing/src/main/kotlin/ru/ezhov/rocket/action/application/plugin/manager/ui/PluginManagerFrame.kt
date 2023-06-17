@@ -20,10 +20,10 @@ class PluginManagerFrame(
         }
     }
         .apply {
-            addColumn("Источник плагина")
-            addColumn("Подробная информация")
-            addColumn("Время загрузки в ms")
-            addColumn("Информация об ошибке")
+            addColumn("Plugin source")
+            addColumn("Detailed information")
+            addColumn("Download time in ms")
+            addColumn("Error Information")
         }
     private val table = JTable(tableModel).apply {
         tableHeader.reorderingAllowed = false
@@ -62,14 +62,14 @@ class PluginManagerFrame(
 
         size = Dimension(600, 500)
         defaultCloseOperation = HIDE_ON_CLOSE
-        title = "Информация о загрузке плагинов"
+        title = "Plugin Download Information"
         setLocationRelativeTo(parent)
     }
 }
 
 private fun RocketActionPluginSourceType.toText() = when (this) {
-    RocketActionPluginSourceType.JAR -> "JAR файл"
-    RocketActionPluginSourceType.INNER -> "Внутренний"
+    RocketActionPluginSourceType.JAR -> "JAR file"
+    RocketActionPluginSourceType.INNER -> "Interior"
     RocketActionPluginSourceType.GROOVY_SCRIPT -> "Groovy"
     RocketActionPluginSourceType.KOTLIN_SCRIPT -> "Kotlin"
     RocketActionPluginSourceType.CLASS_PATH -> "Class path"

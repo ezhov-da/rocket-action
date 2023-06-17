@@ -41,7 +41,7 @@ class CopyToClipboardRocketActionUi : AbstractRocketAction(), RocketActionPlugin
                 val defaultToolkit = Toolkit.getDefaultToolkit()
                 val clipboard = defaultToolkit.systemClipboard
                 clipboard.setContents(StringSelection(text), null)
-                context.notification().show(NotificationType.INFO, "Текст скопирован в буфер")
+                context.notification().show(NotificationType.INFO, "Text copied to clipboard")
             }
 
             context.search().register(settings.id(), text)
@@ -63,17 +63,17 @@ class CopyToClipboardRocketActionUi : AbstractRocketAction(), RocketActionPlugin
 
     override fun type(): RocketActionType = RocketActionType { "COPY_TO_CLIPBOARD" }
 
-    override fun description(): String = "Позволяет скопировать текст в буфер"
+    override fun description(): String = "Allows you to copy text to the clipboard"
 
     override fun asString(): List<String> = listOf(LABEL, TEXT)
 
-    override fun name(): String = "Копировать в буфер"
+    override fun name(): String = "Copy to clipboard"
 
     override fun properties(): List<RocketActionConfigurationProperty> {
         return listOf(
-            createRocketActionProperty(LABEL, LABEL, "Текст для отображения", false),
-            createRocketActionProperty(DESCRIPTION, DESCRIPTION, "Описание", false),
-            createRocketActionProperty(TEXT, TEXT, "Текст для копирования в буфер", true)
+            createRocketActionProperty(LABEL, LABEL, "Text to display", false),
+            createRocketActionProperty(DESCRIPTION, DESCRIPTION, "Description", false),
+            createRocketActionProperty(TEXT, TEXT, "Text to copy to clipboard", true)
         )
     }
 

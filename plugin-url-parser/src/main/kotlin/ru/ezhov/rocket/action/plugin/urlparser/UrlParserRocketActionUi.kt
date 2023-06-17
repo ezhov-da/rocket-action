@@ -74,7 +74,7 @@ class UrlParserRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
                     val textField = TextFieldWithText("URL")
                     textField.columns = 15
                     val txt = JTextPane()
-                    val button = JButton("Получить описание").apply {
+                    val button = JButton("Get description").apply {
                         addActionListener(
                             ButtonListener(
                                 callbackUrl = { textField.text },
@@ -120,9 +120,9 @@ class UrlParserRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
 
     override fun type(): RocketActionType = RocketActionType { "URL_PARSER" }
 
-    override fun name(): String = "Получение описания URL"
+    override fun name(): String = "Getting the description of a URL"
 
-    override fun description(): String = "Получение заголовка и описания URL"
+    override fun description(): String = "Getting the title and description of a URL"
 
     override fun asString(): List<String> = listOf(LABEL)
 
@@ -131,18 +131,15 @@ class UrlParserRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
     override fun properties(): List<RocketActionConfigurationProperty> = listOf(
         createRocketActionProperty(
             key = LABEL,
-            name = "Название",
-            description = "название для отображения",
+            name = "Title",
+            description = "Title to display",
             required = true,
-            property = RocketActionPropertySpec.StringPropertySpec(defaultValue = "Получить заголовок URL"),
+            property = RocketActionPropertySpec.StringPropertySpec(defaultValue = "Get URL title"),
         ),
         createRocketActionProperty(
             key = HEADERS,
-            name = "Заголовки",
-            description =
-            """Заголовки для запроса в формате - каждый заголовок с новой строки:
-                        |Имя${DELIMITER}Значение
-                    """.trimMargin(),
+            name = "Titles",
+            description = "Headers for the request in the format - each header on a new line: Name${DELIMITER}Value",
             required = false,
         )
     )
@@ -191,7 +188,7 @@ class UrlParserRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
 
                     context.notification().show(
                         type = NotificationType.ERROR,
-                        text = "Ошибка получения описания для URL '$url'"
+                        text = "Error getting description for URL '$url'"
                     )
                 }
                 button.icon = null

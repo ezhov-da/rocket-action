@@ -25,7 +25,7 @@ class MutableRocketActionSettings(
         override fun settings(): Map<String, String> =
             try {
                 settings.associate { set ->
-                    // TODO ezhov возможность для оптимизации
+                    // TODO ezhov opportunity for optimization
                     val resultVal = EngineService().processWithEngine(set).toString()
                     set.name to resultVal
                 }

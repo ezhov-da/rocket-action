@@ -3,30 +3,30 @@ package ru.ezhov.rocket.action.application.properties
 private const val PREFIX = "rocket.action"
 
 enum class UsedPropertiesName(val propertyName: String, val description: String) {
-    VERSION("$PREFIX.version", "Версия приложения. Пример: 0.16.6"),
-    INFO("$PREFIX.info", "Информация о приложении"),
-    REPOSITORY("$PREFIX.repository", "Ссылка на репозиторий приложения"),
+    VERSION("$PREFIX.version", "Application version. Example: 0.16.6"),
+    INFO("$PREFIX.info", "App Information"),
+    REPOSITORY("$PREFIX.repository", "Application repository link"),
 
-    FONT_NAME("$PREFIX.font.name", "Имя шрифта. Пример: Monospaced"),
-    FONT_STYLE("$PREFIX.font.style", "Стиль шрифта. Пример: Значение константы java.awt.Font.PLAIN"),
-    FONT_SIZE("$PREFIX.font.size", "Размер шрифта. Пример: 12"),
+    FONT_NAME("$PREFIX.font.name", "Font name. Example: Monospaced"),
+    FONT_STYLE("$PREFIX.font.style", "Font style. Example: Value of a constant java.awt.Font.PLAIN"),
+    FONT_SIZE("$PREFIX.font.size", "Font size. Example: 12"),
 
-    CACHE_FOLDER("$PREFIX.cache.folder", "Папка для кэша. Пример: ./cache"),
+    CACHE_FOLDER("$PREFIX.cache.folder", "Cache folder. Example: ./cache"),
 
-    IS_DEVELOPER("$PREFIX.is.developer", "Режим разработчика. Пример: false"),
+    IS_DEVELOPER("$PREFIX.is.developer", "Developer mode. Example: false"),
 
     DEFAULT_ACTIONS_FILE(
         "$PREFIX.default.actions.file",
-        "Путь к файлу с действиями. Пример: ./actions.yml"
+        "The path to the action file. Example: ./actions.yml"
     ),
 
     UI_CONFIGURATION_DIALOG_WIDTH_IN_PERCENT(
         "$PREFIX.ui.configuration.dialog.width_in_percent",
-        "Ширина окна конфигурации действий в процентах от ширины экрана. Пример: 0.6"
+        "The width of the action configuration window as a percentage of the screen width. Example: 0.6"
     ),
     UI_CONFIGURATION_DIALOG_HEIGHT_IN_PERCENT(
         "$PREFIX.ui.configuration.dialog.height_in_percent",
-        "Высота окна конфигурации действий в процентах от высоты экрана. Пример: 0.6"
+        "The height of the action configuration window as a percentage of the screen height. Example: 0.6"
     ),
 
     UI_CONFIGURATION_LOOK_AND_FEEL_CLASS(
@@ -39,57 +39,57 @@ enum class UsedPropertiesName(val propertyName: String, val description: String)
             FlatLaf Darcula  - com.formdev.flatlaf.FlatDarculaLaf
             Link: https://www.formdev.com/flatlaf/themes/
 
-            Пример: com.formdev.flatlaf.FlatLightLaf
+            Example: com.formdev.flatlaf.FlatLightLaf
         """.trimIndent()
     ),
 
     UI_CONFIGURATION_FRAME_ALWAYS_ON_TOP(
         "$PREFIX.ui.configuration.frame.always_on_top",
         """
-            Отображать окно редактора конфигурации всегда поверх окон.
-            Пример: false
+            Display the configuration editor window always on top of windows.
+            Example: false
         """.trimIndent()
     ),
 
     HANDLER_SERVER_PORT(
         "$PREFIX.handler.server.port",
         """
-            Порт для сервера обработчика.
-            Пример: 4567
+            Port for the handler server.
+            Example: 4567
         """.trimIndent()
     ),
 
     VARIABLES_FILE_REPOSITORY_PATH(
         "$PREFIX.variables.file.repository.path",
         """
-            Путь к файлу для хранения переменных.
-            Пример:
-            - относительный путь './folder/variables.json'
-            - абсолютный путь 'C:/folder/variables.json'
+            Path to a file to store variables.
+            Example:
+            - relative path './folder/variables.json'
+            - absolute path 'C:/folder/variables.json'
         """.trimIndent()
     ),
 
     APPLICATION_CONFIGURATION_FILE_REPOSITORY_PATH(
         "$PREFIX.application.configuration.file.repository.path",
         """
-            Путь хранения настроек приложения.
-            Пример:
-            - относительный путь './folder/configurations.json'
-            - абсолютный путь 'C:/folder/configurations.json'
+            Path for storing application settings.
+            Example:
+            - relative path './folder/configurations.json'
+            - absolute path 'C:/folder/configurations.json'
         """.trimIndent()
     ),
 
     GROOVY_PLUGIN_FOLDER(
         "$PREFIX.groovy.plugin.folder",
         """
-            Путь к папке с плагинами на Groovy
+            Path to folder with plugins on Groovy
         """.trimIndent()
     ),
 
     KOTLIN_PLUGIN_FOLDER(
         "$PREFIX.kotlin.plugin.folder",
         """
-            Путь к папке с плагинами на Kotlin
+            The path to the folder with plugins in Kotlin
         """.trimIndent()
     ),
 }

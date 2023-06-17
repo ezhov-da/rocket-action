@@ -95,8 +95,8 @@ class NoteOnFileRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
 
     override fun type(): RocketActionType = RocketActionType { "NOTE_ON_FILE" }
 
-    override fun description(): String = "Записка в файле. " +
-        "Позволяет сохранять информацию в файл, а так же иметь быстрый доступ к файлу"
+    override fun description(): String = "Note in file. " +
+        "Allows you to save information to a file, as well as have quick access to the file"
 
     override fun asString(): List<String> = listOf(
         LABEL,
@@ -108,23 +108,22 @@ class NoteOnFileRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
         return listOf(
             createRocketActionProperty(
                 key = LABEL,
-                name = "Заголовок в меню",
-                description = "Заголовок в меню",
+                name = "Title in the menu",
+                description = "Title in the menu",
                 required = true,
                 property = RocketActionPropertySpec.StringPropertySpec(),
             ),
             createRocketActionProperty(
                 key = DESCRIPTION,
-                name = "Описание",
-                description = """Описание, которое будет всплывать при наведении,
-                            |в случае отсутствия будет отображаться путь""".trimMargin(),
+                name = "Description",
+                description = "A description that will pop up on hover, otherwise the path will be displayed",
                 required = false,
                 property = RocketActionPropertySpec.StringPropertySpec(),
             ),
             createRocketActionProperty(
                 key = PATH_AND_NAME,
-                name = "Путь к файлу и его название",
-                description = "Путь по которому будет располагаться файл",
+                name = "File path and name",
+                description = "The path where the file will be located",
                 required = true,
                 property = RocketActionPropertySpec.StringPropertySpec(
                     defaultValue = File("./notes/${UUID.randomUUID()}.txt").path
@@ -132,8 +131,8 @@ class NoteOnFileRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
             ),
             createRocketActionProperty(
                 key = SYNTAX_STYLE,
-                name = "Стиль подсветки",
-                description = "Подсветка синтаксиса по умолчанию",
+                name = "Backlight Style",
+                description = "Syntax highlighting by default",
                 required = false,
                 property = RocketActionPropertySpec.ListPropertySpec(
                     defaultValue = SyntaxConstants.SYNTAX_STYLE_NONE,
@@ -142,17 +141,16 @@ class NoteOnFileRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
             ),
             createRocketActionProperty(
                 key = DELIMITER,
-                name = "Разделитель для групп",
-                description = """Если указан разделитель для групп,
-                    |в файле будет искаться указанный разделитель и строиться список групп для быстрого перехода""".trimMargin(),
+                name = "Group separator",
+                description = "If a separator for groups is specified, the specified separator will be searched in " +
+                    "the file and a list of groups will be built for quick transition",
                 required = false,
                 property = RocketActionPropertySpec.StringPropertySpec(),
             ),
             createRocketActionProperty(
                 key = LOAD_TEXT_ON_INITIALIZE,
-                name = "Загружать текст из файла при инициализации",
-                description = """При установке true загружает текст при инициализации.
-                    "В случае, если текста много, может повлиять на первоначальную загрузку""",
+                name = "Load text from file on initialization",
+                description = "When set to true, loads the text on initialization. In case there is a lot of text, it may affect the initial load",
                 required = true,
                 property = RocketActionPropertySpec.BooleanPropertySpec(
                     defaultValue = true,
@@ -160,8 +158,8 @@ class NoteOnFileRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
             ),
             createRocketActionProperty(
                 key = AUTO_SAVE,
-                name = "Сохранять текст автоматически ",
-                description = """Автоматическое сохранение текста""",
+                name = "Save text automatically",
+                description = "Automatic text saving",
                 required = true,
                 property = RocketActionPropertySpec.BooleanPropertySpec(
                     defaultValue = true,
@@ -169,8 +167,8 @@ class NoteOnFileRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
             ),
             createRocketActionProperty(
                 key = AUTO_SAVE_PERIOD_IN_SECOND,
-                name = "Автоматически сохранять через указанное время в секундах",
-                description = """Автоматически сохранять через указанное время в секундах""",
+                name = "Automatically save after a specified time in seconds",
+                description = "Automatically save after a specified time in seconds",
                 required = false,
                 property = RocketActionPropertySpec.IntPropertySpec(
                     defaultValue = DEFAULT_AUTO_SAVE_PERIOD_IN_SECOND,
@@ -179,7 +177,7 @@ class NoteOnFileRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
         )
     }
 
-    override fun name(): String = "Записка в файле"
+    override fun name(): String = "Note on file"
 
     override fun icon(): Icon? = actionContext!!.icon().by(AppIcon.TEXT)
 

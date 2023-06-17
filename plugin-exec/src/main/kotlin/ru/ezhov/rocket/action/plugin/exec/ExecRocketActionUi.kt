@@ -97,7 +97,7 @@ class ExecRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
         val defaultToolkit = Toolkit.getDefaultToolkit()
         val clipboard = defaultToolkit.systemClipboard
         clipboard.setContents(StringSelection(command), null)
-        notification.show(NotificationType.INFO, "Команда '$command' скопирована в буфер")
+        notification.show(NotificationType.INFO, "Command '$command' copied to clipboard")
     }
 
     private fun executeCommand(workingDir: String, command: String, notification: NotificationService) {
@@ -112,7 +112,7 @@ class ExecRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
                 )
             }
         } catch (ex: Exception) {
-            val text = "Ошибка выполнения команды '$command'"
+            val text = "Command execution error '$command'"
             logger.warn(ex) { text }
             notification.show(NotificationType.WARN, text)
         }
@@ -120,9 +120,9 @@ class ExecRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
 
     override fun type(): RocketActionType = RocketActionType { "EXEC" }
 
-    override fun name(): String = "Выполнить команду"
+    override fun name(): String = "Run command"
 
-    override fun description(): String = "Выполнение команды"
+    override fun description(): String = "Command execution"
 
     override fun asString(): List<String> = listOf(
         LABEL, COMMAND
@@ -130,11 +130,11 @@ class ExecRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
 
     override fun properties(): List<RocketActionConfigurationProperty> {
         return listOf(
-            createRocketActionProperty(COMMAND, COMMAND, "Команда", true),
-            createRocketActionProperty(LABEL, LABEL, "Заголовок", false),
-            createRocketActionProperty(WORKING_DIR, WORKING_DIR, "Рабочий каталог", false),
-            createRocketActionProperty(DESCRIPTION, DESCRIPTION, "Описание", false),
-            createRocketActionProperty(ICON_URL, ICON_URL, "URL иконки", false)
+            createRocketActionProperty(COMMAND, COMMAND, "Command", true),
+            createRocketActionProperty(LABEL, LABEL, "Title", false),
+            createRocketActionProperty(WORKING_DIR, WORKING_DIR, "Working directory", false),
+            createRocketActionProperty(DESCRIPTION, DESCRIPTION, "Description", false),
+            createRocketActionProperty(ICON_URL, ICON_URL, "Icon URL", false)
         )
     }
 

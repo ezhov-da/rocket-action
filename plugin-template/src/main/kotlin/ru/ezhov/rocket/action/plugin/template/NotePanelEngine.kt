@@ -29,7 +29,7 @@ class NotePanelEngine(
             val defaultToolkit = Toolkit.getDefaultToolkit()
             val clipboard = defaultToolkit.systemClipboard
             clipboard.setContents(StringSelection(finalText), null)
-            context!!.notification().show(NotificationType.INFO, "Шаблон скопирован в буфер")
+            context!!.notification().show(NotificationType.INFO, "Template copied to clipboard")
         }
     }
 
@@ -49,7 +49,7 @@ class NotePanelEngine(
         maximumSize = panelDimension
         preferredSize = panelDimension
         add(panelEngine, BorderLayout.NORTH)
-        val button = JButton("Применить (CTRL + ENTER на поле)")
+        val button = JButton("Apply (CTRL + ENTER on the field)")
         val panelButton = JPanel(BorderLayout())
         panelButton.add(button, BorderLayout.NORTH)
         textPane = JTextPane().apply {

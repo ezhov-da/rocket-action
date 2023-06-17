@@ -1,13 +1,13 @@
 package ru.ezhov.rocket.action.api.handler
 
 /**
- * Интерфейс, который необходимо реализовать [ru.ezhov.rocket.action.api.RocketAction] для поддержки обработчиков
+ * Interface to be implemented [ru.ezhov.rocket.action.api.RocketAction] to support handlers
  */
 interface RocketActionHandlerFactory {
     /**
-     * Обработчик получается один раз
+     * The handler is obtained once
      *
-     * Может быть null если не удалось создать
+     * May be null if failed to create
      */
     fun handler(): RocketActionHandler?
 }

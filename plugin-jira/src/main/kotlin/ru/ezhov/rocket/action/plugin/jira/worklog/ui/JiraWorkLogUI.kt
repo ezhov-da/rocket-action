@@ -52,11 +52,11 @@ class JiraWorkLogUI(
     init {
         val toolBar = JToolBar()
         toolBar.add(
-            JButton("Открыть в отдельном окне")
+            JButton("Open in a separate window")
                 .apply {
                     addActionListener {
                         SwingUtilities.invokeLater {
-                            val frame = JFrame("Внесение времени в Jira")
+                            val frame = JFrame("Hours tracking in Jira")
                             frame.iconImage = context
                                 .icon().by(AppIcon.ROCKET_APP).toImage()
                             frame.add(
@@ -86,7 +86,7 @@ class JiraWorkLogUI(
                 }
         )
         toolBar.add(
-            JButton("Загрузить текст")
+            JButton("Download text")
                 .apply {
                     addActionListener {
                         commitTimePanel.loadText()
