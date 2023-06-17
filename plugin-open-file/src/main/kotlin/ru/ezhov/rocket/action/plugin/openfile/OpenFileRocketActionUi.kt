@@ -50,7 +50,7 @@ class OpenFileRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
                             Desktop.getDesktop().open(File(path))
                         } catch (ex: Exception) {
                             logger.warn(ex) { "Error when open file '$path'" }
-                            actionContext!!.notification().show(NotificationType.ERROR, "Ошибка открытия файла")
+                            actionContext!!.notification().show(NotificationType.ERROR, "File opening error")
                         }
                     }
                 }
@@ -75,7 +75,7 @@ class OpenFileRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
 
     override fun type(): RocketActionType = RocketActionType { "OPEN_FILE" }
 
-    override fun description(): String = "Открыть файл"
+    override fun description(): String = "Open file"
 
     override fun asString(): List<String> = listOf(
         LABEL,
@@ -87,30 +87,26 @@ class OpenFileRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
         return listOf(
             createRocketActionProperty(
                 key = LABEL,
-                name = "Заголовок",
-                description =
-                """Заголовок, который будет отображаться.
-                            |В случае отсутствия будет использоваться имя файла
-                        """.trimMargin(),
+                name = "Title",
+                description = "The title to be displayed. If not present, the filename will be used.",
                 required = false
             ),
             createRocketActionProperty(
                 key = DESCRIPTION,
-                name = "Описание",
-                description = """Описание, которое будет всплывать при наведении,
-                            |в случае отсутствия будет отображаться путь""".trimMargin(),
+                name = "Description",
+                    description = "A description that will pop up on hover, otherwise the path will be displayed",
                 required = false
             ),
             createRocketActionProperty(
                 key = PATH,
-                name = "Путь к файлу",
-                description = "Путь по которому будет открываться файл",
+                name = "The path to the file",
+                description = "The path where the file will be opened",
                 required = true
             )
         )
     }
 
-    override fun name(): String = "Открыть файл"
+    override fun name(): String = "Open file"
 
     override fun icon(): Icon? = actionContext!!.icon().by(AppIcon.FILE)
 

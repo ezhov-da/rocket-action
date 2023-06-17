@@ -1,33 +1,33 @@
 package ru.ezhov.rocket.action.api.handler
 
 /**
- * Свойство обработчика
+ * Handler property
  */
 interface RocketActionHandlerProperty {
     /**
-     * Должен быть уникальный в разрезе обработчика
-     * @return ключ свойства
+     * Must be unique in the context of the handler
+     * @return property key
      */
     fun key(): RocketActionHandlerPropertyKey
 
     /**
-     * @return название свойства для обработчика
+     * @return property name for the handler
      */
     fun name(): String
 
     /**
-     * @return описание свойства для обработчика
+     * @return description of the property for the handler
      */
     fun description(): String
 
     /**
-     * Это свойство подсказывает пользователю о необходимости заполнения, но не гарантирует заполненность.
-     * @return обязательность заполнения свойства.
+     * This property prompts the user to fill in, but does not guarantee that it is filled.
+     * @return mandatory property.
      */
     fun isRequired(): Boolean
 
     /**
-     * Свойство для конфигурирования
+     * Property to configure
      */
     fun property(): RocketActionHandlerPropertySpec
 }

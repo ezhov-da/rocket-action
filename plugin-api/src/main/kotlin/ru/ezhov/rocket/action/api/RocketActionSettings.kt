@@ -1,28 +1,28 @@
 package ru.ezhov.rocket.action.api
 
 /**
- * Настройки действия
+ * Action settings
  */
 interface RocketActionSettings {
     /**
-     * @return идентификатор действия
+     * @return action ID
      */
     fun id(): String
 
     /**
-     * @return тип действия
+     * @return action type
      */
     fun type(): RocketActionType
 
     /**
-     * @return настройки действия
+     * @return action settings
      */
     fun settings(): Map<String, String>
 
     /**
-     * Используется для групповых действий
+     * Used for group actions
      *
-     * @return действия
+     * @return actions
      */
     fun actions(): List<RocketActionSettings>
 }

@@ -102,17 +102,16 @@ class OpenUrlWithTextRocketActionUi : AbstractRocketAction(), RocketActionPlugin
 
                                 override fun title(): String = label
 
-                                override fun description(): String = "Открыть URL с подстановкой"
+                                override fun description(): String = "Open URL with wildcard"
 
                                 override fun inputArguments(): List<RocketActionHandlerProperty> =
                                     listOf(
                                         object : RocketActionHandlerProperty {
                                             override fun key(): RocketActionHandlerPropertyKey = RocketActionHandlerPropertyKey("text")
 
-                                            override fun name(): String = "Текст для подстановки"
+                                            override fun name(): String = "Substitute text"
 
-                                            override fun description(): String =
-                                                "Текст для подстановки"
+                                            override fun description(): String = "Substitute text"
 
                                             override fun isRequired(): Boolean = true
 
@@ -150,35 +149,35 @@ class OpenUrlWithTextRocketActionUi : AbstractRocketAction(), RocketActionPlugin
                 )
             } catch (ex: Exception) {
                 ex.printStackTrace()
-                actionContext!!.notification().show(NotificationType.ERROR, "Ошибка открытия URL")
+                actionContext!!.notification().show(NotificationType.ERROR, "URL opening error")
             }
         }
     }
 
     override fun type(): RocketActionType = RocketActionType { "OPEN_URL_WITH_TEXT" }
 
-    override fun description(): String = "Открытие шаблонной ссылки с подставленным значением"
+    override fun description(): String = "Opening a template link with a value substituted"
 
     override fun asString(): List<String> = listOf(LABEL, BASE_URL)
 
     override fun properties(): List<RocketActionConfigurationProperty> {
         return listOf(
-            createRocketActionProperty(LABEL, LABEL, "Заголовок", false),
-            createRocketActionProperty(DESCRIPTION, DESCRIPTION, "Описание", false),
-            createRocketActionProperty(BASE_URL, BASE_URL, "Шаблон URL", true),
-            createRocketActionProperty(PLACEHOLDER, PLACEHOLDER, "Строка подстановки", true),
-            createRocketActionProperty(ICON_URL, ICON_URL, "URL иконки", false),
+            createRocketActionProperty(LABEL, LABEL, "Title", false),
+            createRocketActionProperty(DESCRIPTION, DESCRIPTION, "Description", false),
+            createRocketActionProperty(BASE_URL, BASE_URL, "URL pattern", true),
+            createRocketActionProperty(PLACEHOLDER, PLACEHOLDER, "Substitution string", true),
+            createRocketActionProperty(ICON_URL, ICON_URL, "Icon URL", false),
             createRocketActionProperty(
                 key = IS_ENCODE,
                 name = IS_ENCODE,
-                description = "Кодировать для URL",
+                description = "Encode for URL",
                 required = false,
                 property = RocketActionPropertySpec.BooleanPropertySpec(defaultValue = false),
             )
         )
     }
 
-    override fun name(): String = "Открыть ссылку с подстановкой"
+    override fun name(): String = "Open link with wildcard"
 
     override fun icon(): Icon? = actionContext!!.icon().by(AppIcon.LINK_INTACT)
 

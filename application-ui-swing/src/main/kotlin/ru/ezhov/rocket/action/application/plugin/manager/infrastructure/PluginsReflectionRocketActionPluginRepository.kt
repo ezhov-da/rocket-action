@@ -28,7 +28,7 @@ class PluginsReflectionRocketActionPluginRepository : RocketActionPluginReposito
     private fun load() = runBlocking {
         val times = measureTimeMillis {
             logger.info { "Initialise configuration rocket action repository" }
-            // из jar-ников
+            // from jar
             val fromJars = jarsPluginLoader
                 .plugins()
                 .map { jar ->
@@ -38,7 +38,7 @@ class PluginsReflectionRocketActionPluginRepository : RocketActionPluginReposito
                 .flatten()
                 .toList()
 
-            // внутренние
+            // internal
             val inner = innerPluginLoader
                 .plugins()
                 .map { clazzName ->
@@ -47,7 +47,7 @@ class PluginsReflectionRocketActionPluginRepository : RocketActionPluginReposito
                 .awaitAll()
                 .toList()
 
-            // из class path
+            // from class path
             val extended = classPathPluginLoader
                 .plugins()
                 .map { clazzName ->
@@ -58,7 +58,7 @@ class PluginsReflectionRocketActionPluginRepository : RocketActionPluginReposito
                 .awaitAll()
                 .toList()
 
-            // из groovy плагина
+            // from groovy plugin
             val fromGroovy = groovyPluginLoader
                 .plugins()
                 .map { file ->
@@ -69,7 +69,7 @@ class PluginsReflectionRocketActionPluginRepository : RocketActionPluginReposito
                 .awaitAll()
                 .toList()
 
-            // из kotlin плагина
+            // from kotlin plugin
             val fromKotlin = kotlinPluginLoader
                 .plugins()
                 .map { file ->

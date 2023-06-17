@@ -78,7 +78,7 @@ class GroovyScriptRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
                                                 override fun title(): String = label
 
                                                 override fun description(): String =
-                                                    "Выполнение скрипта описанного в действии"
+                                                    "Executing the script described in the action"
 
                                                 override fun inputArguments(): List<RocketActionHandlerProperty> =
                                                     emptyList()
@@ -101,7 +101,7 @@ class GroovyScriptRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
 
     override fun type(): RocketActionType = RocketActionType { TYPE }
 
-    override fun description(): String = "Выполнение скрипта Groovy"
+    override fun description(): String = "Executing a Groovy Script"
 
     override fun asString(): List<String> = listOf(LABEL, SCRIPT)
 
@@ -110,20 +110,20 @@ class GroovyScriptRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
             createRocketActionProperty(
                 key = SCRIPT,
                 name = SCRIPT,
-                description = "Скрипт для выполнения",
+                description = "Script to execute",
                 required = true
             ),
-            createRocketActionProperty(key = LABEL, name = LABEL, description = "Заголовок", required = true),
+            createRocketActionProperty(key = LABEL, name = LABEL, description = "Header", required = true),
             createRocketActionProperty(
                 key = DESCRIPTION,
                 name = DESCRIPTION,
-                description = "Описание",
+                description = "Description",
                 required = false
             ),
             createRocketActionProperty(
                 key = EXECUTE_ON_LOAD,
                 name = EXECUTE_ON_LOAD,
-                description = "Выполнять скрипт при загрузке",
+                description = "Execute script on boot",
                 required = true,
                 property = RocketActionPropertySpec.BooleanPropertySpec(defaultValue = false),
             ),

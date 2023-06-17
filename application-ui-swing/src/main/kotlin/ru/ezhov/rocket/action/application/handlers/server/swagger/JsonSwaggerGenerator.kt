@@ -57,9 +57,9 @@ class JsonSwaggerGenerator : SwaggerGenerator {
                 .post(
                     Operation()
                         .operationId("executeCommand")
-                        .description("Выполнить команду")
+                        .description("Run command")
                         .addTagsItem("Handler")
-                        .summary("Выполнить команду")
+                        .summary("Run command")
                         .parameters(
                             listOf(
                                 headerKeyParameter(),
@@ -89,7 +89,7 @@ class JsonSwaggerGenerator : SwaggerGenerator {
                                                             mapOf(
                                                                 "key" to StringSchema()
                                                                     .description(
-                                                                        "Пара ключ-значение указанные в конкретном действии"
+                                                                        "Key-value pair specified in a specific action"
                                                                     )
                                                                     .example("value")
                                                             )
@@ -116,7 +116,7 @@ class JsonSwaggerGenerator : SwaggerGenerator {
                 mapOf(
                     "key" to StringSchema()
                         .description(
-                            "Пара ключ-значение"
+                            "Key-value pair"
                         )
                         .example("value")
                 )
@@ -126,7 +126,7 @@ class JsonSwaggerGenerator : SwaggerGenerator {
             .addApiResponse(
                 "200",
                 ApiResponse()
-                    .description("Успешный ответ")
+                    .description("Successful response")
                     .content(
                         Content()
                             .addMediaType(
@@ -139,7 +139,7 @@ class JsonSwaggerGenerator : SwaggerGenerator {
             .addApiResponse(
                 "400",
                 ApiResponse()
-                    .description("Некорректный запрос")
+                    .description("Bad request")
                     .content(
                         Content()
                             .addMediaType(
@@ -151,11 +151,11 @@ class JsonSwaggerGenerator : SwaggerGenerator {
                                                 mapOf(
                                                     "errors" to ArraySchema()
                                                         .description(
-                                                            "Список ошибок"
+                                                            "List of errors"
                                                         )
                                                         .items(
                                                             StringSchema()
-                                                                .example("Ошибка")
+                                                                .example("Error")
                                                         )
                                                 )
                                             )
@@ -166,17 +166,17 @@ class JsonSwaggerGenerator : SwaggerGenerator {
             .addApiResponse(
                 "403",
                 ApiResponse()
-                    .description("Запрещено")
+                    .description("Forbidden")
             )
             .addApiResponse(
                 "404",
                 ApiResponse()
-                    .description("Обработчик не найден")
+                    .description("Handler not found")
             )
             .addApiResponse(
                 "500",
                 ApiResponse()
-                    .description("Ошибка")
+                    .description("Error")
                     .content(
                         Content()
                             .addMediaType(
@@ -188,9 +188,9 @@ class JsonSwaggerGenerator : SwaggerGenerator {
                                                 mapOf(
                                                     "message" to StringSchema()
                                                         .description(
-                                                            "Ошибка выполнения"
+                                                            "Runtime error"
                                                         )
-                                                        .example("Ошибка")
+                                                        .example("Error")
                                                 )
                                             )
                                     )

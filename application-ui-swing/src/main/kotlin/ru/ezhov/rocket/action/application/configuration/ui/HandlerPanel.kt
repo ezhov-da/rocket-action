@@ -18,7 +18,7 @@ class HandlerPanel private constructor(private val handlers: List<AvailableHandl
     init {
         add(label)
         label.apply {
-            text = "Доступны обработчики"
+            text = "Handlers available"
 
             addMouseListener(object : MouseAdapter() {
                 val defaultColor = this@HandlerPanel.label.foreground

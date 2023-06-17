@@ -1,6 +1,6 @@
 package ru.ezhov.rocket.action.plugin.noteonfile.command
 
-//Должен создаваться в рамках панели, чтоб не аффектить другие панели
+//Must be created within a panel so as not to affect other panels
 class CommandObserver {
     private val listSaveTextCommandListener: MutableList<SaveTextCommandListener> = mutableListOf()
 

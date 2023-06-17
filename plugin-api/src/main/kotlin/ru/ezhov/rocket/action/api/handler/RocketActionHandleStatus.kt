@@ -1,13 +1,13 @@
 package ru.ezhov.rocket.action.api.handler
 
 /**
- * Ответ обработчика
+ * Processor response
  */
 sealed class RocketActionHandleStatus {
     /**
-     * Успешная обработка.
+     * Successful processing.
      *
-     * [values] - результат выполнения
+     * [values] - execution result
      *
      */
     class Success(
@@ -15,17 +15,17 @@ sealed class RocketActionHandleStatus {
     ) : RocketActionHandleStatus()
 
     /**
-     * Некорректные входные параметры.
+     * Invalid input parameters.
      *
-     * [errors] - список ошибок
+     * [errors] - error list
      */
     class InvalidInputData(val errors: List<String>) : RocketActionHandleStatus()
 
     /**
-     * Ошибка.
+     * Error.
      *
-     * [message] - ошибка
-     * [cause] - причина ошибки
+     * [message] - error message
+     * [cause] - error reason
      */
     class Error(val message: String, val cause: Exception? = null) : RocketActionHandleStatus()
 }

@@ -50,15 +50,15 @@ class AutoSaveInfoPanel(
         progressBar.value = 0
         progressBar.isVisible = true
         var counterMinus = textAutoSave.delayInSeconds
-        progressBar.string = "Сохранение текста через '${counterMinus}' сек"
+        progressBar.string = "Save text after '${counterMinus}' sec"
         var counterPlus = 0
         currentSaveTimer = Timer(1000, null)
         currentSaveTimer!!.addActionListener {
-            progressBar.string = "Сохранение текста через '${--counterMinus}' сек"
+            progressBar.string = "Saving text after '${--counterMinus}' sec"
             progressBar.value = ++counterPlus
             if (counterMinus == 0) {
                 commandObserver.sendCommand(SaveTextCommand())
-                progressBar.string = "Сохранение текста через '${--counterMinus}' сек"
+                progressBar.string = "Saving text after '${--counterMinus}' sec"
                 restTimer()
             }
         }

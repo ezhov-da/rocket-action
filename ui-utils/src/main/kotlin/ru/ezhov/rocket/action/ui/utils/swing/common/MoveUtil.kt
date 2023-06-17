@@ -25,7 +25,7 @@ object MoveUtil {
             override fun mouseReleased(e: MouseEvent) {
                 pressed = false
 
-                // TODO ezhov задел для https://github.com/ezhov-da/rocket-action/issues/7
+                // TODO ezhov groundwork for https://github.com/ezhov-da/rocket-action/issues/7
 //                val ge = GraphicsEnvironment.getLocalGraphicsEnvironment()
 //                val gs = ge.screenDevices
 //                for (curGs in gs) {

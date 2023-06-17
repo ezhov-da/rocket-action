@@ -32,7 +32,7 @@ fun main(args: Array<String>) {
                 tagsService = TagServiceFactory.tagsService,
             )
 
-            runServer() // TODO оформить красиво
+            runServer() // TODO decorate beautifully
 
             BaseDialog.dialog.apply {
                 jMenuBar = actionService.createMenu(this)

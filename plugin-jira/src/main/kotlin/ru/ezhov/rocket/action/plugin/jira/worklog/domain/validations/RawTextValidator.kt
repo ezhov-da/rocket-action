@@ -19,11 +19,11 @@ class RawTextValidator(
             rules.forEach { (k, v) ->
                 when (k) {
                     ValidationRule.MIN_LENGTH -> if (source.length < v as Int) {
-                        add("Минимальная длина '$v' символов. Сейчас '${source.length}'")
+                        add("The minimum length is '$v' characters. Now '${source.length}'")
                     }
 
                     ValidationRule.MAX_LENGTH -> if (source.length > v as Int) {
-                        add("Максимальная длина '$v' символов. Сейчас '${source.length}'")
+                        add("Maximum length of '$v' characters. Now'${source.length}'")
                     }
                 }
             }

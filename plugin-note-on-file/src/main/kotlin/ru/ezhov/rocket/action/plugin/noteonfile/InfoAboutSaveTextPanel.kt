@@ -22,7 +22,7 @@ class InfoAboutSaveTextPanel(
 
         val actual: () -> Unit = {
             label.icon = ImageIcon(this::class.java.getResource("/plugin-note-on-file/success_16x16.png"))
-            label.text = "Текст сохранён " +
+            label.text = "Text saved " +
                 "'${LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"))}'"
         }
 
@@ -41,7 +41,7 @@ class InfoAboutSaveTextPanel(
         eventObserver.register(object : TextChangingListener {
             override fun changing(text: String) {
                 label.icon = ImageIcon(this::class.java.getResource("/plugin-note-on-file/error_16x16.png"))
-                label.text = "Текст не сохранён"
+                label.text = "Text not saved"
             }
         })
     }

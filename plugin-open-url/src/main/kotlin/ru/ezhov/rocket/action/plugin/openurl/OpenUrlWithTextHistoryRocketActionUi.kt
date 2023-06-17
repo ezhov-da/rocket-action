@@ -116,16 +116,16 @@ class OpenUrlWithTextHistoryRocketActionUi :
 
                             override fun title(): String = label
 
-                            override fun description(): String = "Открыть URL с подставленным текстом"
+                            override fun description(): String = "Open URL with substituted text"
 
                             override fun inputArguments(): List<RocketActionHandlerProperty> = listOf(
                                 object : RocketActionHandlerProperty {
                                     override fun key(): RocketActionHandlerPropertyKey =
                                         RocketActionHandlerPropertyKey("text")
 
-                                    override fun name(): String = "Текст для подстановки в URL"
+                                    override fun name(): String = "URL substitution text"
 
-                                    override fun description(): String = "Текст для подстановки в URL"
+                                    override fun description(): String = "URL substitution text"
 
                                     override fun isRequired(): Boolean = true
 
@@ -160,7 +160,7 @@ class OpenUrlWithTextHistoryRocketActionUi :
                 saveToHistory(text = text, menu = menu, uri = uri, addedToHistory = addedToHistory)
             } catch (ex: Exception) {
                 ex.printStackTrace()
-                actionContext!!.notification().show(NotificationType.ERROR, "Ошибка открытия URL")
+                actionContext!!.notification().show(NotificationType.ERROR, "URL opening error")
             }
         }
     }
@@ -209,38 +209,38 @@ class OpenUrlWithTextHistoryRocketActionUi :
 
     override fun type(): RocketActionType = RocketActionType { "OPEN_URL_WITH_TEXT_HISTORY" }
 
-    override fun description(): String = "Открыть ссылку с подстановкой и хранением истории открытий ссылок"
+    override fun description(): String = "Open a link with substitution and storage of the history of opening links"
 
     override fun asString(): List<String> = listOf(LABEL, BASE_URL)
 
     override fun properties(): List<RocketActionConfigurationProperty> {
         return listOf(
-            createRocketActionProperty(key = BASE_URL, name = BASE_URL, description = "Шаблон URL", required = true),
+            createRocketActionProperty(key = BASE_URL, name = BASE_URL, description = "URL pattern", required = true),
             createRocketActionProperty(
                 key = PLACEHOLDER,
                 name = PLACEHOLDER,
-                description = "Строка подстановки",
+                description = "Substitution string",
                 required = true
             ),
-            createRocketActionProperty(key = LABEL, name = LABEL, description = "Заголовок", required = false),
+            createRocketActionProperty(key = LABEL, name = LABEL, description = "Title", required = false),
             createRocketActionProperty(
                 key = DESCRIPTION,
                 name = DESCRIPTION,
-                description = "Описание",
+                description = "Description",
                 required = false
             ),
-            createRocketActionProperty(key = ICON_URL, name = ICON_URL, description = "URL иконки", required = false),
+            createRocketActionProperty(key = ICON_URL, name = ICON_URL, description = "Icon URL", required = false),
             createRocketActionProperty(
                 key = IS_ENCODE,
                 name = IS_ENCODE,
-                description = "Кодировать для URL",
+                description = "Encode for URL",
                 required = false,
                 property = RocketActionPropertySpec.BooleanPropertySpec(defaultValue = false),
             )
         )
     }
 
-    override fun name(): String = "Открытие ссылки с подстановкой и с сохранением истории"
+    override fun name(): String = "Opening a link with substitution and saving history"
 
     override fun icon(): Icon? = actionContext!!.icon().by(AppIcon.LINK_INTACT)
 

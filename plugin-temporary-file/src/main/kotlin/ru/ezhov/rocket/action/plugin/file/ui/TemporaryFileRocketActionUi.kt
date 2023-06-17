@@ -60,7 +60,7 @@ class TemporaryFileRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
 
     override fun type(): RocketActionType = RocketActionType { "SAVE_TEMPORARY_FILE" }
 
-    override fun description(): String = "Сохранить во временный файл"
+    override fun description(): String = "Save to temporary file"
 
     override fun asString(): List<String> = listOf(
         LABEL,
@@ -71,21 +71,20 @@ class TemporaryFileRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
         return listOf(
             createRocketActionProperty(
                 key = LABEL,
-                name = "Заголовок",
-                description = "Заголовок, который будет отображаться",
+                name = "Title",
+                description = "Title to be displayed",
                 required = true
             ),
             createRocketActionProperty(
                 key = DESCRIPTION,
-                name = "Описание",
-                description = """Описание, которое будет всплывать при наведении,
-                            |в случае отсутствия будет отображаться путь""".trimMargin(),
+                name = "Description",
+                description = "A description that will pop up on hover, otherwise the path will be displayed",
                 required = false
             ),
         )
     }
 
-    override fun name(): String = "Сохранить во временный файл"
+    override fun name(): String = "Save to temporary file"
 
     override fun icon(): Icon? = actionContext!!.icon().by(AppIcon.FILE)
 

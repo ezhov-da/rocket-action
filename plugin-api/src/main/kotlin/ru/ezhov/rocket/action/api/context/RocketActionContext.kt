@@ -7,33 +7,33 @@ import ru.ezhov.rocket.action.api.context.search.Search
 import ru.ezhov.rocket.action.api.context.variables.VariablesService
 
 /**
- * Вспомогательный контекст предоставляющий функционал для удобного создания действия
+ * Auxiliary context providing functionality for convenient creation of an action
  */
 interface RocketActionContext {
     /**
-     * Сервис по работе с иконками
+     * Icon service
      */
     fun icon(): IconService
 
     /**
-     * Сервис по работе с уведомлениями
+     * Service for working with notifications
      */
     fun notification(): NotificationService
 
     /**
-     * Сервис кеширования
+     * Caching service
      */
     fun cache(): CacheService
 
     /**
-     * Сервис предоставления переменных
+     * Service providing variables
      */
     fun variables(): VariablesService = object : VariablesService {
         override fun variables(): Map<String, String> = emptyMap()
     }
 
     /**
-     * Сервис регистрации для поиска
+     * Search registration service
      */
     fun search(): Search
 }

@@ -54,7 +54,7 @@ class GistRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
 
     override fun asString(): List<String> = listOf(LABEL)
 
-    override fun name(): String = "Работа с Gists"
+    override fun name(): String = "Working with Gists"
 
     override fun properties(): List<RocketActionConfigurationProperty> {
         return listOf(
@@ -62,7 +62,7 @@ class GistRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
             createRocketActionProperty(
                 key = TOKEN,
                 name = TOKEN,
-                description = "Используйте это свойство или свойство командной строки Java -D$TOKEN_PROPERTY",
+                description = "Use this property or Java command line property -D$TOKEN_PROPERTY",
                 required = false
             ),
             createRocketActionProperty(key = USERNAME, name = USERNAME, description = "", required = true),
@@ -124,7 +124,7 @@ class GistRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
             try {
                 menu.removeAll()
                 menu.add(this.get())
-                actionContext!!.notification().show(NotificationType.INFO, "Gists загружены")
+                actionContext!!.notification().show(NotificationType.INFO, "Gists loaded")
             } catch (e: InterruptedException) {
                 e.printStackTrace()
             } catch (e: ExecutionException) {

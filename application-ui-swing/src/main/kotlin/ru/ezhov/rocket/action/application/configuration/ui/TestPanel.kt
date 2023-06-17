@@ -26,7 +26,7 @@ class TestPanel(
                 ?.factory(RocketActionContextFactory.context)) {
                 null -> {
                     val p = JPanel(BorderLayout())
-                    p.add(JLabel("Не найдено действие для типа '${settings.type}'"))
+                    p.add(JLabel("Action not found for type '${settings.type}'"))
                     p
                 }
 
@@ -37,13 +37,13 @@ class TestPanel(
                         actionUi
                             .create(settings = settings.to(), context = RocketActionContextFactory.context)
                             ?.component()
-                            ?: JLabel("Компонент не создан")
+                            ?: JLabel("Component not created")
                     } catch (ex: Exception) {
                         logger.error(ex) { "Error when create action" }
                         RocketActionContextFactory.context.notification()
                             .show(NotificationType.ERROR, "Error when create test action")
 
-                        JLabel("Ошибка создания компонента")
+                        JLabel("Component creation error")
                     }
                     menuBar.add(component)
                     p.add(menuBar, BorderLayout.CENTER)
@@ -69,7 +69,7 @@ class TestPanel(
 
     init {
         val panel = JPanel()
-        val buttonTest = JButton("Протестировать")
+        val buttonTest = JButton("Test")
         buttonTest.addActionListener { SwingUtilities.invokeLater { callback.create()?.let { rs -> createTest(rs) } } }
         panel.add(buttonTest)
         add(panel, BorderLayout.SOUTH)

@@ -65,7 +65,7 @@ class UiService {
 
             override fun component(): Component = menu
 
-            override fun handler(): RocketActionHandler? = null // TODO ezhov пока не нужен
+            override fun handler(): RocketActionHandler? = null // TODO ezhov is not needed yet
         }
     }
 
@@ -144,7 +144,7 @@ class UiService {
                             )
                         }
                             ?: TextPaneAndDefaultValue(
-                                textPane = TextPaneWithText("Не задано название"),
+                                textPane = TextPaneWithText("Name not set"),
                                 defaultValue = "",
                             )
                     )
@@ -156,7 +156,7 @@ class UiService {
                 JToolBar().apply {
                     isFloatable = false
                     add(
-                        JButton("Выполнить")
+                        JButton("Run")
                             .apply {
                                 addActionListener {
                                     executeFunc.invoke()
@@ -165,7 +165,7 @@ class UiService {
                     )
 
                     add(
-                        JButton("Восстановить значения по умолчанию")
+                        JButton("Restore defaults")
                             .apply {
                                 addActionListener {
                                     variablesField.forEach { it.restore() }
@@ -174,7 +174,7 @@ class UiService {
                     )
 
                     add(
-                        JButton("Копировать результат в буфер")
+                        JButton("Copy result to clipboard")
                             .apply {
                                 addActionListener {
                                     if (resultText.text.isNotBlank()) {
@@ -183,12 +183,12 @@ class UiService {
                                         clipboard.setContents(StringSelection(resultText.text), null)
                                         context.notification().show(
                                             type = NotificationType.INFO,
-                                            text = "Текст скопирован в буфер"
+                                            text = "Text copied to clipboard"
                                         )
                                     } else {
                                         context.notification().show(
                                             type = NotificationType.WARN,
-                                            text = "Отсутствует текст для копирования"
+                                            text = "Missing text to copy"
                                         )
                                     }
                                 }
@@ -230,7 +230,7 @@ class UiService {
                         ).getOrHandle { throw it }?.toString().orEmpty()
                     } catch (ex: Exception) {
                         logger.error(ex) { "Error when execute script" }
-                        "Ошибка выполнения"
+                        "Runtime error"
                     }
 
                 override fun done() {

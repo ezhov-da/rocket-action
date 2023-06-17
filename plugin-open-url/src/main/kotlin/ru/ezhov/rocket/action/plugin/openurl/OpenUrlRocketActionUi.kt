@@ -100,7 +100,7 @@ class OpenUrlRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
 
                             override fun title(): String = label
 
-                            override fun description(): String = "Открыть URL"
+                            override fun description(): String = "Open URL"
 
                             override fun inputArguments(): List<RocketActionHandlerProperty> = emptyList()
 
@@ -120,7 +120,7 @@ class OpenUrlRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
         val defaultToolkit = Toolkit.getDefaultToolkit()
         val clipboard = defaultToolkit.systemClipboard
         clipboard.setContents(StringSelection(url), null)
-        actionContext!!.notification().show(NotificationType.INFO, "URL скопирована в буфер")
+        actionContext!!.notification().show(NotificationType.INFO, "URL copied to clipboard")
     }
 
     private fun openUrl(url: String) {
@@ -129,27 +129,27 @@ class OpenUrlRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
                 Desktop.getDesktop().browse(URI(url))
             } catch (ex: Exception) {
                 ex.printStackTrace()
-                actionContext!!.notification().show(NotificationType.ERROR, "Ошибка открытия URL")
+                actionContext!!.notification().show(NotificationType.ERROR, "URL opening error")
             }
         }
     }
 
     override fun type(): RocketActionType = RocketActionType { "OPEN_URL" }
 
-    override fun description(): String = "Открытие ссылки"
+    override fun description(): String = "Link opening"
 
     override fun asString(): List<String> = listOf(LABEL, URL)
 
     override fun properties(): List<RocketActionConfigurationProperty> {
         return listOf(
-            createRocketActionProperty(LABEL, LABEL, "Заголовок", false),
-            createRocketActionProperty(DESCRIPTION, DESCRIPTION, "Описание", false),
+            createRocketActionProperty(LABEL, LABEL, "Title", false),
+            createRocketActionProperty(DESCRIPTION, DESCRIPTION, "Description", false),
             createRocketActionProperty(URL, URL, "URL", true),
-            createRocketActionProperty(ICON_URL, ICON_URL, "URL иконка", false)
+            createRocketActionProperty(ICON_URL, ICON_URL, "Icon URL", false)
         )
     }
 
-    override fun name(): String = "Открыть ссылку"
+    override fun name(): String = "Open link"
 
     override fun icon(): Icon? = actionContext!!.icon().by(AppIcon.LINK_INTACT)
 

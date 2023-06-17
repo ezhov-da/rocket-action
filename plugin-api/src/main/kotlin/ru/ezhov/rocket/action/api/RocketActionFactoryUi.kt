@@ -3,17 +3,16 @@ package ru.ezhov.rocket.action.api
 import ru.ezhov.rocket.action.api.context.RocketActionContext
 
 /**
- * Фабрика отвечающая за создание действия
+ * Factory responsible for creating the action
  */
 interface RocketActionFactoryUi {
     /**
-     * Действие должно создаваться только после вызова этого метода.
-     * Необходимо "тяжёлые" действия по созданию компонента производить в другом
-     * потоке и не блокировать UI.
+     * The action should only be created after this method has been called.
+     * It is necessary to perform "heavy" actions to create a component in another thread and not block the UI.
      *
-     * @param settings настройки действия
-     * @param context контекст для создания действия
-     * @return действие
+     * @param settings action settings
+     * @param context context to create an action
+     * @return action
      */
     fun create(settings: RocketActionSettings, context: RocketActionContext): RocketAction?
 

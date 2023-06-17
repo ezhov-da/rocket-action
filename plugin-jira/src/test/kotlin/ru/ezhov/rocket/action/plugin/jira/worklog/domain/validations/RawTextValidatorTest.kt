@@ -38,7 +38,7 @@ internal class RawTextValidatorTest {
                     MAX_LENGTH 5
                 """.trimIndent(),
                 "1",
-                listOf("Минимальная длина '3' символов. Сейчас '1'")
+                listOf("The minimum length is '3' characters. Now '1'")
             ),
             Arguments.of(
                 """

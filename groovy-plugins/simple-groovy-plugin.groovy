@@ -14,11 +14,11 @@ class SimpleGroovyRocketActionUi extends AbstractRocketAction implements RocketA
     private def context = null
 
     @Override
-    String name() { return "Простое действие написанное на groovy для отображенния" }
+    String name() { return "A simple action written in groovy to display" }
 
     @Override
     String description() {
-        return """Данное действие располагается в папке ${new File(".").absolutePath}"""
+        return """This action is located in the folder ${new File(".").absolutePath}"""
     }
 
     @Override

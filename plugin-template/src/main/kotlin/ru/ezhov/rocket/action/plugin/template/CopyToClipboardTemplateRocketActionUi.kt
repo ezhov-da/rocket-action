@@ -58,17 +58,17 @@ class CopyToClipboardTemplateRocketActionUi : AbstractRocketAction(), RocketActi
             }
         }
 
-    override fun name(): String = "Копировать в буфер по шаблону"
+    override fun name(): String = "Copy to clipboard by template"
 
     override fun type(): RocketActionType = RocketActionType { "COPY_TO_CLIPBOARD_TEMPLATE" }
 
-    override fun description(): String = "Позволяет скопировать текст в буфер с указанием переменных"
+    override fun description(): String = "Allows you to copy text to the clipboard with the indication of variables"
 
     override fun properties(): List<RocketActionConfigurationProperty> {
         return listOf(
-            createRocketActionProperty(key = LABEL, name = LABEL, description = "Заголовок", required = false),
-            createRocketActionProperty(key = DESCRIPTION, name = DESCRIPTION, description = "Описание", required = false),
-            createRocketActionProperty(key = TEXT, name = TEXT, description = "Шаблон для копирования", required = true)
+            createRocketActionProperty(key = LABEL, name = LABEL, description = "Header", required = false),
+            createRocketActionProperty(key = DESCRIPTION, name = DESCRIPTION, description = "Description", required = false),
+            createRocketActionProperty(key = TEXT, name = TEXT, description = "Template for copy", required = true)
         )
     }
 

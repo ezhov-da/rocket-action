@@ -94,7 +94,7 @@ internal class TextPanel(
         add(JButton(
             object : AbstractAction() {
                 init {
-                    putValue(SHORT_DESCRIPTION, "Скопировать текст в буфер")
+                    putValue(SHORT_DESCRIPTION, "Copy text to clipboard")
                     putValue(SMALL_ICON, context.icon().by(AppIcon.COPY_WRITING))
                 }
 
@@ -104,7 +104,7 @@ internal class TextPanel(
                     clipboard.setContents(StringSelection(textPane.text), null)
                     context.notification().show(
                         type = NotificationType.INFO,
-                        text = "Текст скопирован в буфер"
+                        text = "Text copied to clipboard"
                     )
                 }
             }
@@ -112,7 +112,7 @@ internal class TextPanel(
         add(JButton(
             object : AbstractAction() {
                 init {
-                    putValue(SHORT_DESCRIPTION, "Открыть в отдельном окне")
+                    putValue(SHORT_DESCRIPTION, "Open in a separate window")
                     putValue(SMALL_ICON, context.icon().by(AppIcon.ARROW_TOP))
                 }
 
@@ -124,7 +124,7 @@ internal class TextPanel(
         add(JButton(
             object : AbstractAction() {
                 init {
-                    putValue(SHORT_DESCRIPTION, "Открыть в отдельном окне поверх всех окон")
+                    putValue(SHORT_DESCRIPTION, "Open in a separate window on top of all windows")
                     putValue(SMALL_ICON, context.icon().by(AppIcon.BROWSER))
                 }
 
@@ -137,8 +137,8 @@ internal class TextPanel(
         add(JButton(
             object : AbstractAction() {
                 init {
-                    putValue(NAME, "Сохранить")
-                    putValue(SHORT_DESCRIPTION, "Сохранить")
+                    putValue(NAME, "Save")
+                    putValue(SHORT_DESCRIPTION, "Save")
                 }
 
                 override fun actionPerformed(e: ActionEvent?) {
@@ -155,8 +155,8 @@ internal class TextPanel(
         add(JButton(
             object : AbstractAction() {
                 init {
-                    putValue(NAME, "Загрузить")
-                    putValue(SHORT_DESCRIPTION, "Загрузить")
+                    putValue(NAME, "Download")
+                    putValue(SHORT_DESCRIPTION, "Download")
                 }
 
                 override fun actionPerformed(e: ActionEvent?) {
@@ -171,7 +171,7 @@ internal class TextPanel(
             }
         ))
 
-        val delimiterLabel = JLabel("Разделитель")
+        val delimiterLabel = JLabel("Delimiter")
         delimiterLabel.labelFor = delimiterTextField
         if (addStyleSelected) {
             add(comboBoxListStyles)
@@ -336,7 +336,7 @@ internal class TextPanel(
             textPane.text = text
             onLoad(text)
             if (result.isRight()) {
-                context.notification().show(type = NotificationType.INFO, text = "Текст загружен")
+                context.notification().show(type = NotificationType.INFO, text = "Text loaded")
                 eventObserver.notifyTextLoading(text)
             }
         }
@@ -382,7 +382,7 @@ internal class TextPanel(
                 ""
             }
             if (result.isRight()) {
-                context.notification().show(type = NotificationType.INFO, text = "Текст сохранён $text")
+                context.notification().show(type = NotificationType.INFO, text = "Text saved '$text'")
                 eventObserver.notifyTextSaving(text)
             }
         }

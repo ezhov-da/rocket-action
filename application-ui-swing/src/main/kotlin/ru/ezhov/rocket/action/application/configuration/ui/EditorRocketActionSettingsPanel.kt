@@ -52,14 +52,14 @@ class EditorRocketActionSettingsPanel(
 
     private fun testAndCreate(): JPanel {
         val panel = JPanel()
-        val button = JButton("Сохранить конфигурацию текущего действия")
+        val button = JButton("Save current action configuration")
         button.addActionListener {
             rocketActionSettingsPanel.create()?.let { rs ->
                 callback!!.saved(rs)
                 RocketActionContextFactory.context.notification()
-                    .show(NotificationType.INFO, "Конфигурация текущего действия сохранена")
+                    .show(NotificationType.INFO, "Current action configuration saved")
             } ?: run {
-                RocketActionContextFactory.context.notification().show(NotificationType.WARN, "Действие не выбрано")
+                RocketActionContextFactory.context.notification().show(NotificationType.WARN, "Action not selected")
             }
 
         }
@@ -108,7 +108,7 @@ class EditorRocketActionSettingsPanel(
                 )
             }
             .toMutableList() +
-            configuration // ищем те свойства, что добавились
+            configuration // looking for the properties that have been added
                 ?.properties()
                 ?.filter { p: RocketActionConfigurationProperty ->
                     settingsFinal.firstOrNull { it.name == p.key() } == null
@@ -219,7 +219,7 @@ class EditorRocketActionSettingsPanel(
     }
 
     /**
-     * Панель с одной настройкой
+     * Panel with one setting
      */
     private class SettingPanel(private val value: Value) : JPanel() {
         private var valueCallback: () -> Pair<String, SettingsValueType?> = { Pair("", null) }
@@ -249,9 +249,9 @@ class EditorRocketActionSettingsPanel(
                     val centerPanel = JPanel(BorderLayout())
                     when (val configProperty = property.property()) {
                         is RocketActionPropertySpec.StringPropertySpec -> {
-                            val plainText = JRadioButton("Простой текст").apply { }
-                            val mustacheTemplate = JRadioButton("Шаблон Mustache")
-                            val groovyTemplate = JRadioButton("Шаблон Groovy")
+                            val plainText = JRadioButton("Plain text").apply { }
+                            val mustacheTemplate = JRadioButton("Mustache template")
+                            val groovyTemplate = JRadioButton("Groovy template")
 
                             when (value.valueType) {
                                 SettingsValueType.PLAIN_TEXT -> plainText.isSelected = true
@@ -347,7 +347,7 @@ class EditorRocketActionSettingsPanel(
                     this.add(topPanel, BorderLayout.NORTH)
                     this.add(centerPanel, BorderLayout.CENTER)
                 } ?: run {
-                val text = "Обнаружено незарегистрированное свойство '${value.key}:${value.value}' " +
+                val text = "Unregistered property found '${value.key}:${value.value}' " +
                     "description=${value.property?.description()}"
                 logger.warn { text }
                 RocketActionContextFactory.context.notification().show(
@@ -387,7 +387,7 @@ class EditorRocketActionSettingsPanel(
                 if (event is RemoveSettingUiEvent && event.countChildrenRoot == 0) {
                     stubPanel = JPanel(BorderLayout()).apply {
                         add(
-                            JLabel("Создайте первое действие").apply {
+                            JLabel("Create the first action").apply {
                                 horizontalTextPosition = SwingConstants.CENTER
                                 horizontalAlignment = SwingConstants.CENTER
                                 verticalTextPosition = SwingConstants.CENTER

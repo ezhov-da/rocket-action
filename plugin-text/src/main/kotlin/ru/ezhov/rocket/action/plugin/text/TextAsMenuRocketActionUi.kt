@@ -47,9 +47,9 @@ class TextAsMenuRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
 
     override fun properties(): List<RocketActionConfigurationProperty> =
         listOf(
-            createRocketActionProperty(key = LABEL, name = LABEL, description = "Заголовок", required = true),
-            createRocketActionProperty(key = TEXT, name = TEXT, description = "Текст", required = true),
-            createRocketActionProperty(key = DESCRIPTION, name = DESCRIPTION, description = "Описание", required = false),
+            createRocketActionProperty(key = LABEL, name = LABEL, description = "Title", required = true),
+            createRocketActionProperty(key = TEXT, name = TEXT, description = "Text", required = true),
+            createRocketActionProperty(key = DESCRIPTION, name = DESCRIPTION, description = "Description", required = false),
         )
 
     override fun create(settings: RocketActionSettings, context: RocketActionContext): RocketAction? =
@@ -64,7 +64,7 @@ class TextAsMenuRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
                             add(JButton(
                                 object : AbstractAction() {
                                     init {
-                                        putValue(SHORT_DESCRIPTION, "Скопировать текст в буфер")
+                                        putValue(SHORT_DESCRIPTION, "Copy text to clipboard")
                                         putValue(SMALL_ICON, actionContext!!.icon().by(AppIcon.COPY_WRITING))
                                     }
 
@@ -74,7 +74,7 @@ class TextAsMenuRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
                                         clipboard.setContents(StringSelection(text), null)
                                         actionContext!!.notification().show(
                                             type = NotificationType.INFO,
-                                            text = "Текст скопирован в буфер"
+                                            text = "Text copied to clipboard"
                                         )
                                     }
                                 }
@@ -82,7 +82,7 @@ class TextAsMenuRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
                             add(JButton(
                                 object : AbstractAction() {
                                     init {
-                                        putValue(SHORT_DESCRIPTION, "Открыть в отдельном окне")
+                                        putValue(SHORT_DESCRIPTION, "Open in a separate window")
                                         putValue(SMALL_ICON, actionContext!!.icon().by(AppIcon.ARROW_TOP))
                                     }
 
@@ -156,5 +156,5 @@ class TextAsMenuRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
         private val TEXT = "text"
     }
 
-    override fun name(): String = "Отобразить текст как подпункт меню"
+    override fun name(): String = "Display text as menu item"
 }

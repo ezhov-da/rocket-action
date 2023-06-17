@@ -48,7 +48,7 @@ class NoteRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
                     ?.let { pathConfig ->
                         val path = pathConfig.ifEmpty { File("").absolutePath }
                         val description = settings.settings()[DESCRIPTION]?.takeIf { it.isNotEmpty() } ?: label
-                        // TODO откорректировать на JMenuItem
+                        // TODO correct to JMenuItem
                         val menu = JMenu(label)
                         settings.settings()[ICON_URL].let { icon ->
                             menu.icon = actionContext!!.icon().load(
@@ -111,7 +111,7 @@ class NoteRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
                         .notification()
                         .show(
                             NotificationType.WARN,
-                            "Ошибка создания \"Заметок\""
+                            "Error creating \"Notes\""
                         )
                 }
             }
@@ -120,19 +120,19 @@ class NoteRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
 
     override fun type(): RocketActionType = RocketActionType { TYPE }
 
-    override fun description(): String = "Хранение небольших заметок, ссылок, кусков кода. С тегами и поиском"
+    override fun description(): String = "Storage of small notes, links, pieces of code. With tags and search"
 
     override fun asString(): List<String> = listOf(LABEL)
 
     override fun properties(): List<RocketActionConfigurationProperty> {
         return listOf(
-            createRocketActionProperty(key = LABEL, name = LABEL, description = "Заголовок", required = true, property = RocketActionPropertySpec.StringPropertySpec(defaultValue = "Заметки")),
-            createRocketActionProperty(key = DESCRIPTION, name = DESCRIPTION, description = "Описание", required = false),
-            createRocketActionProperty(key = ICON_URL, name = ICON_URL, description = "URL иконки", required = false),
+            createRocketActionProperty(key = LABEL, name = LABEL, description = "Title", required = true, property = RocketActionPropertySpec.StringPropertySpec(defaultValue = "Notes")),
+            createRocketActionProperty(key = DESCRIPTION, name = DESCRIPTION, description = "Description", required = false),
+            createRocketActionProperty(key = ICON_URL, name = ICON_URL, description = "Icon URL", required = false),
             createRocketActionProperty(
                 key = PATH,
                 name = PATH,
-                description = "Путь хранения сохраняемых данных",
+                description = "Saved data storage path",
                 required = true,
                 property = RocketActionPropertySpec.StringPropertySpec(defaultValue = File("").absolutePath),
             )
@@ -141,7 +141,7 @@ class NoteRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
 
     override fun icon(): Icon? = actionContext!!.icon().by(AppIcon.CLIPBOARD)
 
-    override fun name(): String = "Заметки"
+    override fun name(): String = "Notes"
 
     companion object {
         const val TYPE = "NOTE"

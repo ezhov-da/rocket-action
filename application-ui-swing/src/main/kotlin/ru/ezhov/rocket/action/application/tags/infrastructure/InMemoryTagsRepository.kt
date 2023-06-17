@@ -49,15 +49,15 @@ class InMemoryTagsRepository : TagsRepository {
     override fun tagsTree(): List<TagNode> {
         val mapByIndex = mutableMapOf<Int, MutableList<TagNode.Builder>>()
 
-        // начинаем бедать по ключам
+        // we start running through the keys
         mapKeyAndTags.forEach { (key, tags) ->
-            // для каждого тега в ключе
+            // for each tag in the key
             tags.forEachIndexed { index, tag ->
-                // создаём узел
+                // create a node
                 val tagNode = TagNode.Builder(name = tag)
                 tagNode.keys.add(key)
 
-                // получаем все узлы его уровня
+                // get all nodes of its level
                 val list = mapByIndex.getOrPut(index) { mutableListOf() }
                 if (list.isEmpty()) {
                     list.add(tagNode)

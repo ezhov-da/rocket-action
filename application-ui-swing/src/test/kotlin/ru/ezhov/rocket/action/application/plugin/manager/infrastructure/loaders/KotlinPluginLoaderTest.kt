@@ -51,7 +51,7 @@ internal class KotlinPluginLoaderTest {
         with(properties[0]) {
             Assertions.assertThat(this.key()).isEqualTo("label")
             Assertions.assertThat(this.name()).isEqualTo("label")
-            Assertions.assertThat(this.description()).isEqualTo("Текст для отображения")
+            Assertions.assertThat(this.description()).isEqualTo("Text to display")
             Assertions.assertThat(this.isRequired()).isFalse
         }
     }

@@ -87,14 +87,14 @@ class ShowSvgImageRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
     override fun type(): RocketActionType = RocketActionType { "SHOW_SVG_IMAGE" }
 
     override fun description(): String {
-        return "Отобразить изображение формата *.svg (beta)"
+        return "Display *.svg image (beta)"
     }
 
     override fun properties(): List<RocketActionConfigurationProperty> {
         return listOf(
-            createRocketActionProperty(key = IMAGE_URL, name = IMAGE_URL, description = "URL изображения", required = true),
-            createRocketActionProperty(key = LABEL, name = LABEL, description = "Заголовок", required = false),
-            createRocketActionProperty(key = DESCRIPTION, name = DESCRIPTION, description = "Описание", required = false),
+            createRocketActionProperty(key = IMAGE_URL, name = IMAGE_URL, description = "Image URL", required = true),
+            createRocketActionProperty(key = LABEL, name = LABEL, description = "Title", required = false),
+            createRocketActionProperty(key = DESCRIPTION, name = DESCRIPTION, description = "Description", required = false),
         )
     }
 
@@ -155,7 +155,7 @@ class ShowSvgImageRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
                 }
 
                 init {
-                    putValue(NAME, "Открыть в отдельном окне")
+                    putValue(NAME, "Open in a separate window")
                 }
             })
             preferredSize = newDimension
@@ -254,7 +254,7 @@ class ShowSvgImageRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
 
     override fun asString(): List<String> = listOf(LABEL, IMAGE_URL)
 
-    override fun name(): String = "Показать изображение *.svg (beta)"
+    override fun name(): String = "Show image *.svg (beta)"
 
     override fun icon(): Icon? = actionContext!!.icon().by(AppIcon.IMAGE)
 

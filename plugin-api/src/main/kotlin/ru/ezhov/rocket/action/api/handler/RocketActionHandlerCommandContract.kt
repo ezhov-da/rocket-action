@@ -2,27 +2,27 @@ package ru.ezhov.rocket.action.api.handler
 
 interface RocketActionHandlerCommandContract {
     /**
-     * Название команды
+     * Command name
      */
     fun commandName(): String
 
     /**
-     * Заголовок команды
+     * Command title
      */
     fun title(): String
 
     /**
-     * Описание команды
+     * Command description
      */
     fun description(): String
 
     /**
-     * Входные параметры
+     * Input parameters
      */
     fun inputArguments(): List<RocketActionHandlerProperty>
 
     /**
-     * Выходные параметры
+     * Output parameters
      */
     fun outputParams(): List<RocketActionHandlerProperty>
 }

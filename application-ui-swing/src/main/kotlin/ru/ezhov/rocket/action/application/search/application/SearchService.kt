@@ -34,7 +34,7 @@ class SearchService {
             )
         }
 
-        // TODO когда удалять данные при удалении действия?
+        // TODO when to delete data when deleting an action?
         override fun delete(id: String) {
             logger.debug { "Delete action with id='$id' from search" }
 

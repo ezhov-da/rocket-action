@@ -15,8 +15,8 @@ import java.util.*
 private val logger = KotlinLogging.logger {}
 
 @Deprecated(
-    "Устаревший метод, который будет выводиться из обращения. " +
-        "Используется только для обратной соместимости"
+    "A deprecated method that will be retired. " +
+        "Used for backwards compatibility only"
 )
 class YmlRocketActionSettingsRepositoryOldFormat(private val uri: URI) {
     fun actions(): List<RocketActionSettings> {

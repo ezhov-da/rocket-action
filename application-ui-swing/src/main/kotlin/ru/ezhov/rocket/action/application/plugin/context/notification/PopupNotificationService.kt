@@ -18,7 +18,7 @@ internal class PopupNotificationService : NotificationService {
     private val executorService = Executors.newFixedThreadPool(4)
 
     init {
-        // TODO ezhov перевести на Spring и использовать его инстансы
+        // TODO ezhov translate to Spring and use its instances
         Runtime.getRuntime().addShutdownHook(Thread {
             executorService.shutdownNow()
         })

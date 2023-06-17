@@ -47,8 +47,8 @@ class TemporaryFileUi(
         minimumSize = dimensionResult
         maximumSize = dimensionResult
 
-        val fileNameTextField = TextFieldWithText("Название файла").apply { text = DEFAULT_FILENAME }
-        val fileExtensionTextField = TextFieldWithText("Расширение файла").apply { text = DEFAULT_EXTENSION }
+        val fileNameTextField = TextFieldWithText("File name").apply { text = DEFAULT_FILENAME }
+        val fileExtensionTextField = TextFieldWithText("File extension").apply { text = DEFAULT_EXTENSION }
 
         add(
             JPanel().apply {
@@ -87,14 +87,14 @@ class TemporaryFileUi(
 
         add(
             JPanel().apply {
-                add(JButton("Очистить текст").apply {
+                add(JButton("Clear text").apply {
                     addMouseListener(object : MouseAdapter() {
                         override fun mouseReleased(e: MouseEvent) {
                             textArea.text = ""
                         }
                     })
                 })
-                add(JButton("Сохранить и скопировать абсолютный путь в буфер обмена").apply {
+                add(JButton("Save and copy absolute path to clipboard").apply {
                     addMouseListener(object : MouseAdapter() {
                         override fun mouseReleased(e: MouseEvent?) {
                             val prefixAndExtension = prefixAndExtension()
@@ -113,7 +113,7 @@ class TemporaryFileUi(
                         }
                     })
                 })
-                add(JButton("Сохранить и открыть файл").apply {
+                add(JButton("Save and open file").apply {
                     addMouseListener(object : MouseAdapter() {
                         override fun mouseReleased(e: MouseEvent) {
                             val prefixAndExtension = prefixAndExtension()

@@ -3,47 +3,47 @@ package ru.ezhov.rocket.action.api
 import javax.swing.Icon
 
 /**
- * Конфигурация действия
+ * Action Configuration
  */
 interface RocketActionConfiguration {
     /**
-     * Уникальное значение в рамках всех загруженных действия
+     * Unique value within all loaded activities
      *
-     * @return тип действия
+     * @return action type
      */
     fun type(): RocketActionType
 
     /**
-     * Название действия для отображения
+     * Action name to display
      *
-     * @return название
+     * @return name
      */
     fun name(): String
 
     /**
-     * Описание действия для отображения
+     * Action description to display
      *
-     * @return описание
+     * @return description
      */
     fun description(): String
 
     /**
-     * @return список ключей значение первого из которых
-     * не пустое и не null будет использоваться для отображения настроек
+     * @return list of keys the value of the first of which
+     * is not empty and not null will be used to display the settings
      */
     fun asString(): List<String>
 
     /**
-     * Свойства действия для конфигурирования
+     * Action properties for configuration
      *
-     * @return свойства действия
+     * @return action properties
      */
     fun properties(): List<RocketActionConfigurationProperty>
 
     /**
-     * Иконка конфигурации
+     * Configuration icon
      *
-     * @return иконка
+     * @return icon
      */
     fun icon(): Icon?
 }

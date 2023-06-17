@@ -16,7 +16,7 @@ internal class InMemoryLuceneIndexTest {
         inMemoryLuceneIndex.indexDocument(mapOf("text" to "http://rest/api стандарт бла"))
         inMemoryLuceneIndex.indexDocument(mapOf("text" to "http://rest/api стандарт б"))
         inMemoryLuceneIndex.indexDocument(mapOf("text" to "http://rest/api станда"))
-        inMemoryLuceneIndex.indexDocument(mapOf("text" to "Регламент проведения анализа логов"))
+        inMemoryLuceneIndex.indexDocument(mapOf("text" to "Log analysis rules"))
         inMemoryLuceneIndex.indexDocument(mapOf("text" to "Регламент анализа проведения логов"))
         inMemoryLuceneIndex.indexDocument(mapOf("text" to "Регламент проведения анализа логов"))
 

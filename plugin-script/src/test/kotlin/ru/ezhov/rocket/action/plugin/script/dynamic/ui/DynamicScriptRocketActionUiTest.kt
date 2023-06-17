@@ -60,7 +60,7 @@ fun main() {
                 DynamicScriptRocketActionUi.DESCRIPTION to "Description",
                 DynamicScriptRocketActionUi.COUNT_VARIABLES to "2",
                 DynamicScriptRocketActionUi.SELECTED_SCRIPT_LANG to "GROOVY",
-                DynamicScriptRocketActionUi.FIELD_NAMES to "Первое поле:И значение по умолчанию\nВторое поле",
+                DynamicScriptRocketActionUi.FIELD_NAMES to "First field: And default value\nSecond field",
             )
 
             override fun actions(): List<RocketActionSettings> = emptyList()
