@@ -21,7 +21,9 @@ import java.awt.Dimension
 import java.awt.Toolkit
 import java.awt.datatransfer.StringSelection
 import javax.swing.BoxLayout
+import javax.swing.ImageIcon
 import javax.swing.JButton
+import javax.swing.JLabel
 import javax.swing.JMenu
 import javax.swing.JPanel
 import javax.swing.JScrollPane
@@ -100,9 +102,10 @@ class UiService {
         fieldNames: String,
         context: RocketActionContext,
     ) : JPanel(BorderLayout()) {
+        private val infoLabel = JLabel()
         private val resultText = RSyntaxTextArea()
-        val engineType = ScriptEngineType.valueOf(selectedScriptLang)
-        val engine = ScriptEngineFactory.engine(engineType)
+        private val engineType = ScriptEngineType.valueOf(selectedScriptLang)
+        private val engine = ScriptEngineFactory.engine(engineType)
 
         init {
             data class TextPaneAndDefaultValue(
@@ -117,19 +120,26 @@ class UiService {
             }
 
             val variablesField: MutableList<TextPaneAndDefaultValue> = mutableListOf()
+            val iconLoader = ImageIcon(UiService::class.java.getResource("/icon/loader.gif"))
 
             val executeFunc = {
                 val variables = variablesField
                     .mapIndexed { index, variable ->
                         "_v${index + 1}" to variable.value()
                     }.toMap()
+
+                infoLabel.text = "Execution started"
+                infoLabel.icon = iconLoader
                 executeScript(
                     variables = variables,
                     context = context,
-                    callback = { result -> resultText.text = result }
+                    callback = { result ->
+                        resultText.text = result
+                        infoLabel.text = "Done"
+                        infoLabel.icon = null
+                    }
                 )
             }
-
 
             val variablesPanel = JPanel().apply {
                 layout = BoxLayout(this, BoxLayout.Y_AXIS)
@@ -198,11 +208,16 @@ class UiService {
                 BorderLayout.NORTH
             )
 
+            val bottomPanel = JPanel(BorderLayout()).apply {
+                add(RTextScrollPane(resultText), BorderLayout.CENTER)
+                add(infoLabel, BorderLayout.SOUTH)
+            }
+
             add(JPanel(BorderLayout()).apply {
                 add(
                     JSplitPane(JSplitPane.VERTICAL_SPLIT).apply {
                         topComponent = variablesPanel
-                        bottomComponent = RTextScrollPane(resultText)
+                        bottomComponent = bottomPanel
                     }, BorderLayout.CENTER
                 )
             }, BorderLayout.CENTER)
