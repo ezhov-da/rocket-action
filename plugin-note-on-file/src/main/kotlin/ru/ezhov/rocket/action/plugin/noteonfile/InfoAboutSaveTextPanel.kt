@@ -12,7 +12,7 @@ import javax.swing.JLabel
 import javax.swing.JPanel
 
 class InfoAboutSaveTextPanel(
-    private val eventObserver: EventObserver,
+    eventObserver: EventObserver,
 ) : JPanel() {
     private val label: JLabel = JLabel()
 
