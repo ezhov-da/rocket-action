@@ -15,7 +15,7 @@ import ru.ezhov.rocket.action.api.context.icon.AppIcon
 import ru.ezhov.rocket.action.api.support.AbstractRocketAction
 import java.awt.Component
 import java.io.File
-import java.util.UUID
+import java.util.*
 import javax.swing.Icon
 import javax.swing.JMenu
 
@@ -56,14 +56,19 @@ class NoteOnFileRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
 
                 val component = JMenu(label).apply {
                     this.icon = actionContext!!.icon().by(AppIcon.TEXT)
+
+                    val textPanelConfiguration = TextPanelConfiguration(
+                        path = path,
+                        label = label,
+                        loadOnInitialize = loadTextOnInitialize,
+                        style = settings.settings()[SYNTAX_STYLE],
+                        addStyleSelected = false,
+                        delimiter = delimiter,
+                    )
+
                     this.add(
                         TextPanel(
-                            path = path,
-                            label = label,
-                            loadOnInitialize = loadTextOnInitialize,
-                            style = settings.settings()[SYNTAX_STYLE],
-                            addStyleSelected = false,
-                            delimiter = delimiter,
+                            textPanelConfiguration = textPanelConfiguration,
                             textAutoSave = autoSave?.let {
                                 TextAutoSave(
                                     enable = it,

@@ -51,12 +51,7 @@ import javax.swing.event.ListDataListener
 private val logger = KotlinLogging.logger {}
 
 internal class TextPanel(
-    private val path: String,
-    private val label: String,
-    private val style: String?,
-    private val loadOnInitialize: Boolean,
-    private val addStyleSelected: Boolean,
-    private val delimiter: String,
+    private val textPanelConfiguration: TextPanelConfiguration,
     private val textAutoSave: TextAutoSave?,
     private val context: RocketActionContext,
 ) : JPanel() {
@@ -67,15 +62,15 @@ internal class TextPanel(
     private val defaultStyle = SyntaxConstants.SYNTAX_STYLE_NONE
     private val textPane = RSyntaxTextArea().apply {
         val textPane = this
-        textPane.syntaxEditingStyle = style ?: defaultStyle;
+        textPane.syntaxEditingStyle = textPanelConfiguration.style ?: defaultStyle;
         textPane.isCodeFoldingEnabled = true;
         textPane.background = JLabel().background
     }
 
-    private val delimiterTextField = JTextField(delimiter, 5).apply { isEditable = false }
+    private val delimiterTextField = JTextField(textPanelConfiguration.delimiter, 5).apply { isEditable = false }
 
     private val comboBoxListStyles = JComboBox(StylesList.styles.toTypedArray()).also { cb ->
-        cb.selectedItem = style ?: defaultStyle
+        cb.selectedItem = textPanelConfiguration.style ?: defaultStyle
         cb.model.addListDataListener(object : ListDataListener {
             override fun intervalAdded(e: ListDataEvent?) {}
 
@@ -88,7 +83,7 @@ internal class TextPanel(
         })
     }
 
-    private val labelPath = JLabel(path)
+    private val labelPath = JLabel(textPanelConfiguration.path)
 
     private val toolBar = JToolBar().apply {
         add(JButton(
@@ -143,7 +138,7 @@ internal class TextPanel(
 
                 override fun actionPerformed(e: ActionEvent?) {
                     WriteSwingWorker(
-                        path = path,
+                        path = textPanelConfiguration.path,
                         text = textPane.text,
                         eventObserver = eventObserver,
                         context = context,
@@ -161,9 +156,9 @@ internal class TextPanel(
 
                 override fun actionPerformed(e: ActionEvent?) {
                     ReadSwingWorker(
-                        path = path,
+                        path = textPanelConfiguration.path,
                         textPane = textPane,
-                        onLoad = { text -> pointPanel.calculate(delimiter, text) },
+                        onLoad = { text -> pointPanel.calculate(textPanelConfiguration.delimiter, text) },
                         eventObserver = eventObserver,
                         context = context,
                     ).execute()
@@ -173,7 +168,7 @@ internal class TextPanel(
 
         val delimiterLabel = JLabel("Delimiter")
         delimiterLabel.labelFor = delimiterTextField
-        if (addStyleSelected) {
+        if (textPanelConfiguration.addStyleSelected) {
             add(comboBoxListStyles)
         }
 
@@ -200,7 +195,7 @@ internal class TextPanel(
         commandObserver.register(object : SaveTextCommandListener {
             override fun save(command: SaveTextCommand) {
                 WriteSwingWorker(
-                    path = path,
+                    path = textPanelConfiguration.path,
                     text = textPane.text,
                     eventObserver = eventObserver,
                     context = context,
@@ -213,17 +208,17 @@ internal class TextPanel(
         add(labelPath, BorderLayout.SOUTH)
         val dimensionScreen = Toolkit.getDefaultToolkit().screenSize
         val dimension = Dimension(
-            (dimensionScreen.width * 0.3).toInt(),
-            (dimensionScreen.height * 0.2).toInt()
+            (dimensionScreen.width * 0.5).toInt(),
+            (dimensionScreen.height * 0.3).toInt()
         )
         maximumSize = dimension
         preferredSize = dimension
 
-        if (loadOnInitialize) {
+        if (textPanelConfiguration.loadOnInitialize) {
             ReadSwingWorker(
-                path = path,
+                path = textPanelConfiguration.path,
                 textPane = textPane,
-                onLoad = { text -> pointPanel.calculate(delimiter, text) },
+                onLoad = { text -> pointPanel.calculate(textPanelConfiguration.delimiter, text) },
                 eventObserver = eventObserver,
                 context = context,
             ).execute()
@@ -231,7 +226,7 @@ internal class TextPanel(
 
         labelPath.addMouseListener(object : MouseAdapter() {
             override fun mouseClicked(e: MouseEvent?) {
-                Desktop.getDesktop().open(File(path))
+                Desktop.getDesktop().open(File(textPanelConfiguration.path))
             }
         })
 
@@ -239,7 +234,7 @@ internal class TextPanel(
             override fun keyReleased(e: KeyEvent) {
                 if (e.keyCode == 83 /*S*/ && e.isControlDown) {
                     WriteSwingWorker(
-                        path = path,
+                        path = textPanelConfiguration.path,
                         text = textPane.text,
                         eventObserver = eventObserver,
                         context = context,
@@ -262,7 +257,7 @@ internal class TextPanel(
             }
         })
 
-        when (delimiter.isNotBlank()) {
+        when (textPanelConfiguration.delimiter.isNotBlank()) {
             true -> {
                 val split = JSplitPane(JSplitPane.HORIZONTAL_SPLIT)
                 split.leftComponent = pointPanel
@@ -283,7 +278,7 @@ internal class TextPanel(
                     }
 
                     private fun recalculate() {
-                        pointPanel.calculate(delimiter, textPane.text)
+                        pointPanel.calculate(textPanelConfiguration.delimiter, textPane.text)
                         eventObserver.notifyTextChanging(textPane.text)
                     }
                 })
@@ -391,16 +386,11 @@ internal class TextPanel(
     private fun openInNewWindow(alwaysOnTop: Boolean) {
         SwingUtilities.invokeLater {
             val dimension = Toolkit.getDefaultToolkit().screenSize
-            val frame = JFrame(label)
+            val frame = JFrame(textPanelConfiguration.label)
             frame.iconImage = context.icon().by(AppIcon.ROCKET_APP).toImage()
             frame.add(
                 TextPanel(
-                    path = path,
-                    label = label,
-                    loadOnInitialize = loadOnInitialize,
-                    style = style,
-                    addStyleSelected = true,
-                    delimiter = delimiter,
+                    textPanelConfiguration = textPanelConfiguration,
                     textAutoSave = textAutoSave,
                     context = context,
                 ),

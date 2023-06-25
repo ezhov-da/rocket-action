@@ -21,14 +21,17 @@ fun main() {
     SwingUtilities.invokeLater {
         JFrame()
             .apply {
+                val textPanelConfiguration = TextPanelConfiguration(
+                    path = Files.createTempFile("123", "111").absolutePathString(),
+                    label = "Test",
+                    loadOnInitialize = true,
+                    style = null,
+                    addStyleSelected = true,
+                    delimiter = "",
+                )
                 add(
                     TextPanel(
-                        path = Files.createTempFile("123", "111").absolutePathString(),
-                        label = "Test",
-                        loadOnInitialize = true,
-                        style = null,
-                        addStyleSelected = true,
-                        delimiter = "",
+                        textPanelConfiguration = textPanelConfiguration,
                         textAutoSave = TextAutoSave(enable = true, delayInSeconds = 3),
                         context = object : RocketActionContext {
                             override fun icon(): IconService =
