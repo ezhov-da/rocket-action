@@ -24,7 +24,7 @@ class DynamicScriptRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
         .apply { actionContext = context }
 
     override fun create(settings: RocketActionSettings, context: RocketActionContext): RocketAction? =
-        UiService().build(settings, context)
+        UiService.build(settings, context)
 
     override fun type(): RocketActionType = RocketActionType { TYPE }
 
@@ -79,6 +79,13 @@ class DynamicScriptRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
                     ScriptEngineType.GROOVY.name,
                     ScriptEngineType.values().map { it.name }
                 ),
+            ),
+            createRocketActionProperty(
+                key = INSTRUCTION,
+                name = INSTRUCTION,
+                description = "Script instructions",
+                required = false,
+                property = RocketActionPropertySpec.StringPropertySpec(),
             )
         )
     }
@@ -95,5 +102,6 @@ class DynamicScriptRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
         internal const val COUNT_VARIABLES = "countVariables"
         internal const val SELECTED_SCRIPT_LANG = "selectedScriptLang"
         internal const val FIELD_NAMES = "fieldNames"
+        internal const val INSTRUCTION = "instruction"
     }
 }

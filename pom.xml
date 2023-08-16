@@ -27,9 +27,9 @@
         <assertj-core.version>3.22.0</assertj-core.version>
         <slf4j-api.version>1.7.36</slf4j-api.version>
         <logback-classic.version>1.2.11</logback-classic.version>
-        <swingx.version>1.6.1</swingx.version>
+        <swingx.version>1.6.5-1</swingx.version>
         <mustache.version>0.9.10</mustache.version>
-        <groovy.version>4.0.9</groovy.version>
+        <groovy.version>4.0.13</groovy.version>
         <mockk.version>1.13.4</mockk.version>
     </properties>
 
@@ -83,8 +83,8 @@
             <!--========================================-->
 
             <dependency>
-                <groupId>org.swinglabs</groupId>
-                <artifactId>swingx</artifactId>
+                <groupId>org.swinglabs.swingx</groupId>
+                <artifactId>swingx-all</artifactId>
                 <version>${swingx.version}</version>
             </dependency>
 
@@ -147,6 +147,12 @@
             <dependency>
                 <groupId>org.apache.groovy</groupId>
                 <artifactId>groovy-swing</artifactId>
+                <version>${groovy.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.groovy</groupId>
+                <artifactId>groovy-xml</artifactId>
                 <version>${groovy.version}</version>
             </dependency>
 

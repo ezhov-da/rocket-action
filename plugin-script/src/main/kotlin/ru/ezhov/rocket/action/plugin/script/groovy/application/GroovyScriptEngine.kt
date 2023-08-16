@@ -9,7 +9,7 @@ import ru.ezhov.rocket.action.plugin.script.ScriptEngineException
 import ru.ezhov.rocket.action.plugin.script.ScriptEngineType
 
 class GroovyScriptEngine : ScriptEngine {
-    override fun type(): ScriptEngineType = ScriptEngineType.KOTLIN
+    override fun type(): ScriptEngineType = ScriptEngineType.GROOVY
 
     override fun execute(script: String, variables: Map<String, String>): Either<ScriptEngineException, Any?> =
         try {

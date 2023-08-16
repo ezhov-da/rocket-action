@@ -10,7 +10,7 @@
     </parent>
 
     <artifactId>rocket-action-plugin-script</artifactId>
-    <version>${plugin-api.version}_3</version>
+    <version>${plugin-api.version}_4</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -59,6 +59,11 @@
         </dependency>
 
         <dependency>
+            <groupId>org.apache.groovy</groupId>
+            <artifactId>groovy-xml</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>io.arrow-kt</groupId>
             <artifactId>arrow-core</artifactId>
             <scope>provided</scope>
@@ -77,9 +82,15 @@
         </dependency>
 
         <dependency>
+            <groupId>org.swinglabs.swingx</groupId>
+            <artifactId>swingx-all</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
             <groupId>com.fifesoft</groupId>
             <artifactId>rsyntaxtextarea</artifactId>
-            <version>${rsyntaxtextarea.version}</version>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
