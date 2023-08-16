@@ -49,8 +49,8 @@
         </dependency>
 
         <dependency>
-            <groupId>org.swinglabs</groupId>
-            <artifactId>swingx</artifactId>
+            <groupId>org.swinglabs.swingx</groupId>
+            <artifactId>swingx-all</artifactId>
             <scope>provided</scope>
         </dependency>
     </dependencies>

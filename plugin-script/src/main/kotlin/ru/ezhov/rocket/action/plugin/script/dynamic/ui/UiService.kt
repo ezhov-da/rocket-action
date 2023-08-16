@@ -4,6 +4,7 @@ import arrow.core.getOrHandle
 import mu.KotlinLogging
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea
 import org.fife.ui.rtextarea.RTextScrollPane
+import org.jdesktop.swingx.JXCollapsiblePane
 import ru.ezhov.rocket.action.api.RocketAction
 import ru.ezhov.rocket.action.api.RocketActionSettings
 import ru.ezhov.rocket.action.api.context.RocketActionContext
@@ -28,6 +29,7 @@ import javax.swing.JMenu
 import javax.swing.JPanel
 import javax.swing.JScrollPane
 import javax.swing.JSplitPane
+import javax.swing.JTextArea
 import javax.swing.JTextPane
 import javax.swing.JToolBar
 import javax.swing.SwingWorker
@@ -35,64 +37,70 @@ import javax.swing.SwingWorker
 private val logger = KotlinLogging.logger { }
 
 class UiService {
-    fun build(settings: RocketActionSettings, context: RocketActionContext): RocketAction? {
-        val label = settings.settings()[DynamicScriptRocketActionUi.LABEL].orEmpty()
-        val script = settings.settings()[DynamicScriptRocketActionUi.SCRIPT].orEmpty()
-        val description = settings.settings()[DynamicScriptRocketActionUi.DESCRIPTION].orEmpty()
-        val countVariables = settings.settings()[DynamicScriptRocketActionUi.COUNT_VARIABLES]?.toIntOrNull() ?: 0
-        val selectedScriptLang =
-            settings.settings()[DynamicScriptRocketActionUi.SELECTED_SCRIPT_LANG] ?: ScriptEngineType.GROOVY.name
-        val fieldNames = settings.settings()[DynamicScriptRocketActionUi.FIELD_NAMES].orEmpty()
+    companion object {
+        fun build(settings: RocketActionSettings, context: RocketActionContext): RocketAction? {
+            val label = settings.settings()[DynamicScriptRocketActionUi.LABEL].orEmpty()
+            val script = settings.settings()[DynamicScriptRocketActionUi.SCRIPT].orEmpty()
+            val description = settings.settings()[DynamicScriptRocketActionUi.DESCRIPTION].orEmpty()
+            val countVariables = settings.settings()[DynamicScriptRocketActionUi.COUNT_VARIABLES]?.toIntOrNull() ?: 0
+            val selectedScriptLang =
+                settings.settings()[DynamicScriptRocketActionUi.SELECTED_SCRIPT_LANG] ?: ScriptEngineType.GROOVY.name
+            val fieldNames = settings.settings()[DynamicScriptRocketActionUi.FIELD_NAMES].orEmpty()
+            val instruction = settings.settings()[DynamicScriptRocketActionUi.INSTRUCTION].orEmpty()
 
-        val menu = buildMenu(
-            label = label,
-            script = script,
-            countVariables = countVariables,
-            selectedScriptLang = selectedScriptLang,
-            fieldNames = fieldNames,
-            context = context
-        )
-
-        context.search().register(settings.id(), label)
-        context.search().register(settings.id(), description)
-
-        return object : RocketAction, RocketActionHandlerFactory {
-            override fun contains(search: String): Boolean =
-                label.contains(search, ignoreCase = true)
-                    .or(description.contains(search, ignoreCase = true))
-
-            override fun isChanged(actionSettings: RocketActionSettings): Boolean =
-                !(settings.id() == actionSettings.id() &&
-                    settings.settings() == actionSettings.settings())
-
-            override fun component(): Component = menu
-
-            override fun handler(): RocketActionHandler? = null // TODO ezhov is not needed yet
-        }
-    }
-
-    private fun buildMenu(
-        label: String,
-        script: String,
-        countVariables: Int,
-        selectedScriptLang: String,
-        fieldNames: String,
-        context: RocketActionContext
-    ): JMenu {
-        val menu = JMenu(label).apply {
-            icon = context.icon().by(AppIcon.BOLT)
-            add(
-                ScriptPanel(
-                    script = script,
-                    countVariables = countVariables,
-                    selectedScriptLang = selectedScriptLang,
-                    fieldNames = fieldNames,
-                    context = context,
-                )
+            val menu = buildMenu(
+                label = label,
+                script = script,
+                countVariables = countVariables,
+                selectedScriptLang = selectedScriptLang,
+                fieldNames = fieldNames,
+                instruction = instruction,
+                context = context,
             )
+
+            context.search().register(settings.id(), label)
+            context.search().register(settings.id(), description)
+
+            return object : RocketAction, RocketActionHandlerFactory {
+                override fun contains(search: String): Boolean =
+                    label.contains(search, ignoreCase = true)
+                        .or(description.contains(search, ignoreCase = true))
+
+                override fun isChanged(actionSettings: RocketActionSettings): Boolean =
+                    !(settings.id() == actionSettings.id() &&
+                        settings.settings() == actionSettings.settings())
+
+                override fun component(): Component = menu
+
+                override fun handler(): RocketActionHandler? = null // TODO ezhov is not needed yet
+            }
         }
 
-        return menu
+        private fun buildMenu(
+            label: String,
+            script: String,
+            countVariables: Int,
+            selectedScriptLang: String,
+            fieldNames: String,
+            instruction: String,
+            context: RocketActionContext
+        ): JMenu {
+            val menu = JMenu(label).apply {
+                icon = context.icon().by(AppIcon.BOLT)
+                add(
+                    ScriptPanel(
+                        script = script,
+                        countVariables = countVariables,
+                        selectedScriptLang = selectedScriptLang,
+                        fieldNames = fieldNames,
+                        instruction = instruction,
+                        context = context,
+                    )
+                )
+            }
+
+            return menu
+        }
     }
 
     private class ScriptPanel(
@@ -100,6 +108,7 @@ class UiService {
         countVariables: Int,
         selectedScriptLang: String,
         fieldNames: String,
+        instruction: String,
         context: RocketActionContext,
     ) : JPanel(BorderLayout()) {
         private val infoLabel = JLabel()
@@ -162,6 +171,28 @@ class UiService {
                 variablesField.forEach { add(JScrollPane(it.textPane)) }
             }
 
+            val instructionCollapsiblePane = JXCollapsiblePane()
+            val topPanel = JPanel(BorderLayout()).apply {
+                if (instruction.isNotEmpty()) {
+                    val instructionPanel = JPanel(BorderLayout()).apply {
+                        add(
+                            JTextArea().apply {
+                                isEditable = false
+                                text = instruction
+                                foreground = JLabel().foreground
+                            },
+                            BorderLayout.CENTER
+                        )
+                    }
+                    instructionCollapsiblePane.isAnimated = true
+                    instructionCollapsiblePane.isCollapsed = true
+                    instructionCollapsiblePane.add(instructionPanel)
+                    add(instructionCollapsiblePane, BorderLayout.NORTH)
+                }
+
+                add(variablesPanel, BorderLayout.CENTER)
+            }
+
             add(
                 JToolBar().apply {
                     isFloatable = false
@@ -204,6 +235,17 @@ class UiService {
                                 }
                             }
                     )
+
+                    if (instruction.isNotEmpty()) {
+                        add(
+                            JButton("Instruction")
+                                .apply {
+                                    addActionListener {
+                                        instructionCollapsiblePane.isCollapsed = !instructionCollapsiblePane.isCollapsed
+                                    }
+                                }
+                        )
+                    }
                 },
                 BorderLayout.NORTH
             )
@@ -216,7 +258,7 @@ class UiService {
             add(JPanel(BorderLayout()).apply {
                 add(
                     JSplitPane(JSplitPane.VERTICAL_SPLIT).apply {
-                        topComponent = variablesPanel
+                        topComponent = topPanel
                         bottomComponent = bottomPanel
                     }, BorderLayout.CENTER
                 )
