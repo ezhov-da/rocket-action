@@ -9,23 +9,16 @@ data class AliasForTaskIds private constructor(
 
         fun of(aliases: String?): AliasForTaskIds {
             val v = aliases
-                ?.let { aliasesNotNull ->
-                    aliasesNotNull
-                        .trim()
-                        .split("\n")
-                        .map { row ->
-                            row
-                                .split("_")
-                        }
-                        .mapNotNull {
-                            if (it.size == 2) {
-                                it[0] to it[1].split(",").map { v -> v.trim() }
-                            } else {
-                                null
-                            }
-                        }
-                        .toMap()
-                }
+                ?.trim()
+                ?.split("\n")
+                ?.map { row -> row.split("_") }
+                ?.mapNotNull {
+                    if (it.size == 2) {
+                        it[0] to it[1].split(",").map { v -> v.trim() }
+                    } else {
+                        null
+                    }
+                }?.toMap()
                 ?: emptyMap()
 
             return AliasForTaskIds(v)
