@@ -15,6 +15,7 @@ private val logger = KotlinLogging.logger {}
 private const val DEFAULT_VARIABLES_KEY: String = "314dcf4c-e12b-11ed-b5ea-0242ac120002"
 
 class JsonFileConfigurationRepository : ConfigurationRepository {
+    private var cachedApplicationConfigurations: ApplicationConfigurations? = null
     private val filePath =
         GeneralPropertiesRepositoryFactory
             .repository
@@ -23,16 +24,20 @@ class JsonFileConfigurationRepository : ConfigurationRepository {
     private val mapper = ObjectMapper().registerKotlinModule()
 
     override fun configurations(): ApplicationConfigurations {
-        val file = file()
-        return if (file.exists()) {
-            logger.info { "Read application configuration from file '$file'" }
-            mapper.readValue(file, JsonApplicationConfigurationsDto::class.java).toApplicationConfigurations()
-        } else {
-            logger.info { "Application configurations file '$file' does not exists. Return default configuration" }
-            ApplicationConfigurations(
-                variablesKey = DEFAULT_VARIABLES_KEY,
-            )
+        if (cachedApplicationConfigurations == null) {
+            val file = file()
+            cachedApplicationConfigurations = if (file.exists()) {
+                logger.info { "Read application configuration from file '$file'" }
+                mapper.readValue(file, JsonApplicationConfigurationsDto::class.java).toApplicationConfigurations()
+            } else {
+                logger.info { "Application configurations file '$file' does not exists. Return default configuration" }
+                ApplicationConfigurations(
+                    variablesKey = DEFAULT_VARIABLES_KEY,
+                )
+            }
         }
+
+        return cachedApplicationConfigurations!!
     }
 
     private fun file(): File {
@@ -47,7 +52,10 @@ class JsonFileConfigurationRepository : ConfigurationRepository {
 
     override fun save(applicationConfigurations: ApplicationConfigurations) {
         val file = file()
-        mapper.writerWithDefaultPrettyPrinter().writeValue(file, applicationConfigurations.toJsonApplicationConfigurationsDto())
+        mapper.writerWithDefaultPrettyPrinter()
+            .writeValue(file, applicationConfigurations.toJsonApplicationConfigurationsDto())
+
+        cachedApplicationConfigurations = applicationConfigurations
     }
 }
 
