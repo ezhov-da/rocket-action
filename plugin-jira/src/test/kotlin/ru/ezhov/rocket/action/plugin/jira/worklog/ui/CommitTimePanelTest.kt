@@ -57,7 +57,7 @@ fun main() {
                 aliasForTaskIds = AliasForTaskIds.of(
                     """
                       123_тру,ля,пв,в
-                      122_хз,аля
+                      122_тру,ля
                     """.trimIndent()
                 ),
                 linkToWorkLog = URI.create("https://google.com"),
