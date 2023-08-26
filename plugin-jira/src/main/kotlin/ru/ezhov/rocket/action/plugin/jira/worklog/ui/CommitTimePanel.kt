@@ -2,6 +2,7 @@ package ru.ezhov.rocket.action.plugin.jira.worklog.ui
 
 import arrow.core.flatten
 import mu.KotlinLogging
+import org.jdesktop.swingx.JXCollapsiblePane
 import ru.ezhov.rocket.action.api.context.RocketActionContext
 import ru.ezhov.rocket.action.api.context.notification.NotificationType
 import ru.ezhov.rocket.action.plugin.jira.worklog.domain.CommitTimeService
@@ -23,21 +24,24 @@ import java.awt.event.ActionEvent
 import java.awt.event.InputEvent
 import java.awt.event.KeyAdapter
 import java.awt.event.KeyEvent
+import java.awt.event.MouseAdapter
+import java.awt.event.MouseEvent
 import java.io.File
 import java.net.URI
 import java.time.format.DateTimeFormatter
 import javax.swing.AbstractAction
 import javax.swing.Action
+import javax.swing.BorderFactory
+import javax.swing.BoxLayout
 import javax.swing.JButton
 import javax.swing.JLabel
-import javax.swing.JMenu
-import javax.swing.JMenuBar
-import javax.swing.JMenuItem
 import javax.swing.JPanel
 import javax.swing.JScrollPane
 import javax.swing.JSplitPane
 import javax.swing.JTable
+import javax.swing.JTextField
 import javax.swing.JTextPane
+import javax.swing.JToolBar
 import javax.swing.KeyStroke
 import javax.swing.SwingUtilities
 import javax.swing.SwingWorker
@@ -80,36 +84,58 @@ class CommitTimePanel(
         ReadFile(textPane = textPane, file = fileForSave, context = context).execute()
 
         layout = BorderLayout()
+        val favoriteTasksPanel = FavoriteTasksPanel(tasks = tasks, aliasForTaskIds = aliasForTaskIds) { task ->
+            textPane.document.insertString(
+                textPane.caretPosition, task.id, null
+            )
+        }
+        val aliasForTaskIdsPanel = AliasForTaskIdsPanel(aliasForTaskIds)
+
         add(
-            JMenuBar()
+            JPanel(BorderLayout())
                 .apply {
+                    val toolBar = JToolBar().apply { isFloatable = false }
                     linkToWorkLog?.let { ltwl ->
-                        add(
+                        toolBar.add(
                             JButton("Open link").apply {
-                                addActionListener {
-                                    try {
-                                        Desktop.getDesktop().browse(ltwl)
-                                    } catch (ex: Exception) {
-                                        val msg = "Error open link='$ltwl'"
-                                        logger.warn(ex) { msg }
-                                        context.notification().show(type = NotificationType.WARN, text = msg)
+                                addMouseListener(object : MouseAdapter() {
+                                    override fun mouseReleased(e: MouseEvent?) {
+                                        try {
+                                            Desktop.getDesktop().browse(ltwl)
+                                        } catch (ex: Exception) {
+                                            val msg = "Error open link='$ltwl'"
+                                            logger.warn(ex) { msg }
+                                            context.notification().show(type = NotificationType.WARN, text = msg)
+                                        }
                                     }
-                                }
+                                })
                             }
                         )
+
+                        toolBar.add(JButton("Show favorite tasks").apply {
+                            addActionListener {
+                                SwingUtilities.invokeLater {
+                                    favoriteTasksPanel.isCollapsed = !favoriteTasksPanel.isCollapsed
+                                }
+                            }
+                        })
+                        toolBar.add(JButton("Show substitution patterns").apply {
+                            addActionListener {
+                                SwingUtilities.invokeLater {
+                                    aliasForTaskIdsPanel.isCollapsed = !aliasForTaskIdsPanel.isCollapsed
+                                }
+                            }
+                        })
                     }
-                    createAliasMenu(tasks = tasks, aliasForTaskIds = aliasForTaskIds) { task ->
-                        textPane.document.insertString(
-                            textPane.caretPosition, task.id, null
-                        )
-                    }?.let { aliasesMenu -> add(aliasesMenu) }
+
+                    val innerPanel = JPanel(BorderLayout()).apply {
+                        add(favoriteTasksPanel, BorderLayout.CENTER)
+                        add(aliasForTaskIdsPanel, BorderLayout.SOUTH)
+                    }
 
 
-                    createSubstitutionPatternsMenu(aliasForTaskIds) { value ->
-                        textPane.document.insertString(
-                            textPane.caretPosition, value, null
-                        )
-                    }?.let { patternsMenu -> add(patternsMenu) }
+                    add(toolBar, BorderLayout.NORTH)
+                    add(innerPanel, BorderLayout.CENTER)
                 },
             BorderLayout.NORTH
         )
@@ -160,56 +186,6 @@ class CommitTimePanel(
         })
     }
 
-    private fun createAliasMenu(
-        tasks: List<Task>,
-        aliasForTaskIds: AliasForTaskIds,
-        addCallback: (task: Task) -> Unit,
-    ): JMenu? = tasks.takeIf { it.isNotEmpty() }?.let {
-
-        val jMenu = JMenu("Favorite tasks")
-        tasks.forEach { task ->
-            val aliasesText = aliasForTaskIds
-                .aliasesBy(task.id)
-                .takeIf { it.isNotEmpty() }
-                ?.joinToString(prefix = "[", postfix = "]", separator = ", ")
-                .orEmpty()
-
-            jMenu.add(
-                JMenuItem("${task.id} $aliasesText - ${task.name}").apply {
-                    addActionListener {
-                        SwingUtilities.invokeLater { addCallback(task) }
-                    }
-                })
-        }
-        jMenu
-    }
-
-    private fun createSubstitutionPatternsMenu(
-        aliasForTaskIds: AliasForTaskIds,
-        addCallback: (text: String) -> Unit,
-    ): JMenu? = aliasForTaskIds
-        .values
-        .takeIf { it.isNotEmpty() }
-        ?.let { values ->
-            val jMenu = JMenu("Substitution patterns")
-            val patterns = values.map { (key, values) ->
-                values.map { it to key }
-            }
-                .flatten()
-                .toMap()
-
-
-            patterns.forEach { (k, v) ->
-                jMenu.add(
-                    JMenuItem("$k - $v").apply {
-                        addActionListener {
-                            SwingUtilities.invokeLater { addCallback(k) }
-                        }
-                    })
-            }
-            jMenu
-        }
-
     private fun setUndoAndRedo() {
         val manager = UndoManager()
         textPane.document.addUndoableEditListener(manager)
@@ -243,7 +219,7 @@ class CommitTimePanel(
         private val file: File,
         private val context: RocketActionContext,
     ) : SwingWorker<Any, Unit>() {
-        override fun doInBackground() {
+        override fun doInBackground(): Unit {
             file.parentFile?.let {
                 if (!it.exists()) {
                     it.mkdirs()
@@ -376,6 +352,70 @@ class CommitTimePanel(
                 context.notification().show(type = NotificationType.WARN, text = text)
             } finally {
                 button.isEnabled = true
+            }
+        }
+    }
+
+    private class FavoriteTasksPanel(
+        tasks: List<Task>,
+        private val aliasForTaskIds: AliasForTaskIds,
+        private val addCallback: (task: Task) -> Unit,
+    ) : JXCollapsiblePane() {
+        init {
+            layout = BorderLayout()
+            val panel = JPanel().apply { layout = BoxLayout(this, BoxLayout.Y_AXIS) }
+
+            isCollapsed = true
+            border = BorderFactory.createTitledBorder("Favorite tasks")
+            tasks.forEach {
+                panel.add(FavoriteTaskPanel(aliasForTaskIds = aliasForTaskIds, task = it, addCallback = addCallback))
+            }
+
+            add(panel, BorderLayout.CENTER)
+        }
+    }
+
+    private class AliasForTaskIdsPanel(
+        aliasForTaskIds: AliasForTaskIds,
+    ) : JXCollapsiblePane() {
+        private val textPane = JTextPane()
+
+        init {
+            isCollapsed = true
+            layout = BorderLayout()
+            border = BorderFactory.createTitledBorder("Substitution patterns")
+            textPane.isEditable = false
+            add(textPane, BorderLayout.CENTER)
+            textPane.text = aliasForTaskIds.values.map { (key, values) ->
+                values.map { "$it - $key" }
+            }
+                .flatten()
+                .joinToString(separator = "\n")
+        }
+    }
+
+    private class FavoriteTaskPanel(
+        private val task: Task,
+        private val addCallback: (task: Task) -> Unit,
+        aliasForTaskIds: AliasForTaskIds,
+    ) : JPanel() {
+        private val textField = JTextField()
+        private val addButton = JButton("+")
+
+        init {
+            layout = BorderLayout()
+            textField.isEditable = false
+            val aliasesText = aliasForTaskIds
+                .aliasesBy(task.id)
+                .takeIf { it.isNotEmpty() }
+                ?.joinToString(prefix = " [", postfix = "] ", separator = ", ")
+                .orEmpty()
+            textField.text = "${task.id}$aliasesText- ${task.name}"
+            add(textField, BorderLayout.CENTER)
+            add(addButton, BorderLayout.WEST)
+
+            addButton.addActionListener {
+                SwingUtilities.invokeLater { addCallback(task) }
             }
         }
     }
