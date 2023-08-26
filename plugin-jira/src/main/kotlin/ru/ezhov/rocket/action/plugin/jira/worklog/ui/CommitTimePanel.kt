@@ -2,6 +2,7 @@ package ru.ezhov.rocket.action.plugin.jira.worklog.ui
 
 import arrow.core.flatten
 import mu.KotlinLogging
+import org.jdesktop.swingx.JXCollapsiblePane
 import ru.ezhov.rocket.action.api.context.RocketActionContext
 import ru.ezhov.rocket.action.api.context.notification.NotificationType
 import ru.ezhov.rocket.action.plugin.jira.worklog.domain.CommitTimeService
@@ -40,6 +41,7 @@ import javax.swing.JSplitPane
 import javax.swing.JTable
 import javax.swing.JTextField
 import javax.swing.JTextPane
+import javax.swing.JToolBar
 import javax.swing.KeyStroke
 import javax.swing.SwingUtilities
 import javax.swing.SwingWorker
@@ -82,12 +84,20 @@ class CommitTimePanel(
         ReadFile(textPane = textPane, file = fileForSave, context = context).execute()
 
         layout = BorderLayout()
+        val favoriteTasksPanel = FavoriteTasksPanel(tasks = tasks, aliasForTaskIds = aliasForTaskIds) { task ->
+            textPane.document.insertString(
+                textPane.caretPosition, task.id, null
+            )
+        }
+        val aliasForTaskIdsPanel = AliasForTaskIdsPanel(aliasForTaskIds)
+
         add(
             JPanel(BorderLayout())
                 .apply {
+                    val toolBar = JToolBar().apply { isFloatable = false }
                     linkToWorkLog?.let { ltwl ->
-                        add(
-                            JLabel(ltwl.toString()).apply {
+                        toolBar.add(
+                            JButton("Open link").apply {
                                 addMouseListener(object : MouseAdapter() {
                                     override fun mouseReleased(e: MouseEvent?) {
                                         try {
@@ -99,30 +109,45 @@ class CommitTimePanel(
                                         }
                                     }
                                 })
-                            },
-                            BorderLayout.NORTH
+                            }
                         )
+
+                        toolBar.add(JButton("Show favorite tasks").apply {
+                            addActionListener {
+                                SwingUtilities.invokeLater {
+                                    favoriteTasksPanel.isCollapsed = !favoriteTasksPanel.isCollapsed
+                                }
+                            }
+                        })
+                        toolBar.add(JButton("Show substitution patterns").apply {
+                            addActionListener {
+                                SwingUtilities.invokeLater {
+                                    aliasForTaskIdsPanel.isCollapsed = !aliasForTaskIdsPanel.isCollapsed
+                                }
+                            }
+                        })
                     }
-                    add(
-                        FavoriteTasksPanel(tasks = tasks, aliasForTaskIds = aliasForTaskIds) { task ->
-                            textPane.document.insertString(
-                                textPane.caretPosition, task.id, null
-                            )
-                        },
-                        BorderLayout.CENTER
-                    )
-                    add(AliasForTaskIdsPanel(aliasForTaskIds), BorderLayout.SOUTH)
+
+                    val innerPanel = JPanel(BorderLayout()).apply {
+                        add(favoriteTasksPanel, BorderLayout.CENTER)
+                        add(aliasForTaskIdsPanel, BorderLayout.SOUTH)
+                    }
+
+
+                    add(toolBar, BorderLayout.NORTH)
+                    add(innerPanel, BorderLayout.CENTER)
                 },
             BorderLayout.NORTH
         )
 
         setUndoAndRedo()
 
-        val split = JSplitPane(JSplitPane.VERTICAL_SPLIT)
-        split.topComponent = JScrollPane(textPane)
-        split.bottomComponent = tasksPanel
-        split.setDividerLocation(0.8)
-        split.resizeWeight = 0.8
+        val split = JSplitPane(JSplitPane.VERTICAL_SPLIT, JScrollPane(textPane), tasksPanel)
+            .apply {
+                // https://stackoverflow.com/questions/7625762/setting-divider-location-on-a-jsplitpane-doesnt-work
+                // put everything about resize, size, whatever for JSplitPane into invokeLater() .
+                SwingUtilities.invokeLater { setDividerLocation(0.5) }
+            }
 
         add(split, BorderLayout.CENTER)
 
@@ -335,22 +360,28 @@ class CommitTimePanel(
         tasks: List<Task>,
         private val aliasForTaskIds: AliasForTaskIds,
         private val addCallback: (task: Task) -> Unit,
-    ) : JPanel() {
+    ) : JXCollapsiblePane() {
         init {
-            layout = BoxLayout(this, BoxLayout.Y_AXIS)
+            layout = BorderLayout()
+            val panel = JPanel().apply { layout = BoxLayout(this, BoxLayout.Y_AXIS) }
+
+            isCollapsed = true
             border = BorderFactory.createTitledBorder("Favorite tasks")
             tasks.forEach {
-                add(FavoriteTaskPanel(aliasForTaskIds = aliasForTaskIds, task = it, addCallback = addCallback))
+                panel.add(FavoriteTaskPanel(aliasForTaskIds = aliasForTaskIds, task = it, addCallback = addCallback))
             }
+
+            add(panel, BorderLayout.CENTER)
         }
     }
 
     private class AliasForTaskIdsPanel(
         aliasForTaskIds: AliasForTaskIds,
-    ) : JPanel() {
+    ) : JXCollapsiblePane() {
         private val textPane = JTextPane()
 
         init {
+            isCollapsed = true
             layout = BorderLayout()
             border = BorderFactory.createTitledBorder("Substitution patterns")
             textPane.isEditable = false
