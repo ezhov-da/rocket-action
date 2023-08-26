@@ -259,11 +259,17 @@ internal class TextPanel(
 
         when (textPanelConfiguration.delimiter.isNotBlank()) {
             true -> {
-                val split = JSplitPane(JSplitPane.HORIZONTAL_SPLIT)
-                split.leftComponent = pointPanel
-                split.rightComponent = RTextScrollPane(textPane)
-                split.setDividerLocation(0.2)
-                add(split, BorderLayout.CENTER)
+                add(
+                    JSplitPane(
+                        JSplitPane.HORIZONTAL_SPLIT,
+                        pointPanel.apply { minimumSize = Dimension(100, 50) },
+                        RTextScrollPane(textPane).apply { minimumSize = Dimension(100, 50) }
+                    )
+                        .apply {
+                            SwingUtilities.invokeLater { setDividerLocation(0.3) }
+                        },
+                    BorderLayout.CENTER
+                )
                 textPane.document.addDocumentListener(object : DocumentListener {
                     override fun insertUpdate(e: DocumentEvent?) {
                         recalculate()

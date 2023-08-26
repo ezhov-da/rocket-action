@@ -16,18 +16,27 @@ import javax.swing.ImageIcon
 import javax.swing.JFrame
 import javax.swing.SwingUtilities
 import kotlin.io.path.absolutePathString
+import kotlin.io.path.writeText
 
 fun main() {
     SwingUtilities.invokeLater {
         JFrame()
             .apply {
                 val textPanelConfiguration = TextPanelConfiguration(
-                    path = Files.createTempFile("123", "111").absolutePathString(),
+                    path = Files.createTempFile("123", "111").apply {
+                        writeText("""
+                            >>> test
+                            123
+
+                            >>>test 2
+                            456
+                        """.trimIndent())
+                    }.absolutePathString(),
                     label = "Test",
                     loadOnInitialize = true,
                     style = null,
                     addStyleSelected = true,
-                    delimiter = "",
+                    delimiter = ">>>",
                 )
                 add(
                     TextPanel(
