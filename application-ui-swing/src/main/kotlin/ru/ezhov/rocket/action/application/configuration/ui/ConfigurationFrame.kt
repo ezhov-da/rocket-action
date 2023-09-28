@@ -7,7 +7,7 @@ import ru.ezhov.rocket.action.application.configuration.ui.event.ConfigurationUi
 import ru.ezhov.rocket.action.application.configuration.ui.event.ConfigurationUiObserverFactory
 import ru.ezhov.rocket.action.application.configuration.ui.event.model.ConfigurationUiEvent
 import ru.ezhov.rocket.action.application.configuration.ui.event.model.RemoveSettingUiEvent
-import ru.ezhov.rocket.action.application.core.domain.RocketActionSettingsRepository
+import ru.ezhov.rocket.action.application.core.application.RocketActionSettingsService
 import ru.ezhov.rocket.action.application.core.domain.RocketActionSettingsRepositoryException
 import ru.ezhov.rocket.action.application.core.domain.model.ActionsModel
 import ru.ezhov.rocket.action.application.core.domain.model.RocketActionSettingsModel
@@ -56,7 +56,7 @@ private val logger = KotlinLogging.logger { }
 
 class ConfigurationFrame(
     rocketActionPluginApplicationService: RocketActionPluginApplicationService,
-    private val rocketActionSettingsRepository: RocketActionSettingsRepository,
+    private val rocketActionSettingsService: RocketActionSettingsService,
     updateActionListener: ActionListener
 ) {
     private val frame: JFrame = JFrame()
@@ -75,10 +75,10 @@ class ConfigurationFrame(
         val splitPane = JSplitPane(JSplitPane.HORIZONTAL_SPLIT)
         splitPane.setDividerLocation(0.5)
         splitPane.resizeWeight = 0.5
-        val actions = rocketActionSettingsRepository.actions()
+        val actionsModel = rocketActionSettingsService.actionsModel()
         val root = DefaultMutableTreeNode(null, true)
-        fillTreeNodes(actions.actions, root)
-        setTitle(actions.lastChangedDate)
+        fillTreeNodes(actionsModel.actions, root)
+        setTitle(actionsModel.lastChangedDate)
         val defaultTreeModel = DefaultTreeModel(root)
         val rocketActionSettingsPanel = EditorRocketActionSettingsPanel(
             rocketActionPluginApplicationService = rocketActionPluginApplicationService,
@@ -314,7 +314,7 @@ class ConfigurationFrame(
         }
         try {
             val actions = ActionsModel(actions = settings.map { it.toModel() })
-            rocketActionSettingsRepository.save(actions)
+            rocketActionSettingsService.save(actions)
             setTitle(actions.lastChangedDate)
             RocketActionContextFactory.context.notification().show(NotificationType.INFO, "Actions saved")
         } catch (e: RocketActionSettingsRepositoryException) {
@@ -469,7 +469,7 @@ class ConfigurationFrame(
     var buttonCreateNewAction: JButton? = null
 
     private fun checkEmptyActionsAndShowButtonCreate(menuBar: JToolBar) {
-        if (rocketActionSettingsRepository.actions().actions.isEmpty() && buttonCreateNewAction == null) {
+        if (rocketActionSettingsService.actionsModel().actions.isEmpty() && buttonCreateNewAction == null) {
             createAndShowButtonCreateFirstAction(menuBar = menuBar)
         }
     }

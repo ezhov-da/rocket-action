@@ -2,10 +2,11 @@ package ru.ezhov.rocket.action.application
 
 import com.formdev.flatlaf.FlatLightLaf
 import mu.KotlinLogging
-import ru.ezhov.rocket.action.application.core.domain.RocketActionSettingsRepository
+import ru.ezhov.rocket.action.application.core.application.RocketActionSettingsService
 import ru.ezhov.rocket.action.application.core.domain.model.ActionsModel
-import ru.ezhov.rocket.action.application.handlers.server.Server
 import ru.ezhov.rocket.action.application.core.infrastructure.yml.YmlRocketActionSettingsRepository
+import ru.ezhov.rocket.action.application.handlers.server.Server
+import ru.ezhov.rocket.action.application.plugin.manager.application.RocketActionPluginApplicationService
 import ru.ezhov.rocket.action.application.plugin.manager.application.RocketActionPluginApplicationServiceFactory
 import ru.ezhov.rocket.action.application.properties.GeneralPropertiesRepositoryFactory
 import ru.ezhov.rocket.action.application.properties.UsedPropertiesName
@@ -25,9 +26,10 @@ fun main(args: Array<String>) {
         try {
             getFont()?.let { font -> setUIFont(font) }
 
+            val rocketActionPluginApplicationService = RocketActionPluginApplicationServiceFactory.service
             val actionService = UiQuickActionService(
-                rocketActionSettingsRepository = rockerActionRepository(args),
-                rocketActionPluginApplicationService = RocketActionPluginApplicationServiceFactory.service,
+                rocketActionSettingsService = rockerActionService(args, rocketActionPluginApplicationService),
+                rocketActionPluginApplicationService = rocketActionPluginApplicationService,
                 generalPropertiesRepository = GeneralPropertiesRepositoryFactory.repository,
                 tagsService = TagServiceFactory.tagsService,
             )
@@ -48,7 +50,10 @@ fun main(args: Array<String>) {
     }
 }
 
-private fun rockerActionRepository(args: Array<String>): RocketActionSettingsRepository =
+private fun rockerActionService(
+    args: Array<String>,
+    rocketActionPluginApplicationService: RocketActionPluginApplicationService
+): RocketActionSettingsService =
     if (GeneralPropertiesRepositoryFactory.repository.asBoolean(UsedPropertiesName.IS_DEVELOPER, false)) {
         val testActions = "/test-actions.yml"
 
@@ -76,7 +81,13 @@ private fun rockerActionRepository(args: Array<String>): RocketActionSettingsRep
         }
         repository
     }
-        .apply { load() }
+        .let { repository ->
+            repository.load()
+            RocketActionSettingsService(
+                rocketActionPluginApplicationService = rocketActionPluginApplicationService,
+                rocketActionSettingsRepository = repository,
+            )
+        }
 
 private fun lookAndFeel(): LookAndFeel {
     val className = GeneralPropertiesRepositoryFactory.repository
