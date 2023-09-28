@@ -37,4 +37,8 @@ class TagsServiceImpl(
             .sortedBy { it.name }
 
     override fun tagsTree(): List<TagNode> = tagsRepository.tagsTree()
+
+    override fun clear() {
+        tagsRepository.clear()
+    }
 }

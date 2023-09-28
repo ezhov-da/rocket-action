@@ -9,13 +9,16 @@ import ru.ezhov.rocket.action.application.core.infrastructure.RocketActionCompon
 import ru.ezhov.rocket.action.application.plugin.context.RocketActionContextFactory
 import ru.ezhov.rocket.action.application.plugin.group.GroupRocketActionUi
 import ru.ezhov.rocket.action.application.plugin.manager.application.RocketActionPluginApplicationService
+import ru.ezhov.rocket.action.application.tags.application.TagsService
 import java.awt.Component
+import kotlin.system.measureTimeMillis
 
 private val logger = KotlinLogging.logger {}
 
 class RocketActionSettingsService(
     private val rocketActionPluginApplicationService: RocketActionPluginApplicationService,
     private val rocketActionSettingsRepository: RocketActionSettingsRepository,
+    private val tagsService: TagsService,
 ) {
     private var rocketActionAndComponents: List<RocketActionAndComponent> = emptyList()
 
@@ -23,16 +26,19 @@ class RocketActionSettingsService(
 
     fun save(actions: ActionsModel) {
         rocketActionSettingsRepository.save(actions)
+
+        fillTags(actions)
     }
 
     fun getAllExistsComponents(): List<Component> = rocketActionAndComponents.map { it.component }
 
     fun loadAndGetAllComponents(): List<Component> {
-        val actionSettings = actionsModel()
-        fillCache(actionSettings.actions)
+        val actionsModel = actionsModel()
+        fillTags(actionsModel)
+        fillCache(actionsModel.actions)
         val cache = RocketActionComponentCacheFactory.cache
         val components = mutableListOf<RocketActionAndComponent>()
-        for (rocketActionSettings in actionSettings.actions) {
+        for (rocketActionSettings in actionsModel.actions) {
             rocketActionPluginApplicationService.by(rocketActionSettings.type)
                 ?.factory(RocketActionContextFactory.context)
                 ?.let {
@@ -74,6 +80,28 @@ class RocketActionSettingsService(
         }
         rocketActionAndComponents = components.toList()
         return rocketActionAndComponents.map { it.component }
+    }
+
+    private fun fillTags(actionsModel: ActionsModel) {
+        tagsService.clear()
+
+        fun recursion(actions: List<RocketActionSettingsModel>) {
+            actions.forEach { action ->
+                tagsService.add(action.id, action.tags)
+                if (action.actions.isNotEmpty()) {
+                    recursion(action.actions)
+                }
+            }
+        }
+
+        val time = measureTimeMillis {
+            recursion(actionsModel.actions)
+        }
+
+        logger.info {
+            "Tags filling for '${actionsModel.actions.size}' actions in '$time'ms. " +
+                "Tags count is '${tagsService.count()}'"
+        }
     }
 
     private fun fillCache(actionSettings: List<RocketActionSettingsModel>) {

@@ -14,6 +14,8 @@ interface TagsService {
     fun tagAndKeys(): List<TagAndKeys>
 
     fun tagsTree(): List<TagNode>
+
+    fun clear()
 }
 
 data class TagDto(

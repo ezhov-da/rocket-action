@@ -15,10 +15,8 @@ import ru.ezhov.rocket.action.application.core.infrastructure.yml.model.ActionsD
 import ru.ezhov.rocket.action.application.core.infrastructure.yml.model.RocketActionSettingsDto
 import ru.ezhov.rocket.action.application.core.infrastructure.yml.model.SettingsDto
 import ru.ezhov.rocket.action.application.core.infrastructure.yml.model.SettingsValueTypeDto
-import ru.ezhov.rocket.action.application.tags.application.TagServiceFactory
 import java.io.File
 import java.net.URI
-import kotlin.system.measureTimeMillis
 
 private val logger = KotlinLogging.logger {}
 
@@ -26,7 +24,6 @@ class YmlRocketActionSettingsRepository(
     private val uri: URI
 ) : RocketActionSettingsRepository {
     // TODO ezhov temporary use, will be transferred to the service after refactoring
-    private val tagsService = TagServiceFactory.tagsService
     private val ymlRocketActionSettingsRepositoryOldFormat = YmlRocketActionSettingsRepositoryOldFormat(uri)
     private val mapper = ObjectMapper(YAMLFactory())
         .registerKotlinModule()
@@ -56,28 +53,7 @@ class YmlRocketActionSettingsRepository(
 
             logger.info { "Actions count ${actions.actions.size}" }
 
-            fillTags(actions)
             return actions
-        }
-    }
-
-    private fun fillTags(actionsModel: ActionsModel) {
-        fun recursion(actions: List<RocketActionSettingsModel>) {
-            actions.forEach { action ->
-                tagsService.add(action.id, action.tags)
-                if (action.actions.isNotEmpty()) {
-                    recursion(action.actions)
-                }
-            }
-        }
-
-        val time = measureTimeMillis {
-            recursion(actionsModel.actions)
-        }
-
-        logger.info {
-            "Tags filling for '${actionsModel.actions.size}' actions in '$time'ms. " +
-                "Tags count is '${tagsService.count()}'"
         }
     }
 
@@ -88,8 +64,6 @@ class YmlRocketActionSettingsRepository(
             lastChangedDate = actions.lastChangedDate,
             actions = actions.actions.map { it.toRocketActionSettingsDto() }
         ))
-
-        fillTags(actions)
 
         logger.info { "Actions settings saving completed. count=${actions.actions.size}" }
     }

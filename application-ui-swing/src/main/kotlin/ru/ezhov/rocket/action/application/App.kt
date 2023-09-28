@@ -86,6 +86,7 @@ private fun rockerActionService(
             RocketActionSettingsService(
                 rocketActionPluginApplicationService = rocketActionPluginApplicationService,
                 rocketActionSettingsRepository = repository,
+                tagsService = TagServiceFactory.tagsService
             )
         }
 
