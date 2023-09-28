@@ -79,15 +79,15 @@ class GroupRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
         private val parentMenu: JMenu,
         private val iconUrl: String,
         private val settings: RocketActionSettings,
-    ) : SwingWorker<List<Component?>, String?>() {
+    ) : SwingWorker<Pair<Icon, List<Component>>, String?>() {
 
-        override fun doInBackground(): List<Component> {
+        override fun doInBackground(): Pair<Icon, List<Component>> {
             return createGroup(settings.actions())
         }
 
         private fun createGroup(
             actionSettings: List<RocketActionSettings>,
-        ): List<Component> {
+        ): Pair<Icon, List<Component>> {
             val cache = RocketActionComponentCacheFactory.cache
             val children: MutableList<Component> = ArrayList()
             for (settings in actionSettings) {
@@ -111,22 +111,27 @@ class GroupRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
                     cache.by(settings.id())?.let { children.add(it.component()) }
                 }
             }
-            return children.toList()
+            return Pair(
+                // in a separate thread we also get the icon
+                RocketActionContextFactory.context.icon().load(
+                    iconUrl = iconUrl,
+                    defaultIcon = RocketActionContextFactory.context.icon().by(AppIcon.PROJECT)
+                ),
+                children.toList()
+            )
         }
 
         override fun done() {
             try {
-                val components = this.get()
-                components!!.forEach { c -> parentMenu.add(c) }
+                val result = this.get()
+                parentMenu.icon = result.first
+                val components = this.get().second
+                components.forEach { c -> parentMenu.add(c) }
             } catch (e: InterruptedException) {
                 e.printStackTrace()
             } catch (e: ExecutionException) {
                 e.printStackTrace()
             }
-            parentMenu.icon = RocketActionContextFactory.context.icon().load(
-                iconUrl,
-                RocketActionContextFactory.context.icon().by(AppIcon.PROJECT)
-            )
         }
     }
 
