@@ -14,4 +14,6 @@ interface TagsRepository {
     fun countTags(): Int
 
     fun tagsTree(): List<TagNode>
+
+    fun clear()
 }

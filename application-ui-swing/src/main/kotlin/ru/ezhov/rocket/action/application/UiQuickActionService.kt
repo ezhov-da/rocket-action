@@ -62,7 +62,8 @@ class UiQuickActionService(
             //TODO: favorites
             //menuBar.add(createFavoriteComponent());
 
-            menuBar.add(createTagsMenu(menu));
+            val tagsMenu = createEmptyTagsMenu()
+            menuBar.add(tagsMenu);
             menuBar.add(createSearchField(menu))
 
             val moveLabel = JLabel(RocketActionContextFactory.context.icon().by(AppIcon.MOVE))
@@ -71,7 +72,7 @@ class UiQuickActionService(
             menuBar.add(createTools(baseDialog))
 
             menuBar.add(moveLabel)
-            CreateMenuOrGetExistsWorker(menu, Action.CREATE).execute()
+            CreateMenuOrGetExistsWorker(menu, Action.Create(tagsMenu)).execute()
             menuBar
         } catch (e: Exception) {
             throw UiQuickActionServiceException("Error", e)
@@ -105,7 +106,7 @@ class UiQuickActionService(
                                             }
                                     } else {
                                         SwingUtilities.invokeLater { tf.background = Color.WHITE }
-                                        CreateMenuOrGetExistsWorker(menu, Action.EXISTS).execute()
+                                        CreateMenuOrGetExistsWorker(menu, Action.Restore).execute()
                                     }
                                 } else if (e.keyCode == KeyEvent.VK_ESCAPE) {
                                     resetSearch(textField = tf, menu = menu)
@@ -143,12 +144,16 @@ class UiQuickActionService(
             }
     }
 
-    private fun createTagsMenu(baseMenu: JMenu): JMenu {
+    private fun createEmptyTagsMenu(): JMenu {
+        val iconTag = ImageIcon(this::class.java.getResource("/icons/tag_16x16.png"))
+        return JMenu().apply { icon = iconTag }
+    }
+
+    private fun fillTagsMenu(baseMenu: JMenu, tagsMenu: JMenu) {
         // TODO ezhov move to storage
         val iconTree = ImageIcon(this::class.java.getResource("/icons/tree_16x16.png"))
         val iconTag = ImageIcon(this::class.java.getResource("/icons/tag_16x16.png"))
 
-        val menu = JMenu().apply { icon = iconTag }
         val menuTree = JMenu("Tags tree").apply { icon = iconTree }
 
         val invokeSearch: (keys: Set<String>) -> Unit = { keys ->
@@ -188,13 +193,12 @@ class UiQuickActionService(
 
         tagsService.tagsTree().forEach { node ->
             recursive(menuTree, node)
-
         }
 
-        menu.add(menuTree)
+        tagsMenu.add(menuTree)
 
         tagsService.tagAndKeys().forEach { t ->
-            menu.add(
+            tagsMenu.add(
                 JMenuItem("${t.name} (${t.keys.size})")
                     .apply {
                         icon = iconTag
@@ -204,14 +208,12 @@ class UiQuickActionService(
                     }
             )
         }
-
-        return menu
     }
 
     private fun resetSearch(textField: JTextField, menu: JMenu) {
         textField.text = ""
         SwingUtilities.invokeLater { textField.background = Color.WHITE }
-        CreateMenuOrGetExistsWorker(menu, Action.EXISTS).execute()
+        CreateMenuOrGetExistsWorker(menu, Action.Restore).execute()
     }
 
     private fun createTools(baseDialog: JDialog): JMenu {
@@ -342,29 +344,40 @@ class UiQuickActionService(
                 }
         }
 
-    private inner class CreateMenuOrGetExistsWorker(private val menu: JMenu, private val action: Action) :
+    private inner class CreateMenuOrGetExistsWorker(
+        private val baseMenu: JMenu,
+        private val action: Action
+    ) :
         SwingWorker<List<Component>, String?>() {
 
         init {
-            menu.icon = RocketActionContextFactory.context.icon().by(AppIcon.LOADER)
-            menu.removeAll()
+            baseMenu.icon = RocketActionContextFactory.context.icon().by(AppIcon.LOADER)
+            baseMenu.removeAll()
         }
 
         override fun doInBackground(): List<Component> = when (action) {
-            Action.CREATE -> rocketActionSettingsService.loadAndGetAllComponents()
-            Action.EXISTS -> rocketActionSettingsService.getAllExistsComponents()
+            is Action.Create -> {
+                val components = rocketActionSettingsService.loadAndGetAllComponents()
+                fillTagsMenu(baseMenu, action.tagsMenu)
+                components
+            }
+
+            is Action.Restore -> rocketActionSettingsService.getAllExistsComponents()
         }
 
         override fun done() {
             try {
                 val components = this.get()
-                components.forEach { menu.add(it) }
-                menu.icon = RocketActionContextFactory.context.icon().by(AppIcon.ROCKET_APP)
+                components.forEach { baseMenu.add(it) }
+                baseMenu.icon = RocketActionContextFactory.context.icon().by(AppIcon.ROCKET_APP)
             } catch (ex: Exception) {
                 logger.error(ex) { "Error when load app" }
             }
         }
     }
 
-    enum class Action { CREATE, EXISTS }
+    sealed class Action {
+        class Create(val tagsMenu: JMenu) : Action()
+        object Restore : Action()
+    }
 }

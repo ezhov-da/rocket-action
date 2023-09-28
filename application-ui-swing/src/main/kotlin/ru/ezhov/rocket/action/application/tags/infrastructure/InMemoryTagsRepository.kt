@@ -86,4 +86,9 @@ class InMemoryTagsRepository : TagsRepository {
 
         return mapByIndex[0]?.map { it.build() }?.toList().orEmpty()
     }
+
+    override fun clear() {
+        mapTagAndKeys.clear()
+        mapKeyAndTags.clear()
+    }
 }
