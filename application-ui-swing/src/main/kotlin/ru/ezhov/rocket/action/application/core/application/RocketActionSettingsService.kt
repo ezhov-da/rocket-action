@@ -4,6 +4,7 @@ import mu.KotlinLogging
 import ru.ezhov.rocket.action.api.RocketAction
 import ru.ezhov.rocket.action.application.core.domain.RocketActionSettingsRepository
 import ru.ezhov.rocket.action.application.core.domain.model.ActionsModel
+import ru.ezhov.rocket.action.application.core.domain.model.RocketActionCached
 import ru.ezhov.rocket.action.application.core.domain.model.RocketActionSettingsModel
 import ru.ezhov.rocket.action.application.core.infrastructure.RocketActionComponentCacheFactory
 import ru.ezhov.rocket.action.application.plugin.context.RocketActionContextFactory
@@ -33,52 +34,39 @@ class RocketActionSettingsService(
     fun getAllExistsComponents(): List<Component> = rocketActionAndComponents.map { it.component }
 
     fun loadAndGetAllComponents(): List<Component> {
-        val actionsModel = actionsModel()
-        fillTags(actionsModel)
-        fillCache(actionsModel.actions)
-        val cache = RocketActionComponentCacheFactory.cache
-        val components = mutableListOf<RocketActionAndComponent>()
-        for (rocketActionSettings in actionsModel.actions) {
-            rocketActionPluginApplicationService.by(rocketActionSettings.type)
-                ?.factory(RocketActionContextFactory.context)
-                ?.let {
-                    (
-                        cache
-                            .by(rocketActionSettings.id)
-                            ?.let { action ->
-                                logger.debug {
-                                    "found in cache type='${rocketActionSettings.type}'" +
-                                        "id='${rocketActionSettings.id}"
-                                }
+        val measureTimeMillis = measureTimeMillis {
+            val actionsModel = actionsModel()
+            fillTags(actionsModel)
+            fillCache(actionsModel.actions)
+            val cache = RocketActionComponentCacheFactory.cache
+            val components = mutableListOf<RocketActionAndComponent>()
+            for (rocketActionSettings in actionsModel.actions) {
+                rocketActionPluginApplicationService.by(rocketActionSettings.type)
+                    ?.factory(RocketActionContextFactory.context)
+                    ?.let {
+                        (
+                            cache
+                                .by(rocketActionSettings.id)
+                                ?.let { action ->
+                                    logger.debug {
+                                        "found in cache type='${rocketActionSettings.type}'" +
+                                            "id='${rocketActionSettings.id}"
+                                    }
 
-                                RocketActionAndComponent(
-                                    action,
-                                    action.component()
-                                )
-                            }
-                            ?: run {
-                                logger.debug {
-                                    "not found in cache type='${rocketActionSettings.type}'" +
-                                        "id='${rocketActionSettings.id}. Create component"
-                                }
-
-                                it.create(
-                                    settings = rocketActionSettings.to(),
-                                    context = RocketActionContextFactory.context
-                                )?.let { action ->
                                     RocketActionAndComponent(
-                                        action,
-                                        action.component()
+                                        rocketAction = action,
+                                        component = action.origin.component()
                                     )
                                 }
-                            }
-                        )
-                        ?.let { actionWithComponent ->
-                            components.add(actionWithComponent)
-                        }
-                }
+                            )
+                            ?.let { actionWithComponent -> components.add(actionWithComponent) }
+                    }
+            }
+            rocketActionAndComponents = components.toList()
         }
-        rocketActionAndComponents = components.toList()
+
+        logger.info { "Loading time and receiving all components '$measureTimeMillis' ms" }
+
         return rocketActionAndComponents.map { it.component }
     }
 
@@ -105,60 +93,72 @@ class RocketActionSettingsService(
     }
 
     private fun fillCache(actionSettings: List<RocketActionSettingsModel>) {
-        RocketActionComponentCacheFactory
-            .cache
-            .let { cache ->
-                for (rocketActionSettings in actionSettings) {
-                    val rau = rocketActionPluginApplicationService.by(rocketActionSettings.type)
-                        ?.factory(RocketActionContextFactory.context)
-                    if (rau != null) {
-                        if (rocketActionSettings.type != GroupRocketActionUi.TYPE) {
-                            val mustBeCreate = cache
-                                .by(rocketActionSettings.id)
-                                ?.isChanged(rocketActionSettings.to()) ?: true
+        val allActionSettings = mutableListOf<RocketActionSettingsModel>()
+        getAllActionSettings(actionSettings, allActionSettings)
 
-                            logger.debug {
-                                "must be create '$mustBeCreate' type='${rocketActionSettings.type}'" +
-                                    "id='${rocketActionSettings.id}'"
-                            }
+        val groupAndAnother = allActionSettings.groupBy { it.type == GroupRocketActionUi.TYPE }
+        groupAndAnother[false]?.forEach { settings -> createAndPutToCache(settings) }
+        // expand the list of groups, as we begin to create groups from child
+        groupAndAnother[true]?.reversed()?.forEach { settings -> createAndPutToCache(settings) }
+    }
 
-                            if (mustBeCreate) {
-                                rau.create(
-                                    settings = rocketActionSettings.to(),
-                                    context = RocketActionContextFactory.context
-                                )
-                                    ?.let { action ->
-                                        logger.debug {
-                                            "added to cache type='${rocketActionSettings.type}'" +
-                                                "id='${rocketActionSettings.id}'"
-                                        }
-
-                                        cache.add(
-                                            rocketActionSettings.id,
-                                            action
-                                        )
-                                    }
-                            }
-                        } else {
-                            if (rocketActionSettings.actions.isNotEmpty()) {
-                                fillCache(rocketActionSettings.actions)
-                            }
-                        }
-                    }
-                }
+    private fun getAllActionSettings(
+        actionsSettings: List<RocketActionSettingsModel>,
+        allActionsForFilling: MutableList<RocketActionSettingsModel>
+    ) {
+        actionsSettings.forEach { actionSettings ->
+            if (actionSettings.actions.isEmpty()) {
+                allActionsForFilling.add(actionSettings)
+            } else {
+                // must be first since the parent group must come before its children
+                allActionsForFilling.add(actionSettings)
+                getAllActionSettings(actionSettings.actions, allActionsForFilling)
             }
+        }
+    }
+
+    private fun createAndPutToCache(settings: RocketActionSettingsModel) {
+        val rau = rocketActionPluginApplicationService.by(settings.type)
+            ?.factory(RocketActionContextFactory.context)
+        val cache = RocketActionComponentCacheFactory.cache
+        if (rau != null) {
+            val rocketActionCached = cache.by(settings.id)
+            val isChanged =
+                rocketActionCached
+                    ?.origin
+                    ?.isChanged(settings.to())
+                    ?: true
+
+            logger.debug { "must be create '$isChanged' type='${settings.type}' id='${settings.id}'" }
+
+            if (isChanged) {
+                val newAction = rau.create(
+                    settings = settings.to(),
+                    context = RocketActionContextFactory.context
+                )
+
+                logger.debug { "added to cache type='${settings.type}' id='${settings.id}'" }
+
+                newAction?.let {
+                    cache.add(settings.id, RocketActionCached.newRocketAction(it))
+                }
+            } else {
+                rocketActionCached?.let { cache.add(settings.id, it.toNotChanged()) }
+            }
+        }
     }
 
     fun actionsByIds(ids: Set<String>): List<RocketAction> =
-        RocketActionComponentCacheFactory.cache.byIds(ids)
+        RocketActionComponentCacheFactory.cache.byIds(ids).map { it.origin }
 
     fun actionsByContains(text: String): List<RocketAction> =
         RocketActionComponentCacheFactory.cache
             .all()
+            .map { it.origin }
             .filter { it.contains(text) }
 }
 
 private data class RocketActionAndComponent(
-    val rocketAction: RocketAction,
+    val rocketAction: RocketActionCached,
     val component: Component,
 )

@@ -12,12 +12,13 @@ import ru.ezhov.rocket.action.application.plugin.manager.infrastructure.loaders.
 import ru.ezhov.rocket.action.application.plugin.manager.infrastructure.loaders.InnerPluginLoader
 import ru.ezhov.rocket.action.application.plugin.manager.infrastructure.loaders.JarsPluginLoader
 import ru.ezhov.rocket.action.application.plugin.manager.infrastructure.loaders.KotlinPluginLoader
+import java.util.concurrent.ConcurrentLinkedQueue
 import kotlin.system.measureTimeMillis
 
 private val logger = KotlinLogging.logger {}
 
 class PluginsReflectionRocketActionPluginRepository : RocketActionPluginRepository {
-    private var list: MutableList<RocketActionPluginSpec> = mutableListOf()
+    private var list: ConcurrentLinkedQueue<RocketActionPluginSpec> = ConcurrentLinkedQueue()
 
     private val innerPluginLoader: InnerPluginLoader = InnerPluginLoader()
     private val jarsPluginLoader: JarsPluginLoader = JarsPluginLoader()
@@ -89,7 +90,7 @@ class PluginsReflectionRocketActionPluginRepository : RocketActionPluginReposito
                     "kotlin='${fromKotlin.size}' "
             }
 
-            val allPlugins = mutableListOf<RocketActionPluginSpec>()
+            val allPlugins = ConcurrentLinkedQueue<RocketActionPluginSpec>()
             allPlugins.addAll(fromJars)
             allPlugins.addAll(inner)
             allPlugins.addAll(extended)
@@ -105,7 +106,7 @@ class PluginsReflectionRocketActionPluginRepository : RocketActionPluginReposito
         if (list.isEmpty()) {
             load()
         }
-        return list
+        return list.toList()
     }
 
     override fun by(type: String): RocketActionPluginSpec.Success? =
