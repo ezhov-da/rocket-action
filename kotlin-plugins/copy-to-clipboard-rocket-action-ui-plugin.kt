@@ -62,7 +62,7 @@ class CopyToClipboardRocketActionUi : AbstractRocketAction(), RocketActionPlugin
 
     override fun asString(): List<String> = listOf(LABEL, TEXT)
 
-    override fun name(): String = "Copy to clipboard"
+    override fun name(): String = "Copy to clipboard from kotlin script"
 
     override fun properties(): List<RocketActionConfigurationProperty> {
         return listOf(

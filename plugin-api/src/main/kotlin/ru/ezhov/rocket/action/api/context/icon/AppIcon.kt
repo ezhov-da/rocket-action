@@ -31,4 +31,7 @@ enum class AppIcon {
     FORK,
     CLOCK,
     LOADER,
+    SAVE,
+    EXPAND,
+    COLLAPSE,
 }

@@ -32,4 +32,7 @@ enum class AppIconInner(val iconName: String) {
     CLOCK("clock-2x"),
 
     LOADER("/icons/load_16x16.gif"),
+    SAVE("/icons/save_16x16.png"),
+    EXPAND("/icons/expand_16x16.png"),
+    COLLAPSE("/icons/collapse_16x16.png"),
 }

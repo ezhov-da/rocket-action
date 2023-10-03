@@ -13,7 +13,6 @@ import ru.ezhov.rocket.action.application.core.domain.model.SettingsValueType
 import ru.ezhov.rocket.action.application.core.infrastructure.MutableRocketActionSettings
 import ru.ezhov.rocket.action.application.plugin.context.RocketActionContextFactory
 import ru.ezhov.rocket.action.application.plugin.manager.application.RocketActionPluginApplicationService
-import ru.ezhov.rocket.action.application.plugin.manager.domain.RocketActionPluginRepository
 import ru.ezhov.rocket.action.application.tags.ui.TagsPanelFactory
 import ru.ezhov.rocket.action.ui.utils.swing.common.toImage
 import java.awt.BorderLayout
@@ -74,7 +73,9 @@ class CreateRocketActionSettingsDialog(
     }
 
     private fun panelComboBox(): JPanel {
-        val all = rocketActionPluginApplicationService.all().map { it.configuration(RocketActionContextFactory.context) }
+        val all = rocketActionPluginApplicationService
+            .all()
+            .map { it.configuration(RocketActionContextFactory.context) }
         val sortedAll = all.sortedBy { it.name() }
         sortedAll.forEach(Consumer { anObject: RocketActionConfiguration? -> comboBoxModel.addElement(anObject) })
         val panel = JPanel(BorderLayout())
@@ -90,6 +91,9 @@ class CreateRocketActionSettingsDialog(
                 val label = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus) as JLabel
                 value.let {
                     val configuration = value as RocketActionConfiguration
+                    configuration.icon()?.let { icon ->
+                        label.icon = icon
+                    }
                     label.text = configuration.name()
                     label.toolTipText = configuration.description()
                 }
@@ -111,7 +115,7 @@ class CreateRocketActionSettingsDialog(
     private fun createTestAndSaveDialog(): JPanel {
         val panel = JPanel(BorderLayout())
         val panelCreateButton = JPanel()
-        val buttonCreate = JButton("Create")
+        val buttonCreate = JButton("Create action")
         panelCreateButton.add(buttonCreate)
         buttonCreate.addActionListener {
             val settings = actionSettingsPanel.create()
@@ -162,6 +166,7 @@ class CreateRocketActionSettingsDialog(
                 BorderFactory.createTitledBorder("Tags")
             )
             this.add(tagsPanel)
+            tagsPanel.clearTags()
             this.add(Box.createVerticalBox())
             repaint()
             revalidate()

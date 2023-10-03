@@ -69,7 +69,7 @@ class TestPanel(
 
     init {
         val panel = JPanel()
-        val buttonTest = JButton("Test")
+        val buttonTest = JButton("Test the action")
         buttonTest.addActionListener { SwingUtilities.invokeLater { callback.create()?.let { rs -> createTest(rs) } } }
         panel.add(buttonTest)
         add(panel, BorderLayout.SOUTH)

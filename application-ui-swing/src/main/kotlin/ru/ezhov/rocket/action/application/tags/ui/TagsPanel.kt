@@ -20,7 +20,8 @@ class TagsPanel(
         }
         autocompleteTextField = AutocompleteTextField(
             lookup = { text -> availableTagsService.tags(text).map { it.name } },
-            selectedCallback = { text -> selectedTagsPanel.addTag(text) }
+            selectedCallback = { text -> selectedTagsPanel.addTag(text) },
+            placeholder = "Start typing the name of a previously created or new tag and press ENTER"
         )
 
         add(autocompleteTextField, BorderLayout.NORTH)
@@ -34,6 +35,11 @@ class TagsPanel(
 
     fun setTags(tags: List<String>) {
         selectedTagsPanel.setTags(tags)
+    }
+
+    fun clearTags() {
+        autocompleteTextField.text = ""
+        selectedTagsPanel.clearTags()
     }
 }
 
@@ -53,6 +59,10 @@ private class SelectedTagsPanel : JPanel(BorderLayout()) {
         tags.forEach { label ->
             addTag(label)
         }
+    }
+
+    fun clearTags() {
+        textPane.text = ""
     }
 
     fun tags(): List<String> = textPane
