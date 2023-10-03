@@ -99,6 +99,9 @@ class ConfigurationFrame(
                         callback = object : SavedRocketActionSettingsPanelCallback {
                             override fun saved(settings: TreeRocketActionSettings) {
                                 node.userObject = settings
+                                SwingUtilities.invokeLater {
+                                    tree.repaint()
+                                }
                             }
                         }
                     )
@@ -107,11 +110,51 @@ class ConfigurationFrame(
         }
         tree.cellRenderer = RocketActionSettingsCellRender()
         tree.isRootVisible = false
+
         val panelTree = JPanel(BorderLayout())
-        panelTree.add(SearchInTreePanel(root = root, treeModel = defaultTreeModel, tree = tree), BorderLayout.NORTH)
-        panelTree.add(JScrollPane(tree), BorderLayout.CENTER)
+        val innerPanelTree = JPanel(BorderLayout())
+
+        val toolbar = JToolBar(JToolBar.VERTICAL)
+            .apply {
+                isFloatable = false
+                isRollover = false
+                add(
+                    JButton()
+                        .apply {
+                            val expandIcon = RocketActionContextFactory.context.icon().by(AppIcon.EXPAND)
+                            val collapseIcon = RocketActionContextFactory.context.icon().by(AppIcon.COLLAPSE)
+                            var isExpanded = false
+                            val setButtonState: (Boolean) -> Unit = { b ->
+                                val resultIcon = if (b) collapseIcon else expandIcon
+                                SwingUtilities.invokeLater {
+                                    this.toolTipText = if (b) "Collapse all" else "Expand all"
+                                    this.icon = resultIcon
+                                }
+                            }
+                            setButtonState(isExpanded)
+                            addActionListener {
+                                isExpanded = !isExpanded
+                                JTreeUtil.setTreeExpandedState(tree, isExpanded)
+                                setButtonState(isExpanded)
+                            }
+                        }
+                )
+            }
+
+        innerPanelTree.add(
+            SearchInTreePanel(root = root, treeModel = defaultTreeModel, tree = tree),
+            BorderLayout.NORTH
+        )
+        innerPanelTree.add(JScrollPane(tree), BorderLayout.CENTER)
+
+        panelTree.add(innerPanelTree, BorderLayout.CENTER)
+        panelTree.add(toolbar, BorderLayout.WEST)
+
         val panelSaveTree = JPanel()
-        val buttonSaveTree = JButton("Save all configuration")
+        val buttonSaveTree = JButton(
+            "Save all configuration to storage",
+            RocketActionContextFactory.context.icon().by(AppIcon.SAVE)
+        )
         buttonSaveTree.addActionListener { saveSettings(defaultTreeModel) }
         panelSaveTree.add(buttonSaveTree)
         panelTree.add(panelSaveTree, BorderLayout.SOUTH)

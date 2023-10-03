@@ -12,7 +12,11 @@ class ResourceIconRepository {
 
     fun by(icon: AppIcon): Icon =
         when (val innerIcon = icon.toInner()) {
-            AppIconInner.LOADER, AppIconInner.ROCKET_APP -> ImageIcon(
+            AppIconInner.LOADER,
+            AppIconInner.ROCKET_APP,
+            AppIconInner.COLLAPSE,
+            AppIconInner.EXPAND,
+            AppIconInner.SAVE -> ImageIcon(
                 this.javaClass.getResource(innerIcon.iconName) ?: defaultIcon
             )
 
@@ -55,4 +59,7 @@ private fun AppIcon.toInner() = when (this) {
     AppIcon.FORK -> AppIconInner.FORK
     AppIcon.CLOCK -> AppIconInner.CLOCK
     AppIcon.LOADER -> AppIconInner.LOADER
+    AppIcon.SAVE -> AppIconInner.SAVE
+    AppIcon.COLLAPSE -> AppIconInner.COLLAPSE
+    AppIcon.EXPAND -> AppIconInner.EXPAND
 }

@@ -1,5 +1,6 @@
 package ru.ezhov.rocket.action.application.tags.ui
 
+import ru.ezhov.rocket.action.ui.utils.swing.common.TextFieldWithText
 import java.awt.Dimension
 import java.awt.Window
 import java.awt.event.FocusEvent
@@ -10,7 +11,6 @@ import java.util.function.Function
 import javax.swing.AbstractListModel
 import javax.swing.JList
 import javax.swing.JScrollPane
-import javax.swing.JTextField
 import javax.swing.JWindow
 import javax.swing.SwingUtilities
 import javax.swing.event.DocumentEvent
@@ -27,8 +27,8 @@ class AutocompleteTextField(
      */
     private val lookup: (String) -> List<String>,
     private val selectedCallback: (String) -> Unit,
-) :
-    JTextField(), FocusListener, DocumentListener, KeyListener {
+    placeholder: String,
+) : TextFieldWithText(placeholder), FocusListener, DocumentListener, KeyListener {
     /**
      * [List] of lookup results.
      * It is cached to optimize performance for more complex lookups.
@@ -120,7 +120,7 @@ class AutocompleteTextField(
             popup.pack()
 
             // Display or hide popup depending on the results
-            if (results.size > 0 && text.isNotBlank() ) {
+            if (results.size > 0 && text.isNotBlank()) {
                 showAutocompletePopup()
             } else {
                 hideAutocompletePopup()

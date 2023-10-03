@@ -1,6 +1,5 @@
 package ru.ezhov.rocket.action.application.plugin.context.icon
 
-import mu.KotlinLogging
 import ru.ezhov.rocket.action.api.context.icon.AppIcon
 import ru.ezhov.rocket.action.api.context.icon.IconService
 import javax.swing.Icon

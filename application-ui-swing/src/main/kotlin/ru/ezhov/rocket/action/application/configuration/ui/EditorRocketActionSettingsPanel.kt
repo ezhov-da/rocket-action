@@ -52,7 +52,10 @@ class EditorRocketActionSettingsPanel(
 
     private fun testAndCreate(): JPanel {
         val panel = JPanel()
-        val button = JButton("Save current action configuration")
+        val button = JButton(
+            "Save current action configuration to tree",
+            RocketActionContextFactory.context.icon().by(AppIcon.SAVE)
+        )
         button.addActionListener {
             rocketActionSettingsPanel.create()?.let { rs ->
                 callback!!.saved(rs)
@@ -61,7 +64,6 @@ class EditorRocketActionSettingsPanel(
             } ?: run {
                 RocketActionContextFactory.context.notification().show(NotificationType.WARN, "Action not selected")
             }
-
         }
         panel.add(button)
         return panel

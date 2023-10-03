@@ -3,6 +3,7 @@ import org.jetbrains.annotations.NotNull
 import ru.ezhov.rocket.action.api.*
 import ru.ezhov.rocket.action.api.context.RocketActionContext
 import ru.ezhov.rocket.action.api.support.AbstractRocketAction
+import ru.ezhov.rocket.action.api.context.icon.AppIcon
 
 import javax.swing.*
 import java.awt.*
@@ -41,11 +42,12 @@ class SimpleGroovyRocketActionUi extends AbstractRocketAction implements RocketA
 
     @Override
     Icon icon() {
-        return null
+        return context.icon().by(AppIcon.CLIPBOARD)
     }
 
     @Override
     RocketAction create(@NotNull RocketActionSettings settings, @NotNull RocketActionContext context) {
+        this.context = context
         return new RocketAction() {
 
             @Override
