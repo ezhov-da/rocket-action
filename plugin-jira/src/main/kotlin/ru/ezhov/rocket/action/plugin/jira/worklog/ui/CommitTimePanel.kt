@@ -16,6 +16,7 @@ import ru.ezhov.rocket.action.plugin.jira.worklog.domain.model.CommitTimeTasks
 import ru.ezhov.rocket.action.plugin.jira.worklog.domain.model.Task
 import ru.ezhov.rocket.action.plugin.jira.worklog.domain.validations.Validator
 import java.awt.BorderLayout
+import java.awt.Color
 import java.awt.Component
 import java.awt.Desktop
 import java.awt.FlowLayout
@@ -32,14 +33,14 @@ import java.time.format.DateTimeFormatter
 import javax.swing.AbstractAction
 import javax.swing.Action
 import javax.swing.BorderFactory
-import javax.swing.BoxLayout
+import javax.swing.ImageIcon
 import javax.swing.JButton
 import javax.swing.JLabel
+import javax.swing.JOptionPane
 import javax.swing.JPanel
 import javax.swing.JScrollPane
 import javax.swing.JSplitPane
 import javax.swing.JTable
-import javax.swing.JTextField
 import javax.swing.JTextPane
 import javax.swing.JToolBar
 import javax.swing.KeyStroke
@@ -57,7 +58,7 @@ import javax.swing.undo.UndoManager
 private val logger = KotlinLogging.logger {}
 
 class CommitTimePanel(
-    private val tasks: List<Task> = emptyList(),
+    tasks: List<Task> = emptyList(),
     private val delimiter: String,
     private val dateFormatPattern: String,
     private val constantsNowDate: List<String>,
@@ -82,15 +83,14 @@ class CommitTimePanel(
 
     init {
         ReadFile(textPane = textPane, file = fileForSave, context = context).execute()
-
         layout = BorderLayout()
-        val favoriteTasksPanel = FavoriteTasksPanel(tasks = tasks, aliasForTaskIds = aliasForTaskIds) { task ->
+
+        val aliasForTaskIdsPanel = AliasForTaskIdsPanel(aliasForTaskIds)
+        val favoriteTasksPanel = FavoriteTasksPanel.create(tasks = tasks, aliasForTaskIds = aliasForTaskIds) { task ->
             textPane.document.insertString(
                 textPane.caretPosition, task.id, null
             )
         }
-        val aliasForTaskIdsPanel = AliasForTaskIdsPanel(aliasForTaskIds)
-
         add(
             JPanel(BorderLayout())
                 .apply {
@@ -112,13 +112,6 @@ class CommitTimePanel(
                             }
                         )
 
-                        toolBar.add(JButton("Show favorite tasks").apply {
-                            addActionListener {
-                                SwingUtilities.invokeLater {
-                                    favoriteTasksPanel.isCollapsed = !favoriteTasksPanel.isCollapsed
-                                }
-                            }
-                        })
                         toolBar.add(JButton("Show substitution patterns").apply {
                             addActionListener {
                                 SwingUtilities.invokeLater {
@@ -129,10 +122,11 @@ class CommitTimePanel(
                     }
 
                     val innerPanel = JPanel(BorderLayout()).apply {
-                        add(favoriteTasksPanel, BorderLayout.CENTER)
-                        add(aliasForTaskIdsPanel, BorderLayout.SOUTH)
+                        add(aliasForTaskIdsPanel, BorderLayout.CENTER)
+                        favoriteTasksPanel?.let {
+                            add(it, BorderLayout.NORTH)
+                        }
                     }
-
 
                     add(toolBar, BorderLayout.NORTH)
                     add(innerPanel, BorderLayout.CENTER)
@@ -356,25 +350,6 @@ class CommitTimePanel(
         }
     }
 
-    private class FavoriteTasksPanel(
-        tasks: List<Task>,
-        private val aliasForTaskIds: AliasForTaskIds,
-        private val addCallback: (task: Task) -> Unit,
-    ) : JXCollapsiblePane() {
-        init {
-            layout = BorderLayout()
-            val panel = JPanel().apply { layout = BoxLayout(this, BoxLayout.Y_AXIS) }
-
-            isCollapsed = true
-            border = BorderFactory.createTitledBorder("Favorite tasks")
-            tasks.forEach {
-                panel.add(FavoriteTaskPanel(aliasForTaskIds = aliasForTaskIds, task = it, addCallback = addCallback))
-            }
-
-            add(panel, BorderLayout.CENTER)
-        }
-    }
-
     private class AliasForTaskIdsPanel(
         aliasForTaskIds: AliasForTaskIds,
     ) : JXCollapsiblePane() {
@@ -391,32 +366,6 @@ class CommitTimePanel(
             }
                 .flatten()
                 .joinToString(separator = "\n")
-        }
-    }
-
-    private class FavoriteTaskPanel(
-        private val task: Task,
-        private val addCallback: (task: Task) -> Unit,
-        aliasForTaskIds: AliasForTaskIds,
-    ) : JPanel() {
-        private val textField = JTextField()
-        private val addButton = JButton("+")
-
-        init {
-            layout = BorderLayout()
-            textField.isEditable = false
-            val aliasesText = aliasForTaskIds
-                .aliasesBy(task.id)
-                .takeIf { it.isNotEmpty() }
-                ?.joinToString(prefix = " [", postfix = "] ", separator = ", ")
-                .orEmpty()
-            textField.text = "${task.id}$aliasesText- ${task.name}"
-            add(textField, BorderLayout.CENTER)
-            add(addButton, BorderLayout.WEST)
-
-            addButton.addActionListener {
-                SwingUtilities.invokeLater { addCallback(task) }
-            }
         }
     }
 
@@ -439,7 +388,12 @@ class CommitTimePanel(
 
         }
         private var currentTasks: MutableList<TableTasksPanelTask> = mutableListOf()
-        private val buttonCommit: JButton = JButton("Contribute")
+        private val buttonCommit: JButton = JButton(
+            "Contribute",
+            ImageIcon(TasksPanel::class.java.getResource("/jira/upload_16x16.png"))
+        ).apply {
+            background = Color.GREEN
+        }
 
         private val taskNamesCache = mutableMapOf<String, String>()
 
@@ -495,6 +449,15 @@ class CommitTimePanel(
             tableModel.addColumn("Status")
 
             buttonCommit.addActionListener {
+                val answer = JOptionPane.showConfirmDialog(
+                    this,
+                    "Are you sure you want to record the time write-off?",
+                    "Contribute?",
+                    JOptionPane.YES_NO_OPTION,
+                )
+
+                if (answer != JOptionPane.YES_OPTION) return@addActionListener
+
                 currentTasks
                     .takeIf { it.isNotEmpty() }
                     ?.let { tasks ->
@@ -517,40 +480,45 @@ class CommitTimePanel(
             }
 
             add(
-                JPanel(FlowLayout(FlowLayout.LEFT))
-                    .apply {
-                        add(JButton("Pull up task names")
-                            .also { button ->
-                                button.addActionListener {
-                                    currentTasks
-                                        .filter { it.name == null }
-                                        .let { tasks ->
-                                            NameWorker(
-                                                commitTimeTasks = tasks,
-                                                commitTimeTaskInfoRepository = commitTimeTaskInfoRepository,
-                                                button = button,
-                                                context = context,
-                                                afterSearchName = { triple ->
-                                                    triple.third
-                                                        ?.let { ex ->
-                                                            logger.warn(ex) { "Error get name for task ${triple.first}" }
-                                                        } ?: run {
-                                                        triple.second?.let { info ->
-                                                            taskNamesCache[triple.first.task.id] = info.name
-                                                            logger.debug {
-                                                                "Put task name to cache '${triple.first.task.id}'='${info.name}'"
+                JPanel(BorderLayout()).apply {
+                    add(
+                        JPanel(FlowLayout(FlowLayout.LEFT))
+                            .apply {
+                                add(JButton("Pull up task names")
+                                    .also { button ->
+                                        button.addActionListener {
+                                            currentTasks
+                                                .filter { it.name == null }
+                                                .let { tasks ->
+                                                    NameWorker(
+                                                        commitTimeTasks = tasks,
+                                                        commitTimeTaskInfoRepository = commitTimeTaskInfoRepository,
+                                                        button = button,
+                                                        context = context,
+                                                        afterSearchName = { triple ->
+                                                            triple.third
+                                                                ?.let { ex ->
+                                                                    logger.warn(ex) { "Error get name for task ${triple.first}" }
+                                                                } ?: run {
+                                                                triple.second?.let { info ->
+                                                                    taskNamesCache[triple.first.task.id] = info.name
+                                                                    logger.debug {
+                                                                        "Put task name to cache '${triple.first.task.id}'='${info.name}'"
+                                                                    }
+                                                                    triple.first.name = info.name
+                                                                    SwingUtilities.invokeLater { tableModel.fireTableDataChanged() }
+                                                                }
                                                             }
-                                                            triple.first.name = info.name
-                                                            SwingUtilities.invokeLater { tableModel.fireTableDataChanged() }
                                                         }
-                                                    }
+                                                    ).execute()
                                                 }
-                                            ).execute()
                                         }
-                                }
-                            })
-                        add(labelInfo)
-                    },
+                                    })
+                                add(labelInfo)
+                            }
+                    )
+                    add(JPanel().apply { add(buttonCommit) }, BorderLayout.EAST)
+                },
                 BorderLayout.NORTH
             )
             add(
@@ -561,7 +529,6 @@ class CommitTimePanel(
                     },
                 BorderLayout.CENTER
             )
-            add(buttonCommit, BorderLayout.SOUTH)
         }
 
         fun setCurrentCommitTimeTasks(tasks: CommitTimeTasks) {
