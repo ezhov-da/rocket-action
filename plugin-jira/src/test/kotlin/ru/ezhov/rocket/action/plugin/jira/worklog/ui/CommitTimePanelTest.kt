@@ -35,8 +35,44 @@ fun main() {
             CommitTimePanel(
                 tasks = listOf(
                     Task(
-                        id = "123",
+                        id = "111",
                         name = "ляляля",
+                    ),
+                    Task(
+                        id = "222",
+                        name = "432",
+                    ),
+                    Task(
+                        id = "333",
+                        name = "432",
+                    ),
+                    Task(
+                        id = "444",
+                        name = "432",
+                    ),
+                    Task(
+                        id = "555",
+                        name = "432",
+                    ),
+                    Task(
+                        id = "666",
+                        name = "432",
+                    ),
+                    Task(
+                        id = "777",
+                        name = "432",
+                    ),
+                    Task(
+                        id = "888",
+                        name = "432",
+                    ),
+                    Task(
+                        id = "999",
+                        name = "432",
+                    ),
+                    Task(
+                        id = "123",
+                        name = "432",
                     ),
                     Task(
                         id = "234",
@@ -56,8 +92,8 @@ fun main() {
                 constantsNowDate = listOf("n", "т"),
                 aliasForTaskIds = AliasForTaskIds.of(
                     """
-                      123_тру,ля,пв,в
-                      122_аля,го
+                      111_тру,ля,пв,в
+                      222_аля,го
                     """.trimIndent()
                 ),
                 linkToWorkLog = URI.create("https://google.com"),
