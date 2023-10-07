@@ -10,7 +10,7 @@
     </parent>
 
     <artifactId>rocket-action-plugin-note-on-file</artifactId>
-    <version>${plugin-api.version}_3</version>
+    <version>${plugin-api.version}_4</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
