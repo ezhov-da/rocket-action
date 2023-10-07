@@ -7,6 +7,8 @@ import ru.ezhov.rocket.action.plugin.noteonfile.event.TextChangingListener
 import ru.ezhov.rocket.action.plugin.noteonfile.event.TextLoadingListener
 import ru.ezhov.rocket.action.plugin.noteonfile.event.TextSavingListener
 import java.awt.BorderLayout
+import javax.swing.ImageIcon
+import javax.swing.JButton
 import javax.swing.JPanel
 import javax.swing.JProgressBar
 import javax.swing.Timer
@@ -18,35 +20,43 @@ class AutoSaveInfoPanel(
 ) : JPanel() {
     private val progressBar: JProgressBar = JProgressBar(0, textAutoSave.delayInSeconds)
         .apply {
-            isStringPainted = true;
+            isStringPainted = true
+        }
+    private val cancelButton = JButton(ImageIcon(this::class.java.getResource("/plugin-note-on-file/cancel_16x16.png")))
+        .apply {
+            toolTipText = "Cancel autosave"
+            addActionListener { resetTimer() }
         }
     private var currentSaveTimer: Timer? = null
 
     init {
         layout = BorderLayout()
+        cancelButton.isVisible = false
         progressBar.isVisible = false
+        add(cancelButton, BorderLayout.WEST)
         add(progressBar, BorderLayout.CENTER)
         eventObserver.register(object : TextLoadingListener {
             override fun loading(text: String) {
-                restTimer()
+                resetTimer()
             }
         })
 
         eventObserver.register(object : TextSavingListener {
             override fun saving(text: String) {
-                restTimer()
+                resetTimer()
             }
         })
 
         eventObserver.register(object : TextChangingListener {
             override fun changing(text: String) {
-                restTimer()
+                resetTimer()
                 createAndSetTimer()
             }
         })
     }
 
     private fun createAndSetTimer() {
+        cancelButton.isVisible = true
         progressBar.value = 0
         progressBar.isVisible = true
         var counterMinus = textAutoSave.delayInSeconds
@@ -59,15 +69,16 @@ class AutoSaveInfoPanel(
             if (counterMinus == 0) {
                 commandObserver.sendCommand(SaveTextCommand())
                 progressBar.string = "Saving text after '${--counterMinus}' sec"
-                restTimer()
+                resetTimer()
             }
         }
         currentSaveTimer!!.start()
     }
 
-    private fun restTimer() {
+    private fun resetTimer() {
         currentSaveTimer?.let {
             currentSaveTimer!!.stop()
+            cancelButton.isVisible = false
             progressBar.isVisible = false
         }
     }
