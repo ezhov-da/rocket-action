@@ -4,6 +4,7 @@ import ru.ezhov.rocket.action.plugin.jira.worklog.domain.model.AliasForTaskIds
 import ru.ezhov.rocket.action.plugin.jira.worklog.domain.model.Task
 import java.awt.Component
 import javax.swing.BorderFactory
+import javax.swing.Box
 import javax.swing.BoxLayout
 import javax.swing.ComboBoxModel
 import javax.swing.DefaultComboBoxModel
@@ -56,6 +57,7 @@ class FavoriteTasksPanel(
 
         add(button)
         add(combobox)
+        add(Box.createHorizontalGlue())
     }
 
     companion object {
