@@ -377,6 +377,7 @@ class UiQuickActionService(
             is Action.Create -> {
                 val components = rocketActionSettingsService.loadAndGetAllComponents()
                 fillTagsMenu(baseMenu, action.tagsMenu)
+                DomainEventFactory.publisher.publish(listOf(CreateMenuDomainEvent()))
                 components
             }
 

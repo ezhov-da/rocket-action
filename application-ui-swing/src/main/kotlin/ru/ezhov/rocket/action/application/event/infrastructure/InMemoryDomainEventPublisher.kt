@@ -29,13 +29,17 @@ class InMemoryDomainEventPublisher :
     override fun subscribe(domainEventSubscriber: DomainEventSubscriber) {
         logger.debug { "Subscribe '${domainEventSubscriber::class.java.name}' to ${domainEventSubscriber.subscribedToEventType()}" }
 
-        val set = eventSubscribers.getOrPut(domainEventSubscriber.subscribedToEventType()) { mutableSetOf() }
-        set.add(domainEventSubscriber)
+        domainEventSubscriber.subscribedToEventType().forEach { eventType ->
+            val set = eventSubscribers.getOrPut(eventType) { mutableSetOf() }
+            set.add(domainEventSubscriber)
+        }
     }
 
     override fun unsubscribe(domainEventSubscriber: DomainEventSubscriber) {
         logger.debug { "Unsubscribe '${domainEventSubscriber::class.java.name}' from ${domainEventSubscriber.subscribedToEventType()}" }
 
-        eventSubscribers[domainEventSubscriber.subscribedToEventType()]?.remove(domainEventSubscriber)
+        domainEventSubscriber.subscribedToEventType().forEach { eventType ->
+            eventSubscribers[eventType]?.remove(domainEventSubscriber)
+        }
     }
 }

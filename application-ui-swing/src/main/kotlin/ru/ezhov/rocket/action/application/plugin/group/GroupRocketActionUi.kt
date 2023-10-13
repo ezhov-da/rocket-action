@@ -12,6 +12,7 @@ import ru.ezhov.rocket.action.api.RocketActionType
 import ru.ezhov.rocket.action.api.context.RocketActionContext
 import ru.ezhov.rocket.action.api.context.icon.AppIcon
 import ru.ezhov.rocket.action.api.support.AbstractRocketAction
+import ru.ezhov.rocket.action.application.CreateMenuDomainEvent
 import ru.ezhov.rocket.action.application.RestoreMenuDomainEvent
 import ru.ezhov.rocket.action.application.core.domain.model.RocketActionCachedState
 import ru.ezhov.rocket.action.application.core.infrastructure.RocketActionComponentCacheFactory
@@ -77,8 +78,11 @@ class GroupRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
                         }
                     }
 
-                    override fun subscribedToEventType(): Class<*> =
-                        RestoreMenuDomainEvent::class.java
+                    override fun subscribedToEventType(): List<Class<*>> =
+                        listOf(
+                            CreateMenuDomainEvent::class.java,
+                            RestoreMenuDomainEvent::class.java,
+                        )
                 }
             )
 
