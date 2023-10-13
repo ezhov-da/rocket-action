@@ -3,10 +3,11 @@ package ru.ezhov.rocket.action.application.applicationConfiguration.infrastructu
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import mu.KotlinLogging
+import org.springframework.stereotype.Component
 import ru.ezhov.rocket.action.application.applicationConfiguration.domain.ConfigurationRepository
 import ru.ezhov.rocket.action.application.applicationConfiguration.domain.model.ApplicationConfigurations
 import ru.ezhov.rocket.action.application.applicationConfiguration.infrastructure.model.JsonApplicationConfigurationsDto
-import ru.ezhov.rocket.action.application.properties.GeneralPropertiesRepositoryFactory
+import ru.ezhov.rocket.action.application.properties.GeneralPropertiesRepository
 import ru.ezhov.rocket.action.application.properties.UsedPropertiesName
 import java.io.File
 
@@ -14,11 +15,13 @@ private val logger = KotlinLogging.logger {}
 
 private const val DEFAULT_VARIABLES_KEY: String = "314dcf4c-e12b-11ed-b5ea-0242ac120002"
 
-class JsonFileConfigurationRepository : ConfigurationRepository {
+@Component
+class JsonFileConfigurationRepository(
+    generalPropertiesRepository: GeneralPropertiesRepository
+) : ConfigurationRepository {
     private var cachedApplicationConfigurations: ApplicationConfigurations? = null
     private val filePath =
-        GeneralPropertiesRepositoryFactory
-            .repository
+        generalPropertiesRepository
             .asStringOrNull(UsedPropertiesName.APPLICATION_CONFIGURATION_FILE_REPOSITORY_PATH)
             ?: "./configurations.json"
     private val mapper = ObjectMapper().registerKotlinModule()

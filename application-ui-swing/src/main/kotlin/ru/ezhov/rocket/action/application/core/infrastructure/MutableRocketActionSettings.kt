@@ -17,7 +17,7 @@ class MutableRocketActionSettings(
     val tags: List<String>,
 ) {
 
-    fun to(): RocketActionSettings = object : RocketActionSettings {
+    fun to(engineService: EngineService): RocketActionSettings = object : RocketActionSettings {
         override fun id(): String = id
 
         override fun type(): RocketActionType = RocketActionType { type }
@@ -26,7 +26,7 @@ class MutableRocketActionSettings(
             try {
                 settings.associate { set ->
                     // TODO ezhov opportunity for optimization
-                    val resultVal = EngineService().processWithEngine(set).toString()
+                    val resultVal = engineService.processWithEngine(set).toString()
                     set.name to resultVal
                 }
             } catch (ex: Exception) {
@@ -34,7 +34,7 @@ class MutableRocketActionSettings(
                 emptyMap()
             }
 
-        override fun actions(): List<RocketActionSettings> = actions.map { it.to() }
+        override fun actions(): List<RocketActionSettings> = actions.map { it.to(engineService) }
     }
 
     fun copy(source: MutableRocketActionSettings): MutableRocketActionSettings =

@@ -1,21 +1,24 @@
 package ru.ezhov.rocket.action.application.variables.application
 
 import mu.KotlinLogging
+import org.springframework.stereotype.Service
 import ru.ezhov.rocket.action.application.applicationConfiguration.application.ConfigurationApplication
 import ru.ezhov.rocket.action.application.encryption.application.EncryptionServiceFactory
 import ru.ezhov.rocket.action.application.encryption.domain.EncryptionService
 import ru.ezhov.rocket.action.application.encryption.domain.model.Algorithm
+import ru.ezhov.rocket.action.application.variables.domain.VariableRepository
 import ru.ezhov.rocket.action.application.variables.domain.model.Encryption
 import ru.ezhov.rocket.action.application.variables.domain.model.Variable
 import ru.ezhov.rocket.action.application.variables.domain.model.VariableType
 import ru.ezhov.rocket.action.application.variables.domain.model.Variables
-import ru.ezhov.rocket.action.application.variables.infrastructure.JsonFileVariableRepository
 
 private val logger = KotlinLogging.logger { }
 
-class VariablesApplication {
-    private val variableRepository = JsonFileVariableRepository()
-    private val configurationApplication = ConfigurationApplication.INSTANCE
+@Service
+class VariablesApplication(
+    private val variableRepository: VariableRepository,
+    private val configurationApplication: ConfigurationApplication,
+) {
     private val defaultAlgorithm = Algorithm.BLOWFISH
     private val encryptionService = EncryptionServiceFactory.get(defaultAlgorithm)!!
 

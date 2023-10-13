@@ -4,8 +4,10 @@ import com.mortennobel.imagescaling.AdvancedResizeOp
 import com.mortennobel.imagescaling.ResampleOp
 import mu.KotlinLogging
 import net.sf.image4j.codec.ico.ICODecoder
+import org.springframework.stereotype.Service
+import ru.ezhov.rocket.action.api.context.cache.CacheService
+import ru.ezhov.rocket.action.api.context.notification.NotificationService
 import ru.ezhov.rocket.action.api.context.notification.NotificationType
-import ru.ezhov.rocket.action.application.plugin.context.RocketActionContextFactory
 import java.awt.image.BufferedImage
 import java.net.URL
 import javax.imageio.ImageIO
@@ -14,13 +16,17 @@ import javax.swing.ImageIcon
 
 private val logger = KotlinLogging.logger { }
 
-class ResourceLoaderService {
+@Service
+class ResourceLoaderService(
+    private val cacheService: CacheService,
+    private val notificationService: NotificationService,
+) {
     fun load(iconUrl: String, defaultIcon: Icon): Icon =
         iconUrl
             .takeIf { it.isNotEmpty() }
             ?.let { url ->
                 try {
-                    RocketActionContextFactory.context.cache().get(URL(url))
+                    cacheService.get(URL(url))
                         ?.let { file ->
                             val image: BufferedImage =
                                 if (url.endsWith("ico")) {
@@ -33,7 +39,7 @@ class ResourceLoaderService {
                         }
                 } catch (e: Exception) {
                     logger.warn(e) { "Exception when load icon url='$iconUrl'" }
-                    RocketActionContextFactory.context.notification().show(NotificationType.ERROR, "Error icon loading")
+                    notificationService.show(NotificationType.ERROR, "Error icon loading")
                     defaultIcon
                 }
             } ?: defaultIcon

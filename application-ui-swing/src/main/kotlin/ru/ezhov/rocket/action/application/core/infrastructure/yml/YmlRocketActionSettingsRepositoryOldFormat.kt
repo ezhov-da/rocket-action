@@ -3,6 +3,7 @@ package ru.ezhov.rocket.action.application.core.infrastructure.yml
 import mu.KotlinLogging
 import org.yaml.snakeyaml.Yaml
 import ru.ezhov.rocket.action.api.RocketActionSettings
+import ru.ezhov.rocket.action.application.core.domain.EngineService
 import ru.ezhov.rocket.action.application.core.domain.model.SettingsModel
 import ru.ezhov.rocket.action.application.core.infrastructure.MutableRocketActionSettings
 import java.io.File
@@ -18,7 +19,10 @@ private val logger = KotlinLogging.logger {}
     "A deprecated method that will be retired. " +
         "Used for backwards compatibility only"
 )
-class YmlRocketActionSettingsRepositoryOldFormat(private val uri: URI) {
+class YmlRocketActionSettingsRepositoryOldFormat(
+    private val uri: URI,
+    private val engineService: EngineService,
+) {
     fun actions(): List<RocketActionSettings> {
         logger.debug { "Get actions by uri='$uri'" }
 
@@ -37,7 +41,7 @@ class YmlRocketActionSettingsRepositoryOldFormat(private val uri: URI) {
 
             logger.info { "Actions count ${actions.size}" }
 
-            return actions.map { it.to() }
+            return actions.map { it.to(engineService) }
         }
     }
 

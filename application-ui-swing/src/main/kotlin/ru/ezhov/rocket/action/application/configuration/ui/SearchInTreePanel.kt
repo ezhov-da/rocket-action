@@ -10,7 +10,7 @@ import ru.ezhov.rocket.action.ui.utils.swing.common.TextFieldWithText
 import java.awt.BorderLayout
 import java.awt.event.KeyAdapter
 import java.awt.event.KeyEvent
-import java.util.Enumeration
+import java.util.*
 import javax.swing.JButton
 import javax.swing.JLabel
 import javax.swing.JPanel
@@ -25,6 +25,7 @@ class SearchInTreePanel(
     private val root: DefaultMutableTreeNode,
     private val treeModel: DefaultTreeModel,
     private val tree: JTree,
+    private val rocketActionContextFactory: RocketActionContextFactory,
 ) : JPanel() {
     private val textField = TextFieldWithText("Search")
     private var currentResultPanel: ResultPanel? = null
@@ -47,7 +48,12 @@ class SearchInTreePanel(
                         if (currentResultPanel != null) {
                             searchInTreePanel.remove(currentResultPanel)
                         }
-                        currentResultPanel = ResultPanel(foundNodes = nodes, treeModel = treeModel, tree = tree)
+                        currentResultPanel = ResultPanel(
+                            foundNodes = nodes,
+                            treeModel = treeModel,
+                            tree = tree,
+                            rocketActionContextFactory = rocketActionContextFactory,
+                        )
                         searchInTreePanel.add(currentResultPanel, BorderLayout.EAST)
                         searchInTreePanel.repaint()
                         searchInTreePanel.revalidate()
@@ -94,16 +100,17 @@ class SearchInTreePanel(
         private val foundNodes: List<DefaultMutableTreeNode>,
         private val treeModel: DefaultTreeModel,
         private val tree: JTree,
+        private val rocketActionContextFactory: RocketActionContextFactory,
     ) : JPanel() {
         private var counter = 1
         private val buttonNext = JButton()
             .apply {
-                icon = RocketActionContextFactory.context.icon().by(AppIcon.ARROW_BOTTOM)
+                icon = rocketActionContextFactory.context.icon().by(AppIcon.ARROW_BOTTOM)
                 toolTipText = "Next"
             }
         private val buttonPrevious = JButton()
             .apply {
-                icon = RocketActionContextFactory.context.icon().by(AppIcon.ARROW_TOP)
+                icon = rocketActionContextFactory.context.icon().by(AppIcon.ARROW_TOP)
                 toolTipText = "Previous"
             }
         private val label = JLabel()

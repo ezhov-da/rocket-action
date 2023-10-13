@@ -4,11 +4,13 @@ import mu.KotlinLogging
 import org.apache.lucene.analysis.ru.RussianAnalyzer
 import org.apache.lucene.index.Term
 import org.apache.lucene.store.ByteBuffersDirectory
+import org.springframework.stereotype.Service
 import ru.ezhov.rocket.action.api.context.search.Search
 import ru.ezhov.rocket.action.application.search.infrastructure.lucene.InMemoryLuceneIndex
 
 private val logger = KotlinLogging.logger { }
 
+@Service
 class SearchService {
     private val inMemoryLuceneIndex = InMemoryLuceneIndex(ByteBuffersDirectory(), RussianAnalyzer())
 

@@ -1,5 +1,6 @@
 package ru.ezhov.rocket.action.application.infrastructure
 
+import io.mockk.mockk
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
@@ -13,7 +14,8 @@ class YmlRocketActionSettingsRepositoryTest {
     @Test
     fun actions() {
         val repository = YmlRocketActionSettingsRepository(
-            this.javaClass.getResource("/test-actions.yml")!!.toURI()
+            uri = this.javaClass.getResource("/test-actions.yml")!!.toURI(),
+            engineService = mockk()
         )
         val actions = repository.actions()
         assertEquals(27, actions.actions.size)
@@ -24,7 +26,8 @@ class YmlRocketActionSettingsRepositoryTest {
     @Disabled
     fun save() {
         val repository = YmlRocketActionSettingsRepository(
-            File("./test.yml").toURI()
+            File("./test.yml").toURI(),
+            engineService = mockk()
         )
         repository.save(
             ActionsModel(

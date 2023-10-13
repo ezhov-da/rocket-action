@@ -1,9 +1,6 @@
 package ru.ezhov.rocket.action.application.configuration.ui
 
-import ru.ezhov.rocket.action.application.core.application.RocketActionSettingsService
-import ru.ezhov.rocket.action.application.core.infrastructure.yml.YmlRocketActionSettingsRepository
-import ru.ezhov.rocket.action.application.plugin.manager.application.RocketActionPluginApplicationServiceFactory
-import ru.ezhov.rocket.action.application.tags.application.TagServiceFactory
+import io.mockk.mockk
 import javax.swing.SwingUtilities
 
 object ConfigurationFrameTest {
@@ -12,15 +9,16 @@ object ConfigurationFrameTest {
         SwingUtilities.invokeLater {
             try {
                 ConfigurationFrame(
-                    rocketActionPluginApplicationService = RocketActionPluginApplicationServiceFactory.service,
-                    rocketActionSettingsService = RocketActionSettingsService(
-                        RocketActionPluginApplicationServiceFactory.service,
-                        YmlRocketActionSettingsRepository(
-                            uri = ConfigurationFrameTest::class.java.getResource("/test-actions.yml").toURI()
-                        ),
-                        tagsService = TagServiceFactory.tagsService,
-                    )
-                ) { }.setVisible(true)
+                    rocketActionPluginApplicationService = mockk(),
+                    rocketActionSettingsService = mockk(),
+                    tagsService = mockk(),
+                    rocketActionContextFactory = mockk(),
+                    engineService = mockk(),
+                    availableHandlersRepository = mockk(),
+                    generalPropertiesRepository = mockk(),
+                    variablesApplication = mockk(),
+                ) { }
+                    .setVisible(true)
             } catch (e: Exception) {
                 e.printStackTrace()
             }

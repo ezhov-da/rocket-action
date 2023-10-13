@@ -1,9 +1,11 @@
 package ru.ezhov.rocket.action.application.variables.interfaces.ui
 
 import mu.KotlinLogging
+import org.springframework.stereotype.Component
 import ru.ezhov.rocket.action.api.context.icon.AppIcon
+import ru.ezhov.rocket.action.api.context.icon.IconService
+import ru.ezhov.rocket.action.api.context.notification.NotificationService
 import ru.ezhov.rocket.action.api.context.notification.NotificationType
-import ru.ezhov.rocket.action.application.plugin.context.RocketActionContextFactory
 import ru.ezhov.rocket.action.application.variables.application.VariableDto
 import ru.ezhov.rocket.action.application.variables.application.VariablesApplication
 import ru.ezhov.rocket.action.application.variables.application.VariablesDto
@@ -25,8 +27,12 @@ import javax.swing.table.DefaultTableModel
 
 private val logger = KotlinLogging.logger { }
 
-class VariablesFrame(parent: JFrame? = null) : JFrame() {
-    private val variablesApplication = VariablesApplication()
+class VariablesFrame(
+    parent: JFrame? = null,
+    private val variablesApplication: VariablesApplication,
+    private val notificationService: NotificationService,
+    iconService: IconService,
+) : JFrame() {
     private val applicationTableModel = DefaultTableModel().apply {
         addColumn("*Name")
         addColumn("*Value")
@@ -75,7 +81,7 @@ class VariablesFrame(parent: JFrame? = null) : JFrame() {
 
         loadTable()
 
-        iconImage = RocketActionContextFactory.context.icon().by(AppIcon.ROCKET_APP).toImage()
+        iconImage = iconService.by(AppIcon.ROCKET_APP).toImage()
         size = Dimension(600, 500)
         defaultCloseOperation = HIDE_ON_CLOSE
 
@@ -199,16 +205,16 @@ class VariablesFrame(parent: JFrame? = null) : JFrame() {
         try {
             val key = keyTextField.text
             if (key.isBlank()) {
-                RocketActionContextFactory.context.notification()
+                notificationService
                     .show(NotificationType.WARN, "The key is required to specify")
             } else {
                 variablesApplication.save(VariablesDto(key = key, variables = variables))
 
-                RocketActionContextFactory.context.notification().show(NotificationType.INFO, "Variables saved")
+                notificationService.show(NotificationType.INFO, "Variables saved")
             }
         } catch (ex: Exception) {
             logger.error(ex) { "Variables unsaved" }
-            RocketActionContextFactory.context.notification().show(NotificationType.ERROR, "Variables unsaved")
+            notificationService.show(NotificationType.ERROR, "Variables unsaved")
         }
     }
 }

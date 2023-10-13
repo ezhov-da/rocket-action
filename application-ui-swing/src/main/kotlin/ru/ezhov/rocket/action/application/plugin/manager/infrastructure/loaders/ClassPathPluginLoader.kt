@@ -1,6 +1,7 @@
 package ru.ezhov.rocket.action.application.plugin.manager.infrastructure.loaders
 
 import mu.KotlinLogging
+import org.springframework.stereotype.Service
 import ru.ezhov.rocket.action.api.RocketActionPlugin
 import ru.ezhov.rocket.action.application.plugin.manager.domain.RocketActionPluginSourceType
 import ru.ezhov.rocket.action.application.plugin.manager.domain.RocketActionPluginSpec
@@ -10,6 +11,7 @@ import kotlin.system.measureTimeMillis
 
 private val logger = KotlinLogging.logger {}
 
+@Service
 class ClassPathPluginLoader {
     companion object {
         private const val PROPERTY_NAME = "rocket.action.extended.plugin.classess"

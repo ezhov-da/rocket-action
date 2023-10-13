@@ -7,12 +7,15 @@ import ru.ezhov.rocket.action.api.RocketActionConfiguration
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
 import ru.ezhov.rocket.action.api.RocketActionPropertySpec
 import ru.ezhov.rocket.action.api.context.icon.AppIcon
+import ru.ezhov.rocket.action.application.core.domain.EngineService
 import ru.ezhov.rocket.action.application.core.domain.model.RocketActionSettingsModel
 import ru.ezhov.rocket.action.application.core.domain.model.SettingsModel
 import ru.ezhov.rocket.action.application.core.domain.model.SettingsValueType
 import ru.ezhov.rocket.action.application.core.infrastructure.MutableRocketActionSettings
 import ru.ezhov.rocket.action.application.plugin.context.RocketActionContextFactory
 import ru.ezhov.rocket.action.application.plugin.manager.application.RocketActionPluginApplicationService
+import ru.ezhov.rocket.action.application.tags.application.TagsService
+import ru.ezhov.rocket.action.application.tags.ui.TagsPanel
 import ru.ezhov.rocket.action.application.tags.ui.TagsPanelFactory
 import ru.ezhov.rocket.action.ui.utils.swing.common.toImage
 import java.awt.BorderLayout
@@ -40,22 +43,29 @@ import javax.swing.SpinnerNumberModel
 import javax.swing.SwingUtilities
 import javax.swing.WindowConstants
 
-
 class CreateRocketActionSettingsDialog(
     owner: JFrame,
     private val rocketActionPluginApplicationService: RocketActionPluginApplicationService,
+    private val rocketActionContextFactory: RocketActionContextFactory,
+    engineService: EngineService,
+    private val tagsService: TagsService,
 ) {
     private val comboBoxModel = DefaultComboBoxModel<RocketActionConfiguration>()
     private var comboBox: JComboBox<RocketActionConfiguration> = JComboBox(comboBoxModel)
-    private val actionSettingsPanel: RocketActionSettingsPanel = RocketActionSettingsPanel()
+    private val actionSettingsPanel: RocketActionSettingsPanel =
+        RocketActionSettingsPanel(TagsPanelFactory.panel(tagsService = tagsService))
     private var currentCallback: CreatedRocketActionSettingsCallback? = null
     private val testPanel: TestPanel =
-        TestPanel(rocketActionPluginApplicationService = rocketActionPluginApplicationService) {
+        TestPanel(
+            rocketActionPluginApplicationService = rocketActionPluginApplicationService,
+            rocketActionContextFactory = rocketActionContextFactory,
+            engineService = engineService,
+        ) {
             actionSettingsPanel.create().second
         }
 
     private val dialog: JDialog = JDialog(owner, "Create action").apply {
-        this.setIconImage(RocketActionContextFactory.context.icon().by(AppIcon.ROCKET_APP).toImage())
+        this.setIconImage(rocketActionContextFactory.context.icon().by(AppIcon.ROCKET_APP).toImage())
         val ownerSize = owner.size
         setSize((ownerSize.width * 0.7).toInt(), (ownerSize.height * 0.7).toInt())
 
@@ -75,7 +85,7 @@ class CreateRocketActionSettingsDialog(
     private fun panelComboBox(): JPanel {
         val all = rocketActionPluginApplicationService
             .all()
-            .map { it.configuration(RocketActionContextFactory.context) }
+            .map { it.configuration(rocketActionContextFactory.context) }
         val sortedAll = all.sortedBy { it.name() }
         sortedAll.forEach(Consumer { anObject: RocketActionConfiguration? -> comboBoxModel.addElement(anObject) })
         val panel = JPanel(BorderLayout())
@@ -137,10 +147,11 @@ class CreateRocketActionSettingsDialog(
         dialog.isVisible = true
     }
 
-    private inner class RocketActionSettingsPanel : JPanel() {
+    private inner class RocketActionSettingsPanel(
+        private val tagsPanel: TagsPanel
+    ) : JPanel() {
         private val settingPanels = mutableListOf<SettingPanel>()
         private var currentConfiguration: RocketActionConfiguration? = null
-        private val tagsPanel = TagsPanelFactory.panel()
 
         init {
             this.layout = BoxLayout(this, BoxLayout.Y_AXIS)
@@ -157,7 +168,7 @@ class CreateRocketActionSettingsDialog(
                         .thenBy { it.name() }
                 )
                 .forEach { p: RocketActionConfigurationProperty ->
-                    val panel = SettingPanel(p)
+                    val panel = SettingPanel(rocketActionContextFactory, p)
                     this.add(panel)
                     settingPanels.add(panel)
                 }
@@ -184,13 +195,16 @@ class CreateRocketActionSettingsDialog(
             )
     }
 
-    private class SettingPanel(private val property: RocketActionConfigurationProperty) : JPanel() {
+    private class SettingPanel(
+        rocketActionContextFactory: RocketActionContextFactory,
+        private val property: RocketActionConfigurationProperty
+    ) : JPanel() {
         private val valueCallback: () -> Pair<String, SettingsValueType?>
 
         init {
             this.layout = BorderLayout()
             this.border = BorderFactory.createEmptyBorder(2, 2, 2, 2)
-            val labelDescription = JLabel(RocketActionContextFactory.context.icon().by(AppIcon.INFO))
+            val labelDescription = JLabel(rocketActionContextFactory.context.icon().by(AppIcon.INFO))
             labelDescription.toolTipText = property.description()
 
             val text = if (property.isRequired()) {

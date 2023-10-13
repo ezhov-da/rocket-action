@@ -12,7 +12,6 @@ import ru.ezhov.rocket.action.api.context.icon.AppIcon
 import ru.ezhov.rocket.action.api.support.AbstractRocketAction
 import ru.ezhov.rocket.action.application.core.domain.model.RocketActionCachedState
 import ru.ezhov.rocket.action.application.core.infrastructure.RocketActionComponentCacheFactory
-import ru.ezhov.rocket.action.application.plugin.context.RocketActionContextFactory
 import java.awt.Component
 import javax.swing.Icon
 import javax.swing.JMenu
@@ -30,17 +29,15 @@ class GroupRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
             actionContext = context
         }
 
-    private val icon = RocketActionContextFactory.context.icon().by(AppIcon.PROJECT)
-
     override fun create(settings: RocketActionSettings, context: RocketActionContext): RocketAction? =
         settings.settings()[LABEL]?.takeIf { it.isNotEmpty() }?.let { label ->
             val childrenIds = settings.actions().map { it.id() }.toSet()
             val description = settings.settings()[DESCRIPTION]?.takeIf { it.isNotEmpty() } ?: label
             val iconUrl = settings.settings()[ICON_URL].orEmpty()
             val menu = JMenu(label)
-            menu.icon = RocketActionContextFactory.context.icon().load(
+            menu.icon = context.icon().load(
                 iconUrl = iconUrl,
-                defaultIcon = RocketActionContextFactory.context.icon().by(AppIcon.PROJECT)
+                defaultIcon = context.icon().by(AppIcon.PROJECT)
             )
             menu.toolTipText = description
 
@@ -79,7 +76,7 @@ class GroupRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
 
     override fun name(): String = "Group"
 
-    override fun icon(): Icon = icon
+    override fun icon(): Icon = actionContext!!.icon().by(AppIcon.PROJECT)
 
     companion object {
         const val TYPE = "GROUP"

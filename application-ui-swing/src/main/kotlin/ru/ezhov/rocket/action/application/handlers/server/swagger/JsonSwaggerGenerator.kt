@@ -22,11 +22,13 @@ import io.swagger.v3.oas.models.responses.ApiResponses
 import ru.ezhov.rocket.action.api.handler.RocketActionHandler
 import ru.ezhov.rocket.action.api.handler.RocketActionHandlerProperty
 import ru.ezhov.rocket.action.api.handler.RocketActionHandlerPropertySpec
+import ru.ezhov.rocket.action.application.core.domain.RocketActionComponentCache
 import ru.ezhov.rocket.action.application.handlers.server.BASE_API_PATH
-import ru.ezhov.rocket.action.application.core.infrastructure.RocketActionComponentCacheFactory
 
 
-class JsonSwaggerGenerator : SwaggerGenerator {
+class JsonSwaggerGenerator(
+    private val rocketActionComponentCache: RocketActionComponentCache,
+) : SwaggerGenerator {
     override fun generate(): String {
         var openApi =
             OpenAPI(SpecVersion.V30)
@@ -41,7 +43,7 @@ class JsonSwaggerGenerator : SwaggerGenerator {
         inputPaths.forEach { path ->
             paths = paths.addPathItem(path.first, path.second)
         }
-        val handlers = RocketActionComponentCacheFactory.cache.handlers()
+        val handlers = rocketActionComponentCache.handlers()
         handlers.map { handler ->
             handler.toPathItem().forEach {
                 paths = paths.addPathItem(it.first, it.second)
@@ -52,7 +54,8 @@ class JsonSwaggerGenerator : SwaggerGenerator {
     }
 
     private fun constructHandler(): Pair<String, PathItem> =
-        Pair("$BASE_API_PATH/{id}/{commandName}",
+        Pair(
+            "$BASE_API_PATH/{id}/{commandName}",
             PathItem()
                 .post(
                     Operation()

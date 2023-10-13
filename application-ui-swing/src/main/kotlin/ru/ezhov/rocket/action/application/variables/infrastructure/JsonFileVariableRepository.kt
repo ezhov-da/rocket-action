@@ -3,7 +3,8 @@ package ru.ezhov.rocket.action.application.variables.infrastructure
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import mu.KotlinLogging
-import ru.ezhov.rocket.action.application.properties.GeneralPropertiesRepositoryFactory
+import org.springframework.stereotype.Component
+import ru.ezhov.rocket.action.application.properties.GeneralPropertiesRepository
 import ru.ezhov.rocket.action.application.properties.UsedPropertiesName
 import ru.ezhov.rocket.action.application.variables.domain.VariableRepository
 import ru.ezhov.rocket.action.application.variables.domain.model.Encryption
@@ -16,10 +17,12 @@ import java.io.File
 
 private val logger = KotlinLogging.logger {}
 
-class JsonFileVariableRepository : VariableRepository {
+@Component
+class JsonFileVariableRepository(
+    private val generalPropertiesRepository: GeneralPropertiesRepository,
+) : VariableRepository {
     private val filePath =
-        GeneralPropertiesRepositoryFactory
-            .repository
+        generalPropertiesRepository
             .asStringOrNull(UsedPropertiesName.VARIABLES_FILE_REPOSITORY_PATH)
             ?: "./variables.json"
     private val mapper = ObjectMapper().registerKotlinModule()

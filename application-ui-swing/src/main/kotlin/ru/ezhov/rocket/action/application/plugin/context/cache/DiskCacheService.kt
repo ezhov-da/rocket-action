@@ -2,6 +2,7 @@ package ru.ezhov.rocket.action.application.plugin.context.cache
 
 import com.google.common.hash.Hashing
 import mu.KotlinLogging
+import org.springframework.stereotype.Service
 import ru.ezhov.rocket.action.api.context.cache.CacheService
 import java.io.File
 import java.io.FileOutputStream
@@ -17,6 +18,7 @@ import javax.net.ssl.X509TrustManager
 
 private val logger = KotlinLogging.logger {}
 
+@Service
 class DiskCacheService : CacheService {
     private val cacheFolder = File("./cache")
     private val cache: ConcurrentHashMap<String, String> = ConcurrentHashMap()

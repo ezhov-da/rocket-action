@@ -2,11 +2,12 @@ package ru.ezhov.rocket.action.application.handlers.server
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import mu.KotlinLogging
+import org.springframework.stereotype.Service
 import ru.ezhov.rocket.action.api.handler.RocketActionHandleStatus
 import ru.ezhov.rocket.action.api.handler.RocketActionHandlerCommand
+import ru.ezhov.rocket.action.application.core.domain.RocketActionComponentCache
 import ru.ezhov.rocket.action.application.handlers.server.swagger.JsonSwaggerGenerator
-import ru.ezhov.rocket.action.application.core.infrastructure.RocketActionComponentCacheFactory
-import ru.ezhov.rocket.action.application.properties.GeneralPropertiesRepositoryFactory
+import ru.ezhov.rocket.action.application.properties.GeneralPropertiesRepository
 import ru.ezhov.rocket.action.application.properties.UsedPropertiesName
 import spark.kotlin.Http
 import spark.kotlin.RouteHandler
@@ -17,18 +18,19 @@ private const val HEADER_NAME = "X-Rocket-Action-Handler-Key"
 private const val HEADER_VALUE = "1234"
 const val BASE_API_PATH = "/api/v1/handlers"
 
-class Server {
+@Service
+class HttpServer(
+    private val generalPropertiesRepository: GeneralPropertiesRepository,
+    private val rocketActionComponentCache: RocketActionComponentCache,
+) {
     private val mapper = ObjectMapper()
 
-    companion object {
-        fun port(): Int = GeneralPropertiesRepositoryFactory
-            .repository
-            .asIntegerOrNull(UsedPropertiesName.HANDLER_SERVER_PORT)
-            ?.let { port ->
-                logger.info { "Port for server handler initialized. Value=$port " }
-                port
-            } ?: 4567
-    }
+    fun port(): Int = generalPropertiesRepository
+        .asIntegerOrNull(UsedPropertiesName.HANDLER_SERVER_PORT)
+        ?.let { port ->
+            logger.info { "Port for server handler initialized. Value=$port " }
+            port
+        } ?: 4567
 
     fun run() {
         val http: Http = ignite()
@@ -48,7 +50,7 @@ class Server {
     private fun swaggerJson(http: Http) {
         http.get("/swagger.json") {
             response.type("application/json")
-            JsonSwaggerGenerator().generate()
+            JsonSwaggerGenerator(rocketActionComponentCache).generate()
         }
     }
 
@@ -62,7 +64,7 @@ class Server {
                 logger.info { "Handler called. id=$id command=$command body=$body" }
 
                 val map = mapper.readValue(body, Map::class.java)
-                val handler = RocketActionComponentCacheFactory.cache.handlerBy(id)
+                val handler = rocketActionComponentCache.handlerBy(id)
                 val status = handler
                     ?.handle(
                         RocketActionHandlerCommand(

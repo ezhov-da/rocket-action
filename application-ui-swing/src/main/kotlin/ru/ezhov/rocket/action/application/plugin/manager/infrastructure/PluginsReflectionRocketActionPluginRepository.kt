@@ -4,6 +4,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
+import org.springframework.stereotype.Component
 import ru.ezhov.rocket.action.application.plugin.context.RocketActionContextFactory
 import ru.ezhov.rocket.action.application.plugin.manager.domain.RocketActionPluginRepository
 import ru.ezhov.rocket.action.application.plugin.manager.domain.RocketActionPluginSpec
@@ -17,14 +18,16 @@ import kotlin.system.measureTimeMillis
 
 private val logger = KotlinLogging.logger {}
 
-class PluginsReflectionRocketActionPluginRepository : RocketActionPluginRepository {
+@Component
+class PluginsReflectionRocketActionPluginRepository(
+    private val innerPluginLoader: InnerPluginLoader,
+    private val jarsPluginLoader: JarsPluginLoader,
+    private val classPathPluginLoader: ClassPathPluginLoader,
+    private val groovyPluginLoader: GroovyPluginLoader,
+    private val kotlinPluginLoader: KotlinPluginLoader,
+    private val rocketActionContextFactory: RocketActionContextFactory,
+) : RocketActionPluginRepository {
     private var list: ConcurrentLinkedQueue<RocketActionPluginSpec> = ConcurrentLinkedQueue()
-
-    private val innerPluginLoader: InnerPluginLoader = InnerPluginLoader()
-    private val jarsPluginLoader: JarsPluginLoader = JarsPluginLoader()
-    private val classPathPluginLoader: ClassPathPluginLoader = ClassPathPluginLoader()
-    private val groovyPluginLoader: GroovyPluginLoader = GroovyPluginLoader()
-    private val kotlinPluginLoader: KotlinPluginLoader = KotlinPluginLoader()
 
     private fun load() = runBlocking {
         val times = measureTimeMillis {
@@ -113,7 +116,7 @@ class PluginsReflectionRocketActionPluginRepository : RocketActionPluginReposito
         all()
             .filterIsInstance(RocketActionPluginSpec.Success::class.java)
             .firstOrNull { r: RocketActionPluginSpec.Success ->
-                r.rocketActionPlugin.configuration(context = RocketActionContextFactory.context)
+                r.rocketActionPlugin.configuration(context = rocketActionContextFactory.context)
                     .type()
                     .value() == type
             }

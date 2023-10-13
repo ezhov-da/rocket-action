@@ -1,8 +1,10 @@
 package ru.ezhov.rocket.action.application.tags.application
 
+import org.springframework.stereotype.Service
 import ru.ezhov.rocket.action.application.tags.domain.TagNode
 import ru.ezhov.rocket.action.application.tags.domain.TagsRepository
 
+@Service
 class TagsServiceImpl(
     private val tagsRepository: TagsRepository
 ) : TagsService {

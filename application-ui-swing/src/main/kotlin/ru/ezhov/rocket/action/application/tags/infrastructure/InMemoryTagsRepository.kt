@@ -1,10 +1,12 @@
 package ru.ezhov.rocket.action.application.tags.infrastructure
 
+import org.springframework.stereotype.Component
 import ru.ezhov.rocket.action.application.tags.domain.Tag
 import ru.ezhov.rocket.action.application.tags.domain.TagNode
 import ru.ezhov.rocket.action.application.tags.domain.TagsRepository
 import java.util.concurrent.ConcurrentHashMap
 
+@Component
 class InMemoryTagsRepository : TagsRepository {
     private val mapTagAndKeys: ConcurrentHashMap<String, MutableSet<String>> = ConcurrentHashMap()
     private val mapKeyAndTags: ConcurrentHashMap<String, List<String>> = ConcurrentHashMap()

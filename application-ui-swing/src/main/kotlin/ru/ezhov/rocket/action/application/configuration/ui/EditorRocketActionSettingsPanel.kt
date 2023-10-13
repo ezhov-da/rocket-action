@@ -13,11 +13,14 @@ import ru.ezhov.rocket.action.application.configuration.ui.event.ConfigurationUi
 import ru.ezhov.rocket.action.application.configuration.ui.event.ConfigurationUiObserverFactory
 import ru.ezhov.rocket.action.application.configuration.ui.event.model.ConfigurationUiEvent
 import ru.ezhov.rocket.action.application.configuration.ui.event.model.RemoveSettingUiEvent
+import ru.ezhov.rocket.action.application.core.domain.EngineService
 import ru.ezhov.rocket.action.application.core.domain.model.SettingsModel
 import ru.ezhov.rocket.action.application.core.domain.model.SettingsValueType
 import ru.ezhov.rocket.action.application.core.infrastructure.MutableRocketActionSettings
+import ru.ezhov.rocket.action.application.handlers.server.AvailableHandlersRepository
 import ru.ezhov.rocket.action.application.plugin.context.RocketActionContextFactory
 import ru.ezhov.rocket.action.application.plugin.manager.application.RocketActionPluginApplicationService
+import ru.ezhov.rocket.action.application.tags.application.TagsService
 import ru.ezhov.rocket.action.application.tags.ui.TagsPanelFactory
 import java.awt.BorderLayout
 import javax.swing.BorderFactory
@@ -39,14 +42,22 @@ import javax.swing.SwingConstants
 private val logger = KotlinLogging.logger {}
 
 class EditorRocketActionSettingsPanel(
-    private val rocketActionPluginApplicationService: RocketActionPluginApplicationService
+    private val rocketActionPluginApplicationService: RocketActionPluginApplicationService,
+    private val rocketActionContextFactory: RocketActionContextFactory,
+    engineService: EngineService,
+    availableHandlersRepository: AvailableHandlersRepository,
+    tagsService: TagsService,
 ) : JPanel(BorderLayout()) {
-    private val infoPanel: InfoPanel = InfoPanel()
-    private val rocketActionSettingsPanel = RocketActionSettingsPanel()
+    private val infoPanel: InfoPanel = InfoPanel(availableHandlersRepository)
+    private val rocketActionSettingsPanel = RocketActionSettingsPanel(tagsService)
     private var currentSettings: TreeRocketActionSettings? = null
     private var callback: SavedRocketActionSettingsPanelCallback? = null
     private val testPanel: TestPanel =
-        TestPanel(rocketActionPluginApplicationService = rocketActionPluginApplicationService) {
+        TestPanel(
+            rocketActionPluginApplicationService = rocketActionPluginApplicationService,
+            rocketActionContextFactory = rocketActionContextFactory,
+            engineService = engineService,
+        ) {
             rocketActionSettingsPanel.create()?.settings
         }
 
@@ -54,15 +65,15 @@ class EditorRocketActionSettingsPanel(
         val panel = JPanel()
         val button = JButton(
             "Save current action configuration to tree",
-            RocketActionContextFactory.context.icon().by(AppIcon.SAVE)
+            rocketActionContextFactory.context.icon().by(AppIcon.SAVE)
         )
         button.addActionListener {
             rocketActionSettingsPanel.create()?.let { rs ->
                 callback!!.saved(rs)
-                RocketActionContextFactory.context.notification()
+                rocketActionContextFactory.context.notification()
                     .show(NotificationType.INFO, "Current action configuration saved")
             } ?: run {
-                RocketActionContextFactory.context.notification().show(NotificationType.WARN, "Action not selected")
+                rocketActionContextFactory.context.notification().show(NotificationType.WARN, "Action not selected")
             }
         }
         panel.add(button)
@@ -82,7 +93,7 @@ class EditorRocketActionSettingsPanel(
         this.callback = callback
         val configuration: RocketActionConfiguration? =
             rocketActionPluginApplicationService.by(settings.settings.type)
-                ?.configuration(RocketActionContextFactory.context)
+                ?.configuration(rocketActionContextFactory.context)
         val configurationDescription = configuration?.let {
             configuration.description()
         }
@@ -142,7 +153,9 @@ class EditorRocketActionSettingsPanel(
         val valueType: SettingsValueType?,
     )
 
-    private class InfoPanel : JPanel() {
+    private class InfoPanel(
+        private val availableHandlersRepository: AvailableHandlersRepository
+    ) : JPanel() {
         private val textFieldInfo = JTextField().apply { isEditable = false }
         private val labelDescription = JLabel()
 
@@ -158,7 +171,7 @@ class EditorRocketActionSettingsPanel(
                 labelDescription.text = description
             }
             removeAll()
-            HandlerPanel.of(rocketActionId)
+            HandlerPanel.of(rocketActionId, availableHandlersRepository)
                 ?.let { hp ->
                     add(
                         JPanel(BorderLayout()).apply {
@@ -176,10 +189,12 @@ class EditorRocketActionSettingsPanel(
         }
     }
 
-    private inner class RocketActionSettingsPanel : JPanel() {
+    private inner class RocketActionSettingsPanel(
+        tagsService: TagsService,
+    ) : JPanel() {
         private val settingPanels = mutableListOf<SettingPanel>()
         private var values: List<Value>? = null
-        private val tagsPanel = TagsPanelFactory.panel()
+        private val tagsPanel = TagsPanelFactory.panel(tagsService = tagsService)
 
         init {
             this.layout = BoxLayout(this, BoxLayout.Y_AXIS)
@@ -191,7 +206,7 @@ class EditorRocketActionSettingsPanel(
             this.values = list
             list
                 .forEach { v: Value ->
-                    val panel = SettingPanel(v)
+                    val panel = SettingPanel(rocketActionContextFactory, v)
                     this.add(panel)
                     settingPanels.add(panel)
                 }
@@ -223,7 +238,10 @@ class EditorRocketActionSettingsPanel(
     /**
      * Panel with one setting
      */
-    private class SettingPanel(private val value: Value) : JPanel() {
+    private class SettingPanel(
+        private val rocketActionContextFactory: RocketActionContextFactory,
+        private val value: Value
+    ) : JPanel() {
         private var valueCallback: () -> Pair<String, SettingsValueType?> = { Pair("", null) }
 
         init {
@@ -240,7 +258,7 @@ class EditorRocketActionSettingsPanel(
                         BorderFactory.createTitledBorder(text)
                     )
 
-                    val labelDescription = JLabel(RocketActionContextFactory.context.icon().by(AppIcon.INFO))
+                    val labelDescription = JLabel(rocketActionContextFactory.context.icon().by(AppIcon.INFO))
                     labelDescription.toolTipText = property.description()
 
                     val topPanel = JPanel()
@@ -348,15 +366,16 @@ class EditorRocketActionSettingsPanel(
 
                     this.add(topPanel, BorderLayout.NORTH)
                     this.add(centerPanel, BorderLayout.CENTER)
-                } ?: run {
-                val text = "Unregistered property found '${value.key}:${value.value}' " +
-                    "description=${value.property?.description()}"
-                logger.warn { text }
-                RocketActionContextFactory.context.notification().show(
-                    type = NotificationType.WARN,
-                    text = text
-                )
-            }
+                }
+                ?: run {
+                    val text = "Unregistered property found '${value.key}:${value.value}' " +
+                        "description=${value.property?.description()}"
+                    logger.warn { text }
+                    rocketActionContextFactory.context.notification().show(
+                        type = NotificationType.WARN,
+                        text = text
+                    )
+                }
         }
 
         fun value(): SettingsModel = SettingsModel(

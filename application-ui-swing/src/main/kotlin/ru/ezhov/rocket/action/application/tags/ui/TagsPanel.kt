@@ -9,7 +9,7 @@ import javax.swing.ScrollPaneConstants
 
 class TagsPanel(
     private val tags: List<String>,
-    private val availableTagsService: TagsService,
+    private val tagsService: TagsService,
 ) : JPanel(BorderLayout()) {
     private val autocompleteTextField: AutocompleteTextField
     private val selectedTagsPanel: SelectedTagsPanel
@@ -19,7 +19,7 @@ class TagsPanel(
             setTags(tags)
         }
         autocompleteTextField = AutocompleteTextField(
-            lookup = { text -> availableTagsService.tags(text).map { it.name } },
+            lookup = { text -> tagsService.tags(text).map { it.name } },
             selectedCallback = { text -> selectedTagsPanel.addTag(text) },
             placeholder = "Start typing the name of a previously created or new tag and press ENTER"
         )

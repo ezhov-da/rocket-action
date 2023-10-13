@@ -1,6 +1,7 @@
 package ru.ezhov.rocket.action.application.plugin.manager.infrastructure.loaders
 
 import mu.KotlinLogging
+import org.springframework.stereotype.Service
 import ru.ezhov.rocket.action.api.RocketActionPlugin
 import ru.ezhov.rocket.action.application.plugin.group.GroupRocketActionUi
 import ru.ezhov.rocket.action.application.plugin.manager.domain.RocketActionPluginSourceType
@@ -11,6 +12,7 @@ import kotlin.system.measureTimeMillis
 
 private val logger = KotlinLogging.logger {}
 
+@Service
 class InnerPluginLoader {
     fun plugins(): List<String> =
         listOf(GroupRocketActionUi::class.java.canonicalName)

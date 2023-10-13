@@ -1,4 +1,4 @@
-package ru.ezhov.rocket.action.core.event.domain;
+package ru.ezhov.rocket.action.application.event.domain;
 
 interface DomainEventSubscriber<T : DomainEvent> {
     fun handleEvent(event: T)

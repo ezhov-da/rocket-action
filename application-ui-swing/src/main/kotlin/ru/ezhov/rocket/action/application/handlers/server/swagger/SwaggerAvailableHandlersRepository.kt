@@ -1,19 +1,23 @@
 package ru.ezhov.rocket.action.application.handlers.server.swagger
 
+import org.springframework.stereotype.Component
+import ru.ezhov.rocket.action.application.core.domain.RocketActionComponentCache
 import ru.ezhov.rocket.action.application.handlers.server.AvailableHandlersRepository
-import ru.ezhov.rocket.action.application.handlers.server.Server
+import ru.ezhov.rocket.action.application.handlers.server.HttpServer
 import ru.ezhov.rocket.action.application.handlers.server.model.AvailableHandler
-import ru.ezhov.rocket.action.application.core.infrastructure.RocketActionComponentCacheFactory
 import java.net.URI
 
-class SwaggerAvailableHandlersRepository : AvailableHandlersRepository {
+@Component
+class SwaggerAvailableHandlersRepository(
+    private val httpServer: HttpServer,
+    private val rocketActionComponentCache: RocketActionComponentCache,
+) : AvailableHandlersRepository {
     private val url: (id: String, commandName: String) -> String =
-        { id, commandName -> "http://localhost:${Server.port()}/#/Action/$id-$commandName" }
+        { id, commandName -> "http://localhost:${httpServer.port()}/#/Action/$id-$commandName" }
 
 
     override fun by(handlerId: String): List<AvailableHandler> =
-        RocketActionComponentCacheFactory
-            .cache
+        rocketActionComponentCache
             .handlers()
             .firstOrNull { it.id() == handlerId }
             ?.let { handler ->

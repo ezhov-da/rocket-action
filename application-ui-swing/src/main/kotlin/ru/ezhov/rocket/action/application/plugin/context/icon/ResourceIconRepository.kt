@@ -1,12 +1,14 @@
 package ru.ezhov.rocket.action.application.plugin.context.icon
 
 import mu.KotlinLogging
+import org.springframework.stereotype.Component
 import ru.ezhov.rocket.action.api.context.icon.AppIcon
 import javax.swing.Icon
 import javax.swing.ImageIcon
 
 private val logger = KotlinLogging.logger { }
 
+@Component
 class ResourceIconRepository {
     private val defaultIcon = this.javaClass.getResource("/icons/default_16x16.png")
 

@@ -1,6 +1,6 @@
 package ru.ezhov.rocket.action.application.configuration.ui
 
-import ru.ezhov.rocket.action.application.handlers.server.AvailableHandlersRepositoryFactory
+import ru.ezhov.rocket.action.application.handlers.server.AvailableHandlersRepository
 import ru.ezhov.rocket.action.application.handlers.server.model.AvailableHandler
 import java.awt.Color
 import java.awt.Cursor
@@ -51,9 +51,8 @@ class HandlerPanel private constructor(private val handlers: List<AvailableHandl
     }
 
     companion object {
-        fun of(rocketActionId: String): HandlerPanel? =
-            AvailableHandlersRepositoryFactory
-                .repository
+        fun of(rocketActionId: String, availableHandlersRepository: AvailableHandlersRepository): HandlerPanel? =
+            availableHandlersRepository
                 .by(rocketActionId)
                 .takeIf { it.isNotEmpty() }
                 ?.let { HandlerPanel(it) }

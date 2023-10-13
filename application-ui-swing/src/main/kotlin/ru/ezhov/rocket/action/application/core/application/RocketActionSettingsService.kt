@@ -1,12 +1,14 @@
 package ru.ezhov.rocket.action.application.core.application
 
 import mu.KotlinLogging
+import org.springframework.stereotype.Service
 import ru.ezhov.rocket.action.api.RocketAction
+import ru.ezhov.rocket.action.application.core.domain.EngineService
+import ru.ezhov.rocket.action.application.core.domain.RocketActionComponentCache
 import ru.ezhov.rocket.action.application.core.domain.RocketActionSettingsRepository
 import ru.ezhov.rocket.action.application.core.domain.model.ActionsModel
 import ru.ezhov.rocket.action.application.core.domain.model.RocketActionCached
 import ru.ezhov.rocket.action.application.core.domain.model.RocketActionSettingsModel
-import ru.ezhov.rocket.action.application.core.infrastructure.RocketActionComponentCacheFactory
 import ru.ezhov.rocket.action.application.plugin.context.RocketActionContextFactory
 import ru.ezhov.rocket.action.application.plugin.group.GroupRocketActionUi
 import ru.ezhov.rocket.action.application.plugin.manager.application.RocketActionPluginApplicationService
@@ -16,10 +18,14 @@ import kotlin.system.measureTimeMillis
 
 private val logger = KotlinLogging.logger {}
 
+@Service
 class RocketActionSettingsService(
     private val rocketActionPluginApplicationService: RocketActionPluginApplicationService,
     private val rocketActionSettingsRepository: RocketActionSettingsRepository,
     private val tagsService: TagsService,
+    private val rocketActionContextFactory: RocketActionContextFactory,
+    private val engineService: EngineService,
+    private val rocketActionComponentCache: RocketActionComponentCache,
 ) {
     private var rocketActionAndComponents: List<RocketActionAndComponent> = emptyList()
 
@@ -38,11 +44,11 @@ class RocketActionSettingsService(
             val actionsModel = actionsModel()
             fillTags(actionsModel)
             fillCache(actionsModel.actions)
-            val cache = RocketActionComponentCacheFactory.cache
+            val cache = rocketActionComponentCache
             val components = mutableListOf<RocketActionAndComponent>()
             for (rocketActionSettings in actionsModel.actions) {
                 rocketActionPluginApplicationService.by(rocketActionSettings.type)
-                    ?.factory(RocketActionContextFactory.context)
+                    ?.factory(rocketActionContextFactory.context)
                     ?.let {
                         (
                             cache
@@ -119,22 +125,22 @@ class RocketActionSettingsService(
 
     private fun createAndPutToCache(settings: RocketActionSettingsModel) {
         val rau = rocketActionPluginApplicationService.by(settings.type)
-            ?.factory(RocketActionContextFactory.context)
-        val cache = RocketActionComponentCacheFactory.cache
+            ?.factory(rocketActionContextFactory.context)
+        val cache = rocketActionComponentCache
         if (rau != null) {
             val rocketActionCached = cache.by(settings.id)
             val isChanged =
                 rocketActionCached
                     ?.origin
-                    ?.isChanged(settings.to())
+                    ?.isChanged(settings.to(engineService))
                     ?: true
 
             logger.debug { "must be create '$isChanged' type='${settings.type}' id='${settings.id}'" }
 
             if (isChanged) {
                 val newAction = rau.create(
-                    settings = settings.to(),
-                    context = RocketActionContextFactory.context
+                    settings = settings.to(engineService),
+                    context = rocketActionContextFactory.context
                 )
 
                 logger.debug { "added to cache type='${settings.type}' id='${settings.id}'" }
@@ -149,10 +155,10 @@ class RocketActionSettingsService(
     }
 
     fun actionsByIds(ids: Set<String>): List<RocketAction> =
-        RocketActionComponentCacheFactory.cache.byIds(ids).map { it.origin }
+        rocketActionComponentCache.byIds(ids).map { it.origin }
 
     fun actionsByContains(text: String): List<RocketAction> =
-        RocketActionComponentCacheFactory.cache
+        rocketActionComponentCache
             .all()
             .map { it.origin }
             .filter { it.contains(text) }

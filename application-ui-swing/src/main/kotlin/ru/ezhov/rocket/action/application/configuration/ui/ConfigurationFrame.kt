@@ -8,16 +8,20 @@ import ru.ezhov.rocket.action.application.configuration.ui.event.ConfigurationUi
 import ru.ezhov.rocket.action.application.configuration.ui.event.model.ConfigurationUiEvent
 import ru.ezhov.rocket.action.application.configuration.ui.event.model.RemoveSettingUiEvent
 import ru.ezhov.rocket.action.application.core.application.RocketActionSettingsService
+import ru.ezhov.rocket.action.application.core.domain.EngineService
 import ru.ezhov.rocket.action.application.core.domain.RocketActionSettingsRepositoryException
 import ru.ezhov.rocket.action.application.core.domain.model.ActionsModel
 import ru.ezhov.rocket.action.application.core.domain.model.RocketActionSettingsModel
 import ru.ezhov.rocket.action.application.core.infrastructure.MutableRocketActionSettings
+import ru.ezhov.rocket.action.application.handlers.server.AvailableHandlersRepository
 import ru.ezhov.rocket.action.application.plugin.context.RocketActionContextFactory
 import ru.ezhov.rocket.action.application.plugin.group.GroupRocketActionUi
 import ru.ezhov.rocket.action.application.plugin.manager.application.RocketActionPluginApplicationService
 import ru.ezhov.rocket.action.application.plugin.manager.ui.PluginManagerFrame
-import ru.ezhov.rocket.action.application.properties.GeneralPropertiesRepositoryFactory
+import ru.ezhov.rocket.action.application.properties.GeneralPropertiesRepository
 import ru.ezhov.rocket.action.application.properties.UsedPropertiesName
+import ru.ezhov.rocket.action.application.tags.application.TagsService
+import ru.ezhov.rocket.action.application.variables.application.VariablesApplication
 import ru.ezhov.rocket.action.application.variables.interfaces.ui.VariablesFrame
 import ru.ezhov.rocket.action.ui.utils.swing.common.toImage
 import java.awt.BorderLayout
@@ -57,7 +61,13 @@ private val logger = KotlinLogging.logger { }
 class ConfigurationFrame(
     rocketActionPluginApplicationService: RocketActionPluginApplicationService,
     private val rocketActionSettingsService: RocketActionSettingsService,
-    updateActionListener: ActionListener
+    private val rocketActionContextFactory: RocketActionContextFactory,
+    private val engineService: EngineService,
+    private val availableHandlersRepository: AvailableHandlersRepository,
+    private val tagsService: TagsService,
+    generalPropertiesRepository: GeneralPropertiesRepository,
+    private val variablesApplication: VariablesApplication,
+    updateActionListener: ActionListener,
 ) {
     private val frame: JFrame = JFrame()
     private val rocketActionPluginApplicationService: RocketActionPluginApplicationService
@@ -82,6 +92,10 @@ class ConfigurationFrame(
         val defaultTreeModel = DefaultTreeModel(root)
         val rocketActionSettingsPanel = EditorRocketActionSettingsPanel(
             rocketActionPluginApplicationService = rocketActionPluginApplicationService,
+            rocketActionContextFactory = rocketActionContextFactory,
+            engineService = engineService,
+            availableHandlersRepository = availableHandlersRepository,
+            tagsService = tagsService,
         )
         val panel = JPanel(BorderLayout())
         val tree = JTree(defaultTreeModel)
@@ -121,8 +135,8 @@ class ConfigurationFrame(
                 add(
                     JButton()
                         .apply {
-                            val expandIcon = RocketActionContextFactory.context.icon().by(AppIcon.EXPAND)
-                            val collapseIcon = RocketActionContextFactory.context.icon().by(AppIcon.COLLAPSE)
+                            val expandIcon = rocketActionContextFactory.context.icon().by(AppIcon.EXPAND)
+                            val collapseIcon = rocketActionContextFactory.context.icon().by(AppIcon.COLLAPSE)
                             var isExpanded = false
                             val setButtonState: (Boolean) -> Unit = { b ->
                                 val resultIcon = if (b) collapseIcon else expandIcon
@@ -142,7 +156,12 @@ class ConfigurationFrame(
             }
 
         innerPanelTree.add(
-            SearchInTreePanel(root = root, treeModel = defaultTreeModel, tree = tree),
+            SearchInTreePanel(
+                root = root,
+                treeModel = defaultTreeModel,
+                tree = tree,
+                rocketActionContextFactory = rocketActionContextFactory
+            ),
             BorderLayout.NORTH
         )
         innerPanelTree.add(JScrollPane(tree), BorderLayout.CENTER)
@@ -153,7 +172,7 @@ class ConfigurationFrame(
         val panelSaveTree = JPanel()
         val buttonSaveTree = JButton(
             "Save all configuration to storage",
-            RocketActionContextFactory.context.icon().by(AppIcon.SAVE)
+            rocketActionContextFactory.context.icon().by(AppIcon.SAVE)
         )
         buttonSaveTree.addActionListener { saveSettings(defaultTreeModel) }
         panelSaveTree.add(buttonSaveTree)
@@ -203,7 +222,7 @@ class ConfigurationFrame(
 
                         init {
                             putValue(NAME, "Add above")
-                            putValue(SMALL_ICON, RocketActionContextFactory.context.icon().by(AppIcon.PLUS))
+                            putValue(SMALL_ICON, rocketActionContextFactory.context.icon().by(AppIcon.PLUS))
                         }
                     }))
                     popupMenu.add(JMenuItem(
@@ -225,7 +244,7 @@ class ConfigurationFrame(
 
                             init {
                                 putValue(NAME, "Add below")
-                                putValue(SMALL_ICON, RocketActionContextFactory.context.icon().by(AppIcon.PLUS))
+                                putValue(SMALL_ICON, rocketActionContextFactory.context.icon().by(AppIcon.PLUS))
                             }
                         }
                     ))
@@ -247,7 +266,7 @@ class ConfigurationFrame(
 
                                 init {
                                     putValue(NAME, "Create and add as child")
-                                    putValue(SMALL_ICON, RocketActionContextFactory.context.icon().by(AppIcon.PLUS))
+                                    putValue(SMALL_ICON, rocketActionContextFactory.context.icon().by(AppIcon.PLUS))
                                 }
                             }
                         ))
@@ -279,7 +298,7 @@ class ConfigurationFrame(
 
                                 init {
                                     putValue(NAME, "Duplicate")
-                                    putValue(SMALL_ICON, RocketActionContextFactory.context.icon().by(AppIcon.FORK))
+                                    putValue(SMALL_ICON, rocketActionContextFactory.context.icon().by(AppIcon.FORK))
                                 }
                             }
                         ))
@@ -303,7 +322,7 @@ class ConfigurationFrame(
 
                             init {
                                 putValue(NAME, "Delete")
-                                putValue(SMALL_ICON, RocketActionContextFactory.context.icon().by(AppIcon.MINUS))
+                                putValue(SMALL_ICON, rocketActionContextFactory.context.icon().by(AppIcon.MINUS))
                             }
                         }
                     ))
@@ -325,7 +344,7 @@ class ConfigurationFrame(
     private fun fillTreeNodes(actions: List<RocketActionSettingsModel>?, parent: DefaultMutableTreeNode) {
         for (rocketActionSettings in actions!!) {
             rocketActionPluginApplicationService.by(type = rocketActionSettings.type)
-                ?.configuration(RocketActionContextFactory.context)
+                ?.configuration(rocketActionContextFactory.context)
                 ?.let { config ->
                     val current = DefaultMutableTreeNode(
                         TreeRocketActionSettings(
@@ -359,10 +378,10 @@ class ConfigurationFrame(
             val actions = ActionsModel(actions = settings.map { it.toModel() })
             rocketActionSettingsService.save(actions)
             setTitle(actions.lastChangedDate)
-            RocketActionContextFactory.context.notification().show(NotificationType.INFO, "Actions saved")
+            rocketActionContextFactory.context.notification().show(NotificationType.INFO, "Actions saved")
         } catch (e: RocketActionSettingsRepositoryException) {
             e.printStackTrace()
-            RocketActionContextFactory.context.notification().show(NotificationType.ERROR, "Error saving actions")
+            rocketActionContextFactory.context.notification().show(NotificationType.ERROR, "Error saving actions")
         }
     }
 
@@ -417,8 +436,8 @@ class ConfigurationFrame(
     private var menuBar: JToolBar?
 
     init {
-        frame.iconImage = RocketActionContextFactory.context.icon().by(AppIcon.ROCKET_APP).toImage()
-        frame.isAlwaysOnTop = GeneralPropertiesRepositoryFactory.repository
+        frame.iconImage = rocketActionContextFactory.context.icon().by(AppIcon.ROCKET_APP).toImage()
+        frame.isAlwaysOnTop = generalPropertiesRepository
             .asBoolean(UsedPropertiesName.UI_CONFIGURATION_FRAME_ALWAYS_ON_TOP, false)
         frame.defaultCloseOperation = JFrame.HIDE_ON_CLOSE
         this.updateActionListener = updateActionListener
@@ -426,15 +445,13 @@ class ConfigurationFrame(
 
         val size = Toolkit.getDefaultToolkit().screenSize
         frame.setSize(
-            (size.width * GeneralPropertiesRepositoryFactory
-                .repository
+            (size.width * generalPropertiesRepository
                 .asFloat(
                     UsedPropertiesName.UI_CONFIGURATION_DIALOG_WIDTH_IN_PERCENT,
                     0.6F
                 )
                 ).toInt(),
-            (size.height * GeneralPropertiesRepositoryFactory
-                .repository
+            (size.height * generalPropertiesRepository
                 .asFloat(
                     UsedPropertiesName.UI_CONFIGURATION_DIALOG_HEIGHT_IN_PERCENT,
                     0.6F
@@ -445,6 +462,9 @@ class ConfigurationFrame(
         createRocketActionSettingsDialog = CreateRocketActionSettingsDialog(
             owner = frame,
             rocketActionPluginApplicationService = rocketActionPluginApplicationService,
+            rocketActionContextFactory = rocketActionContextFactory,
+            engineService = engineService,
+            tagsService = tagsService,
         )
 
         val basePanel = JPanel(BorderLayout())
@@ -471,10 +491,10 @@ class ConfigurationFrame(
         // Refresh
         menuBar.add(
             JButton("Refresh").apply {
-                icon = RocketActionContextFactory.context.icon().by(AppIcon.RELOAD)
+                icon = rocketActionContextFactory.context.icon().by(AppIcon.RELOAD)
                 addActionListener { e: ActionEvent? ->
                     SwingUtilities.invokeLater {
-                        updateActionListener.actionPerformed(e)
+                        updateActionListener?.actionPerformed(e)
                         ConfigurationFrame@ frame.isVisible = false
                     }
                 }
@@ -482,8 +502,13 @@ class ConfigurationFrame(
 
         // Variables
         menuBar.add(JButton("Variables").apply {
-            val variablesFrame = VariablesFrame(frame)
-            icon = RocketActionContextFactory.context.icon().by(AppIcon.FORK)
+            val variablesFrame = VariablesFrame(
+                parent = frame,
+                variablesApplication = variablesApplication,
+                notificationService = rocketActionContextFactory.context.notification(),
+                iconService = rocketActionContextFactory.context.icon()
+            )
+            icon = rocketActionContextFactory.context.icon().by(AppIcon.FORK)
             addActionListener {
                 SwingUtilities.invokeLater {
                     variablesFrame.isVisible = true
@@ -497,7 +522,7 @@ class ConfigurationFrame(
                 rocketActionPluginApplicationService = rocketActionPluginApplicationService,
                 parent = frame
             )
-            icon = RocketActionContextFactory.context.icon().by(AppIcon.INFO)
+            icon = rocketActionContextFactory.context.icon().by(AppIcon.INFO)
             addActionListener {
                 SwingUtilities.invokeLater {
                     pluginManagerFrame.isVisible = true
@@ -519,7 +544,7 @@ class ConfigurationFrame(
 
     private fun createAndShowButtonCreateFirstAction(menuBar: JToolBar) {
         buttonCreateNewAction = JButton("Create first action")
-        buttonCreateNewAction!!.icon = RocketActionContextFactory.context.icon().by(AppIcon.STAR)
+        buttonCreateNewAction!!.icon = rocketActionContextFactory.context.icon().by(AppIcon.STAR)
         buttonCreateNewAction!!.addActionListener { _: ActionEvent? ->
             createRocketActionSettingsDialog.show(object : CreatedRocketActionSettingsCallback {
                 override fun create(settings: TreeRocketActionSettings) {
