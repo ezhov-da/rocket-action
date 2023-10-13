@@ -19,6 +19,7 @@ import ru.ezhov.rocket.action.application.core.domain.model.SettingsValueType
 import ru.ezhov.rocket.action.application.core.infrastructure.MutableRocketActionSettings
 import ru.ezhov.rocket.action.application.handlers.server.AvailableHandlersRepository
 import ru.ezhov.rocket.action.application.plugin.context.RocketActionContextFactory
+import ru.ezhov.rocket.action.application.plugin.group.GroupRocketActionUi
 import ru.ezhov.rocket.action.application.plugin.manager.application.RocketActionPluginApplicationService
 import ru.ezhov.rocket.action.application.tags.application.TagsService
 import ru.ezhov.rocket.action.application.tags.ui.TagsPanelFactory
@@ -137,6 +138,7 @@ class EditorRocketActionSettingsPanel(
 
         rocketActionSettingsPanel
             .setRocketActionConfiguration(
+                rocketActionType = currentSettings!!.configuration.type().value(),
                 list = values
                     .sortedWith(
                         compareByDescending<Value> { it.property?.isRequired() }
@@ -200,7 +202,7 @@ class EditorRocketActionSettingsPanel(
             this.layout = BoxLayout(this, BoxLayout.Y_AXIS)
         }
 
-        fun setRocketActionConfiguration(list: List<Value>, tags: List<String>) {
+        fun setRocketActionConfiguration(rocketActionType: String, list: List<Value>, tags: List<String>) {
             removeAll()
             settingPanels.clear()
             this.values = list
@@ -215,7 +217,10 @@ class EditorRocketActionSettingsPanel(
                 BorderFactory.createEmptyBorder(5, 5, 5, 5),
                 BorderFactory.createTitledBorder("Tags")
             )
-            this.add(tagsPanel)
+            // disable tags for group plugin
+            if (rocketActionType != GroupRocketActionUi.TYPE) {
+                this.add(tagsPanel)
+            }
             this.add(Box.createVerticalBox())
             repaint()
             revalidate()

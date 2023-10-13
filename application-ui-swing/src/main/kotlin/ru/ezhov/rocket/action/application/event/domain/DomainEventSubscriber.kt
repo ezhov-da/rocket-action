@@ -1,7 +1,7 @@
 package ru.ezhov.rocket.action.application.event.domain;
 
-interface DomainEventSubscriber<T : DomainEvent> {
-    fun handleEvent(event: T)
+interface   DomainEventSubscriber {
+    fun handleEvent(event: DomainEvent)
 
-    fun subscribedToEventType(): Class<T>
+    fun subscribedToEventType(): Class<*>
 }

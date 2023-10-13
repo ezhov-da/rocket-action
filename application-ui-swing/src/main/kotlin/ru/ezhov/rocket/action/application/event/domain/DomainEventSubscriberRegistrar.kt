@@ -1,7 +1,7 @@
 package ru.ezhov.rocket.action.application.event.domain
 
-interface DomainEventSubscriberRegistrar<T : DomainEvent> {
-    fun subscribe(domainEventSubscriber: DomainEventSubscriber<T>)
+interface DomainEventSubscriberRegistrar {
+    fun subscribe(domainEventSubscriber: DomainEventSubscriber)
 
-    fun unsubscribe(domainEventSubscriber: DomainEventSubscriber<T>)
+    fun unsubscribe(domainEventSubscriber: DomainEventSubscriber)
 }

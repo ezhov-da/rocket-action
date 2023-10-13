@@ -8,6 +8,7 @@ import ru.ezhov.rocket.action.api.context.notification.NotificationType
 import ru.ezhov.rocket.action.application.configuration.ui.ConfigurationFrame
 import ru.ezhov.rocket.action.application.core.application.RocketActionSettingsService
 import ru.ezhov.rocket.action.application.core.domain.EngineService
+import ru.ezhov.rocket.action.application.event.infrastructure.DomainEventFactory
 import ru.ezhov.rocket.action.application.handlers.server.AvailableHandlersRepository
 import ru.ezhov.rocket.action.application.handlers.server.HttpServer
 import ru.ezhov.rocket.action.application.plugin.context.RocketActionContextFactory
@@ -379,7 +380,10 @@ class UiQuickActionService(
                 components
             }
 
-            is Action.Restore -> rocketActionSettingsService.getAllExistsComponents()
+            is Action.Restore -> {
+                DomainEventFactory.publisher.publish(listOf(RestoreMenuDomainEvent()))
+                rocketActionSettingsService.getAllExistsComponents()
+            }
         }
 
         override fun done() {

@@ -29,11 +29,11 @@ class InMemoryConfigurationUiObserver : ConfigurationUiObserver {
 
     override fun register(listener: ConfigurationUiListener) {
         listeners.add(listener)
-        logger.debug { "register listener='${listener::class.java.simpleName}'. Listeners count=${listeners.size}" }
+        logger.debug { "register listener='${listener::class.java.name}'. Listeners count=${listeners.size}" }
     }
 
     override fun remove(listener: ConfigurationUiListener) {
         listeners.remove(listener)
-        logger.debug { "remove listener='${listener::class.java.simpleName}'. Listeners count=${listeners.size}" }
+        logger.debug { "remove listener='${listener::class.java.name}'. Listeners count=${listeners.size}" }
     }
 }

@@ -24,12 +24,13 @@ class AppRunService(
      * All UI must be created without Spring because LaF is not init in Spring
      */
     fun run(args: Array<String>) {
+        runServer() // TODO decorate beautifully
+
         SwingUtilities.invokeLater {
             FlatLightLaf.setup(lookAndFeel())
             try {
                 getFont()?.let { font -> setUIFont(font) }
 
-                runServer() // TODO decorate beautifully
 
                 BaseDialog.dialog.apply {
                     jMenuBar = uiQuickActionService.createMenu(this)

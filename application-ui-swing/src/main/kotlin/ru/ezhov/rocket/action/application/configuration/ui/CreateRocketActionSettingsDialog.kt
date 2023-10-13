@@ -13,6 +13,7 @@ import ru.ezhov.rocket.action.application.core.domain.model.SettingsModel
 import ru.ezhov.rocket.action.application.core.domain.model.SettingsValueType
 import ru.ezhov.rocket.action.application.core.infrastructure.MutableRocketActionSettings
 import ru.ezhov.rocket.action.application.plugin.context.RocketActionContextFactory
+import ru.ezhov.rocket.action.application.plugin.group.GroupRocketActionUi
 import ru.ezhov.rocket.action.application.plugin.manager.application.RocketActionPluginApplicationService
 import ru.ezhov.rocket.action.application.tags.application.TagsService
 import ru.ezhov.rocket.action.application.tags.ui.TagsPanel
@@ -176,7 +177,10 @@ class CreateRocketActionSettingsDialog(
                 BorderFactory.createEmptyBorder(5, 5, 5, 5),
                 BorderFactory.createTitledBorder("Tags")
             )
-            this.add(tagsPanel)
+            // disable tags for group plugin
+            if (configuration.type().value() != GroupRocketActionUi.TYPE) {
+                this.add(tagsPanel)
+            }
             tagsPanel.clearTags()
             this.add(Box.createVerticalBox())
             repaint()
