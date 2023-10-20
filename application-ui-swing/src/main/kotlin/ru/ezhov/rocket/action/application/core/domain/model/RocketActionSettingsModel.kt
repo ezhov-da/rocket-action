@@ -9,11 +9,12 @@ import java.util.*
 private val logger = KotlinLogging.logger { }
 
 data class RocketActionSettingsModel(
-    val id: String,
-    val type: String,
-    val settings: List<SettingsModel>,
-    val actions: List<RocketActionSettingsModel>,
-    val tags: List<String>,
+    // TODO ezhov change to val
+    var id: String,
+    var type: String,
+    var settings: List<SettingsModel>,
+    var actions: List<RocketActionSettingsModel>,
+    var tags: List<String>,
 ) {
     fun to(engineService: EngineService): RocketActionSettings = object : RocketActionSettings {
         override fun id(): String = id

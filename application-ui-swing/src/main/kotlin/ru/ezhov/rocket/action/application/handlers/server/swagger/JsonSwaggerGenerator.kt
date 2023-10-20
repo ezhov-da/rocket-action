@@ -22,12 +22,13 @@ import io.swagger.v3.oas.models.responses.ApiResponses
 import ru.ezhov.rocket.action.api.handler.RocketActionHandler
 import ru.ezhov.rocket.action.api.handler.RocketActionHandlerProperty
 import ru.ezhov.rocket.action.api.handler.RocketActionHandlerPropertySpec
-import ru.ezhov.rocket.action.application.core.domain.RocketActionComponentCache
 import ru.ezhov.rocket.action.application.handlers.server.BASE_API_PATH
+import ru.ezhov.rocket.action.application.handlers.server.RocketActionHandlerService
+import ru.ezhov.rocket.action.application.handlers.server.extendedhandlers.ExtendedRocketActionHandler
 
 
 class JsonSwaggerGenerator(
-    private val rocketActionComponentCache: RocketActionComponentCache,
+    private val rocketActionHandlerService: RocketActionHandlerService,
 ) : SwaggerGenerator {
     override fun generate(): String {
         var openApi =
@@ -43,9 +44,17 @@ class JsonSwaggerGenerator(
         inputPaths.forEach { path ->
             paths = paths.addPathItem(path.first, path.second)
         }
-        val handlers = rocketActionComponentCache.handlers()
-        handlers.map { handler ->
-            handler.toPathItem().forEach {
+        val handlers = rocketActionHandlerService.handlers()
+        val sortedHandlers = handlers.sortedBy { it is ExtendedRocketActionHandler }.reversed()
+
+        sortedHandlers.map { handler ->
+            val tag = if (handler is ExtendedRocketActionHandler) {
+                "Operations"
+            } else {
+                "Action"
+            }
+
+            handler.toPathItem(tag).forEach {
                 paths = paths.addPathItem(it.first, it.second)
             }
 
@@ -202,7 +211,7 @@ class JsonSwaggerGenerator(
 
             )
 
-    private fun RocketActionHandler.toPathItem(): List<Pair<String, PathItem>> {
+    private fun RocketActionHandler.toPathItem(tag: String): List<Pair<String, PathItem>> {
         return this.contracts().map { contract ->
             val name = "$BASE_API_PATH/${this.id()}/${contract.commandName()}"
             val request = createBody(contract.inputArguments())
@@ -212,7 +221,7 @@ class JsonSwaggerGenerator(
                     Operation()
                         .operationId("${this.id()}-${contract.commandName()}")
                         .description(contract.description())
-                        .addTagsItem("Action")
+                        .addTagsItem(tag)
                         .summary(contract.title())
                         .parameters(
                             listOf(

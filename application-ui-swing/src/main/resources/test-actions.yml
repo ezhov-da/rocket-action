@@ -1,5 +1,11 @@
 ---
 actions:
+    -   type: GROUP
+        _id: de16aba8-c229-11ec-9d64-0242ac3420002
+        label: GROUP FOR ADD FROM HTTP
+        iconUrl: null
+        description: description
+        actions: [ ]
 
     -   type: TODOIST
         _id: de1a6ba8-c229-11ec-9d64-0242ac120002

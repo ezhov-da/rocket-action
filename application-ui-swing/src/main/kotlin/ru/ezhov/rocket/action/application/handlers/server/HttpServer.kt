@@ -5,10 +5,10 @@ import mu.KotlinLogging
 import org.springframework.stereotype.Service
 import ru.ezhov.rocket.action.api.handler.RocketActionHandleStatus
 import ru.ezhov.rocket.action.api.handler.RocketActionHandlerCommand
-import ru.ezhov.rocket.action.application.core.domain.RocketActionComponentCache
 import ru.ezhov.rocket.action.application.handlers.server.swagger.JsonSwaggerGenerator
 import ru.ezhov.rocket.action.application.properties.GeneralPropertiesRepository
 import ru.ezhov.rocket.action.application.properties.UsedPropertiesName
+import spark.Filter
 import spark.kotlin.Http
 import spark.kotlin.RouteHandler
 import spark.kotlin.ignite
@@ -21,7 +21,7 @@ const val BASE_API_PATH = "/api/v1/handlers"
 @Service
 class HttpServer(
     private val generalPropertiesRepository: GeneralPropertiesRepository,
-    private val rocketActionComponentCache: RocketActionComponentCache,
+    private val rocketActionHandlerService: RocketActionHandlerService,
 ) {
     private val mapper = ObjectMapper()
 
@@ -38,19 +38,40 @@ class HttpServer(
             logger.info { "Server port is '$port'" }
             http.port(port)
         }
-
         http.staticFiles.location("/swagger");
+
+        disableCors(http)
         swaggerJson(http)
         executeHandlerEndpoint(http)
 
         logger.info { "Server started. port='${http.port()}' auth-header-name='$HEADER_NAME' auth-header-value='$HEADER_VALUE'" }
     }
 
+    private fun disableCors(http: Http) {
+        http.before(CorsFilter.apply(), "*/*")
+        http.options("/*") {
+            response.type("application/json")
+
+            val accessControlRequestHeaders = request.headers("Access-Control-Request-Headers")
+            if (accessControlRequestHeaders != null) {
+                response.header("Access-Control-Allow-Headers", accessControlRequestHeaders)
+            }
+
+            val accessControlRequestMethod = request.headers("Access-Control-Request-Method")
+            if (accessControlRequestMethod != null) {
+                response.header("Access-Control-Allow-Methods", accessControlRequestMethod)
+            }
+
+            response.status(200)
+            response.body("OK")
+        }
+    }
+
 
     private fun swaggerJson(http: Http) {
         http.get("/swagger.json") {
             response.type("application/json")
-            JsonSwaggerGenerator(rocketActionComponentCache).generate()
+            JsonSwaggerGenerator(rocketActionHandlerService).generate()
         }
     }
 
@@ -64,7 +85,7 @@ class HttpServer(
                 logger.info { "Handler called. id=$id command=$command body=$body" }
 
                 val map = mapper.readValue(body, Map::class.java)
-                val handler = rocketActionComponentCache.handlerBy(id)
+                val handler = rocketActionHandlerService.handlerBy(id)
                 val status = handler
                     ?.handle(
                         RocketActionHandlerCommand(
@@ -124,3 +145,22 @@ data class InvalidInputDataDto(
 data class ErrorDto(
     val message: String
 )
+
+// https://gist.github.com/zikani03/7c82b34fbbc9a6187e9a
+private object CorsFilter {
+    private val corsHeaders = HashMap<String, String>()
+
+    init {
+        corsHeaders["Access-Control-Allow-Origin"] = "*"
+        corsHeaders["Access-Control-Allow-Methods"] = "GET,PUT,POST,DELETE,OPTIONS"
+        corsHeaders["Access-Control-Allow-Headers"] =
+            "Content-Type,Authorization,X-Requested-With,Content-Length,Accept,Origin,$HEADER_NAME"
+    }
+
+    fun apply() =
+        Filter { request, response ->
+            corsHeaders.forEach { (key, value) ->
+                response.header(key, value)
+            }
+        }
+}

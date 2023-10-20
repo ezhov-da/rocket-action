@@ -1,5 +1,6 @@
 package ru.ezhov.rocket.action.plugin.openurl
 
+import mu.KotlinLogging
 import ru.ezhov.rocket.action.api.RocketAction
 import ru.ezhov.rocket.action.api.RocketActionConfiguration
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
@@ -29,6 +30,8 @@ import javax.swing.Icon
 import javax.swing.JMenuItem
 import javax.swing.event.MenuKeyEvent
 import javax.swing.event.MenuKeyListener
+
+private val logger = KotlinLogging.logger {}
 
 class OpenUrlRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
     private var actionContext: RocketActionContext? = null
@@ -128,6 +131,8 @@ class OpenUrlRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
             try {
                 Desktop.getDesktop().browse(URI(url))
             } catch (ex: Exception) {
+                logger.warn(ex) { "Error when open url by '$url'" }
+
                 ex.printStackTrace()
                 actionContext!!.notification().show(NotificationType.ERROR, "URL opening error")
             }

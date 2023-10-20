@@ -9,6 +9,8 @@ import ru.ezhov.rocket.action.application.core.domain.RocketActionSettingsReposi
 import ru.ezhov.rocket.action.application.core.domain.model.ActionsModel
 import ru.ezhov.rocket.action.application.core.domain.model.RocketActionCached
 import ru.ezhov.rocket.action.application.core.domain.model.RocketActionSettingsModel
+import ru.ezhov.rocket.action.application.core.event.ActionModelSavedDomainEvent
+import ru.ezhov.rocket.action.application.event.infrastructure.DomainEventFactory
 import ru.ezhov.rocket.action.application.plugin.context.RocketActionContextFactory
 import ru.ezhov.rocket.action.application.plugin.group.GroupRocketActionUi
 import ru.ezhov.rocket.action.application.plugin.manager.application.RocketActionPluginApplicationService
@@ -35,6 +37,8 @@ class RocketActionSettingsService(
         rocketActionSettingsRepository.save(actions)
 
         fillTags(actions)
+
+        DomainEventFactory.publisher.publish(listOf(ActionModelSavedDomainEvent()))
     }
 
     fun getAllExistsComponents(): List<Component> = rocketActionAndComponents.map { it.component }
