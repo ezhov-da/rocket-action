@@ -1,4 +1,4 @@
-package ru.ezhov.rocket.action.application.tags.ui
+package ru.ezhov.rocket.action.application.tags.ui.create
 
 import ru.ezhov.rocket.action.application.tags.application.TagsService
 

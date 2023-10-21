@@ -3,6 +3,7 @@ package ru.ezhov.rocket.action.application.tags.ui
 import io.mockk.every
 import io.mockk.mockk
 import ru.ezhov.rocket.action.application.tags.application.TagDto
+import ru.ezhov.rocket.action.application.tags.ui.create.TagsPanel
 import javax.swing.JFrame
 import javax.swing.UIManager
 

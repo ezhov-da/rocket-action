@@ -1,4 +1,4 @@
-package ru.ezhov.rocket.action.application.tags.ui
+package ru.ezhov.rocket.action.application.tags.ui.create
 
 import ru.ezhov.rocket.action.application.tags.application.TagsService
 import java.awt.BorderLayout
@@ -41,35 +41,35 @@ class TagsPanel(
         autocompleteTextField.text = ""
         selectedTagsPanel.clearTags()
     }
-}
 
-private class SelectedTagsPanel : JPanel(BorderLayout()) {
-    private val textPane = JTextPane()
+    private class SelectedTagsPanel : JPanel(BorderLayout()) {
+        private val textPane = JTextPane()
 
-    init {
-        add(JScrollPane(textPane), BorderLayout.CENTER)
-    }
-
-    fun addTag(tag: String) {
-        textPane.document.insertString(textPane.document.length, " $tag", null)
-    }
-
-    fun setTags(tags: List<String>) {
-        textPane.text = ""
-        tags.forEach { label ->
-            addTag(label)
+        init {
+            add(JScrollPane(textPane), BorderLayout.CENTER)
         }
-    }
 
-    fun clearTags() {
-        textPane.text = ""
-    }
+        fun addTag(tag: String) {
+            textPane.document.insertString(textPane.document.length, " $tag", null)
+        }
 
-    fun tags(): List<String> = textPane
-        .text
-        .replace("\n", "")
-        .split(" ")
-        .map { it.trim() }
-        .filter { it.isNotBlank() }
-        .distinct()
+        fun setTags(tags: List<String>) {
+            textPane.text = ""
+            tags.forEach { label ->
+                addTag(label)
+            }
+        }
+
+        fun clearTags() {
+            textPane.text = ""
+        }
+
+        fun tags(): List<String> = textPane
+            .text
+            .replace("\n", "")
+            .split(" ")
+            .map { it.trim() }
+            .filter { it.isNotBlank() }
+            .distinct()
+    }
 }

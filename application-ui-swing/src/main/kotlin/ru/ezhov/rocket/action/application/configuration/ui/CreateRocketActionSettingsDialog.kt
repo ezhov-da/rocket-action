@@ -17,8 +17,8 @@ import ru.ezhov.rocket.action.application.plugin.context.RocketActionContextFact
 import ru.ezhov.rocket.action.application.plugin.group.GroupRocketActionUi
 import ru.ezhov.rocket.action.application.plugin.manager.application.RocketActionPluginApplicationService
 import ru.ezhov.rocket.action.application.tags.application.TagsService
-import ru.ezhov.rocket.action.application.tags.ui.TagsPanel
-import ru.ezhov.rocket.action.application.tags.ui.TagsPanelFactory
+import ru.ezhov.rocket.action.application.tags.ui.create.TagsPanel
+import ru.ezhov.rocket.action.application.tags.ui.create.TagsPanelFactory
 import ru.ezhov.rocket.action.ui.utils.swing.common.toImage
 import java.awt.BorderLayout
 import java.awt.Component

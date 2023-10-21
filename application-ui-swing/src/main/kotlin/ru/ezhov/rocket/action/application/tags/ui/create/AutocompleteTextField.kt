@@ -1,4 +1,4 @@
-package ru.ezhov.rocket.action.application.tags.ui
+package ru.ezhov.rocket.action.application.tags.ui.create
 
 import ru.ezhov.rocket.action.ui.utils.swing.common.TextFieldWithText
 import java.awt.Dimension
@@ -7,7 +7,6 @@ import java.awt.event.FocusEvent
 import java.awt.event.FocusListener
 import java.awt.event.KeyEvent
 import java.awt.event.KeyListener
-import java.util.function.Function
 import javax.swing.AbstractListModel
 import javax.swing.JList
 import javax.swing.JScrollPane

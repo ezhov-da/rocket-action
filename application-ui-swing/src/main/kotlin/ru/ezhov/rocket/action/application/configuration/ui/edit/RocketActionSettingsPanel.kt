@@ -5,7 +5,7 @@ import ru.ezhov.rocket.action.application.core.infrastructure.MutableRocketActio
 import ru.ezhov.rocket.action.application.plugin.context.RocketActionContextFactory
 import ru.ezhov.rocket.action.application.plugin.group.GroupRocketActionUi
 import ru.ezhov.rocket.action.application.tags.application.TagsService
-import ru.ezhov.rocket.action.application.tags.ui.TagsPanelFactory
+import ru.ezhov.rocket.action.application.tags.ui.create.TagsPanelFactory
 import javax.swing.BorderFactory
 import javax.swing.Box
 import javax.swing.BoxLayout
