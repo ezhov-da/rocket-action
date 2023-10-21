@@ -113,6 +113,9 @@ class ScriptMenu(
 
         fun setText(text: String) {
             textPaneResult.text = text
+            if (text.isNotEmpty()) {
+                textPaneResult.caretPosition = 0
+            }
         }
 
         fun executeScript() {

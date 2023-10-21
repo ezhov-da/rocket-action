@@ -10,7 +10,7 @@
     </parent>
 
     <artifactId>rocket-action-plugin-script</artifactId>
-    <version>${plugin-api.version}_4</version>
+    <version>${plugin-api.version}_5</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

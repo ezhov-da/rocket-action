@@ -144,6 +144,9 @@ class UiService {
                     context = context,
                     callback = { result ->
                         resultText.text = result
+                        if (result.isNotEmpty()) {
+                            resultText.caretPosition = 0
+                        }
                         infoLabel.text = "Done"
                         infoLabel.icon = null
                     }
@@ -287,7 +290,7 @@ class UiService {
                         ).getOrHandle { throw it }?.toString().orEmpty()
                     } catch (ex: Exception) {
                         logger.error(ex) { "Error when execute script" }
-                        "Runtime error"
+                        "Error.\nMessage: ${ex.message}.\nStacktrace:\n${ex.stackTraceToString()} "
                     }
 
                 override fun done() {
