@@ -1,4 +1,4 @@
-package ru.ezhov.rocket.action.application.configuration.ui
+package ru.ezhov.rocket.action.application.configuration.ui.tree
 
 import ru.ezhov.rocket.action.application.configuration.ui.event.ConfigurationUiObserverFactory
 import ru.ezhov.rocket.action.application.configuration.ui.event.model.SettingMovedUiEvent

@@ -1,4 +1,4 @@
-package ru.ezhov.rocket.action.application.configuration.ui
+package ru.ezhov.rocket.action.application.configuration.ui.tree
 
 import java.util.*
 import javax.swing.JTree

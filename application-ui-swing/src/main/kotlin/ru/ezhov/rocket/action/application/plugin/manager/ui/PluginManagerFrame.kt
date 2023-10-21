@@ -22,7 +22,7 @@ class PluginManagerFrame(
         .apply {
             addColumn("Plugin source")
             addColumn("Detailed information")
-            addColumn("Download time in ms")
+            addColumn("Load time in ms")
             addColumn("Error Information")
         }
     private val table = JTable(tableModel).apply {

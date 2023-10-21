@@ -1,4 +1,4 @@
-package ru.ezhov.rocket.action.application.configuration.ui
+package ru.ezhov.rocket.action.application.configuration.ui.tree
 
 import ru.ezhov.rocket.action.api.context.icon.AppIcon
 import ru.ezhov.rocket.action.application.configuration.ui.event.ConfigurationUiListener
@@ -10,7 +10,6 @@ import ru.ezhov.rocket.action.ui.utils.swing.common.TextFieldWithText
 import java.awt.BorderLayout
 import java.awt.event.KeyAdapter
 import java.awt.event.KeyEvent
-import java.util.*
 import javax.swing.JButton
 import javax.swing.JLabel
 import javax.swing.JPanel
@@ -43,7 +42,17 @@ class SearchInTreePanel(
         textField.addKeyListener(object : KeyAdapter() {
             override fun keyReleased(e: KeyEvent) {
                 if (textField.text.isNotEmpty() && e.keyCode == KeyEvent.VK_ENTER) {
-                    val nodes = searchInTree(text = textField.text, root = root)
+                    val nodes = SearchInTreeUtil.searchInTree(
+                        condition = { settings ->
+                            settings.settings.settings.any { set ->
+                                set.value.contains(
+                                    other = textField.text,
+                                    ignoreCase = true
+                                )
+                            }
+                        },
+                        root = root,
+                    )
                     if (nodes.isNotEmpty()) {
                         if (currentResultPanel != null) {
                             searchInTreePanel.remove(currentResultPanel)
@@ -73,27 +82,6 @@ class SearchInTreePanel(
         currentResultPanel = null
         searchInTreePanel.repaint()
         searchInTreePanel.revalidate()
-    }
-
-    private fun searchInTree(
-        text: String,
-        root: DefaultMutableTreeNode,
-    ): List<DefaultMutableTreeNode> {
-        val mutableList: MutableList<DefaultMutableTreeNode> = mutableListOf()
-        var node: DefaultMutableTreeNode?
-        val e: Enumeration<*> = root.breadthFirstEnumeration()
-        while (e.hasMoreElements()) {
-            node = e.nextElement() as DefaultMutableTreeNode
-            if (node.userObject != null && node.userObject is TreeRocketActionSettings) {
-                val settings = node.userObject as TreeRocketActionSettings
-                val contains = settings.settings.settings
-                    .filter { set -> set.value.contains(other = text, ignoreCase = true) }
-                if (contains.isNotEmpty()) {
-                    mutableList.add(node)
-                }
-            }
-        }
-        return mutableList.toList()
     }
 
     private class ResultPanel(

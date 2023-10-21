@@ -4,6 +4,8 @@ import org.springframework.stereotype.Service
 import ru.ezhov.rocket.action.application.core.domain.model.RocketActionSettingsModel
 import ru.ezhov.rocket.action.application.core.domain.model.SettingsModel
 import ru.ezhov.rocket.action.application.core.domain.model.SettingsValueType
+import ru.ezhov.rocket.action.application.core.event.RocketActionSettingsCreatedDomainEvent
+import ru.ezhov.rocket.action.application.event.infrastructure.DomainEventFactory
 import java.time.LocalDateTime
 import java.util.*
 
@@ -23,7 +25,7 @@ class CreateRocketActionSettingsService(
 
         val actionsInGroup = groupAction.actions.toMutableList()
 
-        actionsInGroup.add(
+        val rocketActionSettingsModel =
             RocketActionSettingsModel(
                 id = UUID.randomUUID().toString(),
                 type = type,
@@ -37,10 +39,20 @@ class CreateRocketActionSettingsService(
                 actions = emptyList(),
                 tags = tags?.split(",")?.map { it.trim() }.orEmpty(),
             )
-        )
+
+        actionsInGroup.add(rocketActionSettingsModel)
 
         groupAction.actions = actionsInGroup
 
         rocketActionSettingsService.save(model)
+
+        DomainEventFactory.publisher.publish(
+            listOf(
+                RocketActionSettingsCreatedDomainEvent(
+                    groupId = groupAction.id,
+                    rocketActionSettingsModel = rocketActionSettingsModel
+                )
+            )
+        )
     }
 }

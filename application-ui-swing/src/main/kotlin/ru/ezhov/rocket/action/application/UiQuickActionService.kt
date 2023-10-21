@@ -8,7 +8,7 @@ import ru.ezhov.rocket.action.api.context.notification.NotificationType
 import ru.ezhov.rocket.action.application.configuration.ui.ConfigurationFrame
 import ru.ezhov.rocket.action.application.core.application.RocketActionSettingsService
 import ru.ezhov.rocket.action.application.core.domain.EngineService
-import ru.ezhov.rocket.action.application.core.event.ActionModelSavedDomainEvent
+import ru.ezhov.rocket.action.application.core.event.RocketActionSettingsCreatedDomainEvent
 import ru.ezhov.rocket.action.application.event.domain.DomainEvent
 import ru.ezhov.rocket.action.application.event.domain.DomainEventSubscriber
 import ru.ezhov.rocket.action.application.event.infrastructure.DomainEventFactory
@@ -74,7 +74,8 @@ class UiQuickActionService(
                 updateMenu()
             }
 
-            override fun subscribedToEventType(): List<Class<*>> = listOf(ActionModelSavedDomainEvent::class.java)
+            override fun subscribedToEventType(): List<Class<*>> =
+                listOf(RocketActionSettingsCreatedDomainEvent::class.java)
         })
     }
 
@@ -342,10 +343,7 @@ class UiQuickActionService(
         }
 
     private fun updateListener() =
-        ActionListener {
-            updateMenu()
-
-        }
+        ActionListener { updateMenu() }
 
     private fun updateMenu() {
         SwingUtilities.invokeLater {

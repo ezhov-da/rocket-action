@@ -7,6 +7,7 @@ import ru.ezhov.rocket.action.api.RocketActionConfiguration
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
 import ru.ezhov.rocket.action.api.RocketActionPropertySpec
 import ru.ezhov.rocket.action.api.context.icon.AppIcon
+import ru.ezhov.rocket.action.application.configuration.ui.tree.TreeRocketActionSettings
 import ru.ezhov.rocket.action.application.core.domain.EngineService
 import ru.ezhov.rocket.action.application.core.domain.model.RocketActionSettingsModel
 import ru.ezhov.rocket.action.application.core.domain.model.SettingsModel

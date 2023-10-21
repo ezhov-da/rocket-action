@@ -1,8 +1,9 @@
-package ru.ezhov.rocket.action.application.configuration.ui
+package ru.ezhov.rocket.action.application.configuration.ui.tree
 
 import mu.KotlinLogging
 import ru.ezhov.rocket.action.api.RocketActionConfiguration
 import ru.ezhov.rocket.action.application.core.infrastructure.MutableRocketActionSettings
+import ru.ezhov.rocket.action.application.plugin.group.GroupRocketActionUi
 
 private val logger = KotlinLogging.logger {}
 
@@ -16,7 +17,11 @@ data class TreeRocketActionSettings(
             .firstNotNullOfOrNull { k ->
                 val v = settings.settings.firstOrNull { it.name == k }?.value
                 if (v != null && !v.isNullOrEmpty()) {
-                    v
+                    if (settings.type == GroupRocketActionUi.TYPE) {
+                        "$v (${settings.actions.size})"
+                    } else {
+                        v
+                    }
                 } else {
                     null
                 }
@@ -29,6 +34,10 @@ data class TreeRocketActionSettings(
                         "for type ${configuration.type()}. Set $value"
                 }
 
-                value
+                if (value == GroupRocketActionUi.TYPE) {
+                    "$value (${settings.actions.size})"
+                } else {
+                    value
+                }
             }
 }

@@ -38,7 +38,7 @@ class RocketActionSettingsService(
 
         fillTags(actions)
 
-        DomainEventFactory.publisher.publish(listOf(ActionModelSavedDomainEvent()))
+        DomainEventFactory.publisher.publish(listOf(ActionModelSavedDomainEvent(actions)))
     }
 
     fun getAllExistsComponents(): List<Component> = rocketActionAndComponents.map { it.component }
