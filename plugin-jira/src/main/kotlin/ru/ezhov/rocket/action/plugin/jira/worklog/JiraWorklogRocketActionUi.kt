@@ -27,18 +27,21 @@ import ru.ezhov.rocket.action.plugin.jira.worklog.domain.validations.RawTextVali
 import ru.ezhov.rocket.action.plugin.jira.worklog.domain.validations.ValidationRule
 import ru.ezhov.rocket.action.plugin.jira.worklog.infrastructure.JiraCommitTimeService
 import ru.ezhov.rocket.action.plugin.jira.worklog.infrastructure.JiraCommitTimeTaskInfoRepository
-import ru.ezhov.rocket.action.plugin.jira.worklog.ui.JiraWorkLogUI
+import ru.ezhov.rocket.action.plugin.jira.worklog.ui.JiraWorkLogUIFrame
 import java.awt.Component
+import java.awt.Frame
 import java.io.File
 import java.net.URI
 import java.util.*
 import javax.swing.Icon
-import javax.swing.JMenu
+import javax.swing.JMenuItem
 
 private val logger = KotlinLogging.logger {}
 
 class JiraWorklogRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
     private var actionContext: RocketActionContext? = null
+    private var jiraWorkLogUIFrame: JiraWorkLogUIFrame? = null
+
 
     override fun factory(context: RocketActionContext): RocketActionFactoryUi = this
         .apply {
@@ -78,11 +81,12 @@ class JiraWorklogRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
 
                 val aliasForTaskIds = AliasForTaskIds.of(settings.settings()[ALIAS_FOR_TASK_IDS])
 
-                val menu = JMenu(label)
-                menu.icon = actionContext!!.icon().by(AppIcon.CLOCK)
-                menu.toolTipText = description
-                val jiraWorkLogUI =
-                    JiraWorkLogUI(
+                val menuItem = JMenuItem(label)
+                menuItem.icon = actionContext!!.icon().by(AppIcon.CLOCK)
+                menuItem.toolTipText = description
+
+                jiraWorkLogUIFrame =
+                    JiraWorkLogUIFrame(
                         tasks = tasks,
                         commitTimeService = JiraCommitTimeService(username = username, password = password, url = url),
                         commitTimeTaskInfoRepository = JiraCommitTimeTaskInfoRepository(
@@ -122,7 +126,16 @@ class JiraWorklogRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
                         ),
                         maxTimeInMinutes = settings.settings()[MAX_TIME_IN_MINUTES]?.toIntOrNull()
                     )
-                menu.add(jiraWorkLogUI)
+
+                menuItem.addActionListener {
+                    //https://stackoverflow.com/questions/4005491/how-to-activate-window-in-java
+                    jiraWorkLogUIFrame!!.apply {
+                        isVisible = true
+                        setState(Frame.NORMAL); // restores minimized windows
+                        toFront(); // brings to front without needing to setAlwaysOnTop
+                        requestFocus();
+                    }
+                }
 
                 context.search().register(settings.id(), label)
                 context.search().register(settings.id(), description)
@@ -136,7 +149,7 @@ class JiraWorklogRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
                         !(settings.id() == actionSettings.id() &&
                             settings.settings() == actionSettings.settings())
 
-                    override fun component(): Component = menu
+                    override fun component(): Component = menuItem
                     override fun handler(): RocketActionHandler = object : RocketActionHandler {
                         override fun id(): String = settings.id()
 
@@ -147,7 +160,8 @@ class JiraWorklogRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
 
                                     override fun title(): String = label
 
-                                    override fun description(): String = "Hours worked report. Adding text to the end and saving the file"
+                                    override fun description(): String =
+                                        "Hours worked report. Adding text to the end and saving the file"
 
                                     override fun inputArguments(): List<RocketActionHandlerProperty> =
                                         listOf(object : RocketActionHandlerProperty {
@@ -173,7 +187,7 @@ class JiraWorklogRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
                         override fun handle(command: RocketActionHandlerCommand): RocketActionHandleStatus {
                             if (command.commandName == "append-text-to-end-and-save") {
                                 command.arguments["text"]?.let { text ->
-                                    jiraWorkLogUI.appendTextToCurrentAndSave(text)
+                                    jiraWorkLogUIFrame!!.appendTextToCurrentAndSave(text)
                                 }
                             }
                             return RocketActionHandleStatus.Success()

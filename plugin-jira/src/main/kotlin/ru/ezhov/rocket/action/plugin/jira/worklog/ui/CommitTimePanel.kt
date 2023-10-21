@@ -377,7 +377,7 @@ class CommitTimePanel(
         private val maxTimeInMinutes: Int?,
     ) : JPanel() {
         private val labelInfo: JLabel = JLabel()
-        private val errorsInfo: JTextPane = JTextPane()
+        private val errorsInfo: JTextPane = JTextPane().apply { isEditable = false }
         private val tableModel = object : DefaultTableModel() {
             override fun getColumnClass(columnIndex: Int): Class<TableTasksPanelTask> =
                 TableTasksPanelTask::class.java
@@ -561,7 +561,6 @@ class CommitTimePanel(
                 tableModel.addRow(listOf(it, it, it, it, it, it).toTypedArray())
             }
 
-            errorsInfo.isEditable = false
             errorsInfo.text = tasks.errors.takeIf { it.isNotEmpty() }
                 ?.joinToString(separator = "\n") { it.message }
                 ?: ""
