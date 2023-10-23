@@ -1,6 +1,8 @@
 package ru.ezhov.rocket.action.application.core.application
 
 import org.springframework.stereotype.Service
+import ru.ezhov.rocket.action.api.context.notification.NotificationService
+import ru.ezhov.rocket.action.api.context.notification.NotificationType
 import ru.ezhov.rocket.action.application.core.domain.model.RocketActionSettingsModel
 import ru.ezhov.rocket.action.application.core.domain.model.SettingsModel
 import ru.ezhov.rocket.action.application.core.domain.model.SettingsValueType
@@ -12,7 +14,8 @@ import java.util.*
 // TODO ezhov причесать
 @Service
 class CreateRocketActionSettingsService(
-    private val rocketActionSettingsService: RocketActionSettingsService
+    private val rocketActionSettingsService: RocketActionSettingsService,
+    private val notificationService: NotificationService,
 ) {
     fun create(groupId: String, type: String, params: Map<String, String>, tags: String? = null) {
         val model = rocketActionSettingsService.actionsModel()
@@ -45,6 +48,8 @@ class CreateRocketActionSettingsService(
         groupAction.actions = actionsInGroup
 
         rocketActionSettingsService.save(model)
+
+        notificationService.show(NotificationType.INFO, "Action created")
 
         DomainEventFactory.publisher.publish(
             listOf(
