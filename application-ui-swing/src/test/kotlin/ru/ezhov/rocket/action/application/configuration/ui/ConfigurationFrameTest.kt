@@ -18,7 +18,7 @@ object ConfigurationFrameTest {
                     generalPropertiesRepository = mockk(),
                     variablesApplication = mockk(),
                 ) { }
-                    .setVisible(true)
+                    .show()
             } catch (e: Exception) {
                 e.printStackTrace()
             }
