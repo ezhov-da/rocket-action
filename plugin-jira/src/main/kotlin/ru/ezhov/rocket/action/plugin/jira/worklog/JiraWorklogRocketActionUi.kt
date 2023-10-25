@@ -28,8 +28,8 @@ import ru.ezhov.rocket.action.plugin.jira.worklog.domain.validations.ValidationR
 import ru.ezhov.rocket.action.plugin.jira.worklog.infrastructure.JiraCommitTimeService
 import ru.ezhov.rocket.action.plugin.jira.worklog.infrastructure.JiraCommitTimeTaskInfoRepository
 import ru.ezhov.rocket.action.plugin.jira.worklog.ui.JiraWorkLogUIFrame
+import ru.ezhov.rocket.action.ui.utils.swing.common.showToFront
 import java.awt.Component
-import java.awt.Frame
 import java.io.File
 import java.net.URI
 import java.util.*
@@ -129,12 +129,7 @@ class JiraWorklogRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
 
                 menuItem.addActionListener {
                     //https://stackoverflow.com/questions/4005491/how-to-activate-window-in-java
-                    jiraWorkLogUIFrame!!.apply {
-                        isVisible = true
-                        setState(Frame.NORMAL); // restores minimized windows
-                        toFront(); // brings to front without needing to setAlwaysOnTop
-                        requestFocus();
-                    }
+                    jiraWorkLogUIFrame!!.showToFront()
                 }
 
                 context.search().register(settings.id(), label)

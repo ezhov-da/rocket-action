@@ -18,6 +18,7 @@ import ru.ezhov.rocket.action.application.properties.UsedPropertiesName
 import ru.ezhov.rocket.action.application.tags.application.TagsService
 import ru.ezhov.rocket.action.application.variables.application.VariablesApplication
 import ru.ezhov.rocket.action.application.variables.interfaces.ui.VariablesFrame
+import ru.ezhov.rocket.action.ui.utils.swing.common.showToFront
 import ru.ezhov.rocket.action.ui.utils.swing.common.toImage
 import java.awt.BorderLayout
 import java.awt.Toolkit
@@ -103,8 +104,8 @@ class ConfigurationFrame(
         frame.title = "Configuring actions '$dateAsString'"
     }
 
-    fun setVisible(visible: Boolean) {
-        frame.isVisible = visible
+    fun show() {
+        frame.showToFront()
     }
 
     private var menuBar: JToolBar?

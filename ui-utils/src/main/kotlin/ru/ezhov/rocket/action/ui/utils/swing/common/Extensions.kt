@@ -1,9 +1,11 @@
 package ru.ezhov.rocket.action.ui.utils.swing.common
 
+import java.awt.Frame
 import java.awt.GraphicsEnvironment
 import java.awt.Image
 import javax.swing.Icon
 import javax.swing.ImageIcon
+import javax.swing.JFrame
 
 fun Icon.toImage(): Image =
     when (this is ImageIcon) {
@@ -21,3 +23,13 @@ fun Icon.toImage(): Image =
             image
         }
     }
+
+/**
+ * Show window and make active
+ */
+fun JFrame.showToFront() {
+    isVisible = true
+    state = Frame.NORMAL; // restores minimized windows
+    toFront(); // brings to front without needing to setAlwaysOnTop
+    requestFocus();
+}

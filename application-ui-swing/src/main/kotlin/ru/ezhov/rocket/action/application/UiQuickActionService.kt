@@ -337,7 +337,7 @@ class UiQuickActionService(
                     }
                 }
                 if (configurationFrame != null) {
-                    configurationFrame!!.setVisible(true)
+                    configurationFrame!!.show()
                 }
             }
         }
