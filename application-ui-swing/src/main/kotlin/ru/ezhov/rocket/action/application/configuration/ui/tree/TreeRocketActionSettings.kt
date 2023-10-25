@@ -11,14 +11,16 @@ data class TreeRocketActionSettings(
     val configuration: RocketActionConfiguration,
     val settings: MutableRocketActionSettings,
 ) {
-    fun asString(): String =
+
+    // TODO ezhov maybe it’s worth switching to editing and keeping descendants up to date
+    fun asString(childCount: Int = 0): String =
         configuration
             .asString()
             .firstNotNullOfOrNull { k ->
                 val v = settings.settings.firstOrNull { it.name == k }?.value
                 if (v != null && !v.isNullOrEmpty()) {
                     if (settings.type == GroupRocketActionUi.TYPE) {
-                        "$v (${settings.actions.size})"
+                        "$v ($childCount)"
                     } else {
                         v
                     }
@@ -35,7 +37,7 @@ data class TreeRocketActionSettings(
                 }
 
                 if (value == GroupRocketActionUi.TYPE) {
-                    "$value (${settings.actions.size})"
+                    "$value ($childCount)"
                 } else {
                     value
                 }

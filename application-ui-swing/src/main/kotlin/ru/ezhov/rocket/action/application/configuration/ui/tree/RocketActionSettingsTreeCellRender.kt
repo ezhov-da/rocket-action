@@ -20,7 +20,7 @@ class RocketActionSettingsTreeCellRender : DefaultTreeCellRenderer() {
         val node = value as DefaultMutableTreeNode
         if (node.userObject is TreeRocketActionSettings) {
             val settings = node.userObject as TreeRocketActionSettings
-            label.text = settings.asString()
+            label.text = settings.asString(node.childCount)
             settings.configuration.icon()?.let { icon ->
                 label.icon = icon
             }
