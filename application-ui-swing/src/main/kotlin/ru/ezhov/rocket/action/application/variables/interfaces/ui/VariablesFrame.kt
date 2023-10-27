@@ -1,7 +1,6 @@
 package ru.ezhov.rocket.action.application.variables.interfaces.ui
 
 import mu.KotlinLogging
-import org.springframework.stereotype.Component
 import ru.ezhov.rocket.action.api.context.icon.AppIcon
 import ru.ezhov.rocket.action.api.context.icon.IconService
 import ru.ezhov.rocket.action.api.context.notification.NotificationService
@@ -50,12 +49,15 @@ class VariablesFrame(
 
     private val applicationTable = JTable(applicationTableModel).apply {
         tableHeader.reorderingAllowed = false
+        setDefaultRenderer(Any::class.java, PasswordDefaultTableRenderer(1))
     }
     private val propertiesTable = JTable(propertiesEnableModel).apply {
         tableHeader.reorderingAllowed = false
+        setDefaultRenderer(Any::class.java, PasswordDefaultTableRenderer(1))
     }
     private val environmentTable = JTable(environmentEnableModel).apply {
         tableHeader.reorderingAllowed = false
+        setDefaultRenderer(Any::class.java, PasswordDefaultTableRenderer(1))
     }
 
     private val keyTextField = TextFieldWithText("Key to encode variables")
