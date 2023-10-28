@@ -14,9 +14,9 @@ class KotlinEngine : Engine {
         private const val VARIABLES_NAME = "_variables"
     }
 
-    override fun execute(template: String, variables: List<EngineVariable>): Any =
+    override fun execute(template: String, variables: List<EngineVariable>): Any? =
         try {
-            var result: Any
+            var result: Any?
             val time = measureTimeMillis {
                 val scriptEngineManager = ScriptEngineManager()
                 val scriptEngine = scriptEngineManager.getEngineByExtension("kts")

@@ -6,6 +6,7 @@ import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
 import ru.ezhov.rocket.action.api.RocketActionPlugin
 import ru.ezhov.rocket.action.application.ApplicationContextFactory
+import ru.ezhov.rocket.action.application.engine.application.EngineFactory
 import ru.ezhov.rocket.action.application.properties.GeneralPropertiesRepository
 import ru.ezhov.rocket.action.application.properties.UsedPropertiesName
 import ru.ezhov.rocket.action.application.variables.application.VariablesApplication
@@ -23,6 +24,7 @@ internal class KotlinPluginLoaderTest {
         val loader = KotlinPluginLoader(
             context.getBean(VariablesApplication::class.java),
             context.getBean(GeneralPropertiesRepository::class.java),
+            context.getBean(EngineFactory::class.java),
         )
 
         val files = loader.plugins()
@@ -71,6 +73,7 @@ internal class KotlinPluginLoaderTest {
         val loader = KotlinPluginLoader(
             context.getBean(VariablesApplication::class.java),
             context.getBean(GeneralPropertiesRepository::class.java),
+            context.getBean(EngineFactory::class.java),
         )
         val rocketAction = loader.loadPlugin(
             File.createTempFile("kotlin", "test")

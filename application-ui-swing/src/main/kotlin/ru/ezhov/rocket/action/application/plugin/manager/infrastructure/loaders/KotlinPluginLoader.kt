@@ -23,6 +23,7 @@ private val logger = KotlinLogging.logger { }
 class KotlinPluginLoader(
     private val variablesApplication: VariablesApplication,
     private val generalPropertiesRepository: GeneralPropertiesRepository,
+    private val engineFactory: EngineFactory,
 ) {
     fun plugins(): List<File> =
         File(
@@ -45,7 +46,7 @@ class KotlinPluginLoader(
         return try {
             val rocketActionPlugin: RocketActionPlugin
             val ms = measureTimeMillis {
-                val executeResult = EngineFactory.by(EngineType.KOTLIN)
+                val executeResult = engineFactory.by(EngineType.KOTLIN)
                     .execute(
                         template = file.readText(),
                         variables = variablesApplication.all().variables.map {

@@ -19,7 +19,7 @@ private val logger = KotlinLogging.logger {}
 
 @Component
 class JsonFileVariableRepository(
-    private val generalPropertiesRepository: GeneralPropertiesRepository,
+    generalPropertiesRepository: GeneralPropertiesRepository,
 ) : VariableRepository {
     private val filePath =
         generalPropertiesRepository

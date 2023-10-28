@@ -15,8 +15,8 @@ class GroovyEngine : Engine {
         private const val VARIABLES_NAME = "_variables"
     }
 
-    override fun execute(template: String, variables: List<EngineVariable>): Any {
-        val result: Any
+    override fun execute(template: String, variables: List<EngineVariable>): Any? {
+        val result: Any?
         val time = measureTimeMillis {
             val sharedData = Binding()
             val groovyShell = GroovyShell(sharedData)

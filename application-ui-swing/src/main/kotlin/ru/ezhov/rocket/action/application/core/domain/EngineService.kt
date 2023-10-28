@@ -11,7 +11,8 @@ import ru.ezhov.rocket.action.application.variables.application.VariablesApplica
 
 @Service
 class EngineService(
-    private val variablesApplication: VariablesApplication
+    private val variablesApplication: VariablesApplication,
+    private val engineFactory: EngineFactory,
 ) {
     fun processWithEngine(settingsModel: SettingsModel): Any =
         settingsModel
@@ -22,7 +23,7 @@ class EngineService(
                     SettingsValueType.MUSTACHE_TEMPLATE -> EngineType.MUSTACHE
                     SettingsValueType.PLAIN_TEXT -> null
                 }
-            }?.let { EngineFactory.by(it) }
+            }?.let { engineFactory.by(it) }
             ?.let { engine ->
                 val variables =
                     variablesApplication.all()
