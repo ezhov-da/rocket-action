@@ -1,0 +1,19 @@
+{
+  "changedDate" : "2023-10-29T02:46:49.558",
+  "chainActions" : [ {
+    "id" : "c69489b2-5ac7-4bc3-b1fa-2f957ddd7529",
+    "name" : "Преобразование строки и её возврат",
+    "description" : "Преобразование строки и её возврат",
+    "actionIds" : [ "ccb3ea04-68ef-4988-84f1-2d95e14c0046", "8dba925e-07fb-4d88-af27-18d38eefede0" ]
+  }, {
+    "id" : "315616ea-5ff7-4fe3-885c-90b055d27018",
+    "name" : "Повторюха",
+    "description" : "Муха",
+    "actionIds" : [ "ccb3ea04-68ef-4988-84f1-2d95e14c0046", "8dba925e-07fb-4d88-af27-18d38eefede0", "8dba925e-07fb-4d88-af27-18d38eefede0", "8dba925e-07fb-4d88-af27-18d38eefede0", "8dba925e-07fb-4d88-af27-18d38eefede0", "ccb3ea04-68ef-4988-84f1-2d95e14c0046", "ccb3ea04-68ef-4988-84f1-2d95e14c0046", "8dba925e-07fb-4d88-af27-18d38eefede0" ]
+  }, {
+    "id" : "0682082a-1ee6-4a1b-a960-82e78b0572a0",
+    "name" : "Открытие задачи Jira в браузере",
+    "description" : "Рабочая цепь из одного звена.",
+    "actionIds" : [ "0f023251-5b90-44d2-bb40-2224f504bb92" ]
+  } ]
+}

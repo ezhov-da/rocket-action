@@ -1,5 +1,8 @@
 package ru.ezhov.rocket.action.application.beanconfig
 
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import mu.KotlinLogging
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.ComponentScan
@@ -26,6 +29,12 @@ open class AppConfigCoreSpring {
      */
     @Bean
     open fun rocketActionComponentCache(): RocketActionComponentCache = RocketActionComponentCacheFactory.cache
+
+    @Bean
+    open fun objectMapper(): ObjectMapper =
+        ObjectMapper()
+            .registerKotlinModule()
+            .registerModule(JavaTimeModule())
 
     @Bean
     open fun rocketActionSettingsRepository(

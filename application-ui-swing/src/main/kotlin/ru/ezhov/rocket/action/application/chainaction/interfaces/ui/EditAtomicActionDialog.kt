@@ -1,6 +1,7 @@
 package ru.ezhov.rocket.action.application.chainaction.interfaces.ui
 
 import net.miginfocom.swing.MigLayout
+import ru.ezhov.rocket.action.application.chainaction.application.AtomicActionService
 import ru.ezhov.rocket.action.application.chainaction.application.ChainActionExecutorService
 import ru.ezhov.rocket.action.application.chainaction.application.ChainActionService
 import ru.ezhov.rocket.action.application.chainaction.domain.model.AtomicAction
@@ -20,8 +21,7 @@ import javax.swing.JTextPane
 import javax.swing.KeyStroke
 
 class EditAtomicActionDialog(
-    private val chainActionExecutorService: ChainActionExecutorService,
-    private val chainActionService: ChainActionService,
+    private val atomicActionService: AtomicActionService,
 ) : JDialog() {
     private val contentPane = JPanel(MigLayout(/*"debug"*/))
     private val buttonOK: JButton = JButton("Create")

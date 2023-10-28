@@ -6,9 +6,11 @@ import ru.ezhov.rocket.action.application.chainaction.domain.ChainActionExecutor
 
 @Service
 class ChainActionExecutorService(
-    private val chainActionExecutor: ChainActionExecutor
+    private val chainActionExecutor: ChainActionExecutor,
+    private val chainActionService: ChainActionService,
 ) {
-    fun execute(input: Any?, chainActionId: String, chainActionExecutorProgress: ChainActionExecutorProgress) {
-
+    fun execute(input: String, chainActionId: String, chainActionExecutorProgress: ChainActionExecutorProgress) {
+        val chain = chainActionService.byId(chainActionId)!!
+        chainActionExecutor.execute(input, chain, chainActionExecutorProgress)
     }
 }

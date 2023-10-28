@@ -31,7 +31,7 @@ class JsonSwaggerGenerator(
     private val rocketActionHandlerService: RocketActionHandlerService,
 ) : SwaggerGenerator {
     override fun generate(): String {
-        var openApi =
+        val openApi =
             OpenAPI(SpecVersion.V30)
                 .paths(createPaths(listOf(constructHandler())))
         return ObjectMapper()

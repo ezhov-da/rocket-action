@@ -1,6 +1,6 @@
-package ru.ezhov.rocket.action.application.configuration.ui.event
+package ru.ezhov.rocket.action.application.eventui
 
-import ru.ezhov.rocket.action.application.configuration.ui.event.model.ConfigurationUiEvent
+import ru.ezhov.rocket.action.application.eventui.model.ConfigurationUiEvent
 
 interface ConfigurationUiObserver {
     fun notify(event: ConfigurationUiEvent)

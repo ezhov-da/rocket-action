@@ -1,6 +1,7 @@
 package ru.ezhov.rocket.action.application.chainaction.interfaces.ui
 
 import net.miginfocom.swing.MigLayout
+import ru.ezhov.rocket.action.application.chainaction.application.AtomicActionService
 import ru.ezhov.rocket.action.application.chainaction.application.ChainActionExecutorService
 import ru.ezhov.rocket.action.application.chainaction.application.ChainActionService
 import ru.ezhov.rocket.action.application.chainaction.domain.event.AtomicActionCreatedDomainEvent
@@ -11,9 +12,16 @@ import ru.ezhov.rocket.action.application.chainaction.domain.event.ChainActionDe
 import ru.ezhov.rocket.action.application.chainaction.domain.event.ChainActionUpdatedDomainEvent
 import ru.ezhov.rocket.action.application.chainaction.domain.model.AtomicAction
 import ru.ezhov.rocket.action.application.chainaction.domain.model.ChainAction
+import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.renderer.AtomicActionListCellRenderer
+import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.renderer.ChainActionListCellRenderer
 import ru.ezhov.rocket.action.application.event.domain.DomainEvent
 import ru.ezhov.rocket.action.application.event.domain.DomainEventSubscriber
 import ru.ezhov.rocket.action.application.event.infrastructure.DomainEventFactory
+import ru.ezhov.rocket.action.application.eventui.ConfigurationUiListener
+import ru.ezhov.rocket.action.application.eventui.ConfigurationUiObserverFactory
+import ru.ezhov.rocket.action.application.eventui.model.ConfigurationUiEvent
+import ru.ezhov.rocket.action.application.eventui.model.ShowChainActionConfigurationUiEvent
+import ru.ezhov.rocket.action.ui.utils.swing.common.showToFront
 import java.awt.event.KeyEvent
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
@@ -27,10 +35,11 @@ import javax.swing.JScrollPane
 import javax.swing.KeyStroke
 
 class ChainConfigurationFrame(
-    private val chainActionExecutorService: ChainActionExecutorService,
-    private val chainActionService: ChainActionService,
+    chainActionExecutorService: ChainActionExecutorService,
+    chainActionService: ChainActionService,
+    atomicActionService: AtomicActionService,
 ) : JFrame() {
-    private val contentPane = JPanel(MigLayout("debug"))
+    private val contentPane = JPanel(MigLayout(/*"debug"*/))
     private val buttonCreateChain: JButton = JButton("Create chain action")
     private val buttonCreateAction: JButton = JButton("Create atomic action")
 
@@ -40,16 +49,15 @@ class ChainConfigurationFrame(
     private val allListChains = JList(allListChainsModel)
 
     private val createAtomicActionDialog = CreateAtomicActionDialog(
-        chainActionExecutorService = chainActionExecutorService,
-        chainActionService = chainActionService
+        atomicActionService = atomicActionService
     )
     private val editAtomicActionDialog = EditAtomicActionDialog(
-        chainActionExecutorService = chainActionExecutorService,
-        chainActionService = chainActionService
+        atomicActionService = atomicActionService,
     )
     private val createChainActionDialog = CreateChainActionDialog(
         chainActionExecutorService = chainActionExecutorService,
-        chainActionService = chainActionService
+        chainActionService = chainActionService,
+        atomicActionService = atomicActionService,
     )
     private val editChainActionDialog = EditChainActionDialog(
         chainActionExecutorService = chainActionExecutorService,
@@ -57,12 +65,24 @@ class ChainConfigurationFrame(
     )
 
     init {
+        val chainConfigurationFrame = this
+        ConfigurationUiObserverFactory.observer.register(object : ConfigurationUiListener {
+            override fun action(event: ConfigurationUiEvent) {
+                if (event is ShowChainActionConfigurationUiEvent) {
+                    chainConfigurationFrame.showToFront()
+                }
+            }
+        })
+
+        allListActions.cellRenderer = AtomicActionListCellRenderer()
+        allListChains.cellRenderer = ChainActionListCellRenderer()
+
         val chains = chainActionService.chains()
         chains.forEach {
             allListChainsModel.addElement(it)
         }
 
-        val atomics = chainActionService.atomics()
+        val atomics = atomicActionService.atomics()
         atomics.forEach {
             allListActionsModel.addElement(it)
         }

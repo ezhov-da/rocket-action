@@ -1,0 +1,25 @@
+{
+  "changedDate" : "2023-10-29T02:45:32.672",
+  "atomicActions" : [ {
+    "id" : "ccb3ea04-68ef-4988-84f1-2d95e14c0046",
+    "name" : "Убирает начальные и конечные пробелы у строки",
+    "description" : "Убирает начальные и конечные пробелы у строки",
+    "engine" : "GROOVY",
+    "source" : "TEXT",
+    "data" : "_INPUT.trim()"
+  }, {
+    "id" : "8dba925e-07fb-4d88-af27-18d38eefede0",
+    "name" : "Заменяет все символы `a` на `1`",
+    "description" : "Заменяет все символы `a` на `1`",
+    "engine" : "GROOVY",
+    "source" : "TEXT",
+    "data" : "_INPUT.replace(\"a\", \"1\")"
+  }, {
+    "id" : "0f023251-5b90-44d2-bb40-2224f504bb92",
+    "name" : "Открытие ссылки по Jira задаче",
+    "description" : "Открытие ссылки по Jira задаче.\r\n\r\nВходной параметр - номер задачи.",
+    "engine" : "GROOVY",
+    "source" : "TEXT",
+    "data" : "import java.awt.*\r\n\r\nString jiraNumber = _INPUT\r\n\r\nif (Desktop.desktopSupported) {\r\n    Desktop.desktop.browse(\"https://jira.app.local/browse/INTRASTAR-${jiraNumber.trim()}\".toURI())\r\n}"
+  } ]
+}

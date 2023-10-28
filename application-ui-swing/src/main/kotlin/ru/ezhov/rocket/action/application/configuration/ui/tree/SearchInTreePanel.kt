@@ -1,10 +1,10 @@
 package ru.ezhov.rocket.action.application.configuration.ui.tree
 
 import ru.ezhov.rocket.action.api.context.icon.AppIcon
-import ru.ezhov.rocket.action.application.configuration.ui.event.ConfigurationUiListener
-import ru.ezhov.rocket.action.application.configuration.ui.event.ConfigurationUiObserverFactory
-import ru.ezhov.rocket.action.application.configuration.ui.event.model.ConfigurationUiEvent
-import ru.ezhov.rocket.action.application.configuration.ui.event.model.SettingMovedUiEvent
+import ru.ezhov.rocket.action.application.eventui.ConfigurationUiListener
+import ru.ezhov.rocket.action.application.eventui.ConfigurationUiObserverFactory
+import ru.ezhov.rocket.action.application.eventui.model.ConfigurationUiEvent
+import ru.ezhov.rocket.action.application.eventui.model.SettingMovedUiEvent
 import ru.ezhov.rocket.action.application.plugin.context.RocketActionContextFactory
 import ru.ezhov.rocket.action.ui.utils.swing.common.TextFieldWithText
 import java.awt.BorderLayout

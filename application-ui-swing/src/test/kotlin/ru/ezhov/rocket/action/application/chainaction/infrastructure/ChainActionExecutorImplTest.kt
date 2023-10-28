@@ -3,6 +3,7 @@ package ru.ezhov.rocket.action.application.chainaction.infrastructure
 import io.mockk.every
 import io.mockk.mockk
 import org.junit.jupiter.api.Test
+import ru.ezhov.rocket.action.application.chainaction.application.AtomicActionService
 import ru.ezhov.rocket.action.application.chainaction.domain.ChainActionExecutorProgress
 import ru.ezhov.rocket.action.application.chainaction.domain.model.AtomicAction
 import ru.ezhov.rocket.action.application.chainaction.domain.model.AtomicActionEngine
@@ -16,6 +17,25 @@ import ru.ezhov.rocket.action.application.variables.domain.model.VariableType
 internal class ChainActionExecutorImplTest {
     @Test
     fun `should be success when execute chain`() {
+        val atomicActionService = mockk<AtomicActionService> {
+            every { atomicBy("11") } returns AtomicAction(
+                id = "11",
+                source = AtomicActionSource.TEXT,
+                data = "_INPUT.toInteger()",
+                engine = AtomicActionEngine.GROOVY,
+                name = "String to Int",
+                description = "String to Int",
+            )
+
+            every { atomicBy("22") } returns AtomicAction(
+                id = "22",
+                source = AtomicActionSource.TEXT,
+                data = "_INPUT + 2",
+                engine = AtomicActionEngine.KOTLIN,
+                name = "Int plus Int",
+                description = "Int plus Int",
+            )
+        }
         val chainActionExecutorImpl = ChainActionExecutorImpl(
             EngineFactory(),
             mockk {
@@ -31,6 +51,7 @@ internal class ChainActionExecutorImplTest {
                     )
                 )
             },
+            atomicActionService,
         )
 
         chainActionExecutorImpl.execute(
@@ -39,36 +60,19 @@ internal class ChainActionExecutorImplTest {
                 id = "123",
                 name = "Test name",
                 description = "test description",
-                actions = listOf(
-                    AtomicAction(
-                        id = "11",
-                        source = AtomicActionSource.TEXT,
-                        data = "_INPUT.toInteger()",
-                        engine = AtomicActionEngine.GROOVY,
-                        name = "String to Int",
-                        description = "String to Int",
-                    ),
-                    AtomicAction(
-                        id = "22",
-                        source = AtomicActionSource.TEXT,
-                        data = "_INPUT + 2",
-                        engine = AtomicActionEngine.KOTLIN,
-                        name = "Int plus Int",
-                        description = "Int plus Int",
-                    )
-                )
+                actionIds = listOf("11", "22")
             ),
             object : ChainActionExecutorProgress {
                 override fun complete(result: Any?) {
                     println("complete $result")
                 }
 
-                override fun success(number: Int, atomicAction: AtomicAction) {
-                    println("success $number")
+                override fun success(atomicAction: AtomicAction) {
+                    println("success ${atomicAction.id}")
                 }
 
-                override fun failure(number: Int, atomicAction: AtomicAction, ex: Exception) {
-                    println("failure $number")
+                override fun failure(id: String, atomicAction: AtomicAction?, ex: Exception) {
+                    println("failure $id")
                 }
 
             }
@@ -77,6 +81,25 @@ internal class ChainActionExecutorImplTest {
 
     @Test
     fun `should be failure when execute chain`() {
+        val atomicActionService = mockk<AtomicActionService> {
+            every { atomicBy("11") } returns AtomicAction(
+                id = "11",
+                source = AtomicActionSource.TEXT,
+                data = "_INPUT.toInteger()",
+                engine = AtomicActionEngine.GROOVY,
+                name = "String to Int",
+                description = "String to Int",
+            )
+            every { atomicBy("22") } returns AtomicAction(
+                id = "22",
+                source = AtomicActionSource.TEXT,
+                data = "_INPUT +. 2",
+                engine = AtomicActionEngine.KOTLIN,
+                name = "Int plus Int",
+                description = "Int plus Int",
+            )
+        }
+
         val chainActionExecutorImpl = ChainActionExecutorImpl(
             EngineFactory(),
             mockk {
@@ -92,6 +115,7 @@ internal class ChainActionExecutorImplTest {
                     )
                 )
             },
+            atomicActionService,
         )
 
         chainActionExecutorImpl.execute(
@@ -100,37 +124,19 @@ internal class ChainActionExecutorImplTest {
                 id = "123",
                 name = "Test name",
                 description = "test description",
-                actions = listOf(
-                    AtomicAction(
-                        id = "11",
-                        source = AtomicActionSource.TEXT,
-                        data = "_INPUT.toInteger()",
-                        engine = AtomicActionEngine.GROOVY,
-                        name = "String to Int",
-                        description = "String to Int",
-                    ),
-                    AtomicAction(
-                        id = "22",
-                        source = AtomicActionSource.TEXT,
-                        data = "_INPUT +. 2",
-                        engine = AtomicActionEngine.KOTLIN,
-                        name = "Int plus Int",
-                        description = "Int plus Int",
-                    )
-                )
+                actionIds = listOf("11", "22")
             ),
             object : ChainActionExecutorProgress {
                 override fun complete(result: Any?) {
                     println("complete $result")
                 }
 
-                override fun success(number: Int, atomicAction: AtomicAction) {
-                    println("success $number")
+                override fun success(atomicAction: AtomicAction) {
+                    println("success ${atomicAction.id}")
                 }
 
-                override fun failure(number: Int, atomicAction: AtomicAction, ex: Exception) {
-                    println("failure $number")
-                    ex.printStackTrace()
+                override fun failure(id: String, atomicAction: AtomicAction?, ex: Exception) {
+                    println("failure $id")
                 }
             }
         )

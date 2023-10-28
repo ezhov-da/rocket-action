@@ -7,5 +7,7 @@ interface AtomicActionRepository {
 
     fun all(): List<AtomicAction>
 
+    fun byId(id: String): AtomicAction?
+
     fun delete(id: String)
 }

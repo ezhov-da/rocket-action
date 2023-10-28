@@ -2,11 +2,13 @@ package ru.ezhov.rocket.action.application.chainaction.interfaces.ui
 
 import io.mockk.every
 import io.mockk.mockk
+import ru.ezhov.rocket.action.application.TestUtilsFactory
+import ru.ezhov.rocket.action.application.chainaction.application.AtomicActionService
 import ru.ezhov.rocket.action.application.chainaction.application.ChainActionExecutorService
 import ru.ezhov.rocket.action.application.chainaction.application.ChainActionService
 import ru.ezhov.rocket.action.application.chainaction.infrastructure.ChainActionExecutorImpl
-import ru.ezhov.rocket.action.application.chainaction.infrastructure.InMemoryAtomicActionRepository
-import ru.ezhov.rocket.action.application.chainaction.infrastructure.InMemoryChainActionRepository
+import ru.ezhov.rocket.action.application.chainaction.infrastructure.JsonAtomicActionRepository
+import ru.ezhov.rocket.action.application.chainaction.infrastructure.JsonChainActionRepository
 import ru.ezhov.rocket.action.application.engine.application.EngineFactory
 import ru.ezhov.rocket.action.application.variables.application.VariablesDto
 import javax.swing.JFrame
@@ -18,11 +20,16 @@ fun main(args: Array<String>) {
         ChainActionExecutorService(
             ChainActionExecutorImpl(
                 EngineFactory(),
-                mockk { every { all() } returns VariablesDto(key = "123", variables = emptyList()) })
+                mockk { every { all() } returns VariablesDto(key = "123", variables = emptyList()) },
+                mockk(),
+            ),
+            mockk()
         ),
         ChainActionService(
-            InMemoryChainActionRepository(),
-            InMemoryAtomicActionRepository(),
+            JsonChainActionRepository(TestUtilsFactory.objectMapper),
+        ),
+        AtomicActionService(
+            JsonAtomicActionRepository(TestUtilsFactory.objectMapper),
         )
     )
     frame.isVisible = true

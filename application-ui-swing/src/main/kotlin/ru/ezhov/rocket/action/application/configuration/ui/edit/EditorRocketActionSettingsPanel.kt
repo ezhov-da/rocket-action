@@ -1,10 +1,10 @@
 package ru.ezhov.rocket.action.application.configuration.ui.edit
 
 import ru.ezhov.rocket.action.application.configuration.ui.SavedRocketActionSettingsPanelCallback
-import ru.ezhov.rocket.action.application.configuration.ui.event.ConfigurationUiListener
-import ru.ezhov.rocket.action.application.configuration.ui.event.ConfigurationUiObserverFactory
-import ru.ezhov.rocket.action.application.configuration.ui.event.model.ConfigurationUiEvent
-import ru.ezhov.rocket.action.application.configuration.ui.event.model.RemoveSettingUiEvent
+import ru.ezhov.rocket.action.application.eventui.ConfigurationUiListener
+import ru.ezhov.rocket.action.application.eventui.ConfigurationUiObserverFactory
+import ru.ezhov.rocket.action.application.eventui.model.ConfigurationUiEvent
+import ru.ezhov.rocket.action.application.eventui.model.RemoveSettingUiEvent
 import ru.ezhov.rocket.action.application.configuration.ui.tree.TreeRocketActionSettings
 import ru.ezhov.rocket.action.application.core.domain.EngineService
 import ru.ezhov.rocket.action.application.core.infrastructure.MutableRocketActionSettings

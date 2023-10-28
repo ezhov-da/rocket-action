@@ -4,5 +4,5 @@ class ChainAction(
     var id: String,
     var name: String,
     var description: String,
-    var actions: List<AtomicAction>
+    var actionIds: List<String>
 )

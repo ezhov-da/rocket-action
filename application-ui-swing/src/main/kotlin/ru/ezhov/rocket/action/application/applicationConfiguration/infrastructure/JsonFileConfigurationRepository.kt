@@ -1,7 +1,6 @@
 package ru.ezhov.rocket.action.application.applicationConfiguration.infrastructure
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import mu.KotlinLogging
 import org.springframework.stereotype.Component
 import ru.ezhov.rocket.action.application.applicationConfiguration.domain.ConfigurationRepository
@@ -17,21 +16,21 @@ private const val DEFAULT_VARIABLES_KEY: String = "314dcf4c-e12b-11ed-b5ea-0242a
 
 @Component
 class JsonFileConfigurationRepository(
-    generalPropertiesRepository: GeneralPropertiesRepository
+    generalPropertiesRepository: GeneralPropertiesRepository,
+    private val objectMapper: ObjectMapper
 ) : ConfigurationRepository {
     private var cachedApplicationConfigurations: ApplicationConfigurations? = null
     private val filePath =
         generalPropertiesRepository
             .asStringOrNull(UsedPropertiesName.APPLICATION_CONFIGURATION_FILE_REPOSITORY_PATH)
             ?: "./configurations.json"
-    private val mapper = ObjectMapper().registerKotlinModule()
 
     override fun configurations(): ApplicationConfigurations {
         if (cachedApplicationConfigurations == null) {
             val file = file()
             cachedApplicationConfigurations = if (file.exists()) {
                 logger.info { "Read application configuration from file '$file'" }
-                mapper.readValue(file, JsonApplicationConfigurationsDto::class.java).toApplicationConfigurations()
+                objectMapper.readValue(file, JsonApplicationConfigurationsDto::class.java).toApplicationConfigurations()
             } else {
                 logger.info { "Application configurations file '$file' does not exists. Return default configuration" }
                 ApplicationConfigurations(
@@ -55,7 +54,7 @@ class JsonFileConfigurationRepository(
 
     override fun save(applicationConfigurations: ApplicationConfigurations) {
         val file = file()
-        mapper.writerWithDefaultPrettyPrinter()
+        objectMapper.writerWithDefaultPrettyPrinter()
             .writeValue(file, applicationConfigurations.toJsonApplicationConfigurationsDto())
 
         cachedApplicationConfigurations = applicationConfigurations

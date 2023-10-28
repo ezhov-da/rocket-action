@@ -5,6 +5,7 @@ import ru.ezhov.rocket.action.application.chainaction.application.ChainActionExe
 import ru.ezhov.rocket.action.application.chainaction.application.ChainActionService
 import ru.ezhov.rocket.action.application.chainaction.domain.model.AtomicAction
 import ru.ezhov.rocket.action.application.chainaction.domain.model.ChainAction
+import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.renderer.AtomicActionListCellRenderer
 import java.awt.BorderLayout
 import java.awt.event.KeyEvent
 import java.awt.event.WindowAdapter
@@ -42,6 +43,9 @@ class EditChainActionDialog(
     private val selectedListActions = JList(selectedListActionsModel)
 
     init {
+        allListActions.cellRenderer = AtomicActionListCellRenderer()
+        selectedListActions.cellRenderer = AtomicActionListCellRenderer()
+
         setContentPane(contentPane)
 
         contentPane.add(

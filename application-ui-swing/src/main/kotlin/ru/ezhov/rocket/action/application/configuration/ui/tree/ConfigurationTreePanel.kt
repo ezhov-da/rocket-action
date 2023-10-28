@@ -7,8 +7,8 @@ import ru.ezhov.rocket.action.application.configuration.ui.CreateRocketActionSet
 import ru.ezhov.rocket.action.application.configuration.ui.CreatedRocketActionSettingsCallback
 import ru.ezhov.rocket.action.application.configuration.ui.SavedRocketActionSettingsPanelCallback
 import ru.ezhov.rocket.action.application.configuration.ui.edit.EditorRocketActionSettingsPanel
-import ru.ezhov.rocket.action.application.configuration.ui.event.ConfigurationUiObserverFactory
-import ru.ezhov.rocket.action.application.configuration.ui.event.model.RemoveSettingUiEvent
+import ru.ezhov.rocket.action.application.eventui.ConfigurationUiObserverFactory
+import ru.ezhov.rocket.action.application.eventui.model.RemoveSettingUiEvent
 import ru.ezhov.rocket.action.application.core.application.RocketActionSettingsService
 import ru.ezhov.rocket.action.application.core.domain.RocketActionSettingsRepositoryException
 import ru.ezhov.rocket.action.application.core.domain.model.ActionsModel

@@ -1,7 +1,6 @@
 package ru.ezhov.rocket.action.application.variables.infrastructure
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import mu.KotlinLogging
 import org.springframework.stereotype.Component
 import ru.ezhov.rocket.action.application.properties.GeneralPropertiesRepository
@@ -20,12 +19,12 @@ private val logger = KotlinLogging.logger {}
 @Component
 class JsonFileVariableRepository(
     generalPropertiesRepository: GeneralPropertiesRepository,
+    private val objectMapper: ObjectMapper,
 ) : VariableRepository {
     private val filePath =
         generalPropertiesRepository
             .asStringOrNull(UsedPropertiesName.VARIABLES_FILE_REPOSITORY_PATH)
             ?: "./variables.json"
-    private val mapper = ObjectMapper().registerKotlinModule()
 
     override fun all(): Variables {
         val file = file()
@@ -48,7 +47,7 @@ class JsonFileVariableRepository(
 
         val userVar = try {
             if (file.exists()) {
-                mapper.readValue(file, JsonVariablesDto::class.java).toVariables()
+                objectMapper.readValue(file, JsonVariablesDto::class.java).toVariables()
             } else {
                 Variables.EMPTY
             }
@@ -73,7 +72,7 @@ class JsonFileVariableRepository(
 
     override fun save(variables: Variables) {
         val file = file()
-        mapper.writerWithDefaultPrettyPrinter().writeValue(file, variables)
+        objectMapper.writerWithDefaultPrettyPrinter().writeValue(file, variables)
     }
 }
 

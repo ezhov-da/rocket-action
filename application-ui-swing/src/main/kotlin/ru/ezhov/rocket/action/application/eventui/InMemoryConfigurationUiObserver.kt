@@ -1,7 +1,7 @@
-package ru.ezhov.rocket.action.application.configuration.ui.event
+package ru.ezhov.rocket.action.application.eventui
 
 import mu.KotlinLogging
-import ru.ezhov.rocket.action.application.configuration.ui.event.model.ConfigurationUiEvent
+import ru.ezhov.rocket.action.application.eventui.model.ConfigurationUiEvent
 import java.util.concurrent.ConcurrentLinkedDeque
 
 private val logger = KotlinLogging.logger { }

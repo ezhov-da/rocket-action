@@ -1,8 +1,7 @@
 package ru.ezhov.rocket.action.application.chainaction.interfaces.ui
 
 import net.miginfocom.swing.MigLayout
-import ru.ezhov.rocket.action.application.chainaction.application.ChainActionExecutorService
-import ru.ezhov.rocket.action.application.chainaction.application.ChainActionService
+import ru.ezhov.rocket.action.application.chainaction.application.AtomicActionService
 import ru.ezhov.rocket.action.application.chainaction.domain.model.AtomicAction
 import ru.ezhov.rocket.action.application.chainaction.domain.model.AtomicActionEngine
 import ru.ezhov.rocket.action.application.chainaction.domain.model.AtomicActionSource
@@ -23,12 +22,11 @@ import javax.swing.JTextPane
 import javax.swing.KeyStroke
 
 class CreateAtomicActionDialog(
-    private val chainActionExecutorService: ChainActionExecutorService,
-    private val chainActionService: ChainActionService,
+    private val atomicActionService: AtomicActionService,
 ) : JDialog() {
     private val contentPane = JPanel(MigLayout(/*"debug"*/))
     private val buttonCreate: JButton = JButton("Create")
-    private val buttonCancel: JButton? = JButton("Cancel")
+    private val buttonCancel: JButton = JButton("Cancel")
 
     private val nameTextField: JTextField = JTextField()
     private val nameLabel: JLabel = JLabel("Name:").apply { labelFor = nameTextField }
@@ -43,7 +41,6 @@ class CreateAtomicActionDialog(
     private val sourceLabel: JLabel = JLabel("Source:")
     private val textSource: JRadioButton = JRadioButton("Text")
     private val fileSource: JRadioButton = JRadioButton("File")
-
 
     private val dataTextPane: JTextPane = JTextPane()
     private val dataLabel: JLabel = JLabel("Data:").apply { labelFor = dataTextPane }
@@ -105,7 +102,7 @@ class CreateAtomicActionDialog(
     }
 
     private fun onOK() {
-        chainActionService.addAtomic(
+        atomicActionService.addAtomic(
             AtomicAction(
                 id = UUID.randomUUID().toString(),
                 name = nameTextField.text,

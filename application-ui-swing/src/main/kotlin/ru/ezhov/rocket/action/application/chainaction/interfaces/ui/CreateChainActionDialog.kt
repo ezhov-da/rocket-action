@@ -1,6 +1,7 @@
 package ru.ezhov.rocket.action.application.chainaction.interfaces.ui
 
 import net.miginfocom.swing.MigLayout
+import ru.ezhov.rocket.action.application.chainaction.application.AtomicActionService
 import ru.ezhov.rocket.action.application.chainaction.application.ChainActionExecutorService
 import ru.ezhov.rocket.action.application.chainaction.application.ChainActionService
 import ru.ezhov.rocket.action.application.chainaction.domain.event.AtomicActionCreatedDomainEvent
@@ -8,6 +9,9 @@ import ru.ezhov.rocket.action.application.chainaction.domain.event.AtomicActionD
 import ru.ezhov.rocket.action.application.chainaction.domain.event.AtomicActionUpdatedDomainEvent
 import ru.ezhov.rocket.action.application.chainaction.domain.model.AtomicAction
 import ru.ezhov.rocket.action.application.chainaction.domain.model.ChainAction
+import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.dnd.DragListener
+import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.dnd.ListDropHandler
+import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.renderer.AtomicActionListCellRenderer
 import ru.ezhov.rocket.action.application.event.domain.DomainEvent
 import ru.ezhov.rocket.action.application.event.domain.DomainEventSubscriber
 import ru.ezhov.rocket.action.application.event.infrastructure.DomainEventFactory
@@ -20,6 +24,7 @@ import java.awt.event.WindowEvent
 import java.util.*
 import javax.swing.BorderFactory
 import javax.swing.DefaultListModel
+import javax.swing.DropMode
 import javax.swing.JButton
 import javax.swing.JComponent
 import javax.swing.JDialog
@@ -30,10 +35,12 @@ import javax.swing.JScrollPane
 import javax.swing.JTextField
 import javax.swing.JTextPane
 import javax.swing.KeyStroke
+import javax.swing.ListSelectionModel
 
 class CreateChainActionDialog(
     private val chainActionExecutorService: ChainActionExecutorService,
     private val chainActionService: ChainActionService,
+    private val atomicActionService: AtomicActionService,
 ) : JDialog() {
     private val contentPane = JPanel(MigLayout("insets 5"/*"debug"*/))
     private val buttonCreate: JButton = JButton("Create")
@@ -51,13 +58,24 @@ class CreateChainActionDialog(
     private val selectedListActions = JList(selectedListActionsModel)
 
     init {
+        allListActions.cellRenderer = AtomicActionListCellRenderer()
+        selectedListActions.cellRenderer = AtomicActionListCellRenderer()
+        selectedListActions.selectionMode = ListSelectionModel.SINGLE_SELECTION
+
+        selectedListActions.dragEnabled = true
+        selectedListActions.dropMode = DropMode.INSERT
+        selectedListActions.transferHandler = ListDropHandler(selectedListActions)
+        DragListener(selectedListActions)
+
         fun fillActions() {
             allListActionsModel.removeAllElements()
-            val atomics = chainActionService.atomics()
+            val atomics = atomicActionService.atomics()
             atomics.forEach {
                 allListActionsModel.addElement(it)
             }
         }
+
+        fillActions()
 
         DomainEventFactory.subscriberRegistrar.subscribe(object : DomainEventSubscriber {
             override fun handleEvent(event: DomainEvent) {
@@ -86,8 +104,9 @@ class CreateChainActionDialog(
         allListActions.addMouseListener(object : MouseAdapter() {
             override fun mouseClicked(e: MouseEvent) {
                 if (e.clickCount == 2) {
-                    val action = allListActionsModel.get(allListActions.leadSelectionIndex)
-                    selectedListActionsModel.addElement(action)
+                    allListActions.selectedValue?.let {
+                        selectedListActionsModel.addElement(it)
+                    }
                 }
             }
         }
@@ -141,7 +160,7 @@ class CreateChainActionDialog(
                 id = UUID.randomUUID().toString(),
                 name = nameTextField.text,
                 description = descriptionTextPane.text,
-                actions = selectedListActionsModel.elements().toList(),
+                actionIds = selectedListActionsModel.elements().toList().map { it.id },
             )
         )
 

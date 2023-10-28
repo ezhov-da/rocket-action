@@ -1,4 +1,4 @@
-package ru.ezhov.rocket.action.application.configuration.ui.event
+package ru.ezhov.rocket.action.application.eventui
 
 object ConfigurationUiObserverFactory {
     val observer: ConfigurationUiObserver = InMemoryConfigurationUiObserver()

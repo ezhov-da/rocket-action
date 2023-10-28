@@ -22,8 +22,8 @@ const val BASE_API_PATH = "/api/v1/handlers"
 class HttpServer(
     private val generalPropertiesRepository: GeneralPropertiesRepository,
     private val rocketActionHandlerService: RocketActionHandlerService,
+    private val objectMapper: ObjectMapper,
 ) {
-    private val mapper = ObjectMapper()
 
     fun port(): Int = generalPropertiesRepository
         .asIntegerOrNull(UsedPropertiesName.HANDLER_SERVER_PORT)
@@ -84,7 +84,7 @@ class HttpServer(
 
                 logger.info { "Handler called. id=$id command=$command body=$body" }
 
-                val map = mapper.readValue(body, Map::class.java)
+                val map = objectMapper.readValue(body, Map::class.java)
                 val handler = rocketActionHandlerService.handlerBy(id)
                 val status = handler
                     ?.handle(
@@ -101,14 +101,14 @@ class HttpServer(
 
                     is RocketActionHandleStatus.Success -> {
                         response.status(200)
-                        mapper.writeValueAsString(
+                        objectMapper.writeValueAsString(
                             status.values.map { it.key to it.value }.toMap()
                         )
                     }
 
                     is RocketActionHandleStatus.InvalidInputData -> {
                         response.status(400)
-                        mapper.writeValueAsString(
+                        objectMapper.writeValueAsString(
                             InvalidInputDataDto(status.errors)
                         )
                     }
@@ -117,7 +117,7 @@ class HttpServer(
                         response.status(500)
                         logger.error(status.cause) { "Error ${status.message}" }
 
-                        mapper.writeValueAsString(
+                        objectMapper.writeValueAsString(
                             ErrorDto(message = status.message)
                         )
                     }

@@ -18,6 +18,7 @@ class InMemoryAtomicActionRepository : AtomicActionRepository {
     }
 
     override fun all(): List<AtomicAction> = actions.toList()
+    override fun byId(id: String): AtomicAction?  = actions.firstOrNull { it.id == id }
 
     override fun delete(id: String) {
         val index = actions.indexOfFirst { aa -> aa.id == id }
