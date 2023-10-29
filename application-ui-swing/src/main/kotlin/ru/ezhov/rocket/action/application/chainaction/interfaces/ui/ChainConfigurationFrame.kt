@@ -35,13 +35,18 @@ import javax.swing.JScrollPane
 import javax.swing.KeyStroke
 
 class ChainConfigurationFrame(
-    chainActionExecutorService: ChainActionExecutorService,
-    chainActionService: ChainActionService,
-    atomicActionService: AtomicActionService,
+    private val chainActionExecutorService: ChainActionExecutorService,
+    private val chainActionService: ChainActionService,
+    private val atomicActionService: AtomicActionService,
 ) : JFrame() {
     private val contentPane = JPanel(MigLayout(/*"debug"*/))
-    private val buttonCreateChain: JButton = JButton("Create chain action")
     private val buttonCreateAction: JButton = JButton("Create atomic action")
+    private val buttonEditAction: JButton = JButton("Edit").apply { isEnabled = false }
+    private val buttonDeleteAction: JButton = JButton("Delete").apply { isEnabled = false }
+
+    private val buttonCreateChain: JButton = JButton("Create chain action")
+    private val buttonEditChain: JButton = JButton("Edit").apply { isEnabled = false }
+    private val buttonDeleteChain: JButton = JButton("Delete").apply { isEnabled = false }
 
     private val allListActionsModel = DefaultListModel<AtomicAction>()
     private val allListActions = JList(allListActionsModel)
@@ -61,7 +66,8 @@ class ChainConfigurationFrame(
     )
     private val editChainActionDialog = EditChainActionDialog(
         chainActionExecutorService = chainActionExecutorService,
-        chainActionService = chainActionService
+        chainActionService = chainActionService,
+        atomicActionService = atomicActionService,
     )
 
     init {
@@ -76,6 +82,44 @@ class ChainConfigurationFrame(
 
         allListActions.cellRenderer = AtomicActionListCellRenderer()
         allListChains.cellRenderer = ChainActionListCellRenderer()
+
+        allListActions.addListSelectionListener {
+            allListActions.selectedValue?.let {
+                buttonEditAction.isEnabled = true
+                buttonDeleteAction.isEnabled = true
+            }
+        }
+
+        buttonEditAction.addActionListener {
+            allListActions.selectedValue?.let {
+                editAtomicActionDialog.setAtomicActionAndShow(it, chainConfigurationFrame)
+            }
+        }
+
+        buttonDeleteAction.addActionListener {
+            allListActions.selectedValue?.let {
+                atomicActionService.deleteAtomic(it.id)
+            }
+        }
+
+        buttonEditChain.addActionListener {
+            allListChains.selectedValue?.let {
+                editChainActionDialog.setChainAction(it, chainConfigurationFrame)
+            }
+        }
+
+        buttonDeleteChain.addActionListener {
+            allListChains.selectedValue?.let {
+                chainActionService.deleteChain(it.id)
+            }
+        }
+
+        allListChains.addListSelectionListener {
+            allListChains.selectedValue?.let {
+                buttonEditChain.isEnabled = true
+                buttonDeleteChain.isEnabled = true
+            }
+        }
 
         val chains = chainActionService.chains()
         chains.forEach {
@@ -138,7 +182,7 @@ class ChainConfigurationFrame(
                         while (iterator.hasMoreElements()) {
                             val action = iterator.nextElement()
                             if (action.id == event.chainAction.id) {
-                                val index = allListActionsModel.indexOf(action)
+                                val index = allListChainsModel.indexOf(action)
 
                                 allListChainsModel.set(index, event.chainAction)
                                 break
@@ -159,16 +203,27 @@ class ChainConfigurationFrame(
 
         })
 
-        contentPane.add(buttonCreateAction, "width 50%")
-        contentPane.add(buttonCreateChain, "wrap, width 50%")
+        val panelAtomicAction = JPanel(MigLayout())
+        panelAtomicAction.add(buttonCreateAction, "split 3")
+        panelAtomicAction.add(buttonEditAction)
+        panelAtomicAction.add(buttonDeleteAction, "wrap")
+        panelAtomicAction.add(JScrollPane(allListActions), "height max, width max")
 
-        contentPane.add(JScrollPane(allListActions), "height max, width 50%")
-        contentPane.add(JScrollPane(allListChains), "height max, width 50%")
+        contentPane.add(panelAtomicAction, "width 50%")
+
+        val panelChainAction = JPanel(MigLayout())
+
+        panelChainAction.add(buttonCreateChain, "split 3")
+        panelChainAction.add(buttonEditChain)
+        panelChainAction.add(buttonDeleteChain, "wrap")
+        panelChainAction.add(JScrollPane(allListChains), "height max, width max")
+
+        contentPane.add(panelChainAction, "width 50%")
 
         setContentPane(contentPane)
 
-        buttonCreateChain.apply { addActionListener { createChainActionDialog.isVisible = true } }
-        buttonCreateAction.apply { addActionListener { createAtomicActionDialog.isVisible = true } }
+        buttonCreateAction.apply { addActionListener { createAtomicActionDialog.showDialog() } }
+        buttonCreateChain.apply { addActionListener { createChainActionDialog.showDialog() } }
 
         // call onCancel() when cross is clicked
         defaultCloseOperation = DO_NOTHING_ON_CLOSE

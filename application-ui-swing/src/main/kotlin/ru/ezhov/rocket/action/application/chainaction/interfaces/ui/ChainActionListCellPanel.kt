@@ -12,7 +12,7 @@ class ChainActionListCellPanel(
 ) :
     JPanel(MigLayout(/*"debug"*/)) {
     private val nameLabel = JLabel(chainAction.name)
-    private val countAtomicAction = JLabel("Actions: ${chainAction.actionIds.size}")
+    private val countAtomicAction = JLabel("Actions: ${chainAction.actions.size}")
 
     init {
         isOpaque = true

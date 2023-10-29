@@ -2,9 +2,10 @@ package ru.ezhov.rocket.action.application.chainaction.interfaces.ui
 
 import net.miginfocom.swing.MigLayout
 import ru.ezhov.rocket.action.application.chainaction.application.AtomicActionService
-import ru.ezhov.rocket.action.application.chainaction.application.ChainActionExecutorService
-import ru.ezhov.rocket.action.application.chainaction.application.ChainActionService
 import ru.ezhov.rocket.action.application.chainaction.domain.model.AtomicAction
+import ru.ezhov.rocket.action.application.chainaction.domain.model.AtomicActionEngine
+import ru.ezhov.rocket.action.application.chainaction.domain.model.AtomicActionSource
+import java.awt.Component
 import java.awt.event.KeyEvent
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
@@ -24,7 +25,7 @@ class EditAtomicActionDialog(
     private val atomicActionService: AtomicActionService,
 ) : JDialog() {
     private val contentPane = JPanel(MigLayout(/*"debug"*/))
-    private val buttonOK: JButton = JButton("Create")
+    private val buttonOK: JButton = JButton("Save")
     private val buttonCancel: JButton? = JButton("Cancel")
 
     private val nameTextField: JTextField = JTextField()
@@ -102,7 +103,24 @@ class EditAtomicActionDialog(
     }
 
     private fun onOK() {
-        // add your code here
+        currentAction!!.apply {
+            name = nameTextField.text
+            description = descriptionTextPane.text
+            engine = if (groovyEngine.isSelected) {
+                AtomicActionEngine.GROOVY
+            } else {
+                AtomicActionEngine.KOTLIN
+            }
+            source = if (textSource.isSelected) {
+                AtomicActionSource.TEXT
+            } else {
+                AtomicActionSource.FILE
+            }
+            data = dataTextPane.text
+        }
+
+        atomicActionService.updateAtomic(atomicAction = currentAction!!)
+
         dispose()
     }
 
@@ -111,9 +129,28 @@ class EditAtomicActionDialog(
         dispose()
     }
 
-    private var action: AtomicAction? = null
+    private var currentAction: AtomicAction? = null
 
-    fun setAtomicAction(action: AtomicAction) {
-        this.action = action
+    fun setAtomicActionAndShow(action: AtomicAction, parent: Component) {
+        this.currentAction = action
+
+        nameTextField.text = action.name
+
+        descriptionTextPane.text = action.description
+
+        when (action.engine) {
+            AtomicActionEngine.KOTLIN -> kotlinEngine.isSelected = true
+            AtomicActionEngine.GROOVY -> groovyEngine.isSelected = true
+        }
+
+        when (action.source) {
+            AtomicActionSource.FILE -> fileSource.isSelected = true
+            AtomicActionSource.TEXT -> textSource.isSelected = true
+        }
+        dataTextPane.text = action.data
+
+        setLocationRelativeTo(parent)
+        isModal = true
+        isVisible = true
     }
 }

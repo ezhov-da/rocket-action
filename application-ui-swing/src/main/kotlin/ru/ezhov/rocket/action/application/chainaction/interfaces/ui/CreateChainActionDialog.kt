@@ -7,11 +7,13 @@ import ru.ezhov.rocket.action.application.chainaction.application.ChainActionSer
 import ru.ezhov.rocket.action.application.chainaction.domain.event.AtomicActionCreatedDomainEvent
 import ru.ezhov.rocket.action.application.chainaction.domain.event.AtomicActionDeletedDomainEvent
 import ru.ezhov.rocket.action.application.chainaction.domain.event.AtomicActionUpdatedDomainEvent
+import ru.ezhov.rocket.action.application.chainaction.domain.model.ActionOrder
 import ru.ezhov.rocket.action.application.chainaction.domain.model.AtomicAction
 import ru.ezhov.rocket.action.application.chainaction.domain.model.ChainAction
 import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.dnd.DragListener
 import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.dnd.ListDropHandler
 import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.renderer.AtomicActionListCellRenderer
+import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.renderer.OrderAtomicActionListCellRenderer
 import ru.ezhov.rocket.action.application.event.domain.DomainEvent
 import ru.ezhov.rocket.action.application.event.domain.DomainEventSubscriber
 import ru.ezhov.rocket.action.application.event.infrastructure.DomainEventFactory
@@ -54,12 +56,12 @@ class CreateChainActionDialog(
 
     private val allListActionsModel = DefaultListModel<AtomicAction>()
     private val allListActions = JList(allListActionsModel)
-    private val selectedListActionsModel = DefaultListModel<AtomicAction>()
+    private val selectedListActionsModel = DefaultListModel<SelectedAtomicAction>()
     private val selectedListActions = JList(selectedListActionsModel)
 
     init {
         allListActions.cellRenderer = AtomicActionListCellRenderer()
-        selectedListActions.cellRenderer = AtomicActionListCellRenderer()
+        selectedListActions.cellRenderer = OrderAtomicActionListCellRenderer()
         selectedListActions.selectionMode = ListSelectionModel.SINGLE_SELECTION
 
         selectedListActions.dragEnabled = true
@@ -105,7 +107,11 @@ class CreateChainActionDialog(
             override fun mouseClicked(e: MouseEvent) {
                 if (e.clickCount == 2) {
                     allListActions.selectedValue?.let {
-                        selectedListActionsModel.addElement(it)
+                        selectedListActionsModel.addElement(
+                            SelectedAtomicAction(
+                                atomicAction = it
+                            )
+                        )
                     }
                 }
             }
@@ -160,7 +166,12 @@ class CreateChainActionDialog(
                 id = UUID.randomUUID().toString(),
                 name = nameTextField.text,
                 description = descriptionTextPane.text,
-                actionIds = selectedListActionsModel.elements().toList().map { it.id },
+                actions = selectedListActionsModel.elements().toList().map {
+                    ActionOrder(
+                        chainOrderId = it.id,
+                        actionId = it.atomicAction.id,
+                    )
+                },
             )
         )
 
@@ -171,4 +182,18 @@ class CreateChainActionDialog(
         // add your code here if necessary
         dispose()
     }
+
+    fun showDialog() {
+        nameTextField.text = ""
+        descriptionTextPane.text = ""
+        selectedListActionsModel.removeAllElements()
+
+        isModal = true
+        isVisible = true
+    }
 }
+
+data class SelectedAtomicAction(
+    val id: String = UUID.randomUUID().toString(),
+    val atomicAction: AtomicAction,
+)

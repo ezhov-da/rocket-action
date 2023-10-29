@@ -1,17 +1,32 @@
 package ru.ezhov.rocket.action.application.chainaction.interfaces.ui
 
 import net.miginfocom.swing.MigLayout
+import ru.ezhov.rocket.action.application.chainaction.application.AtomicActionService
 import ru.ezhov.rocket.action.application.chainaction.application.ChainActionExecutorService
 import ru.ezhov.rocket.action.application.chainaction.application.ChainActionService
+import ru.ezhov.rocket.action.application.chainaction.domain.event.AtomicActionCreatedDomainEvent
+import ru.ezhov.rocket.action.application.chainaction.domain.event.AtomicActionDeletedDomainEvent
+import ru.ezhov.rocket.action.application.chainaction.domain.event.AtomicActionUpdatedDomainEvent
+import ru.ezhov.rocket.action.application.chainaction.domain.model.ActionOrder
 import ru.ezhov.rocket.action.application.chainaction.domain.model.AtomicAction
 import ru.ezhov.rocket.action.application.chainaction.domain.model.ChainAction
+import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.dnd.DragListener
+import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.dnd.ListDropHandler
 import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.renderer.AtomicActionListCellRenderer
+import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.renderer.OrderAtomicActionListCellRenderer
+import ru.ezhov.rocket.action.application.event.domain.DomainEvent
+import ru.ezhov.rocket.action.application.event.domain.DomainEventSubscriber
+import ru.ezhov.rocket.action.application.event.infrastructure.DomainEventFactory
 import java.awt.BorderLayout
+import java.awt.Component
 import java.awt.event.KeyEvent
+import java.awt.event.MouseAdapter
+import java.awt.event.MouseEvent
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
 import javax.swing.BorderFactory
 import javax.swing.DefaultListModel
+import javax.swing.DropMode
 import javax.swing.JButton
 import javax.swing.JComponent
 import javax.swing.JDialog
@@ -22,14 +37,16 @@ import javax.swing.JScrollPane
 import javax.swing.JTextField
 import javax.swing.JTextPane
 import javax.swing.KeyStroke
+import javax.swing.ListSelectionModel
 
 class EditChainActionDialog(
     private val chainActionExecutorService: ChainActionExecutorService,
     private val chainActionService: ChainActionService,
+    private val atomicActionService: AtomicActionService,
 ) : JDialog() {
     private val contentPane = JPanel(MigLayout("insets 5"/*"debug"*/))
-    private val buttonOK: JButton = JButton("Create")
-    private val buttonCancel: JButton? = JButton("Cancel")
+    private val buttonEdit: JButton = JButton("Edit")
+    private val buttonCancel: JButton = JButton("Cancel")
 
     private val nameTextField: JTextField = JTextField()
     private val nameLabel: JLabel = JLabel("Name:").apply { labelFor = nameTextField }
@@ -39,12 +56,41 @@ class EditChainActionDialog(
 
     private val allListActionsModel = DefaultListModel<AtomicAction>()
     private val allListActions = JList(allListActionsModel)
-    private val selectedListActionsModel = DefaultListModel<AtomicAction>()
+    private val selectedListActionsModel = DefaultListModel<SelectedAtomicAction>()
     private val selectedListActions = JList(selectedListActionsModel)
 
     init {
         allListActions.cellRenderer = AtomicActionListCellRenderer()
-        selectedListActions.cellRenderer = AtomicActionListCellRenderer()
+        selectedListActions.cellRenderer = OrderAtomicActionListCellRenderer()
+        selectedListActions.selectionMode = ListSelectionModel.SINGLE_SELECTION
+
+        selectedListActions.dragEnabled = true
+        selectedListActions.dropMode = DropMode.INSERT
+        selectedListActions.transferHandler = ListDropHandler(selectedListActions)
+        DragListener(selectedListActions)
+
+        fun fillActions() {
+            allListActionsModel.removeAllElements()
+            val atomics = atomicActionService.atomics()
+            atomics.forEach {
+                allListActionsModel.addElement(it)
+            }
+        }
+
+        fillActions()
+
+        DomainEventFactory.subscriberRegistrar.subscribe(object : DomainEventSubscriber {
+            override fun handleEvent(event: DomainEvent) {
+                fillActions()
+            }
+
+            override fun subscribedToEventType(): List<Class<*>> = listOf(
+                AtomicActionCreatedDomainEvent::class.java,
+                AtomicActionDeletedDomainEvent::class.java,
+                AtomicActionUpdatedDomainEvent::class.java,
+            )
+        })
+
 
         setContentPane(contentPane)
 
@@ -55,6 +101,21 @@ class EditChainActionDialog(
                     border = BorderFactory.createTitledBorder("All atomic actions")
                 },
             "grow, west, wmin 40%, height max"
+        )
+
+        allListActions.addMouseListener(object : MouseAdapter() {
+            override fun mouseClicked(e: MouseEvent) {
+                if (e.clickCount == 2) {
+                    allListActions.selectedValue?.let {
+                        selectedListActionsModel.addElement(
+                            SelectedAtomicAction(
+                                atomicAction = it
+                            )
+                        )
+                    }
+                }
+            }
+        }
         )
 
         contentPane.add(nameLabel)
@@ -72,13 +133,13 @@ class EditChainActionDialog(
             "span, width max, height max"
         )
 
-        contentPane.add(buttonOK, "cell 2 4, split 2, align right")
+        contentPane.add(buttonEdit, "cell 2 4, split 2, align right")
         contentPane.add(buttonCancel)
 
         isModal = true
-        getRootPane().defaultButton = buttonOK
-        buttonOK.addActionListener { onOK() }
-        buttonCancel!!.addActionListener { onCancel() }
+        getRootPane().defaultButton = buttonEdit
+        buttonEdit.addActionListener { onOK() }
+        buttonCancel.addActionListener { onCancel() }
 
         // call onCancel() when cross is clicked
         defaultCloseOperation = DO_NOTHING_ON_CLOSE
@@ -100,7 +161,20 @@ class EditChainActionDialog(
     }
 
     private fun onOK() {
-        // add your code here
+        chainActionService.updateChain(
+            currentChainAction!!.apply {
+                name = nameTextField.text
+                description = descriptionTextPane.text
+                actions = selectedListActionsModel.elements().toList().map {
+                    ActionOrder(
+                        chainOrderId = it.id,
+                        actionId = it.atomicAction.id,
+                    )
+                }
+            }
+        )
+
+        isVisible = false
         dispose()
     }
 
@@ -109,9 +183,29 @@ class EditChainActionDialog(
         dispose()
     }
 
-    private var action: ChainAction? = null
+    private var currentChainAction: ChainAction? = null
 
-    fun setAtomicAction(action: ChainAction) {
-        this.action = action
+    fun setChainAction(chainAction: ChainAction, parent: Component) {
+        this.currentChainAction = chainAction
+        nameTextField.text = chainAction.name
+        descriptionTextPane.text = chainAction.description
+
+        selectedListActionsModel.removeAllElements()
+        val actions = atomicActionService.atomics().associateBy { it.id }
+        chainAction.actions.forEach { order ->
+            actions[order.actionId]?.let { action ->
+                selectedListActionsModel.addElement(
+                    SelectedAtomicAction(
+                        id = order.chainOrderId,
+                        atomicAction = action
+                    )
+                )
+            }
+        }
+
+        setLocationRelativeTo(parent)
+
+        isModal = true
+        isVisible = true
     }
 }

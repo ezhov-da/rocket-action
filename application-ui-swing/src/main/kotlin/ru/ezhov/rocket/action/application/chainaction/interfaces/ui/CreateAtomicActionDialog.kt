@@ -128,4 +128,15 @@ class CreateAtomicActionDialog(
         // add your code here if necessary
         dispose()
     }
+
+    fun showDialog() {
+        nameTextField.text = ""
+        descriptionTextPane.text = ""
+        kotlinEngine.isSelected = true
+        textSource.isSelected = true
+        dataTextPane.text = ""
+
+        isModal = true
+        isVisible = true
+    }
 }

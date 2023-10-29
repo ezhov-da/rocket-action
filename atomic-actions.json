@@ -1,12 +1,12 @@
 {
-  "changedDate" : "2023-10-29T02:45:32.672",
+  "changedDate" : "2023-10-29T12:36:13.005",
   "atomicActions" : [ {
     "id" : "ccb3ea04-68ef-4988-84f1-2d95e14c0046",
-    "name" : "Убирает начальные и конечные пробелы у строки",
+    "name" : "Убирает начальные и конечные пробелы у строки (test)",
     "description" : "Убирает начальные и конечные пробелы у строки",
     "engine" : "GROOVY",
     "source" : "TEXT",
-    "data" : "_INPUT.trim()"
+    "data" : "// test\n\n_INPUT.trim()"
   }, {
     "id" : "8dba925e-07fb-4d88-af27-18d38eefede0",
     "name" : "Заменяет все символы `a` на `1`",

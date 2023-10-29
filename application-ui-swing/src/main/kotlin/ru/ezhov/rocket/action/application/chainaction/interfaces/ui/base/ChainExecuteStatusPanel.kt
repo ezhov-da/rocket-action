@@ -9,6 +9,7 @@ import ru.ezhov.rocket.action.application.chainaction.domain.model.ChainAction
 import java.awt.Color
 import javax.swing.JLabel
 import javax.swing.JPanel
+import javax.swing.SwingUtilities
 
 private val logger = KotlinLogging.logger {}
 
@@ -18,11 +19,15 @@ class ChainExecuteStatusPanel(
 
     fun executeChain(input: String, chainAction: ChainAction, onComplete: () -> Unit) {
         removeAll()
-        val map = chainAction.actionIds.associateWith { JLabel(" ").apply { isOpaque = true } }
-        map.values.forEach { add(it, "width max") }
+        val map = chainAction
+            .actions
+            .associate { it.chainOrderId to (it to JLabel(" ").apply { isOpaque = true }) }
+        map.values.forEach { add(it.second, "width max") }
 
         repaint()
         revalidate()
+
+        val chainExecuteStatusPanel = this
 
         Thread {
             chainActionExecutorService.execute(
@@ -31,18 +36,30 @@ class ChainExecuteStatusPanel(
                 object : ChainActionExecutorProgress {
                     override fun complete(result: Any?) {
                         // TODO ezhov
-                        println(result)
                         onComplete()
+
+                        result?.let {
+                            ResultChainDialog(result.toString())
+                                .apply {
+                                    setLocationRelativeTo(chainExecuteStatusPanel)
+                                    isVisible = true
+                                }
+                        }
                     }
 
-                    override fun success(atomicAction: AtomicAction) {
-                        map[atomicAction.id]!!.background = Color.GREEN
+                    override fun success(orderId: String, atomicAction: AtomicAction) {
+                        SwingUtilities.invokeLater {
+                            map[orderId]!!.second.background = Color.GREEN
+                        }
                     }
 
-                    override fun failure(id: String, atomicAction: AtomicAction?, ex: Exception) {
-                        map[id]!!.background = Color.RED
-
-                        logger.warn(ex) { "Error on action ID '$id'. Action '$atomicAction'" }
+                    override fun failure(orderId: String, atomicAction: AtomicAction?, ex: Exception) {
+                        SwingUtilities.invokeLater {
+                            map[orderId]!!.second.background = Color.RED
+                        }
+                        logger.warn(ex) {
+                            "Error on action ID '${atomicAction?.id} in orderId '$orderId''. Action '$atomicAction'"
+                        }
                     }
                 }
             )

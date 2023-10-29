@@ -6,7 +6,7 @@ import java.lang.Exception
 interface ChainActionExecutorProgress {
     fun complete(result: Any?)
 
-    fun success(atomicAction: AtomicAction)
+    fun success(orderId: String, atomicAction: AtomicAction)
 
-    fun failure(id: String, atomicAction: AtomicAction?, ex: Exception)
+    fun failure(orderId: String, atomicAction: AtomicAction?, ex: Exception)
 }

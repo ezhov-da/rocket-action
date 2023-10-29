@@ -26,19 +26,23 @@ class ChainActionExecutorImpl(
         chainAction: ChainAction,
         chainActionExecutorProgress: ChainActionExecutorProgress
     ) {
+        var currentAtomicActionOrderId: String? = null
         var currentAtomicActionId: String? = null
         var currentAtomicAction: AtomicAction? = null
         var lastResult: Any? = null
         try {
             var inputValue = input
-            chainAction.actionIds.forEach { atomicActionId ->
-                currentAtomicActionId = atomicActionId
-                val atomicAction = atomicActionService.atomicBy(atomicActionId)
+            chainAction.actions.forEach { atomicActionOrder ->
+                currentAtomicActionOrderId = atomicActionOrder.chainOrderId
+                currentAtomicActionId = atomicActionOrder.actionId
+                val atomicAction = atomicActionService.atomicBy(currentAtomicActionId!!)
                 if (atomicAction == null) {
                     chainActionExecutorProgress.failure(
-                        atomicActionId,
+                        currentAtomicActionOrderId!!,
                         null,
-                        IllegalStateException("Action with ID '$atomicActionId' not found for chain '${chainAction.name}'")
+                        IllegalStateException(
+                            "Action with ID '${currentAtomicActionId!!}' not found for chain '${chainAction.name}'"
+                        )
                     )
                     return
                 }
@@ -75,12 +79,12 @@ class ChainActionExecutorImpl(
 
                 inputValue = executeResult
                 lastResult = executeResult
-                chainActionExecutorProgress.success(currentAtomicAction!!)
+                chainActionExecutorProgress.success(currentAtomicActionOrderId!!, currentAtomicAction!!)
             }
 
             chainActionExecutorProgress.complete(lastResult)
         } catch (ex: Exception) {
-            chainActionExecutorProgress.failure(currentAtomicActionId!!, currentAtomicAction!!, ex)
+            chainActionExecutorProgress.failure(currentAtomicActionOrderId!!, currentAtomicAction!!, ex)
         }
     }
 }

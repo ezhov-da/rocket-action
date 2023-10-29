@@ -5,6 +5,7 @@ import io.mockk.mockk
 import org.junit.jupiter.api.Test
 import ru.ezhov.rocket.action.application.chainaction.application.AtomicActionService
 import ru.ezhov.rocket.action.application.chainaction.domain.ChainActionExecutorProgress
+import ru.ezhov.rocket.action.application.chainaction.domain.model.ActionOrder
 import ru.ezhov.rocket.action.application.chainaction.domain.model.AtomicAction
 import ru.ezhov.rocket.action.application.chainaction.domain.model.AtomicActionEngine
 import ru.ezhov.rocket.action.application.chainaction.domain.model.AtomicActionSource
@@ -60,21 +61,27 @@ internal class ChainActionExecutorImplTest {
                 id = "123",
                 name = "Test name",
                 description = "test description",
-                actionIds = listOf("11", "22")
+                actions = listOf(
+                    ActionOrder(
+                        "000", "11"
+                    ),
+                    ActionOrder(
+                        "111", "22"
+                    )
+                )
             ),
             object : ChainActionExecutorProgress {
                 override fun complete(result: Any?) {
                     println("complete $result")
                 }
 
-                override fun success(atomicAction: AtomicAction) {
+                override fun success(orderId: String, atomicAction: AtomicAction) {
                     println("success ${atomicAction.id}")
                 }
 
-                override fun failure(id: String, atomicAction: AtomicAction?, ex: Exception) {
-                    println("failure $id")
+                override fun failure(orderId: String, atomicAction: AtomicAction?, ex: Exception) {
+                    println("failure $orderId")
                 }
-
             }
         )
     }
@@ -124,20 +131,28 @@ internal class ChainActionExecutorImplTest {
                 id = "123",
                 name = "Test name",
                 description = "test description",
-                actionIds = listOf("11", "22")
+                actions = listOf(
+                    ActionOrder(
+                        "000", "11"
+                    ),
+                    ActionOrder(
+                        "111", "22"
+                    )
+                )
             ),
             object : ChainActionExecutorProgress {
                 override fun complete(result: Any?) {
                     println("complete $result")
                 }
 
-                override fun success(atomicAction: AtomicAction) {
+                override fun success(orderId: String, atomicAction: AtomicAction) {
                     println("success ${atomicAction.id}")
                 }
 
-                override fun failure(id: String, atomicAction: AtomicAction?, ex: Exception) {
-                    println("failure $id")
+                override fun failure(orderId: String, atomicAction: AtomicAction?, ex: Exception) {
+                    println("failure $orderId")
                 }
+
             }
         )
     }

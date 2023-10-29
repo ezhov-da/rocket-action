@@ -19,7 +19,14 @@ class JsonAtomicActionRepository(
 
     override fun save(atomicAction: AtomicAction) {
         val actions = all().toMutableList()
-        actions.add(atomicAction)
+
+        val index = actions.indexOfFirst { it.id == atomicAction.id }
+        if (index == -1) {
+            actions.add(atomicAction)
+        } else {
+            actions[index] = atomicAction
+        }
+
         saveActions(actions)
     }
 

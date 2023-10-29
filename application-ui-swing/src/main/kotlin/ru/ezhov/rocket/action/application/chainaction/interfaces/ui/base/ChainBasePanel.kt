@@ -6,6 +6,7 @@ import ru.ezhov.rocket.action.application.chainaction.application.ChainActionSer
 import ru.ezhov.rocket.action.application.eventui.ConfigurationUiObserverFactory
 import ru.ezhov.rocket.action.application.eventui.model.ShowChainActionConfigurationUiEvent
 import ru.ezhov.rocket.action.ui.utils.swing.common.MoveUtil
+import ru.ezhov.rocket.action.ui.utils.swing.common.TextFieldWithText
 import java.awt.Color
 import java.awt.Component
 import java.awt.Toolkit
@@ -34,15 +35,13 @@ import javax.swing.JTextField
 import javax.swing.SwingConstants
 import javax.swing.SwingUtilities
 
-private const val TEXT = "paste here"
-
 class ChainBasePanel(
     private val movableComponent: Component,
     chainActionExecutorService: ChainActionExecutorService,
     private val chainActionService: ChainActionService,
 ) : JPanel(MigLayout(/*"debug"*/)) {
     private val labelDropDown = JLabel("<html><center>Drag text<br>to run chain<br>or</center>")
-    private val textFieldPaste = JTextField(TEXT).apply { horizontalAlignment = JTextField.CENTER }
+    private val textFieldPaste = TextFieldWithText("paste here or type and `Enter`")
     private val chainExecuteStatusPanel =
         ChainExecuteStatusPanel(chainActionExecutorService).apply { isVisible = false }
     private val configurationButton = JButton("C").apply {
@@ -59,6 +58,7 @@ class ChainBasePanel(
         addDropTargetTo(labelDropDown)
         addDropTargetTo(textFieldPaste)
         addCtrlV(textFieldPaste)
+        addEnter(textFieldPaste)
 
         add(labelDropDown, "wrap, width max, height max, id labelDropDown")
         add(textFieldPaste, "width max, split 2")
@@ -114,7 +114,17 @@ class ChainBasePanel(
                 if (e.isControlDown && e.keyCode == KeyEvent.VK_V) {
                     val text = getClipboardContents()
                     text?.let { showSelectedChain(it) }
-                    component.text = TEXT
+                }
+            }
+        })
+    }
+
+    private fun addEnter(component: JTextField) {
+        component.addKeyListener(object : KeyAdapter() {
+            override fun keyReleased(e: KeyEvent) {
+                if (e.keyCode == KeyEvent.VK_ENTER) {
+                    val text = component.text
+                    text?.let { showSelectedChain(it) }
                 }
             }
         })

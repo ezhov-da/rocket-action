@@ -1,5 +1,6 @@
 package ru.ezhov.rocket.action.application.chainaction.interfaces.ui
 
+import ru.ezhov.rocket.action.application.chainaction.domain.model.ActionOrder
 import ru.ezhov.rocket.action.application.chainaction.domain.model.ChainAction
 import javax.swing.JFrame
 import javax.swing.SwingUtilities
@@ -21,7 +22,14 @@ fun main(args: Array<String>) {
                     id = "123",
                     name = "Test name",
                     description = "Test description",
-                    actionIds = listOf("1234")
+                    actions = listOf(
+                        ActionOrder(
+                            "000", "11"
+                        ),
+                        ActionOrder(
+                            "111", "22"
+                        )
+                    )
                 )
             )
         )

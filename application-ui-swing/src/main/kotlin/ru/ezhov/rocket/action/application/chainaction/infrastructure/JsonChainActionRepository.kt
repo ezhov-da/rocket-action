@@ -19,11 +19,18 @@ class JsonChainActionRepository(
 
     override fun save(chainAction: ChainAction) {
         val chains = all().toMutableList()
-        chains.add(chainAction)
-        saveActions(chains)
+
+        val index = chains.indexOfFirst { it.id == chainAction.id }
+        if (index == -1) {
+            chains.add(chainAction)
+        } else {
+            chains[index] = chainAction
+        }
+
+        saveChains(chains)
     }
 
-    private fun saveActions(chains: List<ChainAction>) {
+    private fun saveChains(chains: List<ChainAction>) {
         val actionsDto = ChainActionsDto(
             changedDate = LocalDateTime.now(),
             chainActions = chains.map { it.toChainActionDto() },
@@ -50,20 +57,20 @@ class JsonChainActionRepository(
             actions.removeAt(index)
         }
 
-        saveActions(actions)
+        saveChains(actions)
     }
 
     private fun ChainAction.toChainActionDto(): ChainActionDto = ChainActionDto(
         id = id,
         name = name,
         description = description,
-        actionIds = actionIds,
+        actions = actions,
     )
 
     private fun ChainActionDto.toChainAction(): ChainAction = ChainAction(
         id = id,
         name = name,
         description = description,
-        actionIds = actionIds,
+        actions = actions,
     )
 }

@@ -1,6 +1,6 @@
 package ru.ezhov.rocket.action.application.chainaction.interfaces.ui.dnd
 
-import ru.ezhov.rocket.action.application.chainaction.domain.model.AtomicAction
+import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.SelectedAtomicAction
 import java.awt.datatransfer.DataFlavor
 import java.awt.datatransfer.StringSelection
 import java.awt.dnd.DnDConstants
@@ -47,7 +47,7 @@ internal class DragListener(private val list: JList<*>) : DragSourceListener, Dr
     override fun dropActionChanged(dsde: DragSourceDragEvent) {}
 }
 
-internal class ListDropHandler(private val list: JList<AtomicAction>) : TransferHandler() {
+internal class ListDropHandler(private val list: JList<SelectedAtomicAction>) : TransferHandler() {
     override fun canImport(support: TransferSupport): Boolean {
         if (!support.isDataFlavorSupported(DataFlavor.stringFlavor)) {
             return false
