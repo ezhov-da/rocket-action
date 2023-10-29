@@ -38,6 +38,7 @@ import javax.swing.JTextField
 import javax.swing.JTextPane
 import javax.swing.KeyStroke
 import javax.swing.ListSelectionModel
+import javax.swing.SwingUtilities
 
 class EditChainActionDialog(
     private val chainActionExecutorService: ChainActionExecutorService,
@@ -125,9 +126,24 @@ class EditChainActionDialog(
         contentPane.add(JScrollPane(descriptionTextPane), "span, wrap, width max, hmin 30%")
 
         contentPane.add(
-            JPanel(BorderLayout())
+            JPanel(MigLayout())
                 .apply {
-                    add(JScrollPane(selectedListActions), BorderLayout.CENTER)
+                    val deleteButton = JButton("Delete")
+
+                    deleteButton.addActionListener {
+                        SwingUtilities.invokeLater {
+                            selectedListActions.selectedValue?.let { selectedValue ->
+                                val index = selectedListActionsModel.indexOf(selectedValue)
+                                selectedListActionsModel.removeElement(selectedValue)
+                                if (!selectedListActionsModel.isEmpty) {
+                                    selectedListActions.selectedIndex = index
+                                }
+                            }
+                        }
+                    }
+
+                    add(deleteButton, "wrap")
+                    add(JScrollPane(selectedListActions), "width max, height max")
                     border = BorderFactory.createTitledBorder("Selected atomic actions")
                 },
             "span, width max, height max"
@@ -157,7 +173,7 @@ class EditChainActionDialog(
         )
 
         setLocationRelativeTo(null)
-        setSize(500, 500)
+        setSize(700, 500)
     }
 
     private fun onOK() {
@@ -185,7 +201,7 @@ class EditChainActionDialog(
 
     private var currentChainAction: ChainAction? = null
 
-    fun setChainAction(chainAction: ChainAction, parent: Component) {
+    fun showEditDialog(chainAction: ChainAction, parent: Component? = null) {
         this.currentChainAction = chainAction
         nameTextField.text = chainAction.name
         descriptionTextPane.text = chainAction.description
@@ -203,7 +219,9 @@ class EditChainActionDialog(
             }
         }
 
-        setLocationRelativeTo(parent)
+        parent?.let {
+            setLocationRelativeTo(parent)
+        }
 
         isModal = true
         isVisible = true

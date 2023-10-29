@@ -104,7 +104,7 @@ class ChainConfigurationFrame(
 
         buttonEditChain.addActionListener {
             allListChains.selectedValue?.let {
-                editChainActionDialog.setChainAction(it, chainConfigurationFrame)
+                editChainActionDialog.showEditDialog(it, chainConfigurationFrame)
             }
         }
 

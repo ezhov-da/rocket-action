@@ -1,6 +1,6 @@
 package ru.ezhov.rocket.action.application.chainaction.domain.model
 
-class AtomicAction(
+data class AtomicAction(
     var id: String,
     var name: String,
     var description: String,

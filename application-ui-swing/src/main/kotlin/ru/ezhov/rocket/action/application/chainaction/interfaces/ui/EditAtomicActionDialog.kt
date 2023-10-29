@@ -1,6 +1,9 @@
 package ru.ezhov.rocket.action.application.chainaction.interfaces.ui
 
 import net.miginfocom.swing.MigLayout
+import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea
+import org.fife.ui.rsyntaxtextarea.SyntaxConstants
+import org.fife.ui.rtextarea.RTextScrollPane
 import ru.ezhov.rocket.action.application.chainaction.application.AtomicActionService
 import ru.ezhov.rocket.action.application.chainaction.domain.model.AtomicAction
 import ru.ezhov.rocket.action.application.chainaction.domain.model.AtomicActionEngine
@@ -43,7 +46,7 @@ class EditAtomicActionDialog(
     private val fileSource: JRadioButton = JRadioButton("File")
 
 
-    private val dataTextPane: JTextPane = JTextPane()
+    private val dataTextPane: RSyntaxTextArea = RSyntaxTextArea()
     private val dataLabel: JLabel = JLabel("Data:").apply { labelFor = dataTextPane }
 
     init {
@@ -56,6 +59,16 @@ class EditAtomicActionDialog(
         val sourceButtonGroup = ButtonGroup()
         sourceButtonGroup.add(fileSource)
         sourceButtonGroup.add(textSource)
+
+        setKotlinSyntax()
+        kotlinEngine.addActionListener {
+            setKotlinSyntax()
+        }
+
+        setGroovySyntax()
+        groovyEngine.addActionListener {
+            setGroovySyntax()
+        }
 
         contentPane.add(nameLabel)
         contentPane.add(nameTextField, "grow, span 2, wrap, width max")
@@ -72,7 +85,7 @@ class EditAtomicActionDialog(
         contentPane.add(fileSource, "wrap")
 
         contentPane.add(dataLabel, "wrap")
-        contentPane.add(JScrollPane(dataTextPane), "span, grow, shrink, height max")
+        contentPane.add(RTextScrollPane(dataTextPane), "span, grow, shrink, height max")
 
         contentPane.add(buttonOK, "cell 2 7, split 2, align right")
         contentPane.add(buttonCancel)
@@ -100,6 +113,18 @@ class EditAtomicActionDialog(
 
         setLocationRelativeTo(null)
         setSize(700, 500)
+    }
+
+    private fun setKotlinSyntax() {
+        if (kotlinEngine.isSelected) {
+            dataTextPane.syntaxEditingStyle = SyntaxConstants.SYNTAX_STYLE_KOTLIN;
+        }
+    }
+
+    private fun setGroovySyntax() {
+        if (groovyEngine.isSelected) {
+            dataTextPane.syntaxEditingStyle = SyntaxConstants.SYNTAX_STYLE_GROOVY;
+        }
     }
 
     private fun onOK() {

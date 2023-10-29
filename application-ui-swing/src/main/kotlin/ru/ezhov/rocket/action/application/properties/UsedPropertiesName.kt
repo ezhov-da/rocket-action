@@ -92,4 +92,11 @@ enum class UsedPropertiesName(val propertyName: String, val description: String)
             The path to the folder with plugins in Kotlin
         """.trimIndent()
     ),
+
+    CHAIN_ACTION_ENABLE(
+        "$PREFIX.chain-action.enabled",
+        """
+            Enable support for action chains
+        """.trimIndent()
+    ),
 }

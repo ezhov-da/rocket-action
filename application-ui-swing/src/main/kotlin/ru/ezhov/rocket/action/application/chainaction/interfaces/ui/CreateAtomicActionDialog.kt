@@ -1,6 +1,9 @@
 package ru.ezhov.rocket.action.application.chainaction.interfaces.ui
 
 import net.miginfocom.swing.MigLayout
+import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea
+import org.fife.ui.rsyntaxtextarea.SyntaxConstants
+import org.fife.ui.rtextarea.RTextScrollPane
 import ru.ezhov.rocket.action.application.chainaction.application.AtomicActionService
 import ru.ezhov.rocket.action.application.chainaction.domain.model.AtomicAction
 import ru.ezhov.rocket.action.application.chainaction.domain.model.AtomicActionEngine
@@ -42,7 +45,7 @@ class CreateAtomicActionDialog(
     private val textSource: JRadioButton = JRadioButton("Text")
     private val fileSource: JRadioButton = JRadioButton("File")
 
-    private val dataTextPane: JTextPane = JTextPane()
+    private val dataTextPane: RSyntaxTextArea = RSyntaxTextArea()
     private val dataLabel: JLabel = JLabel("Data:").apply { labelFor = dataTextPane }
 
     init {
@@ -71,7 +74,7 @@ class CreateAtomicActionDialog(
         contentPane.add(fileSource, "wrap")
 
         contentPane.add(dataLabel, "wrap")
-        contentPane.add(JScrollPane(dataTextPane), "span, grow, shrink, height max")
+        contentPane.add(RTextScrollPane(dataTextPane), "span, grow, shrink, height max")
 
         contentPane.add(buttonCreate, "cell 2 7, split 2, align right")
         contentPane.add(buttonCancel)
@@ -80,7 +83,17 @@ class CreateAtomicActionDialog(
         isModal = true
         getRootPane().defaultButton = buttonCreate
         buttonCreate.addActionListener { onOK() }
-        buttonCancel!!.addActionListener { onCancel() }
+        buttonCancel.addActionListener { onCancel() }
+
+        setKotlinSyntax()
+        kotlinEngine.addActionListener {
+            setKotlinSyntax()
+        }
+
+        setGroovySyntax()
+        groovyEngine.addActionListener {
+            setGroovySyntax()
+        }
 
         // call onCancel() when cross is clicked
         defaultCloseOperation = DO_NOTHING_ON_CLOSE
@@ -99,6 +112,18 @@ class CreateAtomicActionDialog(
 
         setLocationRelativeTo(null)
         setSize(700, 500)
+    }
+
+    private fun setKotlinSyntax() {
+        if (kotlinEngine.isSelected) {
+            dataTextPane.syntaxEditingStyle = SyntaxConstants.SYNTAX_STYLE_KOTLIN;
+        }
+    }
+
+    private fun setGroovySyntax() {
+        if (groovyEngine.isSelected) {
+            dataTextPane.syntaxEditingStyle = SyntaxConstants.SYNTAX_STYLE_GROOVY;
+        }
     }
 
     private fun onOK() {
