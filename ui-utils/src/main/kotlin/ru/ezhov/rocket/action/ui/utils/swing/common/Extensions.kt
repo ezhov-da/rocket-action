@@ -1,5 +1,6 @@
 package ru.ezhov.rocket.action.ui.utils.swing.common
 
+import java.awt.Component
 import java.awt.Frame
 import java.awt.GraphicsEnvironment
 import java.awt.Image
@@ -27,7 +28,10 @@ fun Icon.toImage(): Image =
 /**
  * Show window and make active
  */
-fun JFrame.showToFront() {
+fun JFrame.showToFront(parent: Component? = null) {
+    parent?.let {
+        setLocationRelativeTo(parent)
+    }
     isVisible = true
     state = Frame.NORMAL; // restores minimized windows
     toFront(); // brings to front without needing to setAlwaysOnTop

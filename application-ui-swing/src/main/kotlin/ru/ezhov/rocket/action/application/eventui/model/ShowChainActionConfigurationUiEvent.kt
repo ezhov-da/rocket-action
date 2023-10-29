@@ -1,3 +1,5 @@
 package ru.ezhov.rocket.action.application.eventui.model
 
-class ShowChainActionConfigurationUiEvent() : ConfigurationUiEvent()
+import java.awt.Component
+
+class ShowChainActionConfigurationUiEvent(val parent: Component) : ConfigurationUiEvent()

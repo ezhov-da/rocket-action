@@ -65,9 +65,11 @@ class ChainBasePanel(
         add(configurationButton, "wrap, wmax 25")
         add(chainExecuteStatusPanel, "width max, hidemode 2")
 
+        val chainBasePanel = this
+
         configurationButton.addMouseListener(object : MouseAdapter() {
             override fun mouseReleased(e: MouseEvent?) {
-                ConfigurationUiObserverFactory.observer.notify(ShowChainActionConfigurationUiEvent())
+                ConfigurationUiObserverFactory.observer.notify(ShowChainActionConfigurationUiEvent(chainBasePanel))
             }
         })
         border = BorderFactory.createLineBorder(Color.GRAY)
