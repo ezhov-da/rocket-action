@@ -49,7 +49,7 @@ class ChainBasePanel(
     private val textFieldPaste = TextFieldWithText()
     private val chainExecuteStatusPanel =
         ChainExecuteStatusPanel(chainActionExecutorService).apply { isVisible = false }
-    private val configurationButton = JButton("C").apply {
+    private val configurationButton = JButton("...").apply {
         toolTipText = "Open configuration"
     }
 
