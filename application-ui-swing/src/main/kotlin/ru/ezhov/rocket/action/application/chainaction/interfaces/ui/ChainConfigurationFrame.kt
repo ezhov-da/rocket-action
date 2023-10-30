@@ -53,12 +53,10 @@ class ChainConfigurationFrame(
     private val allListChainsModel = DefaultListModel<ChainAction>()
     private val allListChains = JList(allListChainsModel)
 
-    private val createAtomicActionDialog = CreateAtomicActionDialog(
+    private val createAndEditAtomicActionDialog = CreateAndEditAtomicActionDialog(
         atomicActionService = atomicActionService
     )
-    private val editAtomicActionDialog = EditAtomicActionDialog(
-        atomicActionService = atomicActionService,
-    )
+
     private val createChainActionDialog = CreateChainActionDialog(
         chainActionExecutorService = chainActionExecutorService,
         chainActionService = chainActionService,
@@ -81,7 +79,7 @@ class ChainConfigurationFrame(
         })
 
         allListActions.cellRenderer = AtomicActionListCellRenderer()
-        allListChains.cellRenderer = ChainActionListCellRenderer()
+        allListChains.cellRenderer = ChainActionListCellRenderer(atomicActionService)
 
         allListActions.addListSelectionListener {
             allListActions.selectedValue?.let {
@@ -92,7 +90,7 @@ class ChainConfigurationFrame(
 
         buttonEditAction.addActionListener {
             allListActions.selectedValue?.let {
-                editAtomicActionDialog.setAtomicActionAndShow(it, chainConfigurationFrame)
+                createAndEditAtomicActionDialog.showEditDialog(it, chainConfigurationFrame)
             }
         }
 
@@ -222,7 +220,7 @@ class ChainConfigurationFrame(
 
         setContentPane(contentPane)
 
-        buttonCreateAction.apply { addActionListener { createAtomicActionDialog.showDialog() } }
+        buttonCreateAction.apply { addActionListener { createAndEditAtomicActionDialog.showCreateDialog() } }
         buttonCreateChain.apply { addActionListener { createChainActionDialog.showDialog() } }
 
         // call onCancel() when cross is clicked

@@ -10,6 +10,7 @@ import ru.ezhov.rocket.action.application.chainaction.domain.model.AtomicAction
 import ru.ezhov.rocket.action.application.chainaction.domain.model.AtomicActionEngine
 import ru.ezhov.rocket.action.application.chainaction.domain.model.AtomicActionSource
 import ru.ezhov.rocket.action.application.chainaction.domain.model.ChainAction
+import ru.ezhov.rocket.action.application.chainaction.domain.model.ContractType
 import ru.ezhov.rocket.action.application.engine.application.EngineFactory
 import ru.ezhov.rocket.action.application.variables.application.VariableDto
 import ru.ezhov.rocket.action.application.variables.application.VariablesDto
@@ -23,6 +24,7 @@ internal class ChainActionExecutorImplTest {
                 id = "11",
                 source = AtomicActionSource.TEXT,
                 data = "_INPUT.toInteger()",
+                contractType = ContractType.IN_OUT,
                 engine = AtomicActionEngine.GROOVY,
                 name = "String to Int",
                 description = "String to Int",
@@ -32,6 +34,7 @@ internal class ChainActionExecutorImplTest {
                 id = "22",
                 source = AtomicActionSource.TEXT,
                 data = "_INPUT + 2",
+                contractType = ContractType.IN_OUT,
                 engine = AtomicActionEngine.KOTLIN,
                 name = "Int plus Int",
                 description = "Int plus Int",
@@ -93,6 +96,7 @@ internal class ChainActionExecutorImplTest {
                 id = "11",
                 source = AtomicActionSource.TEXT,
                 data = "_INPUT.toInteger()",
+                contractType = ContractType.IN_OUT,
                 engine = AtomicActionEngine.GROOVY,
                 name = "String to Int",
                 description = "String to Int",
@@ -101,6 +105,7 @@ internal class ChainActionExecutorImplTest {
                 id = "22",
                 source = AtomicActionSource.TEXT,
                 data = "_INPUT +. 2",
+                contractType = ContractType.IN_OUT,
                 engine = AtomicActionEngine.KOTLIN,
                 name = "Int plus Int",
                 description = "Int plus Int",

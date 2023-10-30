@@ -17,7 +17,7 @@ class ChainExecuteStatusPanel(
     private val chainActionExecutorService: ChainActionExecutorService
 ) : JPanel(MigLayout(/*"debug"*/)) {
 
-    fun executeChain(input: String, chainAction: ChainAction, onComplete: () -> Unit) {
+    fun executeChain(input: String?, chainAction: ChainAction, onComplete: () -> Unit) {
         removeAll()
         val map = chainAction
             .actions

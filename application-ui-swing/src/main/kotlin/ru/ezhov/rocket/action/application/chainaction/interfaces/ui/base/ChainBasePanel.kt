@@ -1,6 +1,7 @@
 package ru.ezhov.rocket.action.application.chainaction.interfaces.ui.base
 
 import net.miginfocom.swing.MigLayout
+import ru.ezhov.rocket.action.application.chainaction.application.AtomicActionService
 import ru.ezhov.rocket.action.application.chainaction.application.ChainActionExecutorService
 import ru.ezhov.rocket.action.application.chainaction.application.ChainActionService
 import ru.ezhov.rocket.action.application.eventui.ConfigurationUiObserverFactory
@@ -30,7 +31,9 @@ import javax.swing.BorderFactory
 import javax.swing.JButton
 import javax.swing.JComponent
 import javax.swing.JLabel
+import javax.swing.JMenuItem
 import javax.swing.JPanel
+import javax.swing.JPopupMenu
 import javax.swing.JTextField
 import javax.swing.SwingConstants
 import javax.swing.SwingUtilities
@@ -39,14 +42,20 @@ class ChainBasePanel(
     private val movableComponent: Component,
     chainActionExecutorService: ChainActionExecutorService,
     private val chainActionService: ChainActionService,
+    private val atomicActionService: AtomicActionService,
 ) : JPanel(MigLayout(/*"debug"*/)) {
-    private val labelDropDown = JLabel("<html><center>Drag text<br>to run chain<br>or</center>")
-    private val textFieldPaste = TextFieldWithText("paste here or type and `Enter`")
+    private val labelDropDown =
+        JLabel("<html><center>Drag text<br>to run chain<br>or paste here<br>or type and `Enter`</center>")
+    private val textFieldPaste = TextFieldWithText()
     private val chainExecuteStatusPanel =
         ChainExecuteStatusPanel(chainActionExecutorService).apply { isVisible = false }
     private val configurationButton = JButton("C").apply {
         toolTipText = "Open configuration"
     }
+
+    private val popupMenu = JPopupMenu()
+    private val menuItemSelectChain = JMenuItem("Select chain")
+    private val menuItemOpenConfiguration = JMenuItem("Open configuration")
 
     private val currentTimer: Timer = Timer()
 
@@ -65,13 +74,24 @@ class ChainBasePanel(
         add(configurationButton, "wrap, wmax 25")
         add(chainExecuteStatusPanel, "width max, hidemode 2")
 
+        popupMenu.add(menuItemSelectChain)
+        popupMenu.add(menuItemOpenConfiguration)
+
         val chainBasePanel = this
 
         configurationButton.addMouseListener(object : MouseAdapter() {
             override fun mouseReleased(e: MouseEvent?) {
-                ConfigurationUiObserverFactory.observer.notify(ShowChainActionConfigurationUiEvent(chainBasePanel))
+                popupMenu.show(configurationButton, 0, 0)
             }
         })
+
+        menuItemSelectChain.addActionListener {
+            showSelectedChain(null)
+        }
+        menuItemOpenConfiguration.addActionListener {
+            ConfigurationUiObserverFactory.observer.notify(ShowChainActionConfigurationUiEvent(chainBasePanel))
+        }
+
         border = BorderFactory.createLineBorder(Color.GRAY)
     }
 
@@ -132,11 +152,12 @@ class ChainBasePanel(
         })
     }
 
-    private fun showSelectedChain(text: String) {
+    private fun showSelectedChain(text: String?) {
         val chains = chainActionService.chains()
         val chainBasePanel = this
         SelectChainDialog(
-            chains,
+            actionService = atomicActionService,
+            chains = chains,
         ) { chain ->
             chainExecuteStatusPanel.isVisible = true
 

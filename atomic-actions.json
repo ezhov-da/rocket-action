@@ -1,9 +1,10 @@
 {
-  "changedDate" : "2023-10-29T12:36:13.005",
+  "changedDate" : "2023-10-31T00:02:43.731",
   "atomicActions" : [ {
     "id" : "ccb3ea04-68ef-4988-84f1-2d95e14c0046",
     "name" : "Убирает начальные и конечные пробелы у строки (test)",
     "description" : "Убирает начальные и конечные пробелы у строки",
+    "contractType" : "IN_OUT",
     "engine" : "GROOVY",
     "source" : "TEXT",
     "data" : "// test\n\n_INPUT.trim()"
@@ -11,6 +12,7 @@
     "id" : "8dba925e-07fb-4d88-af27-18d38eefede0",
     "name" : "Заменяет все символы `a` на `1`",
     "description" : "Заменяет все символы `a` на `1`",
+    "contractType" : "IN_OUT",
     "engine" : "GROOVY",
     "source" : "TEXT",
     "data" : "_INPUT.replace(\"a\", \"1\")"
@@ -18,8 +20,17 @@
     "id" : "0f023251-5b90-44d2-bb40-2224f504bb92",
     "name" : "Открытие ссылки по Jira задаче",
     "description" : "Открытие ссылки по Jira задаче.\r\n\r\nВходной параметр - номер задачи.",
+    "contractType" : "IN_UNIT",
     "engine" : "GROOVY",
     "source" : "TEXT",
     "data" : "import java.awt.*\r\n\r\nString jiraNumber = _INPUT\r\n\r\nif (Desktop.desktopSupported) {\r\n    Desktop.desktop.browse(\"https://jira.app.local/browse/INTRASTAR-${jiraNumber.trim()}\".toURI())\r\n}"
+  }, {
+    "id" : "79ce0f96-08f9-4267-b9a2-cf58d86a8711",
+    "name" : "UNIT - UNIT",
+    "description" : "Ничего не делаем",
+    "contractType" : "UNIT_OUT",
+    "engine" : "KOTLIN",
+    "source" : "TEXT",
+    "data" : "println(\"Test row!\")"
   } ]
 }

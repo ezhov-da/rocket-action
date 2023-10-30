@@ -1,5 +1,6 @@
 package ru.ezhov.rocket.action.application.chainaction.interfaces.ui.base
 
+import ru.ezhov.rocket.action.application.chainaction.application.AtomicActionService
 import ru.ezhov.rocket.action.application.chainaction.domain.model.ChainAction
 import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.renderer.ChainActionListCellRenderer
 import java.awt.BorderLayout
@@ -13,6 +14,7 @@ import javax.swing.JPanel
 import javax.swing.JScrollPane
 
 class SelectChainDialog(
+    actionService: AtomicActionService,
     chains: List<ChainAction>,
     selectedChainCallback: (ChainAction) -> Unit
 ) : JDialog() {
@@ -22,7 +24,7 @@ class SelectChainDialog(
 
     init {
         chains.forEach { listChainsModel.addElement(it) }
-        chainList.cellRenderer = ChainActionListCellRenderer()
+        chainList.cellRenderer = ChainActionListCellRenderer(actionService)
 
         val selectChainDialog = this
         chainList.addMouseListener(object : MouseAdapter() {

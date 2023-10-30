@@ -4,10 +4,18 @@ data class AtomicAction(
     var id: String,
     var name: String,
     var description: String,
+    var contractType: ContractType,
     var engine: AtomicActionEngine,
     var source: AtomicActionSource,
     var data: String,
 )
+
+enum class ContractType {
+    IN_OUT,
+    IN_UNIT,
+    UNIT_OUT,
+    UNIT_UNIT,
+}
 
 enum class AtomicActionSource {
     FILE,

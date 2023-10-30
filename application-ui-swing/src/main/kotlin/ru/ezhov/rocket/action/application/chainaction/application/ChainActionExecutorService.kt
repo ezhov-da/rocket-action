@@ -9,7 +9,7 @@ class ChainActionExecutorService(
     private val chainActionExecutor: ChainActionExecutor,
     private val chainActionService: ChainActionService,
 ) {
-    fun execute(input: String, chainActionId: String, chainActionExecutorProgress: ChainActionExecutorProgress) {
+    fun execute(input: String?, chainActionId: String, chainActionExecutorProgress: ChainActionExecutorProgress) {
         val chain = chainActionService.byId(chainActionId)!!
         chainActionExecutor.execute(input, chain, chainActionExecutorProgress)
     }

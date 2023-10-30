@@ -26,7 +26,8 @@ fun main(args: Array<String>) {
         }
         val frame = JFrame("_________")
 
-        val chainActionRepository = JsonChainActionRepository(TestUtilsFactory.objectMapper)
+        val chainActionService = ChainActionService(JsonChainActionRepository(TestUtilsFactory.objectMapper))
+        val atomicActionService = AtomicActionService(JsonAtomicActionRepository(TestUtilsFactory.objectMapper))
         frame.add(
             ChainBasePanel(
                 movableComponent = frame,
@@ -39,11 +40,12 @@ fun main(args: Array<String>) {
                                 variables = emptyList()
                             )
                         },
-                        atomicActionService = AtomicActionService(JsonAtomicActionRepository(TestUtilsFactory.objectMapper))
+                        atomicActionService = atomicActionService
                     ),
-                    chainActionService = ChainActionService(chainActionRepository),
+                    chainActionService = chainActionService,
                 ),
-                chainActionService = ChainActionService(chainActionRepository),
+                chainActionService = chainActionService,
+                atomicActionService = atomicActionService,
             )
         )
         frame.setSize(300, 200)

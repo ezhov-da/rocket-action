@@ -3,6 +3,7 @@ package ru.ezhov.rocket.action.application.chainaction.interfaces.ui
 import ru.ezhov.rocket.action.application.chainaction.domain.model.AtomicAction
 import ru.ezhov.rocket.action.application.chainaction.domain.model.AtomicActionEngine
 import ru.ezhov.rocket.action.application.chainaction.domain.model.AtomicActionSource
+import ru.ezhov.rocket.action.application.chainaction.domain.model.ContractType
 import javax.swing.JFrame
 import javax.swing.SwingUtilities
 import javax.swing.UIManager
@@ -23,6 +24,7 @@ fun main(args: Array<String>) {
                     id = "123",
                     name = "Test name",
                     description = "Test description",
+                    contractType = ContractType.IN_OUT,
                     engine = AtomicActionEngine.KOTLIN,
                     source = AtomicActionSource.FILE,
                     data = "Text",

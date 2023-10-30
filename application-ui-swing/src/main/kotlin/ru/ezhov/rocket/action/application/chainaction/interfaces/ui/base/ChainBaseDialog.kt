@@ -17,6 +17,7 @@ class ChainBaseDialog(
         movableComponent = this,
         chainActionExecutorService = chainActionExecutorService,
         chainActionService = chainActionService,
+        atomicActionService = atomicActionService,
     )
 
     private val chainConfigurationFrame = ChainConfigurationFrame(

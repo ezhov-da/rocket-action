@@ -1,16 +1,30 @@
 package ru.ezhov.rocket.action.application.chainaction.interfaces.ui
 
+import io.mockk.mockk
 import ru.ezhov.rocket.action.application.chainaction.application.AtomicActionService
 import ru.ezhov.rocket.action.application.chainaction.infrastructure.InMemoryAtomicActionRepository
 
+internal class CreateAndEditAtomicActionDialogTest
+
 fun main(args: Array<String>) {
-    val dialog = CreateAtomicActionDialog(
+    create()
+}
+
+private fun create() {
+    val dialog = CreateAndEditAtomicActionDialog(
         AtomicActionService(
             InMemoryAtomicActionRepository(),
         )
     )
-    dialog.isVisible = true
+    dialog.showCreateDialog()
     System.exit(0)
 }
 
-internal class CreateAtomicActionDialogTest
+private fun edit() {
+    val dialog = CreateAndEditAtomicActionDialog(
+        mockk()
+
+    )
+    dialog.isVisible = true
+    System.exit(0)
+}

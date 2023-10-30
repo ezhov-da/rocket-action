@@ -1,7 +1,10 @@
 package ru.ezhov.rocket.action.application.chainaction.interfaces.ui
 
+import io.mockk.every
+import io.mockk.mockk
 import ru.ezhov.rocket.action.application.chainaction.domain.model.ActionOrder
 import ru.ezhov.rocket.action.application.chainaction.domain.model.ChainAction
+import ru.ezhov.rocket.action.application.chainaction.domain.model.ContractType
 import javax.swing.JFrame
 import javax.swing.SwingUtilities
 import javax.swing.UIManager
@@ -18,7 +21,7 @@ fun main(args: Array<String>) {
         val frame = JFrame("_________");
         frame.add(
             ChainActionListCellPanel(
-                ChainAction(
+                chainAction = ChainAction(
                     id = "123",
                     name = "Test name",
                     description = "Test description",
@@ -30,7 +33,11 @@ fun main(args: Array<String>) {
                             "111", "22"
                         )
                     )
-                )
+                ),
+                backgroundColor = null,
+                firstAtomicAction = mockk {
+                    every { contractType } returns ContractType.IN_OUT
+                }
             )
         )
         frame.setSize(1000, 600);
