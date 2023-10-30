@@ -3,6 +3,7 @@ package ru.ezhov.rocket.action.application
 
 import com.formdev.flatlaf.FlatLightLaf
 import org.springframework.stereotype.Service
+import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.ChainBaseDialogBuilder
 import ru.ezhov.rocket.action.application.handlers.server.HttpServer
 import ru.ezhov.rocket.action.application.properties.GeneralPropertiesRepository
 import ru.ezhov.rocket.action.application.properties.UsedPropertiesName
@@ -18,6 +19,7 @@ class AppRunService(
     private val uiQuickActionService: UiQuickActionService,
     private val generalPropertiesRepository: GeneralPropertiesRepository,
     private val httpServer: HttpServer,
+    private val chainBaseDialogBuilder: ChainBaseDialogBuilder,
 ) {
 
     /**
@@ -39,6 +41,11 @@ class AppRunService(
                     isAlwaysOnTop = true
                     pack()
                     isVisible = true
+                }
+
+
+                if (generalPropertiesRepository.asBoolean(UsedPropertiesName.CHAIN_ACTION_ENABLE, false)) {
+                    chainBaseDialogBuilder.build().showDialog()
                 }
             } catch (e: UiQuickActionServiceException) {
                 e.printStackTrace()

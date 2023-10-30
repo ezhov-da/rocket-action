@@ -32,4 +32,8 @@ class ChainBaseDialog(
         add(chainBasePanel, BorderLayout.CENTER)
         setLocationRelativeTo(null)
     }
+
+    fun showDialog(){
+        isVisible = true
+    }
 }
