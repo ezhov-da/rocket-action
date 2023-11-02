@@ -37,7 +37,7 @@ class ChainActionExecutorImpl(
                 currentAtomicActionId = atomicActionOrder.actionId
                 val atomicAction = atomicActionService.atomicBy(currentAtomicActionId!!)
                 if (atomicAction == null) {
-                    chainActionExecutorProgress.failure(
+                    chainActionExecutorProgress.onAtomicActionFailure(
                         currentAtomicActionOrderId!!,
                         null,
                         IllegalStateException(
@@ -79,12 +79,16 @@ class ChainActionExecutorImpl(
 
                 inputValue = executeResult
                 lastResult = executeResult
-                chainActionExecutorProgress.success(currentAtomicActionOrderId!!, currentAtomicAction!!)
+                chainActionExecutorProgress.onAtomicActionSuccess(
+                    currentAtomicActionOrderId!!,
+                    lastResult,
+                    currentAtomicAction!!
+                )
             }
 
-            chainActionExecutorProgress.complete(lastResult)
+            chainActionExecutorProgress.onChainComplete(lastResult, currentAtomicAction!!)
         } catch (ex: Exception) {
-            chainActionExecutorProgress.failure(currentAtomicActionOrderId!!, currentAtomicAction!!, ex)
+            chainActionExecutorProgress.onAtomicActionFailure(currentAtomicActionOrderId!!, currentAtomicAction!!, ex)
         }
     }
 }

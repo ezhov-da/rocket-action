@@ -27,14 +27,15 @@ class ChainBaseDialog(
     )
 
     init {
-        setSize(200, 140)
+        setSize(200, 120)
         isAlwaysOnTop = true
         isUndecorated = true
+        opacity = 0.7F // TODO ezhov test
         add(chainBasePanel, BorderLayout.CENTER)
         setLocationRelativeTo(null)
     }
 
-    fun showDialog(){
+    fun showDialog() {
         isVisible = true
     }
 }

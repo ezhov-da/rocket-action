@@ -74,15 +74,15 @@ internal class ChainActionExecutorImplTest {
                 )
             ),
             object : ChainActionExecutorProgress {
-                override fun complete(result: Any?) {
+                override fun onChainComplete(result: Any?, lastAtomicAction: AtomicAction) {
                     println("complete $result")
                 }
 
-                override fun success(orderId: String, atomicAction: AtomicAction) {
+                override fun onAtomicActionSuccess(orderId: String, result: Any?, atomicAction: AtomicAction) {
                     println("success ${atomicAction.id}")
                 }
 
-                override fun failure(orderId: String, atomicAction: AtomicAction?, ex: Exception) {
+                override fun onAtomicActionFailure(orderId: String, atomicAction: AtomicAction?, ex: Exception) {
                     println("failure $orderId")
                 }
             }
@@ -146,18 +146,17 @@ internal class ChainActionExecutorImplTest {
                 )
             ),
             object : ChainActionExecutorProgress {
-                override fun complete(result: Any?) {
+                override fun onChainComplete(result: Any?, lastAtomicAction: AtomicAction) {
                     println("complete $result")
                 }
 
-                override fun success(orderId: String, atomicAction: AtomicAction) {
+                override fun onAtomicActionSuccess(orderId: String, result: Any?, atomicAction: AtomicAction) {
                     println("success ${atomicAction.id}")
                 }
 
-                override fun failure(orderId: String, atomicAction: AtomicAction?, ex: Exception) {
+                override fun onAtomicActionFailure(orderId: String, atomicAction: AtomicAction?, ex: Exception) {
                     println("failure $orderId")
                 }
-
             }
         )
     }

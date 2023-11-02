@@ -39,7 +39,7 @@ class CreateAndEditAtomicActionDialog(
     private val descriptionTextPane: JTextPane = JTextPane()
     private val descriptionLabel: JLabel = JLabel("Description:").apply { labelFor = descriptionTextPane }
 
-    private val contractLabel: JLabel = JLabel("Contract")
+    private val contractLabel: JLabel = JLabel("Contract:")
     private val inOutRadioButton: JRadioButton = JRadioButton("IN and OUT")
     private val inUnitRadioButton: JRadioButton = JRadioButton("IN and UNIT")
     private val unitOutRadioButton: JRadioButton = JRadioButton("UNIT and OUT")

@@ -45,7 +45,7 @@ class ChainBasePanel(
     private val atomicActionService: AtomicActionService,
 ) : JPanel(MigLayout(/*"debug"*/)) {
     private val labelDropDown =
-        JLabel("<html><center>Drag text<br>to run chain<br>or paste here<br>or type and `Enter`</center>")
+        JLabel("<html><center>Drag text to run chain<br>or paste here or type and `Enter`</center>")
     private val textFieldPaste = TextFieldWithText()
     private val chainExecuteStatusPanel =
         ChainExecuteStatusPanel(chainActionExecutorService).apply { isVisible = false }
@@ -162,11 +162,15 @@ class ChainBasePanel(
             chainExecuteStatusPanel.isVisible = true
 
             chainExecuteStatusPanel.executeChain(input = text, chainAction = chain) {
-                currentTimer.schedule(object : TimerTask() {
-                    override fun run() {
-                        SwingUtilities.invokeLater { chainExecuteStatusPanel.isVisible = false }
-                    }
-                }, 10000)
+                textFieldPaste.text = ""
+
+                currentTimer.schedule(
+                    object : TimerTask() {
+                        override fun run() {
+                            SwingUtilities.invokeLater { chainExecuteStatusPanel.isVisible = false }
+                        }
+                    }, 60000
+                )
             }
         }.apply {
             setLocationRelativeTo(chainBasePanel)

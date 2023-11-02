@@ -1,5 +1,5 @@
 {
-  "changedDate" : "2023-10-31T00:02:43.731",
+  "changedDate" : "2023-11-01T17:28:29.905",
   "atomicActions" : [ {
     "id" : "ccb3ea04-68ef-4988-84f1-2d95e14c0046",
     "name" : "Убирает начальные и конечные пробелы у строки (test)",
@@ -12,10 +12,10 @@
     "id" : "8dba925e-07fb-4d88-af27-18d38eefede0",
     "name" : "Заменяет все символы `a` на `1`",
     "description" : "Заменяет все символы `a` на `1`",
-    "contractType" : "IN_OUT",
+    "contractType" : "IN_UNIT",
     "engine" : "GROOVY",
     "source" : "TEXT",
-    "data" : "_INPUT.replace(\"a\", \"1\")"
+    "data" : "_INPUT.replace(\"а\", \"1\").replace(\"a\", \"1\")"
   }, {
     "id" : "0f023251-5b90-44d2-bb40-2224f504bb92",
     "name" : "Открытие ссылки по Jira задаче",
@@ -28,9 +28,25 @@
     "id" : "79ce0f96-08f9-4267-b9a2-cf58d86a8711",
     "name" : "UNIT - UNIT",
     "description" : "Ничего не делаем",
-    "contractType" : "UNIT_OUT",
+    "contractType" : "UNIT_UNIT",
     "engine" : "KOTLIN",
     "source" : "TEXT",
     "data" : "println(\"Test row!\")"
+  }, {
+    "id" : "3ac9741e-9c63-410e-8488-3dc52e5c92f6",
+    "name" : "Отдаём строку",
+    "description" : "",
+    "contractType" : "UNIT_OUT",
+    "engine" : "GROOVY",
+    "source" : "TEXT",
+    "data" : "\"строка\""
+  }, {
+    "id" : "d4b03ab3-09bd-4d65-bc43-368ac169346f",
+    "name" : "Буд-то принимаем, но ничего не возвращаем",
+    "description" : "Буд-то принимаем, но ничего не возвращаем",
+    "contractType" : "IN_UNIT",
+    "engine" : "KOTLIN",
+    "source" : "TEXT",
+    "data" : ""
   } ]
 }

@@ -4,9 +4,9 @@ import ru.ezhov.rocket.action.application.chainaction.domain.model.AtomicAction
 import java.lang.Exception
 
 interface ChainActionExecutorProgress {
-    fun complete(result: Any?)
+    fun onChainComplete(result: Any?, lastAtomicAction: AtomicAction)
 
-    fun success(orderId: String, atomicAction: AtomicAction)
+    fun onAtomicActionSuccess(orderId: String, result: Any?, atomicAction: AtomicAction)
 
-    fun failure(orderId: String, atomicAction: AtomicAction?, ex: Exception)
+    fun onAtomicActionFailure(orderId: String, atomicAction: AtomicAction?, ex: Exception)
 }
