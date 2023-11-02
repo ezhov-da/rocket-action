@@ -2,8 +2,9 @@ package ru.ezhov.rocket.action.application.chainaction.interfaces.ui.base
 
 import mu.KotlinLogging
 import net.miginfocom.swing.MigLayout
-import ru.ezhov.rocket.action.application.chainaction.application.ChainActionExecutorService
-import ru.ezhov.rocket.action.application.chainaction.domain.ChainActionExecutorProgress
+import ru.ezhov.rocket.action.application.chainaction.application.ActionExecutorService
+import ru.ezhov.rocket.action.application.chainaction.domain.ProgressExecutingAction
+import ru.ezhov.rocket.action.application.chainaction.domain.model.Action
 import ru.ezhov.rocket.action.application.chainaction.domain.model.ActionOrder
 import ru.ezhov.rocket.action.application.chainaction.domain.model.AtomicAction
 import ru.ezhov.rocket.action.application.chainaction.domain.model.ChainAction
@@ -18,15 +19,21 @@ import javax.swing.SwingUtilities
 
 private val logger = KotlinLogging.logger {}
 
-class ChainExecuteStatusPanel(
-    private val chainActionExecutorService: ChainActionExecutorService
+class ActionExecuteStatusPanel(
+    private val actionExecutorService: ActionExecutorService
 ) : JPanel(MigLayout(/*"debug"*/"insets 0 0 0 0")) {
 
-    fun executeChain(input: String?, chainAction: ChainAction, onComplete: () -> Unit) {
+    fun executeChain(input: String?, action: Action, onComplete: () -> Unit) {
         removeAll()
-        val map = chainAction
-            .actions
-            .associate { it.chainOrderId to ProgressActionInfo(actionOrder = it) }
+
+        val map = when (action) {
+            is ChainAction -> action
+                .actions
+                .associate { it.chainOrderId to ProgressActionInfo(actionOrder = it) }
+
+            is AtomicAction -> mapOf(action.id to ProgressActionInfo(actionOrder = ActionOrder(action.id, action.id)))
+            else -> throw UnsupportedOperationException("Unsupported action type")
+        }
 
         map.values.forEach { add(it.label, "width max") }
 
@@ -36,11 +43,11 @@ class ChainExecuteStatusPanel(
         val chainExecuteStatusPanel = this
 
         Thread {
-            chainActionExecutorService.execute(
-                input,
-                chainAction.id,
-                object : ChainActionExecutorProgress {
-                    override fun onChainComplete(result: Any?, lastAtomicAction: AtomicAction) {
+            actionExecutorService.execute(
+                input = input,
+                actionId = action.id(),
+                progressExecutingAction = object : ProgressExecutingAction {
+                    override fun onComplete(result: Any?, lastAtomicAction: AtomicAction) {
                         // TODO ezhov
                         onComplete()
 

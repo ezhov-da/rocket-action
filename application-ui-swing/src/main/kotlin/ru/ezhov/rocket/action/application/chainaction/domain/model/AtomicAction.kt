@@ -8,7 +8,9 @@ data class AtomicAction(
     var engine: AtomicActionEngine,
     var source: AtomicActionSource,
     var data: String,
-)
+): Action{
+    override fun id(): String = id
+}
 
 enum class ContractType {
     IN_OUT,

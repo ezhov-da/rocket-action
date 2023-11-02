@@ -3,10 +3,10 @@ package ru.ezhov.rocket.action.application.chainaction.interfaces.ui.base
 import io.mockk.every
 import io.mockk.mockk
 import ru.ezhov.rocket.action.application.TestUtilsFactory
+import ru.ezhov.rocket.action.application.chainaction.application.ActionExecutorService
 import ru.ezhov.rocket.action.application.chainaction.application.AtomicActionService
-import ru.ezhov.rocket.action.application.chainaction.application.ChainActionExecutorService
 import ru.ezhov.rocket.action.application.chainaction.application.ChainActionService
-import ru.ezhov.rocket.action.application.chainaction.infrastructure.ChainActionExecutorImpl
+import ru.ezhov.rocket.action.application.chainaction.infrastructure.ActionExecutorImpl
 import ru.ezhov.rocket.action.application.chainaction.infrastructure.JsonAtomicActionRepository
 import ru.ezhov.rocket.action.application.chainaction.infrastructure.JsonChainActionRepository
 import ru.ezhov.rocket.action.application.engine.application.EngineFactory
@@ -31,8 +31,8 @@ fun main(args: Array<String>) {
         frame.add(
             ChainBasePanel(
                 movableComponent = frame,
-                chainActionExecutorService = ChainActionExecutorService(
-                    chainActionExecutor = ChainActionExecutorImpl(
+                actionExecutorService = ActionExecutorService(
+                    actionExecutor = ActionExecutorImpl(
                         engineFactory = EngineFactory(),
                         variablesApplication = mockk {
                             every { all() } returns VariablesDto(
@@ -43,6 +43,7 @@ fun main(args: Array<String>) {
                         atomicActionService = atomicActionService
                     ),
                     chainActionService = chainActionService,
+                    atomicActionService = atomicActionService,
                 ),
                 chainActionService = chainActionService,
                 atomicActionService = atomicActionService,

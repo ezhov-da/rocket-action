@@ -21,7 +21,7 @@ fun main(args: Array<String>) {
         }
 
         val dialog = EditChainActionDialog(
-            chainActionExecutorService = mockk(),
+            actionExecutorService = mockk(),
             chainActionService = ChainActionService(JsonChainActionRepository(TestUtilsFactory.objectMapper)),
             atomicActionService = AtomicActionService(JsonAtomicActionRepository(TestUtilsFactory.objectMapper)),
         ).showEditDialog(

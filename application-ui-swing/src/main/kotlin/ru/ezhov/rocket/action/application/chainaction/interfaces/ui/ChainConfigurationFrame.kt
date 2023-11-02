@@ -2,7 +2,7 @@ package ru.ezhov.rocket.action.application.chainaction.interfaces.ui
 
 import net.miginfocom.swing.MigLayout
 import ru.ezhov.rocket.action.application.chainaction.application.AtomicActionService
-import ru.ezhov.rocket.action.application.chainaction.application.ChainActionExecutorService
+import ru.ezhov.rocket.action.application.chainaction.application.ActionExecutorService
 import ru.ezhov.rocket.action.application.chainaction.application.ChainActionService
 import ru.ezhov.rocket.action.application.chainaction.domain.event.AtomicActionCreatedDomainEvent
 import ru.ezhov.rocket.action.application.chainaction.domain.event.AtomicActionDeletedDomainEvent
@@ -35,7 +35,7 @@ import javax.swing.JScrollPane
 import javax.swing.KeyStroke
 
 class ChainConfigurationFrame(
-    private val chainActionExecutorService: ChainActionExecutorService,
+    private val actionExecutorService: ActionExecutorService,
     private val chainActionService: ChainActionService,
     private val atomicActionService: AtomicActionService,
 ) : JFrame() {
@@ -58,12 +58,12 @@ class ChainConfigurationFrame(
     )
 
     private val createChainActionDialog = CreateChainActionDialog(
-        chainActionExecutorService = chainActionExecutorService,
+        actionExecutorService = actionExecutorService,
         chainActionService = chainActionService,
         atomicActionService = atomicActionService,
     )
     private val editChainActionDialog = EditChainActionDialog(
-        chainActionExecutorService = chainActionExecutorService,
+        actionExecutorService = actionExecutorService,
         chainActionService = chainActionService,
         atomicActionService = atomicActionService,
     )

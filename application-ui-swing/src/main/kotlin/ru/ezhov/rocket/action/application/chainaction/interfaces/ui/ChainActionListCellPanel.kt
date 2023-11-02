@@ -11,6 +11,7 @@ import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.components.u
 import java.awt.Color
 import javax.swing.JLabel
 import javax.swing.JPanel
+import javax.swing.SwingConstants
 
 class ChainActionListCellPanel(
     chainAction: ChainAction,
@@ -18,7 +19,7 @@ class ChainActionListCellPanel(
     firstAtomicAction: AtomicAction?
 ) :
     JPanel(MigLayout(/*"debug"*/)) {
-    private val nameLabel = JLabel(chainAction.name)
+    private val nameLabel = JLabel(chainAction.name, CHAIN_ICON, SwingConstants.LEFT)
     private val contractLabel: JLabel? = firstAtomicAction?.let {
         JLabel(
             when (it.contractType) {

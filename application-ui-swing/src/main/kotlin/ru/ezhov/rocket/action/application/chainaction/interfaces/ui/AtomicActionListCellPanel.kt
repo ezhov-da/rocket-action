@@ -10,13 +10,13 @@ import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.components.u
 import java.awt.Color
 import javax.swing.JLabel
 import javax.swing.JPanel
+import javax.swing.SwingConstants
 
 class AtomicActionListCellPanel(
     atomicAction: AtomicAction,
     backgroundColor: Color? = null,
-) :
-    JPanel(MigLayout(/*"debug"*/)) {
-    private val nameLabel = JLabel(atomicAction.name)
+) : JPanel(MigLayout(/*"debug"*/)) {
+    private val nameLabel = JLabel(atomicAction.name, ATOMIC_ICON, SwingConstants.LEFT)
     private val contractLabel = JLabel(
         when (atomicAction.contractType) {
             ContractType.IN_OUT -> inOutIcon

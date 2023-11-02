@@ -1,8 +1,8 @@
 package ru.ezhov.rocket.action.application.chainaction.interfaces.ui.base
 
 import net.miginfocom.swing.MigLayout
+import ru.ezhov.rocket.action.application.chainaction.application.ActionExecutorService
 import ru.ezhov.rocket.action.application.chainaction.application.AtomicActionService
-import ru.ezhov.rocket.action.application.chainaction.application.ChainActionExecutorService
 import ru.ezhov.rocket.action.application.chainaction.application.ChainActionService
 import ru.ezhov.rocket.action.application.eventui.ConfigurationUiObserverFactory
 import ru.ezhov.rocket.action.application.eventui.model.ShowChainActionConfigurationUiEvent
@@ -40,15 +40,15 @@ import javax.swing.SwingUtilities
 
 class ChainBasePanel(
     private val movableComponent: Component,
-    chainActionExecutorService: ChainActionExecutorService,
+    actionExecutorService: ActionExecutorService,
     private val chainActionService: ChainActionService,
     private val atomicActionService: AtomicActionService,
 ) : JPanel(MigLayout(/*"debug"*/)) {
     private val labelDropDown =
         JLabel("<html><center>Drag text to run chain<br>or paste here or type and `Enter`</center>")
     private val textFieldPaste = TextFieldWithText()
-    private val chainExecuteStatusPanel =
-        ChainExecuteStatusPanel(chainActionExecutorService).apply { isVisible = false }
+    private val actionExecuteStatusPanel =
+        ActionExecuteStatusPanel(actionExecutorService).apply { isVisible = false }
     private val configurationButton = JButton("...").apply {
         toolTipText = "Open configuration"
     }
@@ -72,7 +72,7 @@ class ChainBasePanel(
         add(labelDropDown, "wrap, width max, height max, id labelDropDown")
         add(textFieldPaste, "width max, split 2")
         add(configurationButton, "wrap, wmax 25")
-        add(chainExecuteStatusPanel, "width max, hidemode 2")
+        add(actionExecuteStatusPanel, "width max, hidemode 2")
 
         popupMenu.add(menuItemSelectChain)
         popupMenu.add(menuItemOpenConfiguration)
@@ -153,21 +153,21 @@ class ChainBasePanel(
     }
 
     private fun showSelectedChain(text: String?) {
-        val chains = chainActionService.chains()
         val chainBasePanel = this
         SelectChainDialog(
             actionService = atomicActionService,
-            chains = chains,
+            chains = chainActionService.chains(),
+            atomics = atomicActionService.atomics(),
         ) { chain ->
-            chainExecuteStatusPanel.isVisible = true
+            actionExecuteStatusPanel.isVisible = true
 
-            chainExecuteStatusPanel.executeChain(input = text, chainAction = chain) {
+            actionExecuteStatusPanel.executeChain(input = text, action = chain) {
                 textFieldPaste.text = ""
 
                 currentTimer.schedule(
                     object : TimerTask() {
                         override fun run() {
-                            SwingUtilities.invokeLater { chainExecuteStatusPanel.isVisible = false }
+                            SwingUtilities.invokeLater { actionExecuteStatusPanel.isVisible = false }
                         }
                     }, 60000
                 )

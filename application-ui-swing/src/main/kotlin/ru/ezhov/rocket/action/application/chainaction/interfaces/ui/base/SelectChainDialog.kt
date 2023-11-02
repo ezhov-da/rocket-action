@@ -1,8 +1,10 @@
 package ru.ezhov.rocket.action.application.chainaction.interfaces.ui.base
 
 import ru.ezhov.rocket.action.application.chainaction.application.AtomicActionService
+import ru.ezhov.rocket.action.application.chainaction.domain.model.Action
+import ru.ezhov.rocket.action.application.chainaction.domain.model.AtomicAction
 import ru.ezhov.rocket.action.application.chainaction.domain.model.ChainAction
-import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.renderer.ChainActionListCellRenderer
+import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.renderer.ChainAndAtomicActionListCellRenderer
 import java.awt.BorderLayout
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
@@ -16,15 +18,17 @@ import javax.swing.JScrollPane
 class SelectChainDialog(
     actionService: AtomicActionService,
     chains: List<ChainAction>,
-    selectedChainCallback: (ChainAction) -> Unit
+    atomics: List<AtomicAction>,
+    selectedChainCallback: (Action) -> Unit
 ) : JDialog() {
-    private val listChainsModel = DefaultListModel<ChainAction>()
+    private val listChainsModel = DefaultListModel<Action>()
     private val chainList = JList(listChainsModel)
     private val buttonCancel = JButton("Cancel")
 
     init {
         chains.forEach { listChainsModel.addElement(it) }
-        chainList.cellRenderer = ChainActionListCellRenderer(actionService)
+        atomics.forEach { listChainsModel.addElement(it) }
+        chainList.cellRenderer = ChainAndAtomicActionListCellRenderer(actionService)
 
         val selectChainDialog = this
         chainList.addMouseListener(object : MouseAdapter() {
