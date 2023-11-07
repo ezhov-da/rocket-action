@@ -154,7 +154,7 @@ class ChainBasePanel(
 
     private fun showSelectedChain(text: String?) {
         val chainBasePanel = this
-        SelectChainDialog(
+        SelectChainPopupMenu(
             actionService = atomicActionService,
             chains = chainActionService.chains(),
             atomics = atomicActionService.atomics(),
@@ -173,8 +173,7 @@ class ChainBasePanel(
                 )
             }
         }.apply {
-            setLocationRelativeTo(chainBasePanel)
-            isVisible = true
+            show(chainBasePanel, 0, 0)
         }
     }
 
