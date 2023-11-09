@@ -25,7 +25,7 @@ fun main() {
                 property = mockk {
                     every { isRequired() } returns true
                 },
-                type = SettingsValueType.PLAIN_TEXT
+                type = SettingsValueType.GROOVY_TEMPLATE
             ),
         )
     )

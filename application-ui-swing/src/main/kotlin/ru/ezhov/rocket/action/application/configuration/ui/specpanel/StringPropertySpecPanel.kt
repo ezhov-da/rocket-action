@@ -22,6 +22,12 @@ class StringPropertySpecPanel(
         val mustacheTemplate = JRadioButton("Mustache template")
         val groovyTemplate = JRadioButton("Groovy template")
 
+        ButtonGroup().apply {
+            add(plainText)
+            add(mustacheTemplate)
+            add(groovyTemplate)
+        }
+
         initValue?.let {
             when (it.type) {
                 SettingsValueType.PLAIN_TEXT -> plainText.isSelected = true
@@ -29,12 +35,6 @@ class StringPropertySpecPanel(
                 SettingsValueType.GROOVY_TEMPLATE -> groovyTemplate.isSelected = true
                 else -> plainText.isSelected = true
             }
-        }
-
-        val buttonGroup = ButtonGroup().apply {
-            add(plainText)
-            add(mustacheTemplate)
-            add(groovyTemplate)
         }
 
         add(JPanel().apply {

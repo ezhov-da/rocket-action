@@ -64,7 +64,6 @@ class JsonFileVariableRepository(
         val file = File(filePath)
         if (!file.exists()) {
             file.parentFile.mkdirs()
-
         }
 
         return file
