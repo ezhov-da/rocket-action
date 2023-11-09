@@ -173,7 +173,9 @@ class ChainBasePanel(
                 )
             }
         }.apply {
-            show(chainBasePanel, 0, 0)
+            SwingUtilities.invokeLater {
+                show(chainBasePanel, 0, 0)
+            }
         }
     }
 
