@@ -1,6 +1,7 @@
 package ru.ezhov.rocket.action.application.configuration.ui
 
 import ru.ezhov.rocket.action.api.context.icon.AppIcon
+import ru.ezhov.rocket.action.application.configuration.ui.create.CreateRocketActionSettingsDialog
 import ru.ezhov.rocket.action.application.configuration.ui.edit.EditorRocketActionSettingsPanel
 import ru.ezhov.rocket.action.application.configuration.ui.tree.ConfigurationTreePanel
 import ru.ezhov.rocket.action.application.core.application.RocketActionSettingsService

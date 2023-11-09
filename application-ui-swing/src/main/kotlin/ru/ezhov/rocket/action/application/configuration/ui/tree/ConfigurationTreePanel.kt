@@ -3,8 +3,8 @@ package ru.ezhov.rocket.action.application.configuration.ui.tree
 import mu.KotlinLogging
 import ru.ezhov.rocket.action.api.context.icon.AppIcon
 import ru.ezhov.rocket.action.api.context.notification.NotificationType
-import ru.ezhov.rocket.action.application.configuration.ui.CreateRocketActionSettingsDialog
-import ru.ezhov.rocket.action.application.configuration.ui.CreatedRocketActionSettingsCallback
+import ru.ezhov.rocket.action.application.configuration.ui.create.CreateRocketActionSettingsDialog
+import ru.ezhov.rocket.action.application.configuration.ui.create.CreatedRocketActionSettingsCallback
 import ru.ezhov.rocket.action.application.configuration.ui.SavedRocketActionSettingsPanelCallback
 import ru.ezhov.rocket.action.application.configuration.ui.edit.EditorRocketActionSettingsPanel
 import ru.ezhov.rocket.action.application.eventui.ConfigurationUiObserverFactory
