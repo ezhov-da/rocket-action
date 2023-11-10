@@ -8,15 +8,25 @@ data class AtomicAction(
     var engine: AtomicActionEngine,
     var source: AtomicActionSource,
     var data: String,
-): Action{
+) : Action {
     override fun id(): String = id
 }
 
-enum class ContractType {
-    IN_OUT,
-    IN_UNIT,
-    UNIT_OUT,
-    UNIT_UNIT,
+enum class ContractType(val inputValue: InputValueContractType, val output: OutputValueContractType) {
+    IN_OUT(InputValueContractType.IN, OutputValueContractType.OUT),
+    IN_UNIT(InputValueContractType.IN, OutputValueContractType.UNIT),
+    UNIT_OUT(InputValueContractType.UNIT, OutputValueContractType.OUT),
+    UNIT_UNIT(InputValueContractType.UNIT, OutputValueContractType.UNIT),
+}
+
+enum class InputValueContractType {
+    IN,
+    UNIT
+}
+
+enum class OutputValueContractType {
+    OUT,
+    UNIT
 }
 
 enum class AtomicActionSource {

@@ -37,6 +37,9 @@ fun main(args: Array<String>) {
                 backgroundColor = null,
                 firstAtomicAction = mockk {
                     every { contractType } returns ContractType.IN_OUT
+                },
+                lastAtomicAction = mockk {
+                    every { contractType } returns ContractType.IN_OUT
                 }
             )
         )

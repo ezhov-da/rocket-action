@@ -1,8 +1,10 @@
 package ru.ezhov.rocket.action.application.chainaction.interfaces.ui
 
 import net.miginfocom.swing.MigLayout
-import ru.ezhov.rocket.action.application.chainaction.application.AtomicActionService
+import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea
+import org.fife.ui.rtextarea.RTextScrollPane
 import ru.ezhov.rocket.action.application.chainaction.application.ActionExecutorService
+import ru.ezhov.rocket.action.application.chainaction.application.AtomicActionService
 import ru.ezhov.rocket.action.application.chainaction.application.ChainActionService
 import ru.ezhov.rocket.action.application.chainaction.domain.event.AtomicActionCreatedDomainEvent
 import ru.ezhov.rocket.action.application.chainaction.domain.event.AtomicActionDeletedDomainEvent
@@ -35,7 +37,6 @@ import javax.swing.JList
 import javax.swing.JPanel
 import javax.swing.JScrollPane
 import javax.swing.JTextField
-import javax.swing.JTextPane
 import javax.swing.KeyStroke
 import javax.swing.ListSelectionModel
 import javax.swing.SwingUtilities
@@ -52,7 +53,7 @@ class EditChainActionDialog(
     private val nameTextField: JTextField = JTextField()
     private val nameLabel: JLabel = JLabel("Name:").apply { labelFor = nameTextField }
 
-    private val descriptionTextPane: JTextPane = JTextPane()
+    private val descriptionTextPane: RSyntaxTextArea = RSyntaxTextArea()
     private val descriptionLabel: JLabel = JLabel("Description:").apply { labelFor = descriptionTextPane }
 
     private val allListActionsModel = DefaultListModel<AtomicAction>()
@@ -123,7 +124,7 @@ class EditChainActionDialog(
         contentPane.add(nameTextField, "span 2, wrap, width max, grow")
 
         contentPane.add(descriptionLabel, "wrap")
-        contentPane.add(JScrollPane(descriptionTextPane), "span, wrap, width max, hmin 30%")
+        contentPane.add(RTextScrollPane(descriptionTextPane, false), "span, wrap, width max, hmin 30%")
 
         contentPane.add(
             JPanel(MigLayout())

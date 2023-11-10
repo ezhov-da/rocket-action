@@ -1,8 +1,8 @@
 {
-  "changedDate" : "2023-11-01T17:25:09.017",
+  "changedDate" : "2023-11-10T23:16:15.881",
   "chainActions" : [ {
     "id" : "1a39305f-5ed2-469a-b84e-2692ac324976",
-    "name" : "99999999999999",
+    "name" : "Тест выполнения многих действий",
     "description" : "12312312123",
     "actions" : [ {
       "chainOrderId" : "373d552d-da32-4903-8a2d-dd1078c23a1b",
@@ -46,13 +46,10 @@
     }, {
       "chainOrderId" : "6345611f-b086-4c96-9d04-cef7189705b6",
       "actionId" : "ccb3ea04-68ef-4988-84f1-2d95e14c0046"
-    }, {
-      "chainOrderId" : "b39ad5c4-41ff-4124-aebf-557375ce59ca",
-      "actionId" : "d4b03ab3-09bd-4d65-bc43-368ac169346f"
     } ]
   }, {
     "id" : "6cb108c9-6772-4f56-bbeb-6a7837ec1fa1",
-    "name" : "5555555555555",
+    "name" : "Открытие ссылки по Jira задаче",
     "description" : "121212",
     "actions" : [ {
       "chainOrderId" : "d4c6db46-8f2a-434b-bb8c-3f7acd119bc4",
@@ -66,7 +63,7 @@
     } ]
   }, {
     "id" : "541921b7-9194-4211-b0c4-8d6ea38b8140",
-    "name" : "222222222222222222222",
+    "name" : "Тестовое",
     "description" : "121212",
     "actions" : [ {
       "chainOrderId" : "d4c6db46-8f2a-434b-bb8c-3f7acd119bc4",
@@ -80,7 +77,7 @@
     } ]
   }, {
     "id" : "0e4e80b2-7861-4779-862d-abc1132a925e",
-    "name" : "`11232134",
+    "name" : "Тест повтора одних и тех же действий",
     "description" : "",
     "actions" : [ {
       "chainOrderId" : "d3eb2650-b557-40b9-a251-8028755aa946",
@@ -100,7 +97,7 @@
     } ]
   }, {
     "id" : "ff5256bc-399e-4576-ac5a-21e70a677458",
-    "name" : "00000000000000000",
+    "name" : "Просто много действий",
     "description" : "12312312123",
     "actions" : [ {
       "chainOrderId" : "6345611f-b086-4c96-9d04-cef7189705b6",
@@ -144,7 +141,7 @@
     } ]
   }, {
     "id" : "ed2bd3f2-ea55-4b74-8162-2fb9a93ed8a7",
-    "name" : "566666666666666666666666666",
+    "name" : "Тоже просто много действий",
     "description" : "12312312123",
     "actions" : [ {
       "chainOrderId" : "6345611f-b086-4c96-9d04-cef7189705b6",

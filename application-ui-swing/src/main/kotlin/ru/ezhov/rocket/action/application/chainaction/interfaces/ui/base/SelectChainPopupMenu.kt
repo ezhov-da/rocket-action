@@ -21,12 +21,14 @@ class SelectChainPopupMenu(
 
         val selectChainDialog = this
 
+        val partCount = 15
+
         val panel = JPanel(MigLayout(/*"debug"*/))
         panel.add(
             SelectChainButtonsPanel(
                 actionService = actionService,
-                chains = chainsSortedByName.take(15),
-                atomics = atomicsSortedByName.take(15),
+                chains = chainsSortedByName.take(partCount),
+                atomics = atomicsSortedByName.take(partCount),
                 selectedChainCallback = { sv ->
                     selectChainDialog.isVisible = false
                     selectedChainCallback(sv)
@@ -35,8 +37,11 @@ class SelectChainPopupMenu(
             "span"
         )
 
-        val chainsForList = chainsSortedByName.slice(15..chainsSortedByName.size)
-        val atomicsForList = atomicsSortedByName.slice(15..chainsSortedByName.size)
+        val chainsForList =
+            chainsSortedByName.takeIf { partCount <= chainsSortedByName.size }?.subList(partCount, chainsSortedByName.size).orEmpty()
+        val atomicsForList =
+            atomicsSortedByName.takeIf { partCount <= atomicsSortedByName.size }?.subList(partCount, atomicsSortedByName.size)
+                .orEmpty()
 
         if (chainsForList.isNotEmpty() || atomicsForList.isNotEmpty()) {
             panel.add(
@@ -46,6 +51,7 @@ class SelectChainPopupMenu(
                     atomics = atomicsForList,
                     selectedChainCallback = { sv ->
                         selectChainDialog.isVisible = false
+                        selectedChainCallback(sv)
                         selectedChainCallback(sv)
                     },
                 ),

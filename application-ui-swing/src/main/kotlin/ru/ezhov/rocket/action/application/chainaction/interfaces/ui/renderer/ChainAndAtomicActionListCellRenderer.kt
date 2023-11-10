@@ -27,6 +27,9 @@ class ChainAndAtomicActionListCellRenderer(
                 backgroundColor = label.background,
                 firstAtomicAction = value.actions.firstOrNull()?.let { actionOrder ->
                     atomicActionService.atomicBy(actionOrder.actionId)
+                },
+                lastAtomicAction = value.actions.lastOrNull()?.let { actionOrder ->
+                    atomicActionService.atomicBy(actionOrder.actionId)
                 }
             )
 

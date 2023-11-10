@@ -6,6 +6,7 @@ import ru.ezhov.rocket.action.application.chainaction.application.AtomicActionSe
 import ru.ezhov.rocket.action.application.chainaction.application.ChainActionService
 import ru.ezhov.rocket.action.application.eventui.ConfigurationUiObserverFactory
 import ru.ezhov.rocket.action.application.eventui.model.ShowChainActionConfigurationUiEvent
+import ru.ezhov.rocket.action.application.resources.Icons
 import ru.ezhov.rocket.action.ui.utils.swing.common.MoveUtil
 import ru.ezhov.rocket.action.ui.utils.swing.common.TextFieldWithText
 import java.awt.Color
@@ -23,17 +24,13 @@ import java.awt.dnd.DropTargetDropEvent
 import java.awt.dnd.DropTargetEvent
 import java.awt.event.KeyAdapter
 import java.awt.event.KeyEvent
-import java.awt.event.MouseAdapter
-import java.awt.event.MouseEvent
 import java.io.IOException
 import java.util.*
 import javax.swing.BorderFactory
 import javax.swing.JButton
 import javax.swing.JComponent
 import javax.swing.JLabel
-import javax.swing.JMenuItem
 import javax.swing.JPanel
-import javax.swing.JPopupMenu
 import javax.swing.JTextField
 import javax.swing.SwingConstants
 import javax.swing.SwingUtilities
@@ -49,13 +46,12 @@ class ChainBasePanel(
     private val textFieldPaste = TextFieldWithText()
     private val actionExecuteStatusPanel =
         ActionExecuteStatusPanel(actionExecutorService).apply { isVisible = false }
-    private val configurationButton = JButton("...").apply {
+    private val openAvailableActionsButton = JButton(Icons.Standard.X2.COG_2X).apply {
+        toolTipText = "Open available actions"
+    }
+    private val openConfigurationButton = JButton(Icons.Standard.X2.PENCIL_2X).apply {
         toolTipText = "Open configuration"
     }
-
-    private val popupMenu = JPopupMenu()
-    private val menuItemSelectChain = JMenuItem("Select chain")
-    private val menuItemOpenConfiguration = JMenuItem("Open configuration")
 
     private val currentTimer: Timer = Timer()
 
@@ -70,25 +66,18 @@ class ChainBasePanel(
         addEnter(textFieldPaste)
 
         add(labelDropDown, "wrap, width max, height max, id labelDropDown")
-        add(textFieldPaste, "width max, split 2")
-        add(configurationButton, "wrap, wmax 25")
+        add(textFieldPaste, "width max, split")
+        add(openAvailableActionsButton, "wmax 25")
+        add(openConfigurationButton, "wrap, wmax 25")
         add(actionExecuteStatusPanel, "width max, hidemode 2")
-
-        popupMenu.add(menuItemSelectChain)
-        popupMenu.add(menuItemOpenConfiguration)
 
         val chainBasePanel = this
 
-        configurationButton.addMouseListener(object : MouseAdapter() {
-            override fun mouseReleased(e: MouseEvent?) {
-                popupMenu.show(configurationButton, 0, 0)
-            }
-        })
-
-        menuItemSelectChain.addActionListener {
+        openAvailableActionsButton.addActionListener {
             showSelectedChain(null)
         }
-        menuItemOpenConfiguration.addActionListener {
+
+        openConfigurationButton.addActionListener {
             ConfigurationUiObserverFactory.observer.notify(ShowChainActionConfigurationUiEvent(chainBasePanel))
         }
 

@@ -73,7 +73,7 @@ class ChainConfigurationFrame(
         ConfigurationUiObserverFactory.observer.register(object : ConfigurationUiListener {
             override fun action(event: ConfigurationUiEvent) {
                 if (event is ShowChainActionConfigurationUiEvent) {
-                    chainConfigurationFrame.showToFront(parent)
+                    chainConfigurationFrame.showToFront(event.parent)
                 }
             }
         })

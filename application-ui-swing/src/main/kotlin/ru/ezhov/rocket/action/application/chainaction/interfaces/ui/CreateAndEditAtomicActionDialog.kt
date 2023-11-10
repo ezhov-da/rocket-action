@@ -36,7 +36,7 @@ class CreateAndEditAtomicActionDialog(
     private val nameTextField: JTextField = JTextField()
     private val nameLabel: JLabel = JLabel("Name:").apply { labelFor = nameTextField }
 
-    private val descriptionTextPane: JTextPane = JTextPane()
+    private val descriptionTextPane: RSyntaxTextArea = RSyntaxTextArea()
     private val descriptionLabel: JLabel = JLabel("Description:").apply { labelFor = descriptionTextPane }
 
     private val contractLabel: JLabel = JLabel("Contract:")
@@ -78,7 +78,7 @@ class CreateAndEditAtomicActionDialog(
         contentPane.add(nameTextField, "span, wrap, width max")
 
         contentPane.add(descriptionLabel, "wrap")
-        contentPane.add(JScrollPane(descriptionTextPane), "span, grow, shrink 50, hmin 18%")
+        contentPane.add(RTextScrollPane(descriptionTextPane, false), "span, grow, shrink 50, hmin 18%")
 
         contentPane.add(contractLabel)
         contentPane.add(inOutRadioButton)
