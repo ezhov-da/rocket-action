@@ -46,10 +46,10 @@ class ChainBasePanel(
     private val textFieldPaste = TextFieldWithText()
     private val actionExecuteStatusPanel =
         ActionExecuteStatusPanel(actionExecutorService).apply { isVisible = false }
-    private val openAvailableActionsButton = JButton(Icons.Standard.X2.COG_2X).apply {
+    private val openAvailableActionsButton = JButton(Icons.Standard.COG_16x16).apply {
         toolTipText = "Open available actions"
     }
-    private val openConfigurationButton = JButton(Icons.Standard.X2.PENCIL_2X).apply {
+    private val openConfigurationButton = JButton(Icons.Standard.PENCIL_16x16).apply {
         toolTipText = "Open configuration"
     }
 

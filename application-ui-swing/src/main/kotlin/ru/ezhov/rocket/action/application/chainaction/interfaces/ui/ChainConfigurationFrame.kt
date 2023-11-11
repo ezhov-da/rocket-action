@@ -1,8 +1,8 @@
 package ru.ezhov.rocket.action.application.chainaction.interfaces.ui
 
 import net.miginfocom.swing.MigLayout
-import ru.ezhov.rocket.action.application.chainaction.application.AtomicActionService
 import ru.ezhov.rocket.action.application.chainaction.application.ActionExecutorService
+import ru.ezhov.rocket.action.application.chainaction.application.AtomicActionService
 import ru.ezhov.rocket.action.application.chainaction.application.ChainActionService
 import ru.ezhov.rocket.action.application.chainaction.domain.event.AtomicActionCreatedDomainEvent
 import ru.ezhov.rocket.action.application.chainaction.domain.event.AtomicActionDeletedDomainEvent
@@ -10,9 +10,8 @@ import ru.ezhov.rocket.action.application.chainaction.domain.event.AtomicActionU
 import ru.ezhov.rocket.action.application.chainaction.domain.event.ChainActionCreatedDomainEvent
 import ru.ezhov.rocket.action.application.chainaction.domain.event.ChainActionDeletedDomainEvent
 import ru.ezhov.rocket.action.application.chainaction.domain.event.ChainActionUpdatedDomainEvent
-import ru.ezhov.rocket.action.application.chainaction.domain.model.AtomicAction
 import ru.ezhov.rocket.action.application.chainaction.domain.model.ChainAction
-import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.renderer.AtomicActionListCellRenderer
+import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.configuration.actions.ActionsConfigurationPanel
 import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.renderer.ChainActionListCellRenderer
 import ru.ezhov.rocket.action.application.event.domain.DomainEvent
 import ru.ezhov.rocket.action.application.event.domain.DomainEventSubscriber
@@ -40,22 +39,15 @@ class ChainConfigurationFrame(
     private val atomicActionService: AtomicActionService,
 ) : JFrame() {
     private val contentPane = JPanel(MigLayout(/*"debug"*/))
-    private val buttonCreateAction: JButton = JButton("Create atomic action")
-    private val buttonEditAction: JButton = JButton("Edit").apply { isEnabled = false }
-    private val buttonDeleteAction: JButton = JButton("Delete").apply { isEnabled = false }
+
+    private val actionsConfigurationPanel = ActionsConfigurationPanel(atomicActionService)
 
     private val buttonCreateChain: JButton = JButton("Create chain action")
     private val buttonEditChain: JButton = JButton("Edit").apply { isEnabled = false }
     private val buttonDeleteChain: JButton = JButton("Delete").apply { isEnabled = false }
 
-    private val allListActionsModel = DefaultListModel<AtomicAction>()
-    private val allListActions = JList(allListActionsModel)
     private val allListChainsModel = DefaultListModel<ChainAction>()
     private val allListChains = JList(allListChainsModel)
-
-    private val createAndEditAtomicActionDialog = CreateAndEditAtomicActionDialog(
-        atomicActionService = atomicActionService
-    )
 
     private val createChainActionDialog = CreateChainActionDialog(
         actionExecutorService = actionExecutorService,
@@ -78,27 +70,7 @@ class ChainConfigurationFrame(
             }
         })
 
-        allListActions.cellRenderer = AtomicActionListCellRenderer()
         allListChains.cellRenderer = ChainActionListCellRenderer(atomicActionService)
-
-        allListActions.addListSelectionListener {
-            allListActions.selectedValue?.let {
-                buttonEditAction.isEnabled = true
-                buttonDeleteAction.isEnabled = true
-            }
-        }
-
-        buttonEditAction.addActionListener {
-            allListActions.selectedValue?.let {
-                createAndEditAtomicActionDialog.showEditDialog(it, chainConfigurationFrame)
-            }
-        }
-
-        buttonDeleteAction.addActionListener {
-            allListActions.selectedValue?.let {
-                atomicActionService.deleteAtomic(it.id)
-            }
-        }
 
         buttonEditChain.addActionListener {
             allListChains.selectedValue?.let {
@@ -124,42 +96,9 @@ class ChainConfigurationFrame(
             allListChainsModel.addElement(it)
         }
 
-        val atomics = atomicActionService.atomics()
-        atomics.forEach {
-            allListActionsModel.addElement(it)
-        }
-
         DomainEventFactory.subscriberRegistrar.subscribe(object : DomainEventSubscriber {
             override fun handleEvent(event: DomainEvent) {
                 when (event) {
-                    is AtomicActionCreatedDomainEvent -> {
-                        allListActionsModel.addElement(event.atomicAction)
-                    }
-
-                    is AtomicActionDeletedDomainEvent -> {
-                        val iterator = allListActionsModel.elements()
-                        while (iterator.hasMoreElements()) {
-                            val action = iterator.nextElement()
-                            if (action.id == event.id) {
-                                allListActionsModel.removeElement(action)
-                                break
-                            }
-                        }
-                    }
-
-                    is AtomicActionUpdatedDomainEvent -> {
-                        val iterator = allListActionsModel.elements()
-                        while (iterator.hasMoreElements()) {
-                            val action = iterator.nextElement()
-                            if (action.id == event.atomicAction.id) {
-                                val index = allListActionsModel.indexOf(action)
-
-                                allListActionsModel.set(index, event.atomicAction)
-                                break
-                            }
-                        }
-                    }
-
                     is ChainActionCreatedDomainEvent -> {
                         allListChainsModel.addElement(event.chainAction)
                     }
@@ -202,10 +141,7 @@ class ChainConfigurationFrame(
         })
 
         val panelAtomicAction = JPanel(MigLayout())
-        panelAtomicAction.add(buttonCreateAction, "split 3")
-        panelAtomicAction.add(buttonEditAction)
-        panelAtomicAction.add(buttonDeleteAction, "wrap")
-        panelAtomicAction.add(JScrollPane(allListActions), "height max, width max")
+        panelAtomicAction.add(actionsConfigurationPanel, "height max, width max")
 
         contentPane.add(panelAtomicAction, "width 50%")
 
@@ -220,7 +156,6 @@ class ChainConfigurationFrame(
 
         setContentPane(contentPane)
 
-        buttonCreateAction.apply { addActionListener { createAndEditAtomicActionDialog.showCreateDialog() } }
         buttonCreateChain.apply { addActionListener { createChainActionDialog.showDialog() } }
 
         // call onCancel() when cross is clicked
@@ -239,7 +174,7 @@ class ChainConfigurationFrame(
         )
 
         setLocationRelativeTo(null)
-        setSize(700, 500)
+        setSize(1000, 800)
     }
 
     private fun onOK() {

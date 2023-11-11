@@ -16,21 +16,23 @@ class ChainActionListCellPanel(
     lastAtomicAction: AtomicAction?,
 ) :
     JPanel(MigLayout(/*"debug"*/)) {
-    private val nameLabel = JLabel(chainAction.name, CHAIN_ICON, SwingConstants.LEFT)
+    private val iconLabel = JLabel(CHAIN_ICON, SwingConstants.LEFT)
+    private val nameLabel = JLabel(chainAction.name)
     private val contractLabel: JLabel? = iconForContractTypes(
         first = firstAtomicAction?.contractType,
         second = lastAtomicAction?.contractType
     )
         ?.let { JLabel(it) }
-    private val countAtomicAction = JLabel("Actions: ${chainAction.actions.size}")
+    private val countAtomicAction = JLabel("<html><b>(${chainAction.actions.size})</b>")
 
     init {
         isOpaque = true
         backgroundColor?.let {
             this.background = backgroundColor
         }
-        add(nameLabel, "span")
+        add(iconLabel)
         contractLabel?.let { add(it) }
+        add(nameLabel)
         add(countAtomicAction)
     }
 }
