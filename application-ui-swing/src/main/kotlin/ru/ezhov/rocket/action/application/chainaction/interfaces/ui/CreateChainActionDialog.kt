@@ -3,8 +3,8 @@ package ru.ezhov.rocket.action.application.chainaction.interfaces.ui
 import net.miginfocom.swing.MigLayout
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea
 import org.fife.ui.rtextarea.RTextScrollPane
-import ru.ezhov.rocket.action.application.chainaction.application.AtomicActionService
 import ru.ezhov.rocket.action.application.chainaction.application.ActionExecutorService
+import ru.ezhov.rocket.action.application.chainaction.application.AtomicActionService
 import ru.ezhov.rocket.action.application.chainaction.application.ChainActionService
 import ru.ezhov.rocket.action.application.chainaction.domain.event.AtomicActionCreatedDomainEvent
 import ru.ezhov.rocket.action.application.chainaction.domain.event.AtomicActionDeletedDomainEvent
@@ -37,7 +37,6 @@ import javax.swing.JList
 import javax.swing.JPanel
 import javax.swing.JScrollPane
 import javax.swing.JTextField
-import javax.swing.JTextPane
 import javax.swing.KeyStroke
 import javax.swing.ListSelectionModel
 
@@ -73,7 +72,7 @@ class CreateChainActionDialog(
 
         fun fillActions() {
             allListActionsModel.removeAllElements()
-            val atomics = atomicActionService.atomics()
+            val atomics = atomicActionService.atomics().sortedBy { it.name }
             atomics.forEach {
                 allListActionsModel.addElement(it)
             }

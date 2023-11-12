@@ -73,7 +73,7 @@ class EditChainActionDialog(
 
         fun fillActions() {
             allListActionsModel.removeAllElements()
-            val atomics = atomicActionService.atomics()
+            val atomics = atomicActionService.atomics().sortedBy { it.name }
             atomics.forEach {
                 allListActionsModel.addElement(it)
             }

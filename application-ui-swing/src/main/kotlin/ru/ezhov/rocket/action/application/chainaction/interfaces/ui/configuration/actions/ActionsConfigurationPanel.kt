@@ -5,9 +5,6 @@ import ru.ezhov.rocket.action.application.chainaction.application.AtomicActionSe
 import ru.ezhov.rocket.action.application.chainaction.domain.event.AtomicActionCreatedDomainEvent
 import ru.ezhov.rocket.action.application.chainaction.domain.event.AtomicActionDeletedDomainEvent
 import ru.ezhov.rocket.action.application.chainaction.domain.event.AtomicActionUpdatedDomainEvent
-import ru.ezhov.rocket.action.application.chainaction.domain.event.ChainActionCreatedDomainEvent
-import ru.ezhov.rocket.action.application.chainaction.domain.event.ChainActionDeletedDomainEvent
-import ru.ezhov.rocket.action.application.chainaction.domain.event.ChainActionUpdatedDomainEvent
 import ru.ezhov.rocket.action.application.chainaction.domain.model.AtomicAction
 import ru.ezhov.rocket.action.application.chainaction.domain.model.AtomicActionEngine
 import ru.ezhov.rocket.action.application.chainaction.domain.model.AtomicActionSource
@@ -18,6 +15,7 @@ import ru.ezhov.rocket.action.application.event.domain.DomainEvent
 import ru.ezhov.rocket.action.application.event.domain.DomainEventSubscriber
 import ru.ezhov.rocket.action.application.event.infrastructure.DomainEventFactory
 import java.beans.PropertyChangeListener
+import javax.swing.BorderFactory
 import javax.swing.DefaultListModel
 import javax.swing.JButton
 import javax.swing.JList
@@ -104,11 +102,7 @@ class ActionsConfigurationPanel(
                 AtomicActionCreatedDomainEvent::class.java,
                 AtomicActionDeletedDomainEvent::class.java,
                 AtomicActionUpdatedDomainEvent::class.java,
-                ChainActionCreatedDomainEvent::class.java,
-                ChainActionDeletedDomainEvent::class.java,
-                ChainActionUpdatedDomainEvent::class.java,
             )
-
         })
 
 
@@ -133,6 +127,8 @@ class ActionsConfigurationPanel(
         panelAtomicAction.add(JScrollPane(allListActions), "height max, width max")
 
         buttonCreateAction.apply { addActionListener { createAndEditAtomicActionDialog.showCreateDialog() } }
+
+        border = BorderFactory.createTitledBorder("Actions")
 
         add(sortActionPanelConfiguration, "wrap, width 100%")
         add(searchActionPanelConfiguration, "wrap, width 100%")
