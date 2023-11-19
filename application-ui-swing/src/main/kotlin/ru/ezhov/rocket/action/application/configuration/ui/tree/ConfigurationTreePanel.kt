@@ -3,12 +3,11 @@ package ru.ezhov.rocket.action.application.configuration.ui.tree
 import mu.KotlinLogging
 import ru.ezhov.rocket.action.api.context.icon.AppIcon
 import ru.ezhov.rocket.action.api.context.notification.NotificationType
+import ru.ezhov.rocket.action.application.configuration.ui.SavedRocketActionSettingsPanelCallback
 import ru.ezhov.rocket.action.application.configuration.ui.create.CreateRocketActionSettingsDialog
 import ru.ezhov.rocket.action.application.configuration.ui.create.CreatedRocketActionSettingsCallback
-import ru.ezhov.rocket.action.application.configuration.ui.SavedRocketActionSettingsPanelCallback
 import ru.ezhov.rocket.action.application.configuration.ui.edit.EditorRocketActionSettingsPanel
-import ru.ezhov.rocket.action.application.eventui.ConfigurationUiObserverFactory
-import ru.ezhov.rocket.action.application.eventui.model.RemoveSettingUiEvent
+import ru.ezhov.rocket.action.application.configuration.ui.tree.move.MoveToPanel
 import ru.ezhov.rocket.action.application.core.application.RocketActionSettingsService
 import ru.ezhov.rocket.action.application.core.domain.RocketActionSettingsRepositoryException
 import ru.ezhov.rocket.action.application.core.domain.model.ActionsModel
@@ -18,9 +17,12 @@ import ru.ezhov.rocket.action.application.core.infrastructure.MutableRocketActio
 import ru.ezhov.rocket.action.application.event.domain.DomainEvent
 import ru.ezhov.rocket.action.application.event.domain.DomainEventSubscriber
 import ru.ezhov.rocket.action.application.event.infrastructure.DomainEventFactory
+import ru.ezhov.rocket.action.application.eventui.ConfigurationUiObserverFactory
+import ru.ezhov.rocket.action.application.eventui.model.RemoveSettingUiEvent
 import ru.ezhov.rocket.action.application.plugin.context.RocketActionContextFactory
 import ru.ezhov.rocket.action.application.plugin.group.GroupRocketActionUi
 import ru.ezhov.rocket.action.application.plugin.manager.application.RocketActionPluginApplicationService
+import ru.ezhov.rocket.action.application.resources.Icons
 import java.awt.BorderLayout
 import java.awt.event.ActionEvent
 import java.awt.event.MouseAdapter
@@ -29,6 +31,7 @@ import javax.swing.AbstractAction
 import javax.swing.DropMode
 import javax.swing.ImageIcon
 import javax.swing.JButton
+import javax.swing.JMenu
 import javax.swing.JMenuItem
 import javax.swing.JPanel
 import javax.swing.JPopupMenu
@@ -142,8 +145,8 @@ class ConfigurationTreePanel(
             override fun mouseReleased(e: MouseEvent) {
                 if (e.button == MouseEvent.BUTTON3) {
                     val treePath = tree.getClosestPathForLocation(e.x, e.y) ?: return
-                    val mutableTreeNode = treePath.lastPathComponent as DefaultMutableTreeNode
-                    val userObject = mutableTreeNode.userObject as? TreeRocketActionSettings
+                    val selectedTreeNode = treePath.lastPathComponent as DefaultMutableTreeNode
+                    val userObject = selectedTreeNode.userObject as? TreeRocketActionSettings
                     val popupMenu = JPopupMenu()
                     popupMenu.add(JMenuItem(object : AbstractAction() {
                         override fun actionPerformed(e: ActionEvent) {
@@ -155,8 +158,8 @@ class ConfigurationTreePanel(
                                                 settings,
                                                 settings.settings.type == GroupRocketActionUi.TYPE
                                             ),
-                                            mutableTreeNode.parent as MutableTreeNode,
-                                            mutableTreeNode.parent.getIndex(mutableTreeNode)
+                                            selectedTreeNode.parent as MutableTreeNode,
+                                            selectedTreeNode.parent.getIndex(selectedTreeNode)
                                         )
                                     }
                                 }
@@ -179,8 +182,8 @@ class ConfigurationTreePanel(
                                                     settings,
                                                     settings.settings.type == GroupRocketActionUi.TYPE
                                                 ),
-                                                mutableTreeNode.parent as MutableTreeNode,
-                                                mutableTreeNode.parent.getIndex(mutableTreeNode) + 1
+                                                selectedTreeNode.parent as MutableTreeNode,
+                                                selectedTreeNode.parent.getIndex(selectedTreeNode) + 1
                                             )
                                         }
                                     }
@@ -201,13 +204,13 @@ class ConfigurationTreePanel(
                                     createRocketActionSettingsDialog.show(object : CreatedRocketActionSettingsCallback {
                                         override fun create(settings: TreeRocketActionSettings) {
                                             SwingUtilities.invokeLater {
-                                                mutableTreeNode.add(
+                                                selectedTreeNode.add(
                                                     DefaultMutableTreeNode(
                                                         settings,
                                                         settings.settings.type == GroupRocketActionUi.TYPE
                                                     )
                                                 )
-                                                defaultTreeModel.reload(mutableTreeNode)
+                                                defaultTreeModel.reload(selectedTreeNode)
                                             }
                                         }
                                     })
@@ -239,8 +242,8 @@ class ConfigurationTreePanel(
                                                 ),
                                                 false
                                             ),
-                                            mutableTreeNode.parent as MutableTreeNode,
-                                            mutableTreeNode.parent.getIndex(mutableTreeNode) + 1
+                                            selectedTreeNode.parent as MutableTreeNode,
+                                            selectedTreeNode.parent.getIndex(selectedTreeNode) + 1
                                         )
                                     }
                                 }
@@ -252,12 +255,42 @@ class ConfigurationTreePanel(
                             }
                         ))
                     }
+
+                    popupMenu.add(JMenu("Move to").apply {
+                        icon = Icons.Standard.SHARE_16x16
+
+                        val selectCallback: (DefaultMutableTreeNode) -> Unit = { node ->
+                            popupMenu.isVisible = false
+
+                            val parent = selectedTreeNode.parent
+                            selectedTreeNode.removeFromParent()
+                            defaultTreeModel.reload(parent)
+
+                            node.add(selectedTreeNode)
+                            defaultTreeModel.reload(node)
+                        }
+
+                        add(
+                            MoveToPanel(
+                                currentNode = selectedTreeNode,
+                                nodes = SearchInTreeUtil.searchInTree(
+                                    { settings ->
+                                        settings.configuration.type().value() == GroupRocketActionUi.TYPE
+                                    },
+                                    root
+                                ),
+                                selectCallback = selectCallback,
+                            )
+                        )
+                    }
+                    )
+
                     popupMenu.add(JMenuItem(
                         object : AbstractAction() {
                             override fun actionPerformed(e: ActionEvent) {
                                 SwingUtilities.invokeLater {
-                                    val parent = mutableTreeNode.parent
-                                    mutableTreeNode.removeFromParent()
+                                    val parent = selectedTreeNode.parent
+                                    selectedTreeNode.removeFromParent()
                                     defaultTreeModel.reload(parent)
 
                                     expandedSet.forEach { path ->
@@ -268,7 +301,7 @@ class ConfigurationTreePanel(
                                         .notify(
                                             RemoveSettingUiEvent(
                                                 defaultTreeModel.getChildCount(root),
-                                                (mutableTreeNode.userObject as TreeRocketActionSettings)
+                                                (selectedTreeNode.userObject as TreeRocketActionSettings)
                                             )
                                         )
                                 }
@@ -280,6 +313,7 @@ class ConfigurationTreePanel(
                             }
                         }
                     ))
+
                     popupMenu.show(e.component, e.x, e.y)
                 }
             }
