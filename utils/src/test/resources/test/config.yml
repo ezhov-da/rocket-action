@@ -1,0 +1,7 @@
+_name: Open link
+_description: Link opening
+label:
+    name: Заголовок для отображения
+    description: |
+        # Тестовое описание в MarkDown
+        Пробуем, что поделать

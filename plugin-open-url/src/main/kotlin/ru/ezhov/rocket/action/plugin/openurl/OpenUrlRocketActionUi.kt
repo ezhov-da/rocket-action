@@ -18,6 +18,7 @@ import ru.ezhov.rocket.action.api.handler.RocketActionHandlerCommandContract
 import ru.ezhov.rocket.action.api.handler.RocketActionHandlerFactory
 import ru.ezhov.rocket.action.api.handler.RocketActionHandlerProperty
 import ru.ezhov.rocket.action.api.support.AbstractRocketAction
+import ru.ezhov.rocket.action.plugin.config.ConfigReaderFactory
 import java.awt.Component
 import java.awt.Desktop
 import java.awt.Toolkit
@@ -35,6 +36,10 @@ private val logger = KotlinLogging.logger {}
 
 class OpenUrlRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
     private var actionContext: RocketActionContext? = null
+    private val reader =
+        OpenUrlRocketActionUi::class.java.getResourceAsStream("/openurlrocketactionui/config.yml").use {
+            ConfigReaderFactory.yml(it!!)
+        }
 
     override fun factory(context: RocketActionContext): RocketActionFactoryUi = this
         .apply {
@@ -141,27 +146,47 @@ class OpenUrlRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
 
     override fun type(): RocketActionType = RocketActionType { "OPEN_URL" }
 
-    override fun description(): String = "Link opening"
+    override fun description(): String = reader.description()
 
     override fun asString(): List<String> = listOf(LABEL, URL)
 
     override fun properties(): List<RocketActionConfigurationProperty> {
         return listOf(
-            createRocketActionProperty(LABEL, LABEL, "Title", false),
-            createRocketActionProperty(DESCRIPTION, DESCRIPTION, "Description", false),
-            createRocketActionProperty(URL, URL, "URL", true),
-            createRocketActionProperty(ICON_URL, ICON_URL, "Icon URL", false)
+            createRocketActionProperty(
+                key = LABEL,
+                name = reader.nameBy(LABEL),
+                description = reader.descriptionBy(LABEL),
+                required = false
+            ),
+            createRocketActionProperty(
+                key = DESCRIPTION,
+                name = reader.nameBy(DESCRIPTION),
+                description = reader.descriptionBy(DESCRIPTION),
+                required = false
+            ),
+            createRocketActionProperty(
+                key = URL,
+                name = reader.nameBy(URL),
+                description = reader.descriptionBy(URL),
+                required = true
+            ),
+            createRocketActionProperty(
+                key = ICON_URL,
+                name = reader.nameBy(ICON_URL),
+                description = reader.descriptionBy(ICON_URL),
+                required = false
+            )
         )
     }
 
-    override fun name(): String = "Open link"
+    override fun name(): String = reader.name()
 
-    override fun icon(): Icon? = actionContext!!.icon().by(AppIcon.LINK_INTACT)
+    override fun icon(): Icon = actionContext!!.icon().by(AppIcon.LINK_INTACT)
 
     companion object {
-        private val LABEL = "label"
-        private val DESCRIPTION = "description"
-        private val URL = "url"
-        private val ICON_URL = "iconUrl"
+        private const val LABEL = "label"
+        private const val DESCRIPTION = "description"
+        private const val URL = "url"
+        private const val ICON_URL = "iconUrl"
     }
 }

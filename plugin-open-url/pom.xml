@@ -32,6 +32,12 @@
         </dependency>
 
         <dependency>
+            <groupId>ru.ezhov</groupId>
+            <artifactId>rocket-action-utils</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-stdlib</artifactId>
             <scope>provided</scope>

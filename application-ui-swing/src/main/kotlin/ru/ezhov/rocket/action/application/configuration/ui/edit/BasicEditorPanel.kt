@@ -16,7 +16,6 @@ import java.awt.BorderLayout
 import javax.swing.BoxLayout
 import javax.swing.JButton
 import javax.swing.JPanel
-import javax.swing.JScrollPane
 
 class BasicEditorPanel(
     private val rocketActionPluginApplicationService: RocketActionPluginApplicationService,
@@ -44,7 +43,7 @@ class BasicEditorPanel(
 
     init {
         add(infoPanel, BorderLayout.NORTH)
-        add(JScrollPane(rocketActionSettingsPanel), BorderLayout.CENTER)
+        add(rocketActionSettingsPanel, BorderLayout.CENTER)
 
         val southPanel = JPanel().apply {
             layout = BoxLayout(this, BoxLayout.Y_AXIS)
@@ -79,13 +78,9 @@ class BasicEditorPanel(
         val configuration: RocketActionConfiguration? =
             rocketActionPluginApplicationService.by(settings.settings.type)
                 ?.configuration(rocketActionContextFactory.context)
-        val configurationDescription = configuration?.let {
-            configuration.description()
-        }
         infoPanel.refresh(
             type = settings.settings.type,
             rocketActionId = settings.settings.id,
-            description = configurationDescription
         )
         val settingsFinal = settings.settings.settings
         val values = settingsFinal

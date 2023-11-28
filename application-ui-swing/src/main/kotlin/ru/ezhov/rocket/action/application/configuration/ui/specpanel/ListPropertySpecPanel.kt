@@ -1,14 +1,13 @@
 package ru.ezhov.rocket.action.application.configuration.ui.specpanel
 
+import net.miginfocom.swing.MigLayout
 import ru.ezhov.rocket.action.api.RocketActionPropertySpec
-import java.awt.BorderLayout
 import javax.swing.JComboBox
-import javax.swing.JScrollPane
 
 class ListPropertySpecPanel(
     configProperty: RocketActionPropertySpec.ListPropertySpec,
     initValue: InitValue? = null,
-) : ValuePanel(BorderLayout()) {
+) : ValuePanel(MigLayout()) {
     private var valueCallback: () -> SpecValue
 
     init {
@@ -17,8 +16,8 @@ class ListPropertySpecPanel(
         if (!selectedValues.contains(default)) {
             selectedValues.toMutableList().add(default)
         }
-        val list = JComboBox(selectedValues.toTypedArray())
-        list.selectedItem =
+        val comboBox = JComboBox(selectedValues.toTypedArray())
+        comboBox.selectedItem =
             when (initValue == null) {
                 true -> default
                 else -> {
@@ -28,12 +27,12 @@ class ListPropertySpecPanel(
                     }
                 }
             }
-        add(JScrollPane(
-            list
-                .also { l ->
-                    valueCallback = { SpecValue(l.selectedItem.toString(), null) }
-                }
-        ), BorderLayout.CENTER)
+        add(comboBox
+            .also { l ->
+                valueCallback = { SpecValue(l.selectedItem.toString(), null) }
+            },
+            "width 100%"
+        )
     }
 
     override fun value(): SpecValue = valueCallback()

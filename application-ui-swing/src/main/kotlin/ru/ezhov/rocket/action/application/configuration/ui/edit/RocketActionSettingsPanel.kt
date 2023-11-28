@@ -1,16 +1,16 @@
 package ru.ezhov.rocket.action.application.configuration.ui.edit
 
-import net.miginfocom.swing.MigLayout
 import ru.ezhov.rocket.action.application.configuration.ui.tree.TreeRocketActionSettings
 import ru.ezhov.rocket.action.application.core.infrastructure.MutableRocketActionSettings
 import ru.ezhov.rocket.action.application.plugin.context.RocketActionContextFactory
 import ru.ezhov.rocket.action.application.plugin.group.GroupRocketActionUi
 import ru.ezhov.rocket.action.application.tags.application.TagsService
 import ru.ezhov.rocket.action.application.tags.ui.create.TagsPanelFactory
+import ru.ezhov.rocket.action.ui.utils.swing.MarkdownEditorPane
+import java.awt.BorderLayout
 import javax.swing.BorderFactory
-import javax.swing.Box
-import javax.swing.BoxLayout
 import javax.swing.JPanel
+import javax.swing.JTabbedPane
 
 class RocketActionSettingsPanel(
     tagsService: TagsService,
@@ -22,7 +22,7 @@ class RocketActionSettingsPanel(
     private val tagsPanel = TagsPanelFactory.panel(tagsService = tagsService)
 
     init {
-        this.layout = BoxLayout(this, BoxLayout.Y_AXIS)
+        this.layout = BorderLayout()
     }
 
     fun setRocketActionConfiguration(
@@ -35,12 +35,25 @@ class RocketActionSettingsPanel(
         removeAll()
         settingPanels.clear()
         this.values = list
+
+        val tabs = JTabbedPane().apply {
+            this.tabLayoutPolicy = JTabbedPane.SCROLL_TAB_LAYOUT
+            this.tabPlacement = JTabbedPane.LEFT
+        }
+
         list
             .forEach { v: Value ->
                 val panel = SettingPanel(rocketActionContextFactory, v)
-                this.add(panel)
+                tabs.addTab(panel.labelText(), panel)
                 settingPanels.add(panel)
             }
+
+        val generalTabs = JTabbedPane()
+        generalTabs.addTab("Configuration", tabs)
+        generalTabs.addTab("Info", MarkdownEditorPane.fromText(settings.configuration.description()))
+
+        this.add(generalTabs, BorderLayout.CENTER)
+
         tagsPanel.setTags(tags)
         tagsPanel.border = BorderFactory.createCompoundBorder(
             BorderFactory.createEmptyBorder(5, 5, 5, 5),
@@ -48,9 +61,8 @@ class RocketActionSettingsPanel(
         )
         // disable tags for group plugin
         if (rocketActionType != GroupRocketActionUi.TYPE) {
-            this.add(tagsPanel)
+            this.add(tagsPanel, BorderLayout.SOUTH)
         }
-        this.add(Box.createVerticalBox())
         repaint()
         revalidate()
     }

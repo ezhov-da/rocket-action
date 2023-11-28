@@ -9,7 +9,6 @@ data class InitValue(
     val type: SettingsValueType?,
 )
 
-
 data class SpecValue(
     val value: String,
     val type: SettingsValueType?,

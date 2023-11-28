@@ -1,5 +1,6 @@
 package ru.ezhov.rocket.action.application.configuration.ui.specpanel
 
+import net.miginfocom.swing.MigLayout
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants
 import org.fife.ui.rtextarea.RTextScrollPane
@@ -37,7 +38,7 @@ class StringPropertySpecPanel(
             }
         }
 
-        add(JPanel().apply {
+        add(JPanel(MigLayout()).apply {
             add(plainText)
             add(mustacheTemplate)
             add(groovyTemplate)

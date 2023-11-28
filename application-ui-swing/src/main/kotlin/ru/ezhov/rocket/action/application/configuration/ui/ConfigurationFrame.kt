@@ -59,8 +59,10 @@ class ConfigurationFrame(
 
     private fun commonPanel(): JPanel {
         val splitPane = JSplitPane(JSplitPane.HORIZONTAL_SPLIT)
-        splitPane.setDividerLocation(0.5)
-        splitPane.resizeWeight = 0.5
+        SwingUtilities.invokeLater {
+            splitPane.setDividerLocation(0.3)
+            splitPane.resizeWeight = 0.3
+        }
 
         setTitle(rocketActionSettingsService.actionsModel().lastChangedDate)
 

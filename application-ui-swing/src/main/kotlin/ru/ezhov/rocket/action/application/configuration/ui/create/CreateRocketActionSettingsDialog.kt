@@ -23,8 +23,6 @@ import javax.swing.JFrame
 import javax.swing.JLabel
 import javax.swing.JList
 import javax.swing.JPanel
-import javax.swing.JScrollPane
-import javax.swing.ScrollPaneConstants
 import javax.swing.SwingUtilities
 import javax.swing.WindowConstants
 
@@ -33,14 +31,13 @@ class CreateRocketActionSettingsDialog(
     private val rocketActionPluginApplicationService: RocketActionPluginApplicationService,
     private val rocketActionContextFactory: RocketActionContextFactory,
     engineService: EngineService,
-    private val tagsService: TagsService,
+    tagsService: TagsService,
 ) {
     private val comboBoxModel = DefaultComboBoxModel<RocketActionConfiguration>()
     private var comboBox: JComboBox<RocketActionConfiguration> = JComboBox(comboBoxModel)
     private val actionSettingsPanel: CreateRocketActionSettingsPanel =
         CreateRocketActionSettingsPanel(
             tagsPanel = TagsPanelFactory.panel(tagsService = tagsService),
-            rocketActionContextFactory = rocketActionContextFactory
         )
     private var currentCallback: CreatedRocketActionSettingsCallback? = null
     private val testPanel: TestPanel =
@@ -59,11 +56,10 @@ class CreateRocketActionSettingsDialog(
 
         add(panelComboBox(), BorderLayout.NORTH)
 
-        actionSettingsPanel.setRocketActionConfiguration(
-            comboBox.selectedItem as RocketActionConfiguration
-        )
+        val ra = comboBox.selectedItem as RocketActionConfiguration
+        actionSettingsPanel.setRocketActionConfiguration(ra)
 
-        add(JScrollPane(actionSettingsPanel), BorderLayout.CENTER)
+        add(actionSettingsPanel, BorderLayout.CENTER)
 
         add(createTestAndSaveDialog(), BorderLayout.SOUTH)
         defaultCloseOperation = WindowConstants.HIDE_ON_CLOSE
