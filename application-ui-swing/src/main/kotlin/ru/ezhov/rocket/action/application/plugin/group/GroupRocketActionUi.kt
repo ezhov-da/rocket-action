@@ -6,6 +6,7 @@ import ru.ezhov.rocket.action.api.RocketActionConfiguration
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
 import ru.ezhov.rocket.action.api.RocketActionFactoryUi
 import ru.ezhov.rocket.action.api.RocketActionPlugin
+import ru.ezhov.rocket.action.api.RocketActionPluginInfo
 import ru.ezhov.rocket.action.api.RocketActionPropertySpec
 import ru.ezhov.rocket.action.api.RocketActionSettings
 import ru.ezhov.rocket.action.api.RocketActionType
@@ -20,6 +21,7 @@ import ru.ezhov.rocket.action.application.event.domain.DomainEvent
 import ru.ezhov.rocket.action.application.event.domain.DomainEventSubscriber
 import ru.ezhov.rocket.action.application.event.infrastructure.DomainEventFactory
 import java.awt.Component
+import java.util.*
 import javax.swing.Icon
 import javax.swing.JMenu
 
@@ -37,6 +39,17 @@ class GroupRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
         .apply {
             actionContext = context
         }
+
+    override fun info(): RocketActionPluginInfo = object : RocketActionPluginInfo {
+        override fun version(): String = Properties().let {
+            it.load(this.javaClass.getResourceAsStream("/general.properties"))
+            it.getProperty("rocket.action.version")
+        }
+
+        override fun author(): String = "DEzhov"
+
+        override fun link(): String? = null
+    }
 
     override fun create(settings: RocketActionSettings, context: RocketActionContext): RocketAction? =
         settings.settings()[LABEL]?.takeIf { it.isNotEmpty() }?.let { label ->

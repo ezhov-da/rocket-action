@@ -22,6 +22,9 @@ class PluginManagerFrame(
         .apply {
             addColumn("Plugin source")
             addColumn("Detailed information")
+            addColumn("Version")
+            addColumn("Author")
+            addColumn("Link")
             addColumn("Load time in ms")
             addColumn("Error Information")
         }
@@ -39,6 +42,9 @@ class PluginManagerFrame(
                             arrayOf(
                                 spec.sourceType.toText(),
                                 spec.from,
+                                spec.version,
+                                spec.author,
+                                spec.link,
                                 spec.loadTime.toMillis(),
                                 "",
                             )
@@ -50,6 +56,9 @@ class PluginManagerFrame(
                             arrayOf(
                                 spec.sourceType.toText(),
                                 spec.from,
+                                "",
+                                "",
+                                "",
                                 "",
                                 spec.error,
                             )

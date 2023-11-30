@@ -8,6 +8,7 @@ import ru.ezhov.rocket.action.api.RocketActionConfiguration
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
 import ru.ezhov.rocket.action.api.RocketActionFactoryUi
 import ru.ezhov.rocket.action.api.RocketActionPlugin
+import ru.ezhov.rocket.action.api.RocketActionPluginInfo
 import ru.ezhov.rocket.action.api.RocketActionSettings
 import ru.ezhov.rocket.action.api.RocketActionType
 import ru.ezhov.rocket.action.api.context.RocketActionContext
@@ -28,6 +29,7 @@ import java.io.File
 import java.io.IOException
 import java.net.URI
 import java.net.URL
+import java.util.*
 import java.util.concurrent.ExecutionException
 import javax.imageio.ImageIO
 import javax.swing.AbstractAction
@@ -48,6 +50,17 @@ private val logger = KotlinLogging.logger {}
 
 class ShowImageRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
     private var actionContext: RocketActionContext? = null
+
+    override fun info(): RocketActionPluginInfo = Properties().let { properties ->
+        properties.load(this.javaClass.getResourceAsStream("/config/plugin-show-image.properties"))
+        object : RocketActionPluginInfo {
+            override fun version(): String = properties.getProperty("version")
+
+            override fun author(): String = properties.getProperty("author")
+
+            override fun link(): String? = properties.getProperty("link")
+        }
+    }
 
     override fun factory(context: RocketActionContext): RocketActionFactoryUi = this
         .apply {

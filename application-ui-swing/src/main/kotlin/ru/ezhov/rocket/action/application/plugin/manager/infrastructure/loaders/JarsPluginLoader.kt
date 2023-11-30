@@ -48,19 +48,22 @@ class JarsPluginLoader {
                     val sourceType = RocketActionPluginSourceType.JAR
 
                     try {
-                        val ra: RocketActionPlugin
+                        val rocketActionPlugin: RocketActionPlugin
                         val initTimeClass = measureTimeMillis {
                             val clazz = classLoader.loadClass(clazzName)
                             val plugin = clazz.getDeclaredConstructor().newInstance() as RocketActionPlugin
-                            ra = RocketActionPluginDecorator(rocketActionPluginOriginal = plugin)
+                            rocketActionPlugin = RocketActionPluginDecorator(rocketActionPluginOriginal = plugin)
                         }
 
                         logger.debug { "Initialize timeMs='$initTimeClass' for jar='${jar.absolutePath}'}" }
 
                         plugins.add(
                             RocketActionPluginSpec.Success(
-                                rocketActionPlugin = ra,
+                                rocketActionPlugin = rocketActionPlugin,
                                 from = from,
+                                version = rocketActionPlugin.info().version(),
+                                author = rocketActionPlugin.info().author(),
+                                link = rocketActionPlugin.info().link(),
                                 sourceType = sourceType,
                                 loadTime = Duration.ofMillis(initTimeClass),
                             )

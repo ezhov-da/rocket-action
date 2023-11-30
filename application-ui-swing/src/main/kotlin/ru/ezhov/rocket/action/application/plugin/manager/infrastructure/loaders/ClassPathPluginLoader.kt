@@ -43,12 +43,19 @@ class ClassPathPluginLoader {
             RocketActionPluginSpec.Success(
                 rocketActionPlugin = rocketActionPlugin,
                 from = from,
+                version = rocketActionPlugin.info().version(),
+                author = rocketActionPlugin.info().author(),
+                link = rocketActionPlugin.info().link(),
                 sourceType = sourceType,
                 loadTime = Duration.ofMillis(initTimeClass),
             )
         } catch (e: Exception) {
             logger.warn(e) { "Error when load class $classAsName" }
-            RocketActionPluginSpec.Failure(from = from, sourceType = sourceType, error = "Error '${e.message}'")
+            RocketActionPluginSpec.Failure(
+                from = from,
+                sourceType = sourceType,
+                error = "Error '${e.message}'"
+            )
         }
     }
 }

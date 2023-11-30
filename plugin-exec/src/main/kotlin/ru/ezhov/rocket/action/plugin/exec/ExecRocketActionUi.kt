@@ -6,6 +6,7 @@ import ru.ezhov.rocket.action.api.RocketActionConfiguration
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
 import ru.ezhov.rocket.action.api.RocketActionFactoryUi
 import ru.ezhov.rocket.action.api.RocketActionPlugin
+import ru.ezhov.rocket.action.api.RocketActionPluginInfo
 import ru.ezhov.rocket.action.api.RocketActionSettings
 import ru.ezhov.rocket.action.api.RocketActionType
 import ru.ezhov.rocket.action.api.context.RocketActionContext
@@ -20,6 +21,7 @@ import java.awt.datatransfer.StringSelection
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import java.io.File
+import java.util.*
 import javax.swing.Icon
 import javax.swing.JMenuItem
 import javax.swing.filechooser.FileSystemView
@@ -28,6 +30,18 @@ private val logger = KotlinLogging.logger { }
 
 class ExecRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
     private var actionContext: RocketActionContext? = null
+
+    override fun info(): RocketActionPluginInfo = Properties().let { properties ->
+        properties.load(this.javaClass.getResourceAsStream("/config/plugin-exec.properties"))
+        object : RocketActionPluginInfo {
+            override fun version(): String = properties.getProperty("version")
+
+            override fun author(): String = properties.getProperty("author")
+
+            override fun link(): String? = properties.getProperty("link")
+        }
+    }
+
     override fun factory(context: RocketActionContext): RocketActionFactoryUi = this
         .apply {
             actionContext = context

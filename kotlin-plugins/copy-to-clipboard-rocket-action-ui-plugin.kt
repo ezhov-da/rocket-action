@@ -3,6 +3,7 @@ import ru.ezhov.rocket.action.api.RocketActionConfiguration
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
 import ru.ezhov.rocket.action.api.RocketActionFactoryUi
 import ru.ezhov.rocket.action.api.RocketActionPlugin
+import ru.ezhov.rocket.action.api.RocketActionPluginInfo
 import ru.ezhov.rocket.action.api.RocketActionSettings
 import ru.ezhov.rocket.action.api.RocketActionType
 import ru.ezhov.rocket.action.api.context.RocketActionContext
@@ -23,6 +24,14 @@ class CopyToClipboardRocketActionUi : AbstractRocketAction(), RocketActionPlugin
         private val DESCRIPTION = "description"
         private val TEXT = "text"
     }
+
+    override fun info(): RocketActionPluginInfo = object : RocketActionPluginInfo {
+            override fun version(): String = "version"
+
+            override fun author(): String = "author"
+
+            override fun link(): String? = "link"
+        }
 
     override fun create(settings: RocketActionSettings, context: RocketActionContext): RocketAction? =
         settings.settings()[TEXT]?.takeIf { it.isNotEmpty() }?.let { text ->

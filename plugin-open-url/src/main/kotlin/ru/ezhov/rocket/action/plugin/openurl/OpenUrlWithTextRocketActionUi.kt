@@ -5,6 +5,7 @@ import ru.ezhov.rocket.action.api.RocketActionConfiguration
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
 import ru.ezhov.rocket.action.api.RocketActionFactoryUi
 import ru.ezhov.rocket.action.api.RocketActionPlugin
+import ru.ezhov.rocket.action.api.RocketActionPluginInfo
 import ru.ezhov.rocket.action.api.RocketActionPropertySpec
 import ru.ezhov.rocket.action.api.RocketActionSettings
 import ru.ezhov.rocket.action.api.RocketActionType
@@ -26,6 +27,7 @@ import java.awt.Desktop
 import java.net.URI
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
+import java.util.*
 import javax.swing.BoxLayout
 import javax.swing.Icon
 import javax.swing.JLabel
@@ -34,6 +36,17 @@ import javax.swing.JPanel
 
 class OpenUrlWithTextRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
     private var actionContext: RocketActionContext? = null
+
+    override fun info(): RocketActionPluginInfo = Properties().let { properties ->
+        properties.load(this.javaClass.getResourceAsStream("/config/plugin-open-url.properties"))
+        object : RocketActionPluginInfo {
+            override fun version(): String = properties.getProperty("version")
+
+            override fun author(): String = properties.getProperty("author")
+
+            override fun link(): String? = properties.getProperty("link")
+        }
+    }
 
     override fun factory(context: RocketActionContext): RocketActionFactoryUi = this
         .apply {
@@ -107,7 +120,8 @@ class OpenUrlWithTextRocketActionUi : AbstractRocketAction(), RocketActionPlugin
                                 override fun inputArguments(): List<RocketActionHandlerProperty> =
                                     listOf(
                                         object : RocketActionHandlerProperty {
-                                            override fun key(): RocketActionHandlerPropertyKey = RocketActionHandlerPropertyKey("text")
+                                            override fun key(): RocketActionHandlerPropertyKey =
+                                                RocketActionHandlerPropertyKey("text")
 
                                             override fun name(): String = "Substitute text"
 
@@ -115,7 +129,8 @@ class OpenUrlWithTextRocketActionUi : AbstractRocketAction(), RocketActionPlugin
 
                                             override fun isRequired(): Boolean = true
 
-                                            override fun property(): RocketActionHandlerPropertySpec = RocketActionHandlerPropertySpec.StringPropertySpec()
+                                            override fun property(): RocketActionHandlerPropertySpec =
+                                                RocketActionHandlerPropertySpec.StringPropertySpec()
                                         }
                                     )
 

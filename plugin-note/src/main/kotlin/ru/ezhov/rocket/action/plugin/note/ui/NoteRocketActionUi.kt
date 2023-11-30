@@ -6,6 +6,7 @@ import ru.ezhov.rocket.action.api.RocketActionConfiguration
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
 import ru.ezhov.rocket.action.api.RocketActionFactoryUi
 import ru.ezhov.rocket.action.api.RocketActionPlugin
+import ru.ezhov.rocket.action.api.RocketActionPluginInfo
 import ru.ezhov.rocket.action.api.RocketActionPropertySpec
 import ru.ezhov.rocket.action.api.RocketActionSettings
 import ru.ezhov.rocket.action.api.RocketActionType
@@ -18,6 +19,7 @@ import ru.ezhov.rocket.action.plugin.note.infrastructure.NoteRepositoryFactory
 import java.awt.Component
 import java.io.File
 import java.nio.file.Path
+import java.util.*
 import javax.swing.Icon
 import javax.swing.JMenu
 import javax.swing.SwingWorker
@@ -28,6 +30,17 @@ private val logger = KotlinLogging.logger {}
 
 class NoteRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
     private var actionContext: RocketActionContext? = null
+
+    override fun info(): RocketActionPluginInfo = Properties().let { properties ->
+        properties.load(this.javaClass.getResourceAsStream("/config/plugin-note.properties"))
+        object : RocketActionPluginInfo {
+            override fun version(): String = properties.getProperty("version")
+
+            override fun author(): String = properties.getProperty("author")
+
+            override fun link(): String? = properties.getProperty("link")
+        }
+    }
 
     override fun factory(context: RocketActionContext): RocketActionFactoryUi = this
         .apply {
@@ -40,7 +53,6 @@ class NoteRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
         }
 
     override fun create(settings: RocketActionSettings, context: RocketActionContext): RocketAction? = run {
-
         settings.settings()[LABEL]
             ?.takeIf { it.isNotEmpty() }
             ?.let { label ->

@@ -63,6 +63,9 @@ class KotlinPluginLoader(
             RocketActionPluginSpec.Success(
                 rocketActionPlugin = RocketActionPluginDecorator(rocketActionPlugin),
                 from = from,
+                version = rocketActionPlugin.info().version(),
+                author = rocketActionPlugin.info().author(),
+                link = rocketActionPlugin.info().link(),
                 sourceType = sourceType,
                 loadTime = Duration.ofMillis(ms),
             )

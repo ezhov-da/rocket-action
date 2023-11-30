@@ -9,6 +9,7 @@ import ru.ezhov.rocket.action.api.RocketActionConfiguration
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
 import ru.ezhov.rocket.action.api.RocketActionFactoryUi
 import ru.ezhov.rocket.action.api.RocketActionPlugin
+import ru.ezhov.rocket.action.api.RocketActionPluginInfo
 import ru.ezhov.rocket.action.api.RocketActionSettings
 import ru.ezhov.rocket.action.api.RocketActionType
 import ru.ezhov.rocket.action.api.context.RocketActionContext
@@ -29,6 +30,7 @@ import java.io.File
 import java.io.IOException
 import java.net.URI
 import java.net.URL
+import java.util.*
 import javax.imageio.ImageIO
 import javax.swing.AbstractAction
 import javax.swing.BoxLayout
@@ -48,6 +50,18 @@ private val logger = KotlinLogging.logger { }
 
 class ShowSvgImageRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
     private var actionContext: RocketActionContext? = null
+
+    override fun info(): RocketActionPluginInfo = Properties().let { properties ->
+        properties.load(this.javaClass.getResourceAsStream("/config/plugin-show-image-svg.properties"))
+        object : RocketActionPluginInfo {
+            override fun version(): String = properties.getProperty("version")
+
+            override fun author(): String = properties.getProperty("author")
+
+            override fun link(): String? = properties.getProperty("link")
+        }
+    }
+
     override fun factory(context: RocketActionContext): RocketActionFactoryUi = this
         .apply {
             actionContext = context
@@ -94,7 +108,12 @@ class ShowSvgImageRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
         return listOf(
             createRocketActionProperty(key = IMAGE_URL, name = IMAGE_URL, description = "Image URL", required = true),
             createRocketActionProperty(key = LABEL, name = LABEL, description = "Title", required = false),
-            createRocketActionProperty(key = DESCRIPTION, name = DESCRIPTION, description = "Description", required = false),
+            createRocketActionProperty(
+                key = DESCRIPTION,
+                name = DESCRIPTION,
+                description = "Description",
+                required = false
+            ),
         )
     }
 

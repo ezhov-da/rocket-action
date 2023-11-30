@@ -5,6 +5,7 @@ import ru.ezhov.rocket.action.api.RocketActionConfiguration
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
 import ru.ezhov.rocket.action.api.RocketActionFactoryUi
 import ru.ezhov.rocket.action.api.RocketActionPlugin
+import ru.ezhov.rocket.action.api.RocketActionPluginInfo
 import ru.ezhov.rocket.action.api.RocketActionSettings
 import ru.ezhov.rocket.action.api.RocketActionType
 import ru.ezhov.rocket.action.api.context.RocketActionContext
@@ -21,6 +22,7 @@ import java.awt.event.MouseEvent
 import java.io.IOException
 import java.net.URI
 import java.net.URISyntaxException
+import java.util.*
 import java.util.concurrent.ExecutionException
 import javax.swing.DefaultListCellRenderer
 import javax.swing.DefaultListModel
@@ -37,12 +39,23 @@ import javax.swing.SwingWorker
 class TodoistRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
     private var actionContext: RocketActionContext? = null
 
-        override fun factory(context: RocketActionContext): RocketActionFactoryUi = this
+    override fun info(): RocketActionPluginInfo = Properties().let { properties ->
+        properties.load(this.javaClass.getResourceAsStream("/config/plugin-todoist.properties"))
+        object : RocketActionPluginInfo {
+            override fun version(): String = properties.getProperty("version")
+
+            override fun author(): String = properties.getProperty("author")
+
+            override fun link(): String? = properties.getProperty("link")
+        }
+    }
+
+    override fun factory(context: RocketActionContext): RocketActionFactoryUi = this
         .apply {
             actionContext = context
         }
 
-        override fun configuration(context: RocketActionContext): RocketActionConfiguration = this
+    override fun configuration(context: RocketActionContext): RocketActionConfiguration = this
         .apply {
             actionContext = context
         }
@@ -175,8 +188,15 @@ class TodoistRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
             val taskJList: JList<Task> = JList<Task>(taskListModel)
             taskJList.fixedCellWidth = 500
             taskJList.setCellRenderer(object : DefaultListCellRenderer() {
-                override fun getListCellRendererComponent(list: JList<*>?, value: Any, index: Int, isSelected: Boolean, cellHasFocus: Boolean): Component {
-                    val label = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus) as JLabel
+                override fun getListCellRendererComponent(
+                    list: JList<*>?,
+                    value: Any,
+                    index: Int,
+                    isSelected: Boolean,
+                    cellHasFocus: Boolean
+                ): Component {
+                    val label =
+                        super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus) as JLabel
                     label.text = (value as Task).content
                     return label
                 }

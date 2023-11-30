@@ -5,6 +5,7 @@ import ru.ezhov.rocket.action.api.RocketActionConfiguration
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
 import ru.ezhov.rocket.action.api.RocketActionFactoryUi
 import ru.ezhov.rocket.action.api.RocketActionPlugin
+import ru.ezhov.rocket.action.api.RocketActionPluginInfo
 import ru.ezhov.rocket.action.api.RocketActionSettings
 import ru.ezhov.rocket.action.api.RocketActionType
 import ru.ezhov.rocket.action.api.context.RocketActionContext
@@ -14,6 +15,7 @@ import ru.ezhov.rocket.action.api.support.AbstractRocketAction
 import java.awt.Component
 import java.awt.Toolkit
 import java.awt.datatransfer.StringSelection
+import java.util.*
 import javax.swing.Icon
 import javax.swing.JMenuItem
 
@@ -21,9 +23,20 @@ class CopyToClipboardRocketActionUi : AbstractRocketAction(), RocketActionPlugin
     private var actionContext: RocketActionContext? = null
 
     companion object {
-        private val LABEL = "label"
-        private val DESCRIPTION = "description"
-        private val TEXT = "text"
+        private const val LABEL = "label"
+        private const val DESCRIPTION = "description"
+        private const val TEXT = "text"
+    }
+
+    override fun info(): RocketActionPluginInfo = Properties().let { properties ->
+        properties.load(this.javaClass.getResourceAsStream("/config/plugin-copy-to-clipboard.properties"))
+        object : RocketActionPluginInfo {
+            override fun version(): String = properties.getProperty("version")
+
+            override fun author(): String = properties.getProperty("author")
+
+            override fun link(): String? = properties.getProperty("link")
+        }
     }
 
     override fun create(settings: RocketActionSettings, context: RocketActionContext): RocketAction? =

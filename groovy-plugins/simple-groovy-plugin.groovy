@@ -2,8 +2,9 @@ import groovy.swing.SwingBuilder
 import org.jetbrains.annotations.NotNull
 import ru.ezhov.rocket.action.api.*
 import ru.ezhov.rocket.action.api.context.RocketActionContext
-import ru.ezhov.rocket.action.api.support.AbstractRocketAction
 import ru.ezhov.rocket.action.api.context.icon.AppIcon
+import ru.ezhov.rocket.action.api.support.AbstractRocketAction
+import ru.ezhov.rocket.action.api.RocketActionPluginInfo
 
 import javax.swing.*
 import java.awt.*
@@ -20,6 +21,17 @@ class SimpleGroovyRocketActionUi extends AbstractRocketAction implements RocketA
     @Override
     String description() {
         return """This action is located in the folder ${new File(".").absolutePath}"""
+    }
+
+    @Override
+    RocketActionPluginInfo info() {
+        return new RocketActionPluginInfo() {
+            String version() { return "version" }
+
+            String author() { return "author" }
+
+            String link() { return "link" }
+        }
     }
 
     @Override
