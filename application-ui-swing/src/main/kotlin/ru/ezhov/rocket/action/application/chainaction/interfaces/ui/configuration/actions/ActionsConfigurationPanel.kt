@@ -10,6 +10,7 @@ import ru.ezhov.rocket.action.application.chainaction.domain.model.AtomicActionE
 import ru.ezhov.rocket.action.application.chainaction.domain.model.AtomicActionSource
 import ru.ezhov.rocket.action.application.chainaction.domain.model.ContractType
 import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.CreateAndEditAtomicActionDialog
+import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.CreateChainActionDialog
 import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.renderer.AtomicActionListCellRenderer
 import ru.ezhov.rocket.action.application.event.domain.DomainEvent
 import ru.ezhov.rocket.action.application.event.domain.DomainEventSubscriber
@@ -24,11 +25,13 @@ import javax.swing.JScrollPane
 
 class ActionsConfigurationPanel(
     private val atomicActionService: AtomicActionService,
+    private val createChainActionDialog: CreateChainActionDialog,
 ) : JPanel(MigLayout()) {
     private val sortActionPanelConfiguration = SortActionPanelConfiguration()
     private val searchActionPanelConfiguration = SearchActionPanelConfiguration()
 
     private val buttonCreateAction: JButton = JButton("Create atomic action")
+    private val buttonCreateChainFromAction: JButton = JButton("Create chain from atomic action").apply { isEnabled = false }
     private val buttonEditAction: JButton = JButton("Edit").apply { isEnabled = false }
     private val buttonDeleteAction: JButton = JButton("Delete").apply { isEnabled = false }
 
@@ -46,6 +49,7 @@ class ActionsConfigurationPanel(
             allListActions.selectedValue?.let {
                 buttonEditAction.isEnabled = true
                 buttonDeleteAction.isEnabled = true
+                buttonCreateChainFromAction.isEnabled = true
             }
         }
 
@@ -58,6 +62,12 @@ class ActionsConfigurationPanel(
         buttonDeleteAction.addActionListener {
             allListActions.selectedValue?.let {
                 atomicActionService.deleteAtomic(it.id)
+            }
+        }
+
+        buttonCreateChainFromAction.addActionListener {
+            allListActions.selectedValue?.let {
+                createChainActionDialog.showDialogWith(it)
             }
         }
 
@@ -121,7 +131,8 @@ class ActionsConfigurationPanel(
         searchActionPanelConfiguration.addPropertyChangeListener(propertyChangeListener)
 
         val panelAtomicAction = JPanel(MigLayout())
-        panelAtomicAction.add(buttonCreateAction, "split 3")
+        panelAtomicAction.add(buttonCreateAction, "split 4")
+        panelAtomicAction.add(buttonCreateChainFromAction, )
         panelAtomicAction.add(buttonEditAction)
         panelAtomicAction.add(buttonDeleteAction, "wrap")
         panelAtomicAction.add(JScrollPane(allListActions), "height max, width max")

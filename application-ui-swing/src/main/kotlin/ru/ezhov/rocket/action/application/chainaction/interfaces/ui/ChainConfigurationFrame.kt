@@ -26,11 +26,19 @@ class ChainConfigurationFrame(
 ) : JFrame() {
     private val contentPane = JPanel(MigLayout(/*"debug"*/))
 
-    private val actionsConfigurationPanel = ActionsConfigurationPanel(atomicActionService)
-    private val chainsConfigurationPanel = ChainsConfigurationPanel(
+    private val createChainActionDialog = CreateChainActionDialog(
         actionExecutorService = actionExecutorService,
         chainActionService = chainActionService,
         atomicActionService = atomicActionService,
+    )
+
+    private val actionsConfigurationPanel = ActionsConfigurationPanel(atomicActionService, createChainActionDialog)
+
+    private val chainsConfigurationPanel = ChainsConfigurationPanel(
+        actionExecutorService = actionExecutorService,
+        atomicActionService = atomicActionService,
+        chainActionService = chainActionService,
+        createChainActionDialog = createChainActionDialog,
     )
 
     init {

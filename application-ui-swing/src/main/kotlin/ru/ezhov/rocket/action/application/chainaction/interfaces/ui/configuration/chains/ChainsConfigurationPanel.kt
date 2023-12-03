@@ -26,6 +26,7 @@ class ChainsConfigurationPanel(
     private val actionExecutorService: ActionExecutorService,
     private val chainActionService: ChainActionService,
     private val atomicActionService: AtomicActionService,
+    private val createChainActionDialog: CreateChainActionDialog,
 ) : JPanel(MigLayout()) {
     private val sortChainPanelConfiguration = SortChainPanelConfiguration()
     private val searchChainPanelConfiguration = SearchChainPanelConfiguration()
@@ -37,11 +38,6 @@ class ChainsConfigurationPanel(
     private val allListChainsModel = DefaultListModel<ChainAction>()
     private val allListChains = JList(allListChainsModel)
 
-    private val createChainActionDialog = CreateChainActionDialog(
-        actionExecutorService = actionExecutorService,
-        chainActionService = chainActionService,
-        atomicActionService = atomicActionService,
-    )
     private val editChainActionDialog = EditChainActionDialog(
         actionExecutorService = actionExecutorService,
         chainActionService = chainActionService,

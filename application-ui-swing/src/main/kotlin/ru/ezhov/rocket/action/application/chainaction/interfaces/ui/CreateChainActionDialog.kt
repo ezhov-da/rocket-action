@@ -157,8 +157,8 @@ class CreateChainActionDialog(
             JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
         )
 
-        setLocationRelativeTo(null)
         setSize(500, 500)
+        setLocationRelativeTo(null)
     }
 
     private fun onOK() {
@@ -188,6 +188,26 @@ class CreateChainActionDialog(
         nameTextField.text = ""
         descriptionTextPane.text = ""
         selectedListActionsModel.removeAllElements()
+
+        isModal = true
+        isVisible = true
+    }
+
+    fun showDialogWith(atomicAction: AtomicAction) {
+        nameTextField.text = ""
+        descriptionTextPane.text = ""
+
+        selectedListActionsModel.removeAllElements()
+
+        allListActionsModel
+            .elements()
+            .toList()
+            .firstOrNull { it.id == atomicAction.id }
+            ?.let {
+                selectedListActionsModel.addElement(
+                    SelectedAtomicAction(atomicAction = it)
+                )
+            }
 
         isModal = true
         isVisible = true
