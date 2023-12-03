@@ -11,7 +11,7 @@ private val logger = KotlinLogging.logger { }
 class KotlinEngine : Engine {
 
     companion object {
-        private const val VARIABLES_NAME = "_variables"
+        private const val VARIABLES_NAME = "_VARIABLES"
     }
 
     override fun execute(template: String, variables: List<EngineVariable>): Any? =

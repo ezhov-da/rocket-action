@@ -4,7 +4,7 @@ import arrow.core.Either
 
 interface ScriptEngine {
     companion object {
-        const val VARIABLES_NAME = "_variables"
+        const val VARIABLES_NAME = "_VARIABLES"
     }
 
     fun type(): ScriptEngineType
