@@ -9,8 +9,7 @@ import ru.ezhov.rocket.action.application.chainaction.domain.event.ChainActionCr
 import ru.ezhov.rocket.action.application.chainaction.domain.event.ChainActionDeletedDomainEvent
 import ru.ezhov.rocket.action.application.chainaction.domain.event.ChainActionUpdatedDomainEvent
 import ru.ezhov.rocket.action.application.chainaction.domain.model.ChainAction
-import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.CreateChainActionDialog
-import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.EditChainActionDialog
+import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.CreateAndEditChainActionDialog
 import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.renderer.ChainActionListCellRenderer
 import ru.ezhov.rocket.action.application.event.domain.DomainEvent
 import ru.ezhov.rocket.action.application.event.domain.DomainEventSubscriber
@@ -27,7 +26,7 @@ class ChainsConfigurationPanel(
     private val actionExecutorService: ActionExecutorService,
     private val chainActionService: ChainActionService,
     private val atomicActionService: AtomicActionService,
-    private val createChainActionDialog: CreateChainActionDialog,
+    private val createAndEditChainActionDialog: CreateAndEditChainActionDialog,
 ) : JPanel(MigLayout()) {
     private val sortChainPanelConfiguration = SortChainPanelConfiguration()
     private val searchChainPanelConfiguration = SearchChainPanelConfiguration()
@@ -40,18 +39,12 @@ class ChainsConfigurationPanel(
     private val allListChainsModel = DefaultListModel<ChainAction>()
     private val allListChains = JList(allListChainsModel)
 
-    private val editChainActionDialog = EditChainActionDialog(
-        actionExecutorService = actionExecutorService,
-        chainActionService = chainActionService,
-        atomicActionService = atomicActionService,
-    )
-
     init {
         allListChains.cellRenderer = ChainActionListCellRenderer(atomicActionService)
 
         buttonEditChain.addActionListener {
             allListChains.selectedValue?.let {
-                editChainActionDialog.showEditDialog(it, this)
+                createAndEditChainActionDialog.showEditDialog(it)
             }
         }
 
@@ -65,7 +58,7 @@ class ChainsConfigurationPanel(
             allListChains.selectedValue?.let {
                 val chain = it.duplicate()
                 chainActionService.addChain(chain)
-                editChainActionDialog.showEditDialog(it, this)
+                createAndEditChainActionDialog.showEditDialog(it)
             }
         }
 
@@ -73,7 +66,7 @@ class ChainsConfigurationPanel(
             allListChains.selectedValue?.let {
                 buttonEditChain.isEnabled = true
                 buttonDeleteChain.isEnabled = true
-                buttonDuplicate?.isEnabled = true
+                buttonDuplicate.isEnabled = true
             }
         }
 
@@ -151,7 +144,7 @@ class ChainsConfigurationPanel(
         panelChainAction.add(buttonDeleteChain, "wrap")
         panelChainAction.add(JScrollPane(allListChains), "height max, width max")
 
-        buttonCreateChain.apply { addActionListener { createChainActionDialog.showDialog() } }
+        buttonCreateChain.apply { addActionListener { createAndEditChainActionDialog.showCreateDialog() } }
 
         border = BorderFactory.createTitledBorder("Chains")
 

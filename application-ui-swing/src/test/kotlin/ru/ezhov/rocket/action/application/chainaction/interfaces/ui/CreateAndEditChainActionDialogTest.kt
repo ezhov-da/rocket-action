@@ -20,7 +20,7 @@ fun main(args: Array<String>) {
         } catch (ex: Throwable) {
             //
         }
-        val dialog = EditChainActionDialog(
+        val dialog = CreateAndEditChainActionDialog(
             ActionExecutorService(
                 ActionExecutorImpl(
                     engineFactory = EngineFactory(),

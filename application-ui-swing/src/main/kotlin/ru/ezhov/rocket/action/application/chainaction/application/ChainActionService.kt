@@ -1,7 +1,6 @@
 package ru.ezhov.rocket.action.application.chainaction.application
 
 import org.springframework.stereotype.Service
-import ru.ezhov.rocket.action.application.chainaction.domain.AtomicActionRepository
 import ru.ezhov.rocket.action.application.chainaction.domain.ChainActionRepository
 import ru.ezhov.rocket.action.application.chainaction.domain.event.ChainActionCreatedDomainEvent
 import ru.ezhov.rocket.action.application.chainaction.domain.event.ChainActionDeletedDomainEvent
@@ -34,4 +33,6 @@ class ChainActionService(
 
         DomainEventFactory.publisher.publish(listOf(ChainActionUpdatedDomainEvent(chainAction)))
     }
+
+    fun usageAction(id: String) = chains().filter { it.actions.any { act -> act.actionId == id } }
 }

@@ -1,6 +1,7 @@
 package ru.ezhov.rocket.action.application.chainaction.interfaces.ui.renderer
 
 import ru.ezhov.rocket.action.application.chainaction.application.AtomicActionService
+import ru.ezhov.rocket.action.application.chainaction.application.ChainActionService
 import ru.ezhov.rocket.action.application.chainaction.domain.model.AtomicAction
 import ru.ezhov.rocket.action.application.chainaction.domain.model.ChainAction
 import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.AtomicActionListCellPanel
@@ -12,7 +13,8 @@ import javax.swing.JLabel
 import javax.swing.JList
 
 class ChainAndAtomicActionListCellRenderer(
-    private val atomicActionService: AtomicActionService
+    private val atomicActionService: AtomicActionService,
+    private val chainActionService: ChainActionService,
 ) : DefaultListCellRenderer() {
     override fun getListCellRendererComponent(
         list: JList<*>?,
@@ -29,7 +31,12 @@ class ChainAndAtomicActionListCellRenderer(
                 backgroundColor = label.background,
             )
 
-            is AtomicAction -> AtomicActionListCellPanel(value, label.background)
+            is AtomicAction -> AtomicActionListCellPanel(
+                atomicAction = value,
+                backgroundColor = label.background,
+                chainActionService = chainActionService
+            )
+
             else -> label
         }
     }

@@ -1,5 +1,6 @@
 package ru.ezhov.rocket.action.application.chainaction.interfaces.ui
 
+import io.mockk.mockk
 import ru.ezhov.rocket.action.application.chainaction.domain.model.AtomicAction
 import ru.ezhov.rocket.action.application.chainaction.domain.model.AtomicActionEngine
 import ru.ezhov.rocket.action.application.chainaction.domain.model.AtomicActionSource
@@ -28,7 +29,9 @@ fun main(args: Array<String>) {
                     engine = AtomicActionEngine.KOTLIN,
                     source = AtomicActionSource.FILE,
                     data = "Text",
-                )
+                ),
+                backgroundColor = null,
+                chainActionService = mockk(),
             )
         )
         frame.setSize(1000, 600);

@@ -2,6 +2,7 @@ package ru.ezhov.rocket.action.application.chainaction.interfaces.ui.configurati
 
 import net.miginfocom.swing.MigLayout
 import ru.ezhov.rocket.action.application.chainaction.application.AtomicActionService
+import ru.ezhov.rocket.action.application.chainaction.application.ChainActionService
 import ru.ezhov.rocket.action.application.chainaction.domain.event.AtomicActionCreatedDomainEvent
 import ru.ezhov.rocket.action.application.chainaction.domain.event.AtomicActionDeletedDomainEvent
 import ru.ezhov.rocket.action.application.chainaction.domain.event.AtomicActionUpdatedDomainEvent
@@ -9,23 +10,29 @@ import ru.ezhov.rocket.action.application.chainaction.domain.model.AtomicAction
 import ru.ezhov.rocket.action.application.chainaction.domain.model.AtomicActionEngine
 import ru.ezhov.rocket.action.application.chainaction.domain.model.AtomicActionSource
 import ru.ezhov.rocket.action.application.chainaction.domain.model.ContractType
+import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.ChainsSelectPanel
 import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.CreateAndEditAtomicActionDialog
-import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.CreateChainActionDialog
+import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.CreateAndEditChainActionDialog
 import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.renderer.AtomicActionListCellRenderer
 import ru.ezhov.rocket.action.application.event.domain.DomainEvent
 import ru.ezhov.rocket.action.application.event.domain.DomainEventSubscriber
 import ru.ezhov.rocket.action.application.event.infrastructure.DomainEventFactory
+import java.awt.event.MouseAdapter
+import java.awt.event.MouseEvent
 import java.beans.PropertyChangeListener
 import javax.swing.BorderFactory
 import javax.swing.DefaultListModel
 import javax.swing.JButton
 import javax.swing.JList
+import javax.swing.JMenu
 import javax.swing.JPanel
+import javax.swing.JPopupMenu
 import javax.swing.JScrollPane
 
 class ActionsConfigurationPanel(
     private val atomicActionService: AtomicActionService,
-    private val createChainActionDialog: CreateChainActionDialog,
+    private val chainActionService: ChainActionService,
+    private val createAndEditChainActionDialog: CreateAndEditChainActionDialog,
 ) : JPanel(MigLayout()) {
     private val sortActionPanelConfiguration = SortActionPanelConfiguration()
     private val searchActionPanelConfiguration = SearchActionPanelConfiguration()
@@ -45,7 +52,7 @@ class ActionsConfigurationPanel(
     )
 
     init {
-        allListActions.cellRenderer = AtomicActionListCellRenderer()
+        allListActions.cellRenderer = AtomicActionListCellRenderer(chainActionService)
 
         allListActions.addListSelectionListener {
             allListActions.selectedValue?.let {
@@ -56,9 +63,19 @@ class ActionsConfigurationPanel(
             }
         }
 
+        allListActions.addMouseListener(object : MouseAdapter() {
+            override fun mouseReleased(e: MouseEvent) {
+                if (e.button == MouseEvent.BUTTON3) {
+                    allListActionsModel.getElementAt(allListActions.locationToIndex(e.point))?.let {
+                        showPopupMenu(element = it, event = e)
+                    }
+                }
+            }
+        })
+
         buttonEditAction.addActionListener {
             allListActions.selectedValue?.let {
-                createAndEditAtomicActionDialog.showEditDialog(it, this)
+                createAndEditAtomicActionDialog.showEditDialog(it)
             }
         }
 
@@ -70,7 +87,7 @@ class ActionsConfigurationPanel(
 
         buttonCreateChainFromAction.addActionListener {
             allListActions.selectedValue?.let {
-                createChainActionDialog.showDialogWith(it)
+                createAndEditChainActionDialog.showCreateDialogWith(it)
             }
         }
 
@@ -78,7 +95,7 @@ class ActionsConfigurationPanel(
             allListActions.selectedValue?.let {
                 val action = it.duplicate()
                 atomicActionService.addAtomic(action)
-                createAndEditAtomicActionDialog.showEditDialog(action, this)
+                createAndEditAtomicActionDialog.showEditDialog(action)
             }
         }
 
@@ -240,5 +257,22 @@ class ActionsConfigurationPanel(
         filterByConditions.forEach {
             allListActionsModel.addElement(it)
         }
+    }
+
+    private fun showPopupMenu(element: AtomicAction, event: MouseEvent) {
+        val chains = chainActionService.usageAction(element.id)
+
+        val popup = JPopupMenu()
+        popup.add(JMenu("Usage").apply {
+            add(
+                ChainsSelectPanel(
+                    chains = chains,
+                    atomicActionService = atomicActionService,
+                    selectChainCallback = { chain -> createAndEditChainActionDialog.showEditDialog(chain) }
+                )
+            )
+        })
+
+        popup.show(allListActions, event.x, event.y)
     }
 }

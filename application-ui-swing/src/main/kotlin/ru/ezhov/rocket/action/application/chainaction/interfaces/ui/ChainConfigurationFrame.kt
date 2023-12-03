@@ -10,8 +10,9 @@ import ru.ezhov.rocket.action.application.eventui.ConfigurationUiListener
 import ru.ezhov.rocket.action.application.eventui.ConfigurationUiObserverFactory
 import ru.ezhov.rocket.action.application.eventui.model.ConfigurationUiEvent
 import ru.ezhov.rocket.action.application.eventui.model.ShowChainActionConfigurationUiEvent
+import ru.ezhov.rocket.action.ui.utils.swing.common.SizeUtil
 import ru.ezhov.rocket.action.ui.utils.swing.common.showToFront
-import java.awt.Toolkit
+import ru.ezhov.rocket.action.ui.utils.swing.common.toImage
 import java.awt.event.KeyEvent
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
@@ -27,19 +28,23 @@ class ChainConfigurationFrame(
 ) : JFrame() {
     private val contentPane = JPanel(MigLayout(/*"debug"*/))
 
-    private val createChainActionDialog = CreateChainActionDialog(
+    private val createChainActionDialog = CreateAndEditChainActionDialog(
         actionExecutorService = actionExecutorService,
         chainActionService = chainActionService,
         atomicActionService = atomicActionService,
     )
 
-    private val actionsConfigurationPanel = ActionsConfigurationPanel(atomicActionService, createChainActionDialog)
+    private val actionsConfigurationPanel = ActionsConfigurationPanel(
+        atomicActionService = atomicActionService,
+        chainActionService = chainActionService,
+        createAndEditChainActionDialog = createChainActionDialog
+    )
 
     private val chainsConfigurationPanel = ChainsConfigurationPanel(
         actionExecutorService = actionExecutorService,
         atomicActionService = atomicActionService,
         chainActionService = chainActionService,
-        createChainActionDialog = createChainActionDialog,
+        createAndEditChainActionDialog = createChainActionDialog,
     )
 
     init {
@@ -78,13 +83,11 @@ class ChainConfigurationFrame(
             JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
         )
 
+        iconImage = CHAIN_ICON.toImage()
+        title = "Chains"
+
+        size = SizeUtil.dimension(0.8, 0.8)
         setLocationRelativeTo(null)
-        Toolkit.getDefaultToolkit().screenSize.let { screenSize ->
-            setSize(
-                (screenSize.width * 0.8).toInt(),
-                (screenSize.height * 0.8).toInt()
-            )
-        }
     }
 
     private fun onOK() {

@@ -10,7 +10,7 @@ import ru.ezhov.rocket.action.application.chainaction.infrastructure.JsonChainAc
 import javax.swing.SwingUtilities
 import javax.swing.UIManager
 
-internal class EditChainActionDialogTest
+internal class CreateAndEditChainActionDialog2
 
 fun main(args: Array<String>) {
     SwingUtilities.invokeLater {
@@ -20,7 +20,7 @@ fun main(args: Array<String>) {
             //
         }
 
-        val dialog = EditChainActionDialog(
+        val dialog = CreateAndEditChainActionDialog(
             actionExecutorService = mockk(),
             chainActionService = ChainActionService(JsonChainActionRepository(TestUtilsFactory.objectMapper)),
             atomicActionService = AtomicActionService(JsonAtomicActionRepository(TestUtilsFactory.objectMapper)),

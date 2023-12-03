@@ -10,6 +10,8 @@ class ResultChainDialog(
     private val resultChainPanel = ResultChainPanel(text)
 
     init {
+        title = "Result"
+
         val panel = JPanel(BorderLayout())
         panel.add(resultChainPanel, BorderLayout.CENTER)
 

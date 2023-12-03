@@ -2,6 +2,7 @@ package ru.ezhov.rocket.action.application.chainaction.interfaces.ui.base
 
 import net.miginfocom.swing.MigLayout
 import ru.ezhov.rocket.action.application.chainaction.application.AtomicActionService
+import ru.ezhov.rocket.action.application.chainaction.application.ChainActionService
 import ru.ezhov.rocket.action.application.chainaction.domain.model.Action
 import ru.ezhov.rocket.action.application.chainaction.domain.model.AtomicAction
 import ru.ezhov.rocket.action.application.chainaction.domain.model.ChainAction
@@ -11,6 +12,7 @@ import javax.swing.JPopupMenu
 
 class SelectChainPopupMenu(
     actionService: AtomicActionService,
+    chainActionService: ChainActionService,
     chains: List<ChainAction>,
     atomics: List<AtomicAction>,
     selectedChainCallback: (Action) -> Unit
@@ -27,6 +29,7 @@ class SelectChainPopupMenu(
         panel.add(
             SelectChainButtonsPanel(
                 actionService = actionService,
+                chainActionService = chainActionService,
                 chains = chainsSortedByName.take(partCount),
                 atomics = atomicsSortedByName.take(partCount),
                 selectedChainCallback = { sv ->
@@ -47,6 +50,7 @@ class SelectChainPopupMenu(
             panel.add(
                 SelectChainListPanel(
                     actionService = actionService,
+                    chainActionService = chainActionService,
                     chains = chainsForList,
                     atomics = atomicsForList,
                     selectedChainCallback = { sv ->

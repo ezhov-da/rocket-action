@@ -1,5 +1,6 @@
 package ru.ezhov.rocket.action.application.chainaction.interfaces.ui.renderer
 
+import ru.ezhov.rocket.action.application.chainaction.application.ChainActionService
 import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.AtomicActionListCellPanel
 import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.SelectedAtomicAction
 import java.awt.Component
@@ -7,7 +8,9 @@ import javax.swing.DefaultListCellRenderer
 import javax.swing.JLabel
 import javax.swing.JList
 
-class OrderAtomicActionListCellRenderer : DefaultListCellRenderer() {
+class OrderAtomicActionListCellRenderer(
+    private val chainActionService: ChainActionService,
+) : DefaultListCellRenderer() {
     override fun getListCellRendererComponent(
         list: JList<*>?,
         value: Any?,
@@ -17,7 +20,11 @@ class OrderAtomicActionListCellRenderer : DefaultListCellRenderer() {
     ): Component {
         val label = super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus) as JLabel
         return if (value is SelectedAtomicAction) {
-            AtomicActionListCellPanel(value.atomicAction, label.background)
+            AtomicActionListCellPanel(
+                atomicAction = value.atomicAction,
+                backgroundColor = label.background,
+                chainActionService = chainActionService
+            )
         } else {
             label
         }

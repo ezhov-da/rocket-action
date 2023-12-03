@@ -9,7 +9,7 @@ import ru.ezhov.rocket.action.application.chainaction.domain.model.AtomicAction
 import ru.ezhov.rocket.action.application.chainaction.domain.model.AtomicActionEngine
 import ru.ezhov.rocket.action.application.chainaction.domain.model.AtomicActionSource
 import ru.ezhov.rocket.action.application.chainaction.domain.model.ContractType
-import java.awt.Component
+import ru.ezhov.rocket.action.ui.utils.swing.common.SizeUtil
 import java.awt.event.KeyEvent
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
@@ -21,9 +21,7 @@ import javax.swing.JDialog
 import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.JRadioButton
-import javax.swing.JScrollPane
 import javax.swing.JTextField
-import javax.swing.JTextPane
 import javax.swing.KeyStroke
 
 class CreateAndEditAtomicActionDialog(
@@ -135,8 +133,8 @@ class CreateAndEditAtomicActionDialog(
             JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
         )
 
+        size = SizeUtil.dimension(0.8, 0.8)
         setLocationRelativeTo(null)
-        setSize(700, 500)
     }
 
     private fun setKotlinSyntax() {
@@ -225,6 +223,8 @@ class CreateAndEditAtomicActionDialog(
     private var dialogType: DialogType? = null
 
     fun showCreateDialog() {
+        title = "Create atomic action"
+
         dialogType = DialogType.CREATE
 
         nameTextField.text = ""
@@ -239,7 +239,9 @@ class CreateAndEditAtomicActionDialog(
 
     private var currentAction: AtomicAction? = null
 
-    fun showEditDialog(action: AtomicAction, parent: Component) {
+    fun showEditDialog(action: AtomicAction) {
+        title = "Edit atomic action"
+
         dialogType = DialogType.EDIT
 
         this.currentAction = action
@@ -259,7 +261,6 @@ class CreateAndEditAtomicActionDialog(
         }
         dataTextPane.text = action.data
 
-        setLocationRelativeTo(parent)
         isModal = true
         isVisible = true
     }

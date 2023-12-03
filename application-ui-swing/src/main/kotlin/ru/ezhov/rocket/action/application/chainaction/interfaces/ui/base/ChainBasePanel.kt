@@ -145,6 +145,7 @@ class ChainBasePanel(
         val chainBasePanel = this
         SelectChainPopupMenu(
             actionService = atomicActionService,
+            chainActionService = chainActionService,
             chains = chainActionService.chains(),
             atomics = atomicActionService.atomics(),
         ) { chain ->

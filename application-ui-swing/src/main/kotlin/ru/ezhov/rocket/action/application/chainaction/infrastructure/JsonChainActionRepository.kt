@@ -37,18 +37,27 @@ class JsonChainActionRepository(
         )
 
         objectMapper.writerWithDefaultPrettyPrinter().writeValue(filePath, actionsDto)
+
+        allCached = null
     }
 
-    override fun all(): List<ChainAction> =
-        when (filePath.exists()) {
-            true ->
-                objectMapper.readValue(
-                    filePath,
-                    ChainActionsDto::class.java
-                ).chainActions.map { it.toChainAction() }
+    private var allCached: List<ChainAction>? = null
 
-            false -> emptyList()
+    override fun all(): List<ChainAction> {
+        if (allCached == null) {
+            allCached = when (filePath.exists()) {
+                true ->
+                    objectMapper.readValue(
+                        filePath,
+                        ChainActionsDto::class.java
+                    ).chainActions.map { it.toChainAction() }
+
+                false -> emptyList()
+            }
         }
+
+        return allCached!!
+    }
 
     override fun delete(id: String) {
         val actions = all().toMutableList()

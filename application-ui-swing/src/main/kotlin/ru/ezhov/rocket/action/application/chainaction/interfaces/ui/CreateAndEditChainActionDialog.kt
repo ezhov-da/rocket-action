@@ -19,13 +19,14 @@ import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.renderer.Ord
 import ru.ezhov.rocket.action.application.event.domain.DomainEvent
 import ru.ezhov.rocket.action.application.event.domain.DomainEventSubscriber
 import ru.ezhov.rocket.action.application.event.infrastructure.DomainEventFactory
+import ru.ezhov.rocket.action.ui.utils.swing.common.SizeUtil
 import java.awt.BorderLayout
-import java.awt.Component
 import java.awt.event.KeyEvent
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
+import java.util.*
 import javax.swing.BorderFactory
 import javax.swing.DefaultListModel
 import javax.swing.DropMode
@@ -41,13 +42,13 @@ import javax.swing.KeyStroke
 import javax.swing.ListSelectionModel
 import javax.swing.SwingUtilities
 
-class EditChainActionDialog(
+class CreateAndEditChainActionDialog(
     private val actionExecutorService: ActionExecutorService,
     private val chainActionService: ChainActionService,
     private val atomicActionService: AtomicActionService,
 ) : JDialog() {
     private val contentPane = JPanel(MigLayout("insets 5"/*"debug"*/))
-    private val buttonEdit: JButton = JButton("Edit")
+    private val buttonSave: JButton = JButton("Save")
     private val buttonCancel: JButton = JButton("Cancel")
 
     private val nameTextField: JTextField = JTextField()
@@ -62,8 +63,8 @@ class EditChainActionDialog(
     private val selectedListActions = JList(selectedListActionsModel)
 
     init {
-        allListActions.cellRenderer = AtomicActionListCellRenderer()
-        selectedListActions.cellRenderer = OrderAtomicActionListCellRenderer()
+        allListActions.cellRenderer = AtomicActionListCellRenderer(chainActionService)
+        selectedListActions.cellRenderer = OrderAtomicActionListCellRenderer(chainActionService)
         selectedListActions.selectionMode = ListSelectionModel.SINGLE_SELECTION
 
         selectedListActions.dragEnabled = true
@@ -96,15 +97,6 @@ class EditChainActionDialog(
 
         setContentPane(contentPane)
 
-        contentPane.add(
-            JPanel(BorderLayout())
-                .apply {
-                    add(JScrollPane(allListActions), BorderLayout.CENTER)
-                    border = BorderFactory.createTitledBorder("All atomic actions")
-                },
-            "grow, west, wmin 40%, height max"
-        )
-
         allListActions.addMouseListener(object : MouseAdapter() {
             override fun mouseClicked(e: MouseEvent) {
                 if (e.clickCount == 2) {
@@ -117,8 +109,7 @@ class EditChainActionDialog(
                     }
                 }
             }
-        }
-        )
+        })
 
         contentPane.add(nameLabel)
         contentPane.add(nameTextField, "span 2, wrap, width max, grow")
@@ -127,36 +118,43 @@ class EditChainActionDialog(
         contentPane.add(RTextScrollPane(descriptionTextPane, false), "span, wrap, width max, hmin 30%")
 
         contentPane.add(
-            JPanel(MigLayout())
+            JPanel(BorderLayout())
                 .apply {
-                    val deleteButton = JButton("Delete")
+                    add(JScrollPane(allListActions), BorderLayout.CENTER)
+                    border = BorderFactory.createTitledBorder("All atomic actions")
+                },
+            "grow, west, wmin 40%, height max"
+        )
 
-                    deleteButton.addActionListener {
-                        SwingUtilities.invokeLater {
-                            selectedListActions.selectedValue?.let { selectedValue ->
-                                val index = selectedListActionsModel.indexOf(selectedValue)
-                                selectedListActionsModel.removeElement(selectedValue)
-                                if (!selectedListActionsModel.isEmpty) {
-                                    selectedListActions.selectedIndex = index
-                                }
+        contentPane.add(
+            JPanel(MigLayout()).apply {
+                val deleteButton = JButton("Delete")
+
+                deleteButton.addActionListener {
+                    SwingUtilities.invokeLater {
+                        selectedListActions.selectedValue?.let { selectedValue ->
+                            val index = selectedListActionsModel.indexOf(selectedValue)
+                            selectedListActionsModel.removeElement(selectedValue)
+                            if (!selectedListActionsModel.isEmpty) {
+                                selectedListActions.selectedIndex = index
                             }
                         }
                     }
+                }
 
-                    add(deleteButton, "wrap")
-                    add(JScrollPane(selectedListActions), "width max, height max")
-                    border = BorderFactory.createTitledBorder("Selected atomic actions")
-                },
-            "span, width max, height max"
+                add(deleteButton, "wrap")
+                add(JScrollPane(selectedListActions), "width max, height max")
+                border = BorderFactory.createTitledBorder("Selected atomic actions")
+            }, "span, width max, height max"
         )
 
-        contentPane.add(buttonEdit, "cell 2 4, split 2, align right")
+        contentPane.add(buttonSave, "cell 2 4, split 2, align right")
         contentPane.add(buttonCancel)
 
         isModal = true
-        getRootPane().defaultButton = buttonEdit
-        buttonEdit.addActionListener { onOK() }
-        buttonCancel.addActionListener { onCancel() }
+        getRootPane().defaultButton = buttonSave
+        buttonSave.addActionListener { onOK() }
+        buttonCancel!!.addActionListener { onCancel() }
 
         // call onCancel() when cross is clicked
         defaultCloseOperation = DO_NOTHING_ON_CLOSE
@@ -168,30 +166,49 @@ class EditChainActionDialog(
 
         // call onCancel() on ESCAPE
         contentPane.registerKeyboardAction(
-            { onCancel() },
-            KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
-            JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
+            { onCancel() }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT
         )
 
+        size = SizeUtil.dimension(0.8, 0.8)
         setLocationRelativeTo(null)
-        setSize(700, 500)
     }
 
+    private var dialogType: DialogType? = null
+    private var currentEditChainAction: ChainAction? = null
     private fun onOK() {
-        chainActionService.updateChain(
-            currentChainAction!!.apply {
-                name = nameTextField.text
-                description = descriptionTextPane.text
-                actions = selectedListActionsModel.elements().toList().map {
-                    ActionOrder(
-                        chainOrderId = it.id,
-                        actionId = it.atomicAction.id,
+        when (dialogType!!) {
+            DialogType.CREATE -> {
+                chainActionService.addChain(
+                    ChainAction(
+                        id = UUID.randomUUID().toString(),
+                        name = nameTextField.text,
+                        description = descriptionTextPane.text,
+                        actions = selectedListActionsModel.elements().toList().map {
+                            ActionOrder(
+                                chainOrderId = it.id,
+                                actionId = it.atomicAction.id,
+                            )
+                        },
                     )
-                }
+                )
             }
-        )
 
-        isVisible = false
+            DialogType.EDIT -> {
+                chainActionService.updateChain(currentEditChainAction!!.apply {
+                    name = nameTextField.text
+                    description = descriptionTextPane.text
+                    actions = selectedListActionsModel.elements().toList().map {
+                        ActionOrder(
+                            chainOrderId = it.id,
+                            actionId = it.atomicAction.id,
+                        )
+                    }
+                })
+
+                isVisible = false
+            }
+        }
+
         dispose()
     }
 
@@ -200,31 +217,68 @@ class EditChainActionDialog(
         dispose()
     }
 
-    private var currentChainAction: ChainAction? = null
+    fun showCreateDialog() {
+        title = "Create chain action"
+        dialogType = DialogType.CREATE
 
-    fun showEditDialog(chainAction: ChainAction, parent: Component? = null) {
-        this.currentChainAction = chainAction
-        nameTextField.text = chainAction.name
-        descriptionTextPane.text = chainAction.description
+        nameTextField.text = ""
+        descriptionTextPane.text = ""
+        selectedListActionsModel.removeAllElements()
+
+        isModal = true
+        isVisible = true
+    }
+
+    fun showCreateDialogWith(atomicAction: AtomicAction) {
+        title = "Create chain action"
+        dialogType = DialogType.CREATE
+
+        nameTextField.text = ""
+        descriptionTextPane.text = ""
 
         selectedListActionsModel.removeAllElements()
-        val actions = atomicActionService.atomics().associateBy { it.id }
-        chainAction.actions.forEach { order ->
-            actions[order.actionId]?.let { action ->
-                selectedListActionsModel.addElement(
-                    SelectedAtomicAction(
-                        id = order.chainOrderId,
-                        atomicAction = action
-                    )
-                )
-            }
-        }
 
-        parent?.let {
-            setLocationRelativeTo(parent)
+        allListActionsModel.elements().toList().firstOrNull { it.id == atomicAction.id }?.let {
+            selectedListActionsModel.addElement(
+                SelectedAtomicAction(atomicAction = it)
+            )
         }
 
         isModal = true
         isVisible = true
     }
+
+    fun showEditDialog(chainAction: ChainAction) {
+        title = "Edit chain action"
+        dialogType = DialogType.EDIT
+
+        this.currentEditChainAction = chainAction
+        nameTextField.text = chainAction.name
+        descriptionTextPane.text = chainAction.description
+
+        selectedListActionsModel.removeAllElements()
+
+        val actions = atomicActionService.atomics().associateBy { it.id }
+        chainAction.actions.forEach { order ->
+            actions[order.actionId]?.let { action ->
+                selectedListActionsModel.addElement(
+                    SelectedAtomicAction(
+                        id = order.chainOrderId, atomicAction = action
+                    )
+                )
+            }
+        }
+
+        isModal = true
+        isVisible = true
+    }
+}
+
+data class SelectedAtomicAction(
+    val id: String = UUID.randomUUID().toString(),
+    val atomicAction: AtomicAction,
+)
+
+private enum class DialogType {
+    CREATE, EDIT
 }

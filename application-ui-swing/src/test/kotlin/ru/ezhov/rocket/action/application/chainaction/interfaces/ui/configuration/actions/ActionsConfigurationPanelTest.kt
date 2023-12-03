@@ -21,7 +21,8 @@ fun main() {
         frame.add(
             ActionsConfigurationPanel(
                 AtomicActionService(JsonAtomicActionRepository(TestUtilsFactory.objectMapper)),
-                createChainActionDialog = mockk {}
+                chainActionService = mockk {},
+                createAndEditChainActionDialog = mockk {}
             )
         )
         frame.setSize(1000, 700)

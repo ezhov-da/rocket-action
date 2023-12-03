@@ -3,6 +3,7 @@ package ru.ezhov.rocket.action.application.chainaction.interfaces.ui.base
 import net.miginfocom.swing.MigLayout
 import org.jdesktop.swingx.JXTitledSeparator
 import ru.ezhov.rocket.action.application.chainaction.application.AtomicActionService
+import ru.ezhov.rocket.action.application.chainaction.application.ChainActionService
 import ru.ezhov.rocket.action.application.chainaction.domain.model.Action
 import ru.ezhov.rocket.action.application.chainaction.domain.model.AtomicAction
 import ru.ezhov.rocket.action.application.chainaction.domain.model.ChainAction
@@ -20,6 +21,7 @@ import javax.swing.SwingConstants
 
 class SelectChainButtonsPanel(
     actionService: AtomicActionService,
+    chainActionService: ChainActionService,
     chains: List<ChainAction>,
     atomics: List<AtomicAction>,
     selectedChainCallback: (Action) -> Unit
@@ -30,7 +32,7 @@ class SelectChainButtonsPanel(
     init {
         chains.forEach { listChainsModel.addElement(it) }
         atomics.forEach { listChainsModel.addElement(it) }
-        chainList.cellRenderer = ChainAndAtomicActionListCellRenderer(actionService)
+        chainList.cellRenderer = ChainAndAtomicActionListCellRenderer(actionService, chainActionService)
 
         chainList.addMouseListener(object : MouseAdapter() {
             override fun mouseReleased(e: MouseEvent?) {
