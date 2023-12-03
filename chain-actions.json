@@ -1,5 +1,5 @@
 {
-  "changedDate" : "2023-11-12T18:38:20.103",
+  "changedDate" : [ 2023, 12, 3, 10, 1, 2, 511000000 ],
   "chainActions" : [ {
     "id" : "1a39305f-5ed2-469a-b84e-2692ac324976",
     "name" : "Тест выполнения многих действий",
@@ -198,6 +198,14 @@
     "actions" : [ {
       "chainOrderId" : "1c7d5c9e-e58c-4029-9078-e279a90ad9dc",
       "actionId" : "ccb3ea04-68ef-4988-84f1-2d95e14c0046"
+    } ]
+  }, {
+    "id" : "7988fd08-9712-4396-a26b-ca9b5cfbcaee",
+    "name" : "01",
+    "description" : "asdasdvvd",
+    "actions" : [ {
+      "chainOrderId" : "a9689eb5-8d95-4a64-b6bd-2c3b6d323468",
+      "actionId" : "8dba925e-07fb-4d88-af27-18d38eefede0"
     } ]
   } ]
 }

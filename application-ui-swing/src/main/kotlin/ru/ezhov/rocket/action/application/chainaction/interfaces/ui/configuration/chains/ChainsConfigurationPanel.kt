@@ -75,6 +75,8 @@ class ChainsConfigurationPanel(
                 when (event) {
                     is ChainActionCreatedDomainEvent -> {
                         allListChainsModel.addElement(event.chainAction)
+
+                        fillList()
                     }
 
                     is ChainActionDeletedDomainEvent -> {
@@ -96,6 +98,8 @@ class ChainsConfigurationPanel(
                                 val index = allListChainsModel.indexOf(action)
 
                                 allListChainsModel.set(index, event.chainAction)
+
+                                fillList()
                                 break
                             }
                         }
