@@ -25,6 +25,7 @@ fun main() {
                 actionExecutorService = mockk(),
                 chainActionService = ChainActionService(JsonChainActionRepository(TestUtilsFactory.objectMapper)),
                 atomicActionService = AtomicActionService(JsonAtomicActionRepository(TestUtilsFactory.objectMapper)),
+                mockk(),
             )
         )
         frame.setSize(1000, 700)

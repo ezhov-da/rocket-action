@@ -18,29 +18,34 @@ fun main(args: Array<String>) {
         } catch (ex: Throwable) {
             //
         }
-        val frame = JFrame("_________");
+        val frame = JFrame("_________")
+
+        val actions = listOf(
+            ActionOrder(
+                "000", "11"
+            ),
+            ActionOrder(
+                "111", "22"
+            )
+        )
+        val chainAction = ChainAction(
+            id = "123",
+            name = "Test name",
+            description = "Test description",
+            actions = actions,
+        )
+
         frame.add(
             ChainActionListCellPanel(
-                chainAction = ChainAction(
-                    id = "123",
-                    name = "Test name",
-                    description = "Test description",
-                    actions = listOf(
-                        ActionOrder(
-                            "000", "11"
-                        ),
-                        ActionOrder(
-                            "111", "22"
-                        )
-                    )
-                ),
-                backgroundColor = null,
-                firstAtomicAction = mockk {
-                    every { contractType } returns ContractType.IN_OUT
-                },
-                lastAtomicAction = mockk {
-                    every { contractType } returns ContractType.IN_OUT
-                }
+                chainAction = chainAction,
+                chainIcon = chainIcon(chainAction, mockk {
+                    every { atomicBy("11") } returns mockk {
+                        every { contractType } returns ContractType.IN_OUT
+                    }
+                    every { atomicBy("22") } returns mockk {
+                        every { contractType } returns ContractType.IN_UNIT
+                    }
+                })
             )
         )
         frame.setSize(1000, 600);
