@@ -1,5 +1,7 @@
 package ru.ezhov.rocket.action.application.chainaction.domain.model
 
+import java.util.*
+
 data class ChainAction(
     var id: String,
     var name: String,
@@ -7,6 +9,13 @@ data class ChainAction(
     var actions: List<ActionOrder>,
 ) : Action {
     override fun id(): String = id
+
+    fun duplicate(): ChainAction = ChainAction(
+        id = UUID.randomUUID().toString(),
+        name = this.name,
+        description = this.name,
+        actions = this.actions,
+    )
 }
 
 /**

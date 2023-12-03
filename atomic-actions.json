@@ -1,5 +1,5 @@
 {
-  "changedDate" : "2023-11-11T22:15:49.322",
+  "changedDate" : [ 2023, 12, 3, 10, 50, 10, 330000000 ],
   "atomicActions" : [ {
     "id" : "ccb3ea04-68ef-4988-84f1-2d95e14c0046",
     "name" : "Убирает начальные и конечные пробелы у строки (test)",
@@ -12,7 +12,7 @@
     "id" : "8dba925e-07fb-4d88-af27-18d38eefede0",
     "name" : "Заменяет все символы `a` на `1`",
     "description" : "Заменяет все символы `a` на `1`",
-    "contractType" : "IN_UNIT",
+    "contractType" : "IN_OUT",
     "engine" : "GROOVY",
     "source" : "TEXT",
     "data" : "_INPUT.replace(\"а\", \"1\").replace(\"a\", \"1\")"
@@ -48,5 +48,13 @@
     "engine" : "KOTLIN",
     "source" : "TEXT",
     "data" : ""
+  }, {
+    "id" : "66f98f16-75a7-4848-ae48-d94af5c8d35a",
+    "name" : "Заменяет все символы `a` на `2` (Дубликат)",
+    "description" : "Заменяет все символы `a` на `2`",
+    "contractType" : "IN_OUT",
+    "engine" : "GROOVY",
+    "source" : "TEXT",
+    "data" : "_INPUT.replace(\"а\", \"2\").replace(\"a\", \"2\")"
   } ]
 }

@@ -33,6 +33,7 @@ class ChainsConfigurationPanel(
 
     private val buttonCreateChain: JButton = JButton("Create chain action")
     private val buttonEditChain: JButton = JButton("Edit").apply { isEnabled = false }
+    private val buttonDuplicate: JButton = JButton("Duplicate").apply { isEnabled = false }
     private val buttonDeleteChain: JButton = JButton("Delete").apply { isEnabled = false }
 
     private val allListChainsModel = DefaultListModel<ChainAction>()
@@ -59,10 +60,19 @@ class ChainsConfigurationPanel(
             }
         }
 
+        buttonDuplicate.addActionListener {
+            allListChains.selectedValue?.let {
+                val chain = it.duplicate()
+                chainActionService.addChain(chain)
+                editChainActionDialog.showEditDialog(it, this)
+            }
+        }
+
         allListChains.addListSelectionListener {
             allListChains.selectedValue?.let {
                 buttonEditChain.isEnabled = true
                 buttonDeleteChain.isEnabled = true
+                buttonDuplicate?.isEnabled = true
             }
         }
 
@@ -127,8 +137,9 @@ class ChainsConfigurationPanel(
 
         val panelChainAction = JPanel(MigLayout())
 
-        panelChainAction.add(buttonCreateChain, "split 3")
+        panelChainAction.add(buttonCreateChain, "split 4")
         panelChainAction.add(buttonEditChain)
+        panelChainAction.add(buttonDuplicate)
         panelChainAction.add(buttonDeleteChain, "wrap")
         panelChainAction.add(JScrollPane(allListChains), "height max, width max")
 

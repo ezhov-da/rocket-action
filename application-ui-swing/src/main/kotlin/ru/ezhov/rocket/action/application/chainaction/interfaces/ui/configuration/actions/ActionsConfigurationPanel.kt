@@ -31,7 +31,9 @@ class ActionsConfigurationPanel(
     private val searchActionPanelConfiguration = SearchActionPanelConfiguration()
 
     private val buttonCreateAction: JButton = JButton("Create atomic action")
-    private val buttonCreateChainFromAction: JButton = JButton("Create chain from atomic action").apply { isEnabled = false }
+    private val buttonCreateChainFromAction: JButton =
+        JButton("Create chain from atomic action").apply { isEnabled = false }
+    private val buttonDuplicate: JButton = JButton("Duplicate").apply { isEnabled = false }
     private val buttonEditAction: JButton = JButton("Edit").apply { isEnabled = false }
     private val buttonDeleteAction: JButton = JButton("Delete").apply { isEnabled = false }
 
@@ -50,6 +52,7 @@ class ActionsConfigurationPanel(
                 buttonEditAction.isEnabled = true
                 buttonDeleteAction.isEnabled = true
                 buttonCreateChainFromAction.isEnabled = true
+                buttonDuplicate.isEnabled = true
             }
         }
 
@@ -68,6 +71,14 @@ class ActionsConfigurationPanel(
         buttonCreateChainFromAction.addActionListener {
             allListActions.selectedValue?.let {
                 createChainActionDialog.showDialogWith(it)
+            }
+        }
+
+        buttonDuplicate.addActionListener {
+            allListActions.selectedValue?.let {
+                val action = it.duplicate()
+                atomicActionService.addAtomic(action)
+                createAndEditAtomicActionDialog.showEditDialog(action, this)
             }
         }
 
@@ -131,9 +142,10 @@ class ActionsConfigurationPanel(
         searchActionPanelConfiguration.addPropertyChangeListener(propertyChangeListener)
 
         val panelAtomicAction = JPanel(MigLayout())
-        panelAtomicAction.add(buttonCreateAction, "split 4")
-        panelAtomicAction.add(buttonCreateChainFromAction, )
+        panelAtomicAction.add(buttonCreateAction, "split 5")
+        panelAtomicAction.add(buttonCreateChainFromAction)
         panelAtomicAction.add(buttonEditAction)
+        panelAtomicAction.add(buttonDuplicate)
         panelAtomicAction.add(buttonDeleteAction, "wrap")
         panelAtomicAction.add(JScrollPane(allListActions), "height max, width max")
 

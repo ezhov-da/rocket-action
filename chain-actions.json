@@ -1,5 +1,5 @@
 {
-  "changedDate" : [ 2023, 12, 3, 10, 6, 17, 264000000 ],
+  "changedDate" : [ 2023, 12, 3, 10, 51, 55, 368000000 ],
   "chainActions" : [ {
     "id" : "1a39305f-5ed2-469a-b84e-2692ac324976",
     "name" : "Тест выполнения многих действий",
@@ -49,8 +49,8 @@
     } ]
   }, {
     "id" : "6cb108c9-6772-4f56-bbeb-6a7837ec1fa1",
-    "name" : "Открытие ссылки по Jira задаче",
-    "description" : "121212",
+    "name" : "Открытие ссылки по Jira задаче (Дубликат)",
+    "description" : "Дубликбат",
     "actions" : [ {
       "chainOrderId" : "d4c6db46-8f2a-434b-bb8c-3f7acd119bc4",
       "actionId" : "ccb3ea04-68ef-4988-84f1-2d95e14c0046"
@@ -185,7 +185,7 @@
     } ]
   }, {
     "id" : "0819e376-1684-4c0f-bd83-fe743e1921ce",
-    "name" : "Печатает строку",
+    "name" : "Дубликать печати строки",
     "description" : "Печатает строку",
     "actions" : [ {
       "chainOrderId" : "1650e567-8874-46aa-aacb-c14dcd22cec6",
@@ -206,6 +206,28 @@
     "actions" : [ {
       "chainOrderId" : "a9689eb5-8d95-4a64-b6bd-2c3b6d323468",
       "actionId" : "8dba925e-07fb-4d88-af27-18d38eefede0"
+    } ]
+  }, {
+    "id" : "f11efe30-2359-43aa-9d4a-eeb81d7b845d",
+    "name" : "Печатает строку",
+    "description" : "Печатает строку",
+    "actions" : [ {
+      "chainOrderId" : "1650e567-8874-46aa-aacb-c14dcd22cec6",
+      "actionId" : "79ce0f96-08f9-4267-b9a2-cf58d86a8711"
+    } ]
+  }, {
+    "id" : "b40225cd-a024-4e66-b58e-9d8d5fd1d227",
+    "name" : "Открытие ссылки по Jira задаче",
+    "description" : "Открытие ссылки по Jira задаче",
+    "actions" : [ {
+      "chainOrderId" : "d4c6db46-8f2a-434b-bb8c-3f7acd119bc4",
+      "actionId" : "ccb3ea04-68ef-4988-84f1-2d95e14c0046"
+    }, {
+      "chainOrderId" : "2d470ad0-c922-4fa1-9fe0-eb545d26b497",
+      "actionId" : "8dba925e-07fb-4d88-af27-18d38eefede0"
+    }, {
+      "chainOrderId" : "0871e6c2-00c2-4160-81fd-0be1b1d6df72",
+      "actionId" : "0f023251-5b90-44d2-bb40-2224f504bb92"
     } ]
   } ]
 }

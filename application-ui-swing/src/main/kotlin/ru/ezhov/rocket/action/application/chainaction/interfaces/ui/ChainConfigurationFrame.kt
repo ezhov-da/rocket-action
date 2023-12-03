@@ -11,6 +11,7 @@ import ru.ezhov.rocket.action.application.eventui.ConfigurationUiObserverFactory
 import ru.ezhov.rocket.action.application.eventui.model.ConfigurationUiEvent
 import ru.ezhov.rocket.action.application.eventui.model.ShowChainActionConfigurationUiEvent
 import ru.ezhov.rocket.action.ui.utils.swing.common.showToFront
+import java.awt.Toolkit
 import java.awt.event.KeyEvent
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
@@ -78,7 +79,12 @@ class ChainConfigurationFrame(
         )
 
         setLocationRelativeTo(null)
-        setSize(1000, 800)
+        Toolkit.getDefaultToolkit().screenSize.let { screenSize ->
+            setSize(
+                (screenSize.width * 0.8).toInt(),
+                (screenSize.height * 0.8).toInt()
+            )
+        }
     }
 
     private fun onOK() {
