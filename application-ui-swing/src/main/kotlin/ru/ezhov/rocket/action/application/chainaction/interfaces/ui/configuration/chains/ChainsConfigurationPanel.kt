@@ -4,6 +4,7 @@ import net.miginfocom.swing.MigLayout
 import ru.ezhov.rocket.action.application.chainaction.application.ActionExecutorService
 import ru.ezhov.rocket.action.application.chainaction.application.AtomicActionService
 import ru.ezhov.rocket.action.application.chainaction.application.ChainActionService
+import ru.ezhov.rocket.action.application.chainaction.domain.event.AtomicActionUpdatedDomainEvent
 import ru.ezhov.rocket.action.application.chainaction.domain.event.ChainActionCreatedDomainEvent
 import ru.ezhov.rocket.action.application.chainaction.domain.event.ChainActionDeletedDomainEvent
 import ru.ezhov.rocket.action.application.chainaction.domain.event.ChainActionUpdatedDomainEvent
@@ -110,6 +111,11 @@ class ChainsConfigurationPanel(
                             }
                         }
                     }
+
+                    is AtomicActionUpdatedDomainEvent -> {
+                        // Atomic action can change contract
+                        allListChains.repaint()
+                    }
                 }
             }
 
@@ -117,6 +123,8 @@ class ChainsConfigurationPanel(
                 ChainActionCreatedDomainEvent::class.java,
                 ChainActionDeletedDomainEvent::class.java,
                 ChainActionUpdatedDomainEvent::class.java,
+
+                AtomicActionUpdatedDomainEvent::class.java,
             )
         })
 

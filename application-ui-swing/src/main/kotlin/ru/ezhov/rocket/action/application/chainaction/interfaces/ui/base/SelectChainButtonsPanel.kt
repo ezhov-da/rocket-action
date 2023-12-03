@@ -6,6 +6,8 @@ import ru.ezhov.rocket.action.application.chainaction.application.AtomicActionSe
 import ru.ezhov.rocket.action.application.chainaction.domain.model.Action
 import ru.ezhov.rocket.action.application.chainaction.domain.model.AtomicAction
 import ru.ezhov.rocket.action.application.chainaction.domain.model.ChainAction
+import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.chainIcon
+import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.components.toIcon8x8
 import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.renderer.ChainAndAtomicActionListCellRenderer
 import java.awt.BorderLayout
 import java.awt.event.MouseAdapter
@@ -14,6 +16,7 @@ import javax.swing.DefaultListModel
 import javax.swing.JButton
 import javax.swing.JList
 import javax.swing.JPanel
+import javax.swing.SwingConstants
 
 class SelectChainButtonsPanel(
     actionService: AtomicActionService,
@@ -63,6 +66,8 @@ class SelectChainButtonsPanel(
             chains.chunked(3).forEach { chs ->
                 chs.forEachIndexed { index, ch ->
                     val button = JButton(ch.name).apply {
+                        icon = chainIcon(chain = ch, atomicActionService = actionService)
+                        horizontalAlignment = SwingConstants.LEFT
                         addMouseListener(object : MouseAdapter() {
                             override fun mouseReleased(e: MouseEvent) {
                                 selectedChainCallback(ch)
@@ -85,6 +90,8 @@ class SelectChainButtonsPanel(
             atomics.chunked(3).forEach { ats ->
                 ats.forEachIndexed { index, at ->
                     val button = JButton(at.name).apply {
+                        icon = at.contractType.toIcon8x8()
+                        horizontalAlignment = SwingConstants.LEFT
                         addMouseListener(object : MouseAdapter() {
                             override fun mouseReleased(e: MouseEvent) {
                                 selectedChainCallback(at)

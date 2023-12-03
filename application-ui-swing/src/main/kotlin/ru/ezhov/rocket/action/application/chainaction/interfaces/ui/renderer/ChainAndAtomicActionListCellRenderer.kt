@@ -5,6 +5,7 @@ import ru.ezhov.rocket.action.application.chainaction.domain.model.AtomicAction
 import ru.ezhov.rocket.action.application.chainaction.domain.model.ChainAction
 import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.AtomicActionListCellPanel
 import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.ChainActionListCellPanel
+import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.chainIcon
 import java.awt.Component
 import javax.swing.DefaultListCellRenderer
 import javax.swing.JLabel
@@ -24,13 +25,8 @@ class ChainAndAtomicActionListCellRenderer(
         return when (value) {
             is ChainAction -> ChainActionListCellPanel(
                 chainAction = value,
+                chainIcon = chainIcon(value, atomicActionService),
                 backgroundColor = label.background,
-                firstAtomicAction = value.actions.firstOrNull()?.let { actionOrder ->
-                    atomicActionService.atomicBy(actionOrder.actionId)
-                },
-                lastAtomicAction = value.actions.lastOrNull()?.let { actionOrder ->
-                    atomicActionService.atomicBy(actionOrder.actionId)
-                }
             )
 
             is AtomicAction -> AtomicActionListCellPanel(value, label.background)
