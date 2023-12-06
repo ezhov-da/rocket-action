@@ -70,9 +70,9 @@ class CommitTimeTasks private constructor(
             return this
                 .split(delimiter)
                 .let { parts ->
-                    if (parts.size != 4) {
+                    if (parts.size < 4) {
                         CommitTimeTasksError(
-                            "$error The data must consist of four columns separated by '$delimiter'. " +
+                            "${error}. The data must consist of four columns separated by '$delimiter'. " +
                                 "ID$delimiter'$dateFormatPattern' or '$constantsNowDate'" +
                                 "${delimiter}Time in minutes${delimiter}Description"
                         ).left()
@@ -118,7 +118,11 @@ class CommitTimeTasks private constructor(
                         }
 
                         // comment validation
-                        val comment = parts[3]
+                        val comment =
+                            when (parts.size > 4) {
+                                true -> parts.subList(3, parts.size).joinToString(separator = "_")
+                                false -> parts[3]
+                            }
                         val commentErrors = validator.validate(comment)
                         if (commentErrors.isNotEmpty()) {
                             errors.addAll(commentErrors)
