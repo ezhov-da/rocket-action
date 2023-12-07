@@ -20,9 +20,10 @@ fun main() {
         val frame = JFrame("_________");
         frame.add(
             ActionsConfigurationPanel(
-                AtomicActionService(JsonAtomicActionRepository(TestUtilsFactory.objectMapper)),
-                chainActionService = mockk {},
-                createAndEditChainActionDialog = mockk {}
+                atomicActionService = AtomicActionService(JsonAtomicActionRepository(TestUtilsFactory.objectMapper)),
+                chainActionService = mockk(),
+                createAndEditChainActionDialog = mockk(),
+                actionExecutor = mockk(),
             )
         )
         frame.setSize(1000, 700)

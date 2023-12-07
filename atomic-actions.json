@@ -1,5 +1,5 @@
 {
-  "changedDate" : [ 2023, 12, 7, 14, 39, 22, 664000000 ],
+  "changedDate" : [ 2023, 12, 7, 23, 1, 53, 204000000 ],
   "atomicActions" : [ {
     "id" : "ccb3ea04-68ef-4988-84f1-2d95e14c0046",
     "name" : "Убирает начальные и конечные пробелы у строки (test)",
@@ -7,7 +7,8 @@
     "contractType" : "IN_OUT",
     "engine" : "GROOVY",
     "source" : "TEXT",
-    "data" : "// test\n\n_INPUT.trim()"
+    "data" : "// test\n\n_INPUT.trim()",
+    "alias" : null
   }, {
     "id" : "8dba925e-07fb-4d88-af27-18d38eefede0",
     "name" : "Заменяет все символы `a` на `1`",
@@ -15,15 +16,17 @@
     "contractType" : "IN_OUT",
     "engine" : "GROOVY",
     "source" : "TEXT",
-    "data" : "_INPUT.replace(\"а\", \"1\").replace(\"a\", \"1\")"
+    "data" : "_INPUT.replace(\"а\", \"1\").replace(\"a\", \"1\")",
+    "alias" : null
   }, {
     "id" : "0f023251-5b90-44d2-bb40-2224f504bb92",
     "name" : "Открытие ссылки по Jira задаче",
     "description" : "Открытие ссылки по Jira задаче.\r\n\r\nВходной параметр - номер задачи.",
-    "contractType" : "IN_UNIT",
+    "contractType" : "IN_OUT",
     "engine" : "GROOVY",
     "source" : "TEXT",
-    "data" : "import java.awt.*\r\n\r\nString jiraNumber = _INPUT\r\n\r\nif (Desktop.desktopSupported) {\r\n    Desktop.desktop.browse(\"https://jira.app.local/browse/INTRASTAR-${jiraNumber.trim()}\".toURI())\r\n}"
+    "data" : "import java.awt.*\r\n\r\nString jiraNumber = _INPUT\r\n\r\nif (Desktop.desktopSupported) {\r\n    Desktop.desktop.browse(\"https://jira.app.local/browse/INTRASTAR-${jiraNumber.trim()}\".toURI())\r\n}",
+    "alias" : "openJiraUrlByNumber"
   }, {
     "id" : "79ce0f96-08f9-4267-b9a2-cf58d86a8711",
     "name" : "UNIT - UNIT",
@@ -31,7 +34,8 @@
     "contractType" : "UNIT_UNIT",
     "engine" : "KOTLIN",
     "source" : "TEXT",
-    "data" : "println(\"Test row!\")\n"
+    "data" : "println(\"Test row!\")\n",
+    "alias" : null
   }, {
     "id" : "3ac9741e-9c63-410e-8488-3dc52e5c92f6",
     "name" : "Отдаём строку",
@@ -39,7 +43,8 @@
     "contractType" : "UNIT_OUT",
     "engine" : "GROOVY",
     "source" : "TEXT",
-    "data" : "\"строка\""
+    "data" : "\"строка\"",
+    "alias" : null
   }, {
     "id" : "d4b03ab3-09bd-4d65-bc43-368ac169346f",
     "name" : "Буд-то принимаем, но ничего не возвращаем",
@@ -47,7 +52,8 @@
     "contractType" : "IN_UNIT",
     "engine" : "KOTLIN",
     "source" : "TEXT",
-    "data" : ""
+    "data" : "",
+    "alias" : null
   }, {
     "id" : "66f98f16-75a7-4848-ae48-d94af5c8d35a",
     "name" : "Заменяет все символы `a` на `2` (Дубликат)",
@@ -55,7 +61,8 @@
     "contractType" : "IN_OUT",
     "engine" : "GROOVY",
     "source" : "TEXT",
-    "data" : "_INPUT.replace(\"а\", \"2\").replace(\"a\", \"2\")"
+    "data" : "_INPUT.replace(\"а\", \"2\").replace(\"a\", \"2\")",
+    "alias" : null
   }, {
     "id" : "cbb13a8a-52cc-4a47-991c-aafc3d304179",
     "name" : "Получить заголовок страницы по URL",
@@ -63,6 +70,34 @@
     "contractType" : "IN_OUT",
     "engine" : "GROOVY",
     "source" : "TEXT",
-    "data" : "import org.jsoup.Jsoup\n\ndef urlText = _INPUT\n\ndef doc = Jsoup.parse(new URL(urlText), 5000)\n\ndoc.select(\"head > title\").text()"
+    "data" : "import org.jsoup.Jsoup\n\ndef urlText = _INPUT\n\ndef doc = Jsoup.parse(new URL(urlText), 5000)\n\ndoc.select(\"head > title\").text()",
+    "alias" : null
+  }, {
+    "id" : "e1811227-8089-4d84-bfdf-dcab99d470d6",
+    "name" : "Действие для тестирования вызова другого скрипта",
+    "description" : "",
+    "contractType" : "UNIT_UNIT",
+    "engine" : "KOTLIN",
+    "source" : "TEXT",
+    "data" : "_AA.execute(\"openJiraUrlByNumber\", 123)",
+    "alias" : null
+  }, {
+    "id" : "cb6b43b2-5d27-47ca-aa54-4c03eb3b42fb",
+    "name" : "Действие для тестирования вызова другого скрипта (2)",
+    "description" : "",
+    "contractType" : "UNIT_UNIT",
+    "engine" : "GROOVY",
+    "source" : "TEXT",
+    "data" : "_AA.execute(\"openJiraUrlByNumber\", 123)",
+    "alias" : null
+  }, {
+    "id" : "fcfeab32-cfa5-4ec9-a0d0-282c5244eb03",
+    "name" : "Пробуем создать действие, которое создаёт ссылку",
+    "description" : "Входной - ссылка\n",
+    "contractType" : "IN_UNIT",
+    "engine" : "GROOVY",
+    "source" : "TEXT",
+    "data" : "import ru.ezhov.rocket.action.application.api.RaPublicApi\n\nRaPublicApi.createService.create(\"de16aba8-c229-11ec-9d64-0242ac3420002\", \"OPEN_URL\", [\"url\":_INPUT], null)",
+    "alias" : null
   } ]
 }

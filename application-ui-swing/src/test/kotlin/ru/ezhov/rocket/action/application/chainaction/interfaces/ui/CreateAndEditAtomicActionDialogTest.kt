@@ -12,9 +12,10 @@ fun main(args: Array<String>) {
 
 private fun create() {
     val dialog = CreateAndEditAtomicActionDialog(
-        AtomicActionService(
-            InMemoryAtomicActionRepository(),
-        )
+        atomicActionService = AtomicActionService(
+            atomicActionRepository = InMemoryAtomicActionRepository(),
+        ),
+        actionExecutor = mockk(),
     )
     dialog.showCreateDialog()
     System.exit(0)
@@ -22,8 +23,8 @@ private fun create() {
 
 private fun edit() {
     val dialog = CreateAndEditAtomicActionDialog(
-        mockk()
-
+        atomicActionService = mockk(),
+        actionExecutor = mockk(),
     )
     dialog.isVisible = true
     System.exit(0)

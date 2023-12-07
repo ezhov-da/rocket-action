@@ -549,7 +549,6 @@ object Icons {
         val YEN_16x16 = ImageIcon(this::class.java.getResource("/icons/open-iconic/png/yen-2x.png"))
         val ZOOM_IN_16x16 = ImageIcon(this::class.java.getResource("/icons/open-iconic/png/zoom-in-2x.png"))
         val ZOOM_OUT_16x16 = ImageIcon(this::class.java.getResource("/icons/open-iconic/png/zoom-out-2x.png"))
-
     }
 
     object Advanced {
@@ -557,5 +556,6 @@ object Icons {
         val KOTLIN_16x16 = ImageIcon(this::class.java.getResource("/icons/kotlin_16x16.png"))
         val GROOVY_8x8 = ImageIcon(this::class.java.getResource("/icons/groovy_8x8.png"))
         val GROOVY_16x16 = ImageIcon(this::class.java.getResource("/icons/groovy_16x16.png"))
+        val COPY_16x16 = ImageIcon(this::class.java.getResource("/icons/copy_16x16.png"))
     }
 }

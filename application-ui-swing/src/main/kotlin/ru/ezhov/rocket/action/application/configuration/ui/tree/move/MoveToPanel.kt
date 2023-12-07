@@ -109,7 +109,7 @@ class MoveToPanel(
 
     private data class ListModel(
         val node: DefaultMutableTreeNode,
-        val settings: TreeRocketActionSettings = node.userObject as TreeRocketActionSettings
+        val settings: TreeRocketActionSettings? = node.userObject as? TreeRocketActionSettings
     ) {
         private var parents: LinkedList<DefaultMutableTreeNode>? = null
         private var textList: LinkedList<String>? = null
@@ -118,7 +118,9 @@ class MoveToPanel(
             if (parents == null) {
                 parents = LinkedList<DefaultMutableTreeNode>()
 
-                fun fillParents(initNode: DefaultMutableTreeNode) {
+                fun fillParents(initNode: DefaultMutableTreeNode?) {
+                    if (initNode == null) return
+
                     if (initNode != node) {
                         val settings = initNode.userObject as? TreeRocketActionSettings
                         if (settings != null) {
@@ -132,7 +134,7 @@ class MoveToPanel(
                     }
                 }
 
-                fillParents(node.parent as DefaultMutableTreeNode)
+                fillParents(node.parent as? DefaultMutableTreeNode)
             }
 
             return parents!!
@@ -146,6 +148,8 @@ class MoveToPanel(
                     val settings = node.userObject as? TreeRocketActionSettings
                     if (settings != null) {
                         textList!!.push(settings.asString(null))
+                    } else {
+                        textList!!.push("Root")
                     }
 
                     val parent = node.parent as? DefaultMutableTreeNode

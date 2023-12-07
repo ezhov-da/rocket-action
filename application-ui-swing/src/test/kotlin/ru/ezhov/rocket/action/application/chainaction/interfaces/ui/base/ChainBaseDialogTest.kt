@@ -3,8 +3,8 @@ package ru.ezhov.rocket.action.application.chainaction.interfaces.ui.base
 import io.mockk.every
 import io.mockk.mockk
 import ru.ezhov.rocket.action.application.TestUtilsFactory
-import ru.ezhov.rocket.action.application.chainaction.application.AtomicActionService
 import ru.ezhov.rocket.action.application.chainaction.application.ActionExecutorService
+import ru.ezhov.rocket.action.application.chainaction.application.AtomicActionService
 import ru.ezhov.rocket.action.application.chainaction.application.ChainActionService
 import ru.ezhov.rocket.action.application.chainaction.infrastructure.ActionExecutorImpl
 import ru.ezhov.rocket.action.application.chainaction.infrastructure.JsonAtomicActionRepository
@@ -42,6 +42,7 @@ fun main(args: Array<String>) {
                 chainActionService = chainActionService,
                 atomicActionService = atomicActionService,
             ),
+            actionExecutor = mockk(),
             chainActionService = chainActionService,
             atomicActionService = atomicActionService,
         )

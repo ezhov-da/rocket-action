@@ -4,6 +4,7 @@ import net.miginfocom.swing.MigLayout
 import ru.ezhov.rocket.action.application.chainaction.application.ActionExecutorService
 import ru.ezhov.rocket.action.application.chainaction.application.AtomicActionService
 import ru.ezhov.rocket.action.application.chainaction.application.ChainActionService
+import ru.ezhov.rocket.action.application.chainaction.domain.ActionExecutor
 import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.configuration.actions.ActionsConfigurationPanel
 import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.configuration.chains.ChainsConfigurationPanel
 import ru.ezhov.rocket.action.application.eventui.ConfigurationUiListener
@@ -25,6 +26,7 @@ class ChainConfigurationFrame(
     actionExecutorService: ActionExecutorService,
     chainActionService: ChainActionService,
     atomicActionService: AtomicActionService,
+    actionExecutor: ActionExecutor,
 ) : JFrame() {
     private val contentPane = JPanel(MigLayout(/*"debug"*/))
 
@@ -37,7 +39,8 @@ class ChainConfigurationFrame(
     private val actionsConfigurationPanel = ActionsConfigurationPanel(
         atomicActionService = atomicActionService,
         chainActionService = chainActionService,
-        createAndEditChainActionDialog = createChainActionDialog
+        createAndEditChainActionDialog = createChainActionDialog,
+        actionExecutor = actionExecutor,
     )
 
     private val chainsConfigurationPanel = ChainsConfigurationPanel(

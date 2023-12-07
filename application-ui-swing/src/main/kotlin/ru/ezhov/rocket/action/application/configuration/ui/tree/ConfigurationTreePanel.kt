@@ -270,15 +270,17 @@ class ConfigurationTreePanel(
                             defaultTreeModel.reload(node)
                         }
 
+                        val nodes = SearchInTreeUtil.searchInTree(
+                            { settings ->
+                                settings.configuration.type().value() == GroupRocketActionUi.TYPE
+                            },
+                            root
+                        ) + root
+
                         add(
                             MoveToPanel(
                                 currentNode = selectedTreeNode,
-                                nodes = SearchInTreeUtil.searchInTree(
-                                    { settings ->
-                                        settings.configuration.type().value() == GroupRocketActionUi.TYPE
-                                    },
-                                    root
-                                ),
+                                nodes = nodes,
                                 selectCallback = selectCallback,
                             )
                         )

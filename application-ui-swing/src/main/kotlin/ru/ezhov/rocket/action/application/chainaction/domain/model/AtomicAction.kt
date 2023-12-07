@@ -10,6 +10,7 @@ data class AtomicAction(
     var engine: AtomicActionEngine,
     var source: AtomicActionSource,
     var data: String,
+    var alias: String? = null,
 ) : Action {
     override fun id(): String = id
 
@@ -21,6 +22,7 @@ data class AtomicAction(
         engine = this.engine,
         source = this.source,
         data = this.data,
+        alias = this.alias,
     )
 }
 

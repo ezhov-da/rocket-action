@@ -2,6 +2,7 @@ package ru.ezhov.rocket.action.application.configuration.ui.create
 
 import ru.ezhov.rocket.action.api.RocketActionConfiguration
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
+import ru.ezhov.rocket.action.application.configuration.ContractGenerator
 import ru.ezhov.rocket.action.application.core.domain.model.RocketActionSettingsModel
 import ru.ezhov.rocket.action.application.core.infrastructure.MutableRocketActionSettings
 import ru.ezhov.rocket.action.application.plugin.group.GroupRocketActionUi
@@ -32,21 +33,27 @@ class CreateRocketActionSettingsPanel(
         }
 
         this.currentConfiguration = configuration
-        configuration
+        val properties = configuration
             .properties()
             .sortedWith(
                 compareByDescending<RocketActionConfigurationProperty> { it.isRequired() }
                     .thenBy { it.name() }
             )
-            .forEach { p: RocketActionConfigurationProperty ->
-                val panel = SettingPanel(p)
-                tabs.addTab(panel.labelText(), panel)
-                settingPanels.add(panel)
-            }
+
+
+        properties.forEach { p: RocketActionConfigurationProperty ->
+            val panel = SettingPanel(p)
+            tabs.addTab(panel.labelText(), panel)
+            settingPanels.add(panel)
+        }
 
         val generalTabs = JTabbedPane()
         generalTabs.addTab("Configuration", tabs)
         generalTabs.addTab("Info", MarkdownEditorPane.fromText(configuration.description()))
+        generalTabs.addTab(
+            "Contract",
+            MarkdownEditorPane.fromText(ContractGenerator.generateToMarkDown(properties))
+        )
 
         this.add(generalTabs, BorderLayout.CENTER)
 

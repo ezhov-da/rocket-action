@@ -6,14 +6,9 @@ import ru.ezhov.rocket.action.application.chainaction.domain.ActionExecutor
 import ru.ezhov.rocket.action.application.chainaction.domain.ProgressExecutingAction
 import ru.ezhov.rocket.action.application.chainaction.domain.model.Action
 import ru.ezhov.rocket.action.application.chainaction.domain.model.AtomicAction
-import ru.ezhov.rocket.action.application.chainaction.domain.model.AtomicActionEngine
-import ru.ezhov.rocket.action.application.chainaction.domain.model.AtomicActionSource
 import ru.ezhov.rocket.action.application.chainaction.domain.model.ChainAction
 import ru.ezhov.rocket.action.application.engine.application.EngineFactory
-import ru.ezhov.rocket.action.application.engine.domain.model.EngineType
-import ru.ezhov.rocket.action.application.engine.domain.model.EngineVariable
 import ru.ezhov.rocket.action.application.variables.application.VariablesApplication
-import java.io.File
 
 
 @Service
@@ -78,35 +73,15 @@ class ActionExecutorImpl(
         }
     }
 
-    private fun executeScript(inputValue: Any?, atomicAction: AtomicAction): Any? {
-        val script = when (atomicAction.source) {
-            AtomicActionSource.FILE -> File(atomicAction.data).readText()
-            AtomicActionSource.TEXT -> atomicAction.data
-        }
+    private fun executeScript(
+        inputValue: Any?, atomicAction: AtomicAction
+    ) = AtomicActionScriptExecutor(
+        engineFactory = engineFactory,
+        variablesApplication = variablesApplication,
+        atomicActionService = atomicActionService,
+    )
+        .executeScript(inputValue, atomicAction)
 
-        val engine = when (atomicAction.engine) {
-            AtomicActionEngine.KOTLIN -> engineFactory.by(EngineType.KOTLIN)
-            AtomicActionEngine.GROOVY -> engineFactory.by(EngineType.GROOVY)
-        }
-
-        return engine
-            .execute(
-                template = script,
-                variables = variablesApplication
-                    .all()
-                    .variables
-                    .map {
-                        EngineVariable(
-                            name = it.name,
-                            value = it.value,
-                        )
-                    } +
-                    EngineVariable(
-                        name = ActionExecutor.INPUT_NAME_ARG,
-                        value = inputValue,
-                    )
-            )
-    }
 
     private fun executeAtomicAction(
         input: Any?,

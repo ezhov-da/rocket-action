@@ -1,5 +1,6 @@
 package ru.ezhov.rocket.action.application.configuration.ui.edit
 
+import ru.ezhov.rocket.action.application.configuration.ContractGenerator
 import ru.ezhov.rocket.action.application.configuration.ui.tree.TreeRocketActionSettings
 import ru.ezhov.rocket.action.application.core.infrastructure.MutableRocketActionSettings
 import ru.ezhov.rocket.action.application.plugin.context.RocketActionContextFactory
@@ -51,6 +52,10 @@ class RocketActionSettingsPanel(
         val generalTabs = JTabbedPane()
         generalTabs.addTab("Configuration", tabs)
         generalTabs.addTab("Info", MarkdownEditorPane.fromText(settings.configuration.description()))
+        generalTabs.addTab(
+            "Contract",
+            MarkdownEditorPane.fromText(ContractGenerator.generateToMarkDown(list.mapNotNull { it.property }))
+        )
 
         this.add(generalTabs, BorderLayout.CENTER)
 

@@ -29,8 +29,10 @@ fun Icon.toImage(): Image =
  * Show window and make active
  */
 fun JFrame.showToFront(parent: Component? = null) {
-    parent?.let {
-        setLocationRelativeTo(parent)
+    if (!isVisible) {
+        parent?.let {
+            setLocationRelativeTo(parent)
+        }
     }
     isVisible = true
     state = Frame.NORMAL; // restores minimized windows

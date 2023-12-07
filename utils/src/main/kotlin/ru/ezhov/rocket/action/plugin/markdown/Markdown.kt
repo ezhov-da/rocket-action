@@ -19,10 +19,12 @@ object Markdown {
 
     private fun markdownToHtml(markdown: String): String {
         // https://github.com/commonmark/commonmark-java
-        val parser: Parser = Parser.builder().extensions(listOf(TablesExtension.create())).build()
+        val extensions = listOf(TablesExtension.create())
+        val parser: Parser = Parser.builder().extensions(extensions).build()
         val document: Node = parser.parse(markdown)
 
         val renderer: HtmlRenderer = HtmlRenderer.builder()
+            .extensions(extensions)
             .attributeProviderFactory { ImageAttributeProvider() }
             .build()
         return renderer.render(document)

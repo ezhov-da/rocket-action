@@ -3,11 +3,13 @@ package ru.ezhov.rocket.action.application.chainaction.interfaces.ui.base
 import ru.ezhov.rocket.action.application.chainaction.application.AtomicActionService
 import ru.ezhov.rocket.action.application.chainaction.application.ActionExecutorService
 import ru.ezhov.rocket.action.application.chainaction.application.ChainActionService
+import ru.ezhov.rocket.action.application.chainaction.domain.ActionExecutor
 import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.ChainConfigurationFrame
 import java.awt.BorderLayout
 import javax.swing.JDialog
 
 class ChainBaseDialog(
+    actionExecutor: ActionExecutor,
     actionExecutorService: ActionExecutorService,
     chainActionService: ChainActionService,
     atomicActionService: AtomicActionService,
@@ -24,6 +26,7 @@ class ChainBaseDialog(
         actionExecutorService = actionExecutorService,
         chainActionService = chainActionService,
         atomicActionService = atomicActionService,
+        actionExecutor = actionExecutor,
     )
 
     init {

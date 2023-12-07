@@ -3,9 +3,13 @@ package ru.ezhov.rocket.action.application.chainaction.interfaces.ui.configurati
 import net.miginfocom.swing.MigLayout
 import ru.ezhov.rocket.action.application.chainaction.application.AtomicActionService
 import ru.ezhov.rocket.action.application.chainaction.application.ChainActionService
+import ru.ezhov.rocket.action.application.chainaction.domain.ActionExecutor
 import ru.ezhov.rocket.action.application.chainaction.domain.event.AtomicActionCreatedDomainEvent
 import ru.ezhov.rocket.action.application.chainaction.domain.event.AtomicActionDeletedDomainEvent
 import ru.ezhov.rocket.action.application.chainaction.domain.event.AtomicActionUpdatedDomainEvent
+import ru.ezhov.rocket.action.application.chainaction.domain.event.ChainActionCreatedDomainEvent
+import ru.ezhov.rocket.action.application.chainaction.domain.event.ChainActionDeletedDomainEvent
+import ru.ezhov.rocket.action.application.chainaction.domain.event.ChainActionUpdatedDomainEvent
 import ru.ezhov.rocket.action.application.chainaction.domain.model.AtomicAction
 import ru.ezhov.rocket.action.application.chainaction.domain.model.AtomicActionEngine
 import ru.ezhov.rocket.action.application.chainaction.domain.model.AtomicActionSource
@@ -33,6 +37,7 @@ class ActionsConfigurationPanel(
     private val atomicActionService: AtomicActionService,
     private val chainActionService: ChainActionService,
     private val createAndEditChainActionDialog: CreateAndEditChainActionDialog,
+    private val actionExecutor: ActionExecutor,
 ) : JPanel(MigLayout()) {
     private val sortActionPanelConfiguration = SortActionPanelConfiguration()
     private val searchActionPanelConfiguration = SearchActionPanelConfiguration()
@@ -48,7 +53,8 @@ class ActionsConfigurationPanel(
     private val allListActions = JList(allListActionsModel)
 
     private val createAndEditAtomicActionDialog = CreateAndEditAtomicActionDialog(
-        atomicActionService = atomicActionService
+        atomicActionService = atomicActionService,
+        actionExecutor = actionExecutor,
     )
 
     init {
@@ -133,6 +139,12 @@ class ActionsConfigurationPanel(
 
                         fillList()
                     }
+
+                    is ChainActionCreatedDomainEvent,
+                    is ChainActionUpdatedDomainEvent,
+                    is ChainActionDeletedDomainEvent -> {
+                        allListActions.repaint()
+                    }
                 }
             }
 
@@ -140,6 +152,10 @@ class ActionsConfigurationPanel(
                 AtomicActionCreatedDomainEvent::class.java,
                 AtomicActionDeletedDomainEvent::class.java,
                 AtomicActionUpdatedDomainEvent::class.java,
+
+                ChainActionCreatedDomainEvent::class.java,
+                ChainActionUpdatedDomainEvent::class.java,
+                ChainActionDeletedDomainEvent::class.java,
             )
         })
 

@@ -5,10 +5,13 @@ import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants
 import org.fife.ui.rtextarea.RTextScrollPane
 import ru.ezhov.rocket.action.application.chainaction.application.AtomicActionService
+import ru.ezhov.rocket.action.application.chainaction.domain.ActionExecutor
 import ru.ezhov.rocket.action.application.chainaction.domain.model.AtomicAction
 import ru.ezhov.rocket.action.application.chainaction.domain.model.AtomicActionEngine
 import ru.ezhov.rocket.action.application.chainaction.domain.model.AtomicActionSource
 import ru.ezhov.rocket.action.application.chainaction.domain.model.ContractType
+import ru.ezhov.rocket.action.application.resources.Icons
+import ru.ezhov.rocket.action.plugin.clipboard.ClipboardUtil
 import ru.ezhov.rocket.action.ui.utils.swing.common.SizeUtil
 import java.awt.event.KeyEvent
 import java.awt.event.WindowAdapter
@@ -26,13 +29,26 @@ import javax.swing.KeyStroke
 
 class CreateAndEditAtomicActionDialog(
     private val atomicActionService: AtomicActionService,
+    actionExecutor: ActionExecutor,
 ) : JDialog() {
     private val contentPane = JPanel(MigLayout(/*"debug"*/))
     private val buttonSave: JButton = JButton("Save")
     private val buttonCancel: JButton = JButton("Cancel")
 
+    private val idTextField: JTextField = JTextField().apply { isEditable = false }
+    private val idLabel: JLabel = JLabel("ID:").apply { labelFor = idTextField }
+    private val idButton: JButton = JButton(Icons.Advanced.COPY_16x16).apply {
+        toolTipText = "Copy ID to clipboard"
+        addActionListener {
+            ClipboardUtil.copyToClipboard(idTextField.text)
+        }
+    }
+
     private val nameTextField: JTextField = JTextField()
     private val nameLabel: JLabel = JLabel("Name:").apply { labelFor = nameTextField }
+
+    private val aliasTextField: JTextField = JTextField()
+    private val aliasLabel: JLabel = JLabel("Alias:").apply { labelFor = aliasTextField }
 
     private val descriptionTextPane: RSyntaxTextArea = RSyntaxTextArea()
     private val descriptionLabel: JLabel = JLabel("Description:").apply { labelFor = descriptionTextPane }
@@ -52,7 +68,13 @@ class CreateAndEditAtomicActionDialog(
     private val fileSource: JRadioButton = JRadioButton("File")
 
     private val dataTextPane: RSyntaxTextArea = RSyntaxTextArea()
-    private val dataLabel: JLabel = JLabel("Data:").apply { labelFor = dataTextPane }
+
+    private val dataText = listOf(
+        "Data:",
+    ) + actionExecutor.additionalVariables().map { "<b>${it.name}</b> - ${it.description}" }
+
+    private val dataLabel: JLabel =
+        JLabel("<html>${dataText.joinToString(separator = "<br>")}").apply { labelFor = dataTextPane }
 
     init {
         kotlinEngine.isSelected = true
@@ -72,23 +94,30 @@ class CreateAndEditAtomicActionDialog(
         contractButtonGroup.add(unitOutRadioButton)
         contractButtonGroup.add(unitUnitRadioButton)
 
-        contentPane.add(nameLabel)
-        contentPane.add(nameTextField, "span, wrap, width max")
+        contentPane.add(idLabel, "split 3")
+        contentPane.add(idTextField, "wmin 25%")
+        contentPane.add(idButton, "wrap")
+
+        contentPane.add(nameLabel, "split 4")
+        contentPane.add(nameTextField, "wmin 25%")
+        contentPane.add(aliasLabel)
+        contentPane.add(aliasTextField, "wrap, wmin 25%")
+
 
         contentPane.add(descriptionLabel, "wrap")
         contentPane.add(RTextScrollPane(descriptionTextPane, false), "span, grow, shrink 50, hmin 18%")
 
-        contentPane.add(contractLabel)
+        contentPane.add(contractLabel, "split 5")
         contentPane.add(inOutRadioButton)
         contentPane.add(inUnitRadioButton)
         contentPane.add(unitOutRadioButton)
         contentPane.add(unitUnitRadioButton, "wrap")
 
-        contentPane.add(engineLabel)
+        contentPane.add(engineLabel, "split 3")
         contentPane.add(kotlinEngine)
         contentPane.add(groovyEngine, "wrap")
 
-        contentPane.add(sourceLabel)
+        contentPane.add(sourceLabel, "split 3")
         contentPane.add(textSource)
         contentPane.add(fileSource, "wrap")
 
@@ -178,6 +207,7 @@ class CreateAndEditAtomicActionDialog(
                             AtomicActionSource.FILE
                         },
                         data = dataTextPane.text,
+                        alias = aliasTextField.text.takeIf { it.isNotEmpty() },
                     )
                 )
             }
@@ -206,6 +236,7 @@ class CreateAndEditAtomicActionDialog(
                         AtomicActionSource.FILE
                     }
                     data = dataTextPane.text
+                    alias = aliasTextField.text.takeIf { it.isNotEmpty() }
                 }
 
                 atomicActionService.updateAtomic(atomicAction = currentAction!!)
@@ -232,6 +263,7 @@ class CreateAndEditAtomicActionDialog(
         kotlinEngine.isSelected = true
         textSource.isSelected = true
         dataTextPane.text = ""
+        aliasTextField.text = ""
 
         isModal = true
         isVisible = true
@@ -246,9 +278,18 @@ class CreateAndEditAtomicActionDialog(
 
         this.currentAction = action
 
+        idTextField.text = action.id
+
         nameTextField.text = action.name
 
         descriptionTextPane.text = action.description
+
+        when (action.contractType) {
+            ContractType.IN_OUT -> inOutRadioButton.isSelected = true
+            ContractType.IN_UNIT -> inUnitRadioButton.isSelected = true
+            ContractType.UNIT_OUT -> unitOutRadioButton.isSelected = true
+            ContractType.UNIT_UNIT -> unitUnitRadioButton.isSelected = true
+        }
 
         when (action.engine) {
             AtomicActionEngine.KOTLIN -> kotlinEngine.isSelected = true
@@ -260,6 +301,7 @@ class CreateAndEditAtomicActionDialog(
             AtomicActionSource.TEXT -> textSource.isSelected = true
         }
         dataTextPane.text = action.data
+        aliasTextField.text = action.alias.orEmpty()
 
         isModal = true
         isVisible = true

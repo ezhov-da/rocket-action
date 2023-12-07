@@ -25,21 +25,22 @@ fun main(args: Array<String>) {
             //
         }
         val frame = ChainConfigurationFrame(
-            ActionExecutorService(
-                ActionExecutorImpl(
+            actionExecutorService = ActionExecutorService(
+                actionExecutor = ActionExecutorImpl(
                     EngineFactory(),
                     mockk { every { all() } returns VariablesDto(key = "123", variables = emptyList()) },
                     mockk(),
                 ),
-                mockk(),
-                mockk(),
+                chainActionService = mockk(),
+                atomicActionService = mockk(),
             ),
-            ChainActionService(
-                JsonChainActionRepository(TestUtilsFactory.objectMapper),
+            chainActionService = ChainActionService(
+                chainActionRepository = JsonChainActionRepository(TestUtilsFactory.objectMapper),
             ),
-            AtomicActionService(
-                JsonAtomicActionRepository(TestUtilsFactory.objectMapper),
-            )
+            atomicActionService = AtomicActionService(
+                atomicActionRepository = JsonAtomicActionRepository(TestUtilsFactory.objectMapper),
+            ),
+            actionExecutor = mockk(),
         )
         frame.isVisible = true
         frame.defaultCloseOperation = JFrame.EXIT_ON_CLOSE

@@ -33,4 +33,6 @@ class AtomicActionService(
 
         DomainEventFactory.publisher.publish(listOf(AtomicActionUpdatedDomainEvent(atomicAction)))
     }
+
+    fun byAlias(alias: String): AtomicAction? = atomics().firstOrNull() { it.alias == alias }
 }

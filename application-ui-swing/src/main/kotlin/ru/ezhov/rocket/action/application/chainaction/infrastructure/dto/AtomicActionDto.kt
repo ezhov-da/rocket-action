@@ -14,4 +14,5 @@ class AtomicActionDto(
     var engine: AtomicActionEngine,
     var source: AtomicActionSource,
     var data: String,
+    var alias: String? = null,
 )

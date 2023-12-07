@@ -3,6 +3,7 @@ package ru.ezhov.rocket.action.application.core.application
 import org.springframework.stereotype.Service
 import ru.ezhov.rocket.action.api.context.notification.NotificationService
 import ru.ezhov.rocket.action.api.context.notification.NotificationType
+import ru.ezhov.rocket.action.application.api.CreateRocketActionSettingsPublicApi
 import ru.ezhov.rocket.action.application.core.domain.model.RocketActionSettingsModel
 import ru.ezhov.rocket.action.application.core.domain.model.SettingsModel
 import ru.ezhov.rocket.action.application.core.domain.model.SettingsValueType
@@ -16,8 +17,9 @@ import java.util.*
 class CreateRocketActionSettingsService(
     private val rocketActionSettingsService: RocketActionSettingsService,
     private val notificationService: NotificationService,
-) {
-    fun create(groupId: String, type: String, params: Map<String, String>, tags: String? = null) {
+) : CreateRocketActionSettingsPublicApi {
+
+    override fun create(groupId: String, type: String, params: Map<String, String>, tags: String?) {
         val model = rocketActionSettingsService.actionsModel()
 
         model.lastChangedDate = LocalDateTime.now()
