@@ -15,10 +15,10 @@ class ResultChainDialog(
         val panel = JPanel(BorderLayout())
         panel.add(resultChainPanel, BorderLayout.CENTER)
 
-        defaultCloseOperation = DISPOSE_ON_CLOSE
-
         add(panel, BorderLayout.CENTER)
         setSize(500, 400)
+
+        defaultCloseOperation = DISPOSE_ON_CLOSE
         isAlwaysOnTop = true
         isModal = false
     }

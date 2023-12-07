@@ -11,7 +11,9 @@ class ActionExecutorService(
     private val atomicActionService: AtomicActionService,
 ) {
     fun execute(input: String?, actionId: String, progressExecutingAction: ProgressExecutingAction) {
-        val action = chainActionService.byId(actionId) ?: atomicActionService.atomicBy(actionId)!!
+        val action =
+            chainActionService.byId(actionId)
+                ?: atomicActionService.atomicBy(actionId)!!
         actionExecutor.execute(input, action, progressExecutingAction)
     }
 }

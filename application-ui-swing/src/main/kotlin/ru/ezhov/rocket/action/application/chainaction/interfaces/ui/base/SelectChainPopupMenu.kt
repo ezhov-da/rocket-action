@@ -41,9 +41,11 @@ class SelectChainPopupMenu(
         )
 
         val chainsForList =
-            chainsSortedByName.takeIf { partCount <= chainsSortedByName.size }?.subList(partCount, chainsSortedByName.size).orEmpty()
+            chainsSortedByName.takeIf { partCount <= chainsSortedByName.size }
+                ?.subList(partCount, chainsSortedByName.size).orEmpty()
         val atomicsForList =
-            atomicsSortedByName.takeIf { partCount <= atomicsSortedByName.size }?.subList(partCount, atomicsSortedByName.size)
+            atomicsSortedByName.takeIf { partCount <= atomicsSortedByName.size }
+                ?.subList(partCount, atomicsSortedByName.size)
                 .orEmpty()
 
         if (chainsForList.isNotEmpty() || atomicsForList.isNotEmpty()) {
@@ -55,7 +57,6 @@ class SelectChainPopupMenu(
                     atomics = atomicsForList,
                     selectedChainCallback = { sv ->
                         selectChainDialog.isVisible = false
-                        selectedChainCallback(sv)
                         selectedChainCallback(sv)
                     },
                 ),

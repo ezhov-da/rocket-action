@@ -1,5 +1,5 @@
 {
-  "changedDate" : [ 2023, 12, 3, 11, 10, 50, 677000000 ],
+  "changedDate" : [ 2023, 12, 7, 14, 39, 22, 664000000 ],
   "atomicActions" : [ {
     "id" : "ccb3ea04-68ef-4988-84f1-2d95e14c0046",
     "name" : "Убирает начальные и конечные пробелы у строки (test)",
@@ -56,5 +56,13 @@
     "engine" : "GROOVY",
     "source" : "TEXT",
     "data" : "_INPUT.replace(\"а\", \"2\").replace(\"a\", \"2\")"
+  }, {
+    "id" : "cbb13a8a-52cc-4a47-991c-aafc3d304179",
+    "name" : "Получить заголовок страницы по URL",
+    "description" : "Входной - URL\nВыходной - заголовок страницы",
+    "contractType" : "IN_OUT",
+    "engine" : "GROOVY",
+    "source" : "TEXT",
+    "data" : "import org.jsoup.Jsoup\n\ndef urlText = _INPUT\n\ndef doc = Jsoup.parse(new URL(urlText), 5000)\n\ndoc.select(\"head > title\").text()"
   } ]
 }
