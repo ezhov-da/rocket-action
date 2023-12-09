@@ -101,6 +101,7 @@ class HttpServer(
 
                     is RocketActionHandleStatus.Success -> {
                         response.status(200)
+
                         objectMapper.writeValueAsString(
                             status.values.map { it.key to it.value }.toMap()
                         )

@@ -9,6 +9,7 @@ import ru.ezhov.rocket.action.application.core.domain.RocketActionSettingsReposi
 import ru.ezhov.rocket.action.application.core.domain.model.ActionsModel
 import ru.ezhov.rocket.action.application.core.domain.model.RocketActionCached
 import ru.ezhov.rocket.action.application.core.domain.model.RocketActionSettingsModel
+import ru.ezhov.rocket.action.application.core.domain.model.SearchParameters
 import ru.ezhov.rocket.action.application.core.event.ActionModelSavedDomainEvent
 import ru.ezhov.rocket.action.application.event.infrastructure.DomainEventFactory
 import ru.ezhov.rocket.action.application.plugin.context.RocketActionContextFactory
@@ -30,6 +31,19 @@ class RocketActionSettingsService(
     private val rocketActionComponentCache: RocketActionComponentCache,
 ) {
     private var rocketActionAndComponents: List<RocketActionAndComponent> = emptyList()
+
+    fun searchBy(parameters: SearchParameters): List<RocketActionSettingsModel> {
+        val list = mutableListOf<RocketActionSettingsModel>()
+        if (parameters.types.isEmpty()) {
+            getAllActionSettings(actionsModel().actions, list) { true }
+        } else {
+            getAllActionSettings(actionsModel().actions, list) { action ->
+                parameters.types.contains(action.type)
+            }
+        }
+
+        return list
+    }
 
     fun actionsModel(): ActionsModel = rocketActionSettingsRepository.actions()
 
@@ -104,7 +118,7 @@ class RocketActionSettingsService(
 
     private fun fillCache(actionSettings: List<RocketActionSettingsModel>) {
         val allActionSettings = mutableListOf<RocketActionSettingsModel>()
-        getAllActionSettings(actionSettings, allActionSettings)
+        getAllActionSettings(actionSettings, allActionSettings) { true }
 
         val groupAndAnother = allActionSettings.groupBy { it.type == GroupRocketActionUi.TYPE }
         groupAndAnother[false]?.forEach { settings -> createAndPutToCache(settings) }
@@ -114,15 +128,18 @@ class RocketActionSettingsService(
 
     private fun getAllActionSettings(
         actionsSettings: List<RocketActionSettingsModel>,
-        allActionsForFilling: MutableList<RocketActionSettingsModel>
+        allActionsForFilling: MutableList<RocketActionSettingsModel>,
+        filter: (action: RocketActionSettingsModel) -> Boolean
     ) {
         actionsSettings.forEach { actionSettings ->
-            if (actionSettings.actions.isEmpty()) {
+            if (actionSettings.actions.isEmpty() && filter(actionSettings)) {
                 allActionsForFilling.add(actionSettings)
             } else {
-                // must be first since the parent group must come before its children
-                allActionsForFilling.add(actionSettings)
-                getAllActionSettings(actionSettings.actions, allActionsForFilling)
+                if (filter(actionSettings)) {
+                    // must be first since the parent group must come before its children
+                    allActionsForFilling.add(actionSettings)
+                }
+                getAllActionSettings(actionSettings.actions, allActionsForFilling, filter)
             }
         }
     }
