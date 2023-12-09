@@ -13,6 +13,7 @@ import java.io.File
 private val logger = KotlinLogging.logger {}
 
 private const val DEFAULT_VARIABLES_KEY: String = "314dcf4c-e12b-11ed-b5ea-0242ac120002"
+private const val DEFAULT_NUMBER_BUTTONS_ON_CHAIN_ACTION_SELECTION_PANEL: Int = 15
 
 @Component
 class JsonFileConfigurationRepository(
@@ -23,7 +24,7 @@ class JsonFileConfigurationRepository(
     private val filePath =
         generalPropertiesRepository
             .asStringOrNull(UsedPropertiesName.APPLICATION_CONFIGURATION_FILE_REPOSITORY_PATH)
-            ?: "./configurations.json"
+            ?: "./.rocket-action/configurations.json"
 
     override fun configurations(): ApplicationConfigurations {
         if (cachedApplicationConfigurations == null) {
@@ -35,7 +36,9 @@ class JsonFileConfigurationRepository(
                 logger.info { "Application configurations file '$file' does not exists. Return default configuration" }
                 ApplicationConfigurations(
                     variablesKey = DEFAULT_VARIABLES_KEY,
-                )
+                    numberButtonsOnChainActionSelectionPanel = DEFAULT_NUMBER_BUTTONS_ON_CHAIN_ACTION_SELECTION_PANEL,
+
+                    )
             }
         }
 
@@ -63,10 +66,13 @@ class JsonFileConfigurationRepository(
 
 private fun ApplicationConfigurations.toJsonApplicationConfigurationsDto(): JsonApplicationConfigurationsDto =
     JsonApplicationConfigurationsDto(
-        variablesKey = this.variablesKey
+        variablesKey = this.variablesKey,
+        numberButtonsOnChainActionSelectionPanel = this.numberButtonsOnChainActionSelectionPanel,
     )
 
 private fun JsonApplicationConfigurationsDto.toApplicationConfigurations(): ApplicationConfigurations =
     ApplicationConfigurations(
-        variablesKey = this.variablesKey ?: DEFAULT_VARIABLES_KEY
+        variablesKey = this.variablesKey ?: DEFAULT_VARIABLES_KEY,
+        numberButtonsOnChainActionSelectionPanel = numberButtonsOnChainActionSelectionPanel
+            ?: DEFAULT_NUMBER_BUTTONS_ON_CHAIN_ACTION_SELECTION_PANEL
     )

@@ -3,45 +3,27 @@ package ru.ezhov.rocket.action.application.chainaction.interfaces.ui.base
 import net.miginfocom.swing.MigLayout
 import org.jdesktop.swingx.JXTitledSeparator
 import ru.ezhov.rocket.action.application.chainaction.application.AtomicActionService
-import ru.ezhov.rocket.action.application.chainaction.application.ChainActionService
 import ru.ezhov.rocket.action.application.chainaction.domain.model.Action
 import ru.ezhov.rocket.action.application.chainaction.domain.model.AtomicAction
 import ru.ezhov.rocket.action.application.chainaction.domain.model.ChainAction
 import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.chainIcon
 import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.components.toIcon8x8
-import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.renderer.ChainAndAtomicActionListCellRenderer
 import java.awt.BorderLayout
+import java.awt.Component
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
-import javax.swing.DefaultListModel
 import javax.swing.JButton
-import javax.swing.JList
 import javax.swing.JPanel
 import javax.swing.SwingConstants
 
 class SelectChainButtonsPanel(
     actionService: AtomicActionService,
-    chainActionService: ChainActionService,
     chains: List<ChainAction>,
     atomics: List<AtomicAction>,
     selectedChainCallback: (Action) -> Unit
 ) : JPanel(BorderLayout()) {
-    private val listChainsModel = DefaultListModel<Action>()
-    private val chainList = JList(listChainsModel)
 
     init {
-        chains.forEach { listChainsModel.addElement(it) }
-        atomics.forEach { listChainsModel.addElement(it) }
-        chainList.cellRenderer = ChainAndAtomicActionListCellRenderer(actionService, chainActionService)
-
-        chainList.addMouseListener(object : MouseAdapter() {
-            override fun mouseReleased(e: MouseEvent?) {
-                chainList.selectedValue?.let { selected ->
-                    selectedChainCallback(selected)
-                }
-            }
-        })
-
         add(
             InnerButtonsPanel(
                 actionService = actionService,
@@ -59,53 +41,44 @@ class SelectChainButtonsPanel(
         chains: List<ChainAction>,
         atomics: List<AtomicAction>,
         selectedChainCallback: (Action) -> Unit
-    ) : JPanel(MigLayout("", "[fill][fill][fill]")) {
+    ) : JPanel(MigLayout("", "[fill][fill]")) {
         init {
-            if (chains.isNotEmpty()) {
-                add(JXTitledSeparator("Chains"), "push, span 3, wrap")
-            }
+            val chainButtons = chains.map { ch ->
 
-            chains.chunked(3).forEach { chs ->
-                chs.forEachIndexed { index, ch ->
-                    val button = JButton(ch.name).apply {
-                        icon = chainIcon(chain = ch, atomicActionService = actionService)
-                        horizontalAlignment = SwingConstants.LEFT
-                        addMouseListener(object : MouseAdapter() {
-                            override fun mouseReleased(e: MouseEvent) {
-                                selectedChainCallback(ch)
-                            }
-                        })
-                    }
-                    if (index == chs.size - 1) {
-                        add(button, "push, wrap")
-                    } else {
-                        add(button, "push")
-                    }
+                JButton(ch.name).apply {
+                    icon = chainIcon(chain = ch, atomicActionService = actionService)
+                    horizontalAlignment = SwingConstants.LEFT
+                    addMouseListener(object : MouseAdapter() {
+                        override fun mouseReleased(e: MouseEvent) {
+                            selectedChainCallback(ch)
+                        }
+                    })
                 }
-
             }
 
-            if (atomics.isNotEmpty()) {
-                add(JXTitledSeparator("Actions"), "push, span 3, wrap")
-            }
+            add(ButtonsPanel("Chains", chainButtons))
 
-            atomics.chunked(3).forEach { ats ->
-                ats.forEachIndexed { index, at ->
-                    val button = JButton(at.name).apply {
-                        icon = at.contractType.toIcon8x8()
-                        horizontalAlignment = SwingConstants.LEFT
-                        addMouseListener(object : MouseAdapter() {
-                            override fun mouseReleased(e: MouseEvent) {
-                                selectedChainCallback(at)
-                            }
-                        })
-                    }
-                    if (index == ats.size - 1) {
-                        add(button, "push, wrap")
-                    } else {
-                        add(button, "push")
-                    }
+            val atomicButtons = atomics.map { at ->
+                JButton(at.name).apply {
+                    icon = at.contractType.toIcon8x8()
+                    horizontalAlignment = SwingConstants.LEFT
+                    addMouseListener(object : MouseAdapter() {
+                        override fun mouseReleased(e: MouseEvent) {
+                            selectedChainCallback(at)
+                        }
+                    })
                 }
+            }
+
+            add(ButtonsPanel("Actions", atomicButtons))
+        }
+    }
+
+    private class ButtonsPanel(title: String, components: List<Component>) : JPanel(MigLayout("", "[fill]")) {
+        init {
+            add(JXTitledSeparator(title), "push, wrap")
+            components.forEach {
+                add(it, "push, wrap")
             }
         }
     }

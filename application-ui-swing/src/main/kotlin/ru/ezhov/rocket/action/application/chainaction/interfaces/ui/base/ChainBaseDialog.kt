@@ -1,5 +1,6 @@
 package ru.ezhov.rocket.action.application.chainaction.interfaces.ui.base
 
+import ru.ezhov.rocket.action.application.applicationConfiguration.application.ConfigurationApplication
 import ru.ezhov.rocket.action.application.chainaction.application.AtomicActionService
 import ru.ezhov.rocket.action.application.chainaction.application.ActionExecutorService
 import ru.ezhov.rocket.action.application.chainaction.application.ChainActionService
@@ -13,6 +14,7 @@ class ChainBaseDialog(
     actionExecutorService: ActionExecutorService,
     chainActionService: ChainActionService,
     atomicActionService: AtomicActionService,
+    configurationApplication: ConfigurationApplication,
 ) : JDialog() {
 
     private val chainBasePanel: ChainBasePanel = ChainBasePanel(
@@ -20,6 +22,7 @@ class ChainBaseDialog(
         actionExecutorService = actionExecutorService,
         chainActionService = chainActionService,
         atomicActionService = atomicActionService,
+        configurationApplication =     configurationApplication,
     )
 
     private val chainConfigurationFrame = ChainConfigurationFrame(

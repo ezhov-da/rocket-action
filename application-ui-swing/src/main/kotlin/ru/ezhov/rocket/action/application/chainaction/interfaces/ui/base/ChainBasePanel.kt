@@ -1,6 +1,7 @@
 package ru.ezhov.rocket.action.application.chainaction.interfaces.ui.base
 
 import net.miginfocom.swing.MigLayout
+import ru.ezhov.rocket.action.application.applicationConfiguration.application.ConfigurationApplication
 import ru.ezhov.rocket.action.application.chainaction.application.ActionExecutorService
 import ru.ezhov.rocket.action.application.chainaction.application.AtomicActionService
 import ru.ezhov.rocket.action.application.chainaction.application.ChainActionService
@@ -40,6 +41,7 @@ class ChainBasePanel(
     actionExecutorService: ActionExecutorService,
     private val chainActionService: ChainActionService,
     private val atomicActionService: AtomicActionService,
+    private val configurationApplication: ConfigurationApplication,
 ) : JPanel(MigLayout(/*"debug"*/)) {
     private val labelDropDown =
         JLabel("<html><center>Drag text to run chain<br>or paste here or type and `Enter`</center>")
@@ -148,6 +150,7 @@ class ChainBasePanel(
             chainActionService = chainActionService,
             chains = chainActionService.chains(),
             atomics = atomicActionService.atomics(),
+            configurationApplication = configurationApplication,
         ) { chain ->
             actionExecuteStatusPanel.isVisible = true
 

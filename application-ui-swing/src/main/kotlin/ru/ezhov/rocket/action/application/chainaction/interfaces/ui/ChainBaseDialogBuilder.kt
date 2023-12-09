@@ -1,6 +1,7 @@
 package ru.ezhov.rocket.action.application.chainaction.interfaces.ui
 
 import org.springframework.stereotype.Service
+import ru.ezhov.rocket.action.application.applicationConfiguration.application.ConfigurationApplication
 import ru.ezhov.rocket.action.application.chainaction.application.AtomicActionService
 import ru.ezhov.rocket.action.application.chainaction.application.ActionExecutorService
 import ru.ezhov.rocket.action.application.chainaction.application.ChainActionService
@@ -13,6 +14,7 @@ class ChainBaseDialogBuilder(
     private val actionExecutorService: ActionExecutorService,
     private val chainActionService: ChainActionService,
     private val atomicActionService: AtomicActionService,
+    private val configurationApplication: ConfigurationApplication,
 ) {
     fun build(): ChainBaseDialog =
         ChainBaseDialog(
@@ -20,5 +22,6 @@ class ChainBaseDialogBuilder(
             actionExecutorService = actionExecutorService,
             chainActionService = chainActionService,
             atomicActionService = atomicActionService,
+            configurationApplication = configurationApplication,
         )
 }
