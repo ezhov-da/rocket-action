@@ -47,6 +47,7 @@ fun main(args: Array<String>) {
                 ),
                 chainActionService = chainActionService,
                 atomicActionService = atomicActionService,
+                configurationApplication = mockk(),
             )
         )
         frame.setSize(300, 200)

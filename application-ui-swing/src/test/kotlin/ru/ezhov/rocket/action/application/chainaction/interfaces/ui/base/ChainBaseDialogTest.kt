@@ -45,6 +45,7 @@ fun main(args: Array<String>) {
             actionExecutor = mockk(),
             chainActionService = chainActionService,
             atomicActionService = atomicActionService,
+            configurationApplication = mockk(),
         )
         dialog.isVisible = true
     }
