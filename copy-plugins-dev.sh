@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+# Copy plugins for develop
+
 DIRECTORY=plugins
 rm -rf $DIRECTORY && mkdir -p $DIRECTORY && cp -f plugin-copy-to-clipboard/target/*fat.jar \
 plugin-exec/target/*fat.jar \

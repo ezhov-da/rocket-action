@@ -15,7 +15,7 @@ import java.time.LocalDateTime
 class JsonAtomicActionRepository(
     private val objectMapper: ObjectMapper
 ) : AtomicActionRepository {
-    private val filePath = File("./atomic-actions.json")
+    private val filePath = File("./.rocket-action/atomic-actions.json")
 
     override fun save(atomicAction: AtomicAction) {
         val actions = all().toMutableList()
@@ -47,7 +47,10 @@ class JsonAtomicActionRepository(
                     AtomicActionsDto::class.java
                 ).atomicActions.map { it.toAtomicActionDto() }
 
-            false -> emptyList()
+            false -> {
+                filePath.parentFile.mkdirs()
+                emptyList()
+            }
         }
 
     override fun byId(id: String): AtomicAction? = all().firstOrNull { it.id == id }

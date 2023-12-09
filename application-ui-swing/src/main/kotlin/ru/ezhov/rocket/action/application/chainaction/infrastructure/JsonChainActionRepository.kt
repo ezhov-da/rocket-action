@@ -15,7 +15,7 @@ import java.time.LocalDateTime
 class JsonChainActionRepository(
     private val objectMapper: ObjectMapper
 ) : ChainActionRepository {
-    private val filePath = File("./chain-actions.json")
+    private val filePath = File("./.rocket-action/chain-actions.json")
 
     override fun save(chainAction: ChainAction) {
         val chains = all().toMutableList()
@@ -52,7 +52,10 @@ class JsonChainActionRepository(
                         ChainActionsDto::class.java
                     ).chainActions.map { it.toChainAction() }
 
-                false -> emptyList()
+                false -> {
+                    filePath.parentFile.mkdirs()
+                    emptyList()
+                }
             }
         }
 

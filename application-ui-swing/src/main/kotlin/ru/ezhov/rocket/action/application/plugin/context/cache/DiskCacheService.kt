@@ -20,7 +20,7 @@ private val logger = KotlinLogging.logger {}
 
 @Service
 class DiskCacheService : CacheService {
-    private val cacheFolder = File("./cache")
+    private val cacheFolder = File("./.rocket-action/cache")
     private val cache: ConcurrentHashMap<String, String> = ConcurrentHashMap()
 
     override fun get(url: URL): File? {

@@ -658,7 +658,7 @@ actions:
         _id: de30aba8-c229-11ec-9d64-0242ac120002
         label: "Test File"
         description: "Описание"
-        pathAndName: "./notes/d9530ff6-a228-11ec-b909-0242ac120002.txt"
+        pathAndName: "./.rocket-action/plugins/notes/d9530ff6-a228-11ec-b909-0242ac120002.txt"
 
     -   type: JIRA_WORK_LOG
         _id: de31aba8-c229-11ec-9d64-0242ac120002

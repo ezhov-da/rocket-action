@@ -24,7 +24,7 @@ class JsonFileVariableRepository(
     private val filePath =
         generalPropertiesRepository
             .asStringOrNull(UsedPropertiesName.VARIABLES_FILE_REPOSITORY_PATH)
-            ?: "./variables.json"
+            ?: "./.rocket-action/variables.json"
 
     override fun all(): Variables {
         val file = file()
