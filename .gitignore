@@ -8,3 +8,4 @@ target
 /.rocket-action/cache
 /.rocket-action/actions.yml
 /notes.s3db
+/plugin-note/test_notes.s3db
