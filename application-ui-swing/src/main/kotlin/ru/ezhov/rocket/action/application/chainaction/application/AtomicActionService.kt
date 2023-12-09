@@ -1,5 +1,6 @@
 package ru.ezhov.rocket.action.application.chainaction.application
 
+import org.springframework.beans.factory.InitializingBean
 import org.springframework.stereotype.Service
 import ru.ezhov.rocket.action.application.chainaction.domain.AtomicActionRepository
 import ru.ezhov.rocket.action.application.chainaction.domain.event.AtomicActionCreatedDomainEvent
@@ -11,7 +12,7 @@ import ru.ezhov.rocket.action.application.event.infrastructure.DomainEventFactor
 @Service
 class AtomicActionService(
     private val atomicActionRepository: AtomicActionRepository,
-) {
+) : InitializingBean {
     fun atomics(): List<AtomicAction> = atomicActionRepository.all()
 
     fun atomicBy(id: String): AtomicAction? = atomicActionRepository.byId(id)
@@ -35,4 +36,16 @@ class AtomicActionService(
     }
 
     fun byAlias(alias: String): AtomicAction? = atomics().firstOrNull() { it.alias == alias }
+
+    /**
+     * Used only for access outside the Spring context.
+     * Important! Can be null if called before the context is initialized.
+     */
+    companion object {
+        var INSTANCE: AtomicActionService? = null
+    }
+
+    override fun afterPropertiesSet() {
+        INSTANCE = this
+    }
 }

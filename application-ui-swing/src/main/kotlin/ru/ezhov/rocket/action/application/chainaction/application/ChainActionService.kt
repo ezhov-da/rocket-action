@@ -1,5 +1,6 @@
 package ru.ezhov.rocket.action.application.chainaction.application
 
+import org.springframework.beans.factory.InitializingBean
 import org.springframework.stereotype.Service
 import ru.ezhov.rocket.action.application.chainaction.domain.ChainActionRepository
 import ru.ezhov.rocket.action.application.chainaction.domain.event.ChainActionCreatedDomainEvent
@@ -11,7 +12,7 @@ import ru.ezhov.rocket.action.application.event.infrastructure.DomainEventFactor
 @Service
 class ChainActionService(
     private val chainActionRepository: ChainActionRepository,
-) {
+) : InitializingBean {
     fun chains(): List<ChainAction> = chainActionRepository.all()
 
     fun byId(id: String): ChainAction? = chainActionRepository.all().firstOrNull { it.id == id }
@@ -35,4 +36,16 @@ class ChainActionService(
     }
 
     fun usageAction(id: String) = chains().filter { it.actions.any { act -> act.actionId == id } }
+
+    /**
+     * Used only for access outside the Spring context.
+     * Important! Can be null if called before the context is initialized.
+     */
+    companion object {
+        var INSTANCE: ChainActionService? = null
+    }
+
+    override fun afterPropertiesSet() {
+        INSTANCE = this
+    }
 }

@@ -4,6 +4,7 @@ import mu.KotlinLogging
 import ru.ezhov.rocket.action.api.RocketActionPropertySpec
 import ru.ezhov.rocket.action.api.context.notification.NotificationType
 import ru.ezhov.rocket.action.application.configuration.ui.specpanel.BooleanPropertySpecPanel
+import ru.ezhov.rocket.action.application.configuration.ui.specpanel.ComponentPropertySpecPanel
 import ru.ezhov.rocket.action.application.configuration.ui.specpanel.InitValue
 import ru.ezhov.rocket.action.application.configuration.ui.specpanel.IntPropertySpecPanel
 import ru.ezhov.rocket.action.application.configuration.ui.specpanel.ListPropertySpecPanel
@@ -67,6 +68,15 @@ class SettingPanel(
                     )
 
                     is RocketActionPropertySpec.IntPropertySpec -> IntPropertySpecPanel(
+                        configProperty = configProperty,
+                        initValue = InitValue(
+                            value = value.value,
+                            property = value.property,
+                            type = value.valueType
+                        )
+                    )
+
+                    is RocketActionPropertySpec.ComponentPropertySpec -> ComponentPropertySpecPanel(
                         configProperty = configProperty,
                         initValue = InitValue(
                             value = value.value,

@@ -20,7 +20,14 @@ class InMemoryDomainEventPublisher :
         logger.debug { "Publish events '${events.map { it::class.java.name }}'" }
 
         events.forEach { e ->
-            eventSubscribers[e.javaClass]?.forEach { subscriber ->
+            val subscribers = eventSubscribers[e.javaClass]
+
+            logger.debug { "Subscribers count for event '${e::class.java}' is '${subscribers?.size}' " }
+
+            subscribers?.forEach { subscriber ->
+
+                logger.debug { "Call handle '${subscriber::class.java}' for event '${e::class.java}'" }
+
                 subscriber.handleEvent(e)
             }
         }

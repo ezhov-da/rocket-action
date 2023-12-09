@@ -3,6 +3,7 @@ package ru.ezhov.rocket.action.application.configuration.ui.create
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
 import ru.ezhov.rocket.action.api.RocketActionPropertySpec
 import ru.ezhov.rocket.action.application.configuration.ui.specpanel.BooleanPropertySpecPanel
+import ru.ezhov.rocket.action.application.configuration.ui.specpanel.ComponentPropertySpecPanel
 import ru.ezhov.rocket.action.application.configuration.ui.specpanel.IntPropertySpecPanel
 import ru.ezhov.rocket.action.application.configuration.ui.specpanel.ListPropertySpecPanel
 import ru.ezhov.rocket.action.application.configuration.ui.specpanel.StringPropertySpecPanel
@@ -41,6 +42,8 @@ class SettingPanel(
                 is RocketActionPropertySpec.ListPropertySpec -> ListPropertySpecPanel(configProperty)
 
                 is RocketActionPropertySpec.IntPropertySpec -> IntPropertySpecPanel(configProperty)
+
+                is RocketActionPropertySpec.ComponentPropertySpec -> ComponentPropertySpecPanel(configProperty)
             }
 
         val tabs = JTabbedPane()

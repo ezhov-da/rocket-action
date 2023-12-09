@@ -14,6 +14,10 @@ data class AtomicAction(
 ) : Action {
     override fun id(): String = id
 
+    override fun name(): String = name
+
+    override fun description(): String = description
+
     fun duplicate(): AtomicAction = AtomicAction(
         id = UUID.randomUUID().toString(),
         name = this.name,

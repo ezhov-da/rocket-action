@@ -1,5 +1,6 @@
 package ru.ezhov.rocket.action.application.chainaction.infrastructure
 
+import mu.KotlinLogging
 import org.springframework.stereotype.Service
 import ru.ezhov.rocket.action.application.chainaction.application.AtomicActionService
 import ru.ezhov.rocket.action.application.chainaction.domain.ActionExecutor
@@ -10,6 +11,7 @@ import ru.ezhov.rocket.action.application.chainaction.domain.model.ChainAction
 import ru.ezhov.rocket.action.application.engine.application.EngineFactory
 import ru.ezhov.rocket.action.application.variables.application.VariablesApplication
 
+private val logger = KotlinLogging.logger { }
 
 @Service
 class ActionExecutorImpl(
@@ -34,10 +36,12 @@ class ActionExecutorImpl(
         progressExecutingAction: ProgressExecutingAction
     ) {
         var currentAtomicActionOrderId: String? = null
-        var currentAtomicActionId: String? = null
+        var currentAtomicActionId: String?
         var currentAtomicAction: AtomicAction? = null
         var lastResult: Any? = null
         try {
+            logger.debug { "Run chain action by ID '${chainAction.id}'. Input '$input'" }
+
             var inputValue = input
             chainAction.actions.forEach { atomicActionOrder ->
                 currentAtomicActionOrderId = atomicActionOrder.chainOrderId
@@ -68,6 +72,8 @@ class ActionExecutorImpl(
             }
 
             progressExecutingAction.onComplete(lastResult, currentAtomicAction!!)
+
+            logger.debug { "Chain action by ID '${chainAction.id}'. Input '$input'. Completed" }
         } catch (ex: Exception) {
             progressExecutingAction.onAtomicActionFailure(currentAtomicActionOrderId!!, currentAtomicAction!!, ex)
         }
@@ -89,6 +95,8 @@ class ActionExecutorImpl(
         progressExecutingAction: ProgressExecutingAction
     ) {
         try {
+            logger.debug { "Run atomic action by ID '${atomicAction.id}'. Input '$input'" }
+
             val executeResult = executeScript(input, atomicAction)
 
             progressExecutingAction.onAtomicActionSuccess(
@@ -98,6 +106,8 @@ class ActionExecutorImpl(
             )
 
             progressExecutingAction.onComplete(executeResult, atomicAction)
+
+            logger.debug { "Atomic action by ID '${atomicAction.id}'. Input '$input'. Completed" }
         } catch (ex: Exception) {
             progressExecutingAction.onAtomicActionFailure(atomicAction.id, atomicAction, ex)
         }

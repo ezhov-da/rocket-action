@@ -1,5 +1,6 @@
 package ru.ezhov.rocket.action.ui.utils.swing.common
 
+import java.awt.Component
 import java.awt.Dimension
 import java.awt.Toolkit
 
@@ -11,4 +12,12 @@ object SizeUtil {
                 (screenSize.height * hPercent).toInt()
             )
         }
+
+    fun setAllSize(component: Component, dimension: Dimension) {
+        component.apply {
+            minimumSize = dimension
+            maximumSize = dimension
+            preferredSize = dimension
+        }
+    }
 }

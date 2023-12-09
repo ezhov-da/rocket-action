@@ -28,16 +28,16 @@ class SelectChainListPanel(
 ) : JPanel(BorderLayout()) {
     private val searchTextField = TextFieldWithText("Search")
     private val clearSearchButton = JButton(Icons.Standard.X_16x16)
-    private val listChainsModel = DefaultListModel<Action>()
-    private val chainList = JList(listChainsModel)
+    private val listModel = DefaultListModel<Action>()
+    private val actionsList = JList(listModel)
 
     init {
         fillList()
-        chainList.cellRenderer = ChainAndAtomicActionListCellRenderer(actionService, chainActionService)
+        actionsList.cellRenderer = ChainAndAtomicActionListCellRenderer(actionService, chainActionService)
 
-        chainList.addMouseListener(object : MouseAdapter() {
+        actionsList.addMouseListener(object : MouseAdapter() {
             override fun mouseReleased(e: MouseEvent?) {
-                chainList.selectedValue?.let { selected ->
+                actionsList.selectedValue?.let { selected ->
                     selectedChainCallback(selected)
                 }
             }
@@ -57,22 +57,30 @@ class SelectChainListPanel(
             add(searchTextField, "width 100%")
             add(clearSearchButton)
         }, BorderLayout.NORTH)
-        add(JScrollPane(chainList), BorderLayout.CENTER)
+        add(JScrollPane(actionsList), BorderLayout.CENTER)
     }
 
     private fun fillList(text: String? = null) {
-        listChainsModel.removeAllElements()
+        listModel.removeAllElements()
 
         if (text == null) {
-            chains.forEach { listChainsModel.addElement(it) }
-            atomics.forEach { listChainsModel.addElement(it) }
+            chains.forEach { listModel.addElement(it) }
+            atomics.forEach { listModel.addElement(it) }
         } else {
             chains.filter { it.name.lowercase().contains(text.lowercase()) }.forEach {
-                listChainsModel.addElement(it)
+                listModel.addElement(it)
             }
             atomics.filter { it.name.lowercase().contains(text.lowercase()) }.forEach {
-                listChainsModel.addElement(it)
+                listModel.addElement(it)
             }
+        }
+    }
+
+    fun selectedAction(): Action? = actionsList.selectedValue
+
+    fun setSelectedAction(id: String) {
+        listModel.elements().toList().firstOrNull { it.id() == id }?.let { action ->
+            actionsList.setSelectedValue(action, true)
         }
     }
 }

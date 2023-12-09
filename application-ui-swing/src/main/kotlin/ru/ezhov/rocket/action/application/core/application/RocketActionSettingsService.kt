@@ -120,7 +120,8 @@ class RocketActionSettingsService(
         val allActionSettings = mutableListOf<RocketActionSettingsModel>()
         getAllActionSettings(actionSettings, allActionSettings) { true }
 
-        val groupAndAnother = allActionSettings.groupBy { it.type == GroupRocketActionUi.TYPE }
+        val groupAndAnother = allActionSettings
+            .groupBy { it.type == GroupRocketActionUi.TYPE }
         groupAndAnother[false]?.forEach { settings -> createAndPutToCache(settings) }
         // expand the list of groups, as we begin to create groups from child
         groupAndAnother[true]?.reversed()?.forEach { settings -> createAndPutToCache(settings) }

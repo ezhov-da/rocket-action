@@ -10,6 +10,10 @@ data class ChainAction(
 ) : Action {
     override fun id(): String = id
 
+    override fun name(): String = name
+
+    override fun description(): String = description
+
     fun duplicate(): ChainAction = ChainAction(
         id = UUID.randomUUID().toString(),
         name = this.name,

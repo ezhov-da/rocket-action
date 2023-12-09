@@ -557,5 +557,6 @@ object Icons {
         val GROOVY_8x8 = ImageIcon(this::class.java.getResource("/icons/groovy_8x8.png"))
         val GROOVY_16x16 = ImageIcon(this::class.java.getResource("/icons/groovy_16x16.png"))
         val COPY_16x16 = ImageIcon(this::class.java.getResource("/icons/copy_16x16.png"))
+        val ROCKET_BLACK_16x16 = ImageIcon(this::class.java.getResource("/icons/rocket_black_16x16.png"))
     }
 }
