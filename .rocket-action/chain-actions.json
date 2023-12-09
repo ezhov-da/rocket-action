@@ -1,5 +1,5 @@
 {
-  "changedDate" : [ 2023, 12, 7, 23, 9, 27, 477000000 ],
+  "changedDate" : [ 2023, 12, 10, 2, 41, 13, 802000000 ],
   "chainActions" : [ {
     "id" : "1a39305f-5ed2-469a-b84e-2692ac324976",
     "name" : "Тест выполнения многих действий",
@@ -46,7 +46,8 @@
     }, {
       "chainOrderId" : "6345611f-b086-4c96-9d04-cef7189705b6",
       "actionId" : "ccb3ea04-68ef-4988-84f1-2d95e14c0046"
-    } ]
+    } ],
+    "icon" : null
   }, {
     "id" : "6cb108c9-6772-4f56-bbeb-6a7837ec1fa1",
     "name" : "Открытие ссылки по Jira задаче (Дубликат)",
@@ -60,7 +61,8 @@
     }, {
       "chainOrderId" : "0871e6c2-00c2-4160-81fd-0be1b1d6df72",
       "actionId" : "0f023251-5b90-44d2-bb40-2224f504bb92"
-    } ]
+    } ],
+    "icon" : null
   }, {
     "id" : "541921b7-9194-4211-b0c4-8d6ea38b8140",
     "name" : "Тестовое",
@@ -74,7 +76,8 @@
     }, {
       "chainOrderId" : "0871e6c2-00c2-4160-81fd-0be1b1d6df72",
       "actionId" : "0f023251-5b90-44d2-bb40-2224f504bb92"
-    } ]
+    } ],
+    "icon" : "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAALEwAACxMBAJqcGAAAANpJREFUOI2d0lFKw1AQBdBDPky7ljQK6nLckkW0UboWKe5C6U8RXYTxo60fb1pCmoTGC8ODmXfv3HnzOMUVXrDGb8Qaz7jsuH/EBEvssO+JHSrkXeS3HlKOa9zjJ3Kr4ByxHOjaRIGvyFfNmYdst1GgDk5JerA+cpcAzKO2IL3wWIGbqH2Q1jRWYBq1Ouu5cDYyfP6DV8S5yaSdjsVdnCvS9xyzxlJa4xazQ7I6U6DEd+Qfm4U87HQJTHGLh+i8xysu2tYm4WRonG10PiG3bS6kT1JHvOOpOfMBf3ivdcA62MlrAAAAAElFTkSuQmCC"
   }, {
     "id" : "0e4e80b2-7861-4779-862d-abc1132a925e",
     "name" : "Тест повтора одних и тех же действий",
@@ -94,7 +97,8 @@
     }, {
       "chainOrderId" : "fbf91d2f-e301-44ff-afba-706245cc4000",
       "actionId" : "0f023251-5b90-44d2-bb40-2224f504bb92"
-    } ]
+    } ],
+    "icon" : null
   }, {
     "id" : "ff5256bc-399e-4576-ac5a-21e70a677458",
     "name" : "Просто много действий",
@@ -138,7 +142,8 @@
     }, {
       "chainOrderId" : "19c32396-8efc-4320-97b6-e79b46802bce",
       "actionId" : "8dba925e-07fb-4d88-af27-18d38eefede0"
-    } ]
+    } ],
+    "icon" : null
   }, {
     "id" : "ed2bd3f2-ea55-4b74-8162-2fb9a93ed8a7",
     "name" : "Тоже просто много действий",
@@ -182,7 +187,8 @@
     }, {
       "chainOrderId" : "19c32396-8efc-4320-97b6-e79b46802bce",
       "actionId" : "8dba925e-07fb-4d88-af27-18d38eefede0"
-    } ]
+    } ],
+    "icon" : null
   }, {
     "id" : "0819e376-1684-4c0f-bd83-fe743e1921ce",
     "name" : "Дубликать печати строки",
@@ -190,7 +196,8 @@
     "actions" : [ {
       "chainOrderId" : "1650e567-8874-46aa-aacb-c14dcd22cec6",
       "actionId" : "79ce0f96-08f9-4267-b9a2-cf58d86a8711"
-    } ]
+    } ],
+    "icon" : null
   }, {
     "id" : "e2a16de6-f1e4-4c4b-8086-15238f0290ad",
     "name" : "Тестовая цепочка",
@@ -198,7 +205,8 @@
     "actions" : [ {
       "chainOrderId" : "1c7d5c9e-e58c-4029-9078-e279a90ad9dc",
       "actionId" : "ccb3ea04-68ef-4988-84f1-2d95e14c0046"
-    } ]
+    } ],
+    "icon" : null
   }, {
     "id" : "7988fd08-9712-4396-a26b-ca9b5cfbcaee",
     "name" : "01",
@@ -206,7 +214,8 @@
     "actions" : [ {
       "chainOrderId" : "a9689eb5-8d95-4a64-b6bd-2c3b6d323468",
       "actionId" : "8dba925e-07fb-4d88-af27-18d38eefede0"
-    } ]
+    } ],
+    "icon" : "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAAOElEQVQ4jWNgGAU0B/+hGCdgJKCZoFpcBuCyFUM9NgPwOhldD7oBhDRj6GNCk9hChGZi1IwCUgAAm30HbfHmV2MAAAAASUVORK5CYII="
   }, {
     "id" : "f11efe30-2359-43aa-9d4a-eeb81d7b845d",
     "name" : "Печатает строку",
@@ -214,7 +223,8 @@
     "actions" : [ {
       "chainOrderId" : "1650e567-8874-46aa-aacb-c14dcd22cec6",
       "actionId" : "79ce0f96-08f9-4267-b9a2-cf58d86a8711"
-    } ]
+    } ],
+    "icon" : null
   }, {
     "id" : "b40225cd-a024-4e66-b58e-9d8d5fd1d227",
     "name" : "Открытие ссылки по Jira задаче",
@@ -228,6 +238,7 @@
     }, {
       "chainOrderId" : "0871e6c2-00c2-4160-81fd-0be1b1d6df72",
       "actionId" : "0f023251-5b90-44d2-bb40-2224f504bb92"
-    } ]
+    } ],
+    "icon" : null
   } ]
 }

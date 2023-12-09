@@ -19,6 +19,8 @@ import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.renderer.Ord
 import ru.ezhov.rocket.action.application.event.domain.DomainEvent
 import ru.ezhov.rocket.action.application.event.domain.DomainEventSubscriber
 import ru.ezhov.rocket.action.application.event.infrastructure.DomainEventFactory
+import ru.ezhov.rocket.action.application.icon.infrastructure.IconRepository
+import ru.ezhov.rocket.action.application.icon.interfaces.ui.SelectIconPanel
 import ru.ezhov.rocket.action.application.resources.Icons
 import ru.ezhov.rocket.action.plugin.clipboard.ClipboardUtil
 import ru.ezhov.rocket.action.ui.utils.swing.common.SizeUtil
@@ -48,6 +50,7 @@ class CreateAndEditChainActionDialog(
     private val actionExecutorService: ActionExecutorService,
     private val chainActionService: ChainActionService,
     private val atomicActionService: AtomicActionService,
+    private val iconRepository: IconRepository,
 ) : JDialog() {
     private val contentPane = JPanel(MigLayout("insets 5"/*"debug"*/))
     private val buttonSave: JButton = JButton("Save")
@@ -55,12 +58,13 @@ class CreateAndEditChainActionDialog(
 
     private val idTextField: JTextField = JTextField().apply { isEditable = false }
     private val idLabel: JLabel = JLabel("ID:").apply { labelFor = idTextField }
-    private val idButton: JButton = JButton(Icons.Advanced.COPY_16x16).apply {
+    private val copyIdButton: JButton = JButton(Icons.Advanced.COPY_16x16).apply {
         toolTipText = "Copy ID to clipboard"
         addActionListener {
             ClipboardUtil.copyToClipboard(idTextField.text)
         }
     }
+    private val selectIconPanel: SelectIconPanel = SelectIconPanel(iconRepository)
 
     private val nameTextField: JTextField = JTextField()
     private val nameLabel: JLabel = JLabel("Name:").apply { labelFor = nameTextField }
@@ -122,9 +126,10 @@ class CreateAndEditChainActionDialog(
             }
         })
 
-        contentPane.add(idLabel, "split 3")
+        contentPane.add(idLabel, "split 4")
         contentPane.add(idTextField, "wmin 25%")
-        contentPane.add(idButton, "wrap")
+        contentPane.add(copyIdButton)
+        contentPane.add(selectIconPanel, "wrap")
 
         contentPane.add(nameLabel)
         contentPane.add(nameTextField, "span 2, wrap, width max, grow")
@@ -166,10 +171,9 @@ class CreateAndEditChainActionDialog(
         contentPane.add(buttonSave, "cell 2 4, split 2, align right")
         contentPane.add(buttonCancel)
 
-        isModal = true
         getRootPane().defaultButton = buttonSave
         buttonSave.addActionListener { onOK() }
-        buttonCancel!!.addActionListener { onCancel() }
+        buttonCancel.addActionListener { onCancel() }
 
         // call onCancel() when cross is clicked
         defaultCloseOperation = DO_NOTHING_ON_CLOSE
@@ -204,6 +208,7 @@ class CreateAndEditChainActionDialog(
                                 actionId = it.atomicAction.id,
                             )
                         },
+                        icon = selectIconPanel.selectedIcon(),
                     )
                 )
             }
@@ -218,6 +223,7 @@ class CreateAndEditChainActionDialog(
                             actionId = it.atomicAction.id,
                         )
                     }
+                    icon = selectIconPanel.selectedIcon()
                 })
 
                 isVisible = false
@@ -241,7 +247,8 @@ class CreateAndEditChainActionDialog(
         descriptionTextPane.text = ""
         selectedListActionsModel.removeAllElements()
 
-        isModal = true
+        selectIconPanel.setIcon(null)
+
         isVisible = true
     }
 
@@ -255,13 +262,14 @@ class CreateAndEditChainActionDialog(
 
         selectedListActionsModel.removeAllElements()
 
+        selectIconPanel.setIcon(null)
+
         allListActionsModel.elements().toList().firstOrNull { it.id == atomicAction.id }?.let {
             selectedListActionsModel.addElement(
                 SelectedAtomicAction(atomicAction = it)
             )
         }
 
-        isModal = true
         isVisible = true
     }
 
@@ -277,6 +285,8 @@ class CreateAndEditChainActionDialog(
 
         selectedListActionsModel.removeAllElements()
 
+        selectIconPanel.setIcon(chainAction.icon)
+
         val actions = atomicActionService.atomics().associateBy { it.id }
         chainAction.actions.forEach { order ->
             actions[order.actionId]?.let { action ->
@@ -288,7 +298,6 @@ class CreateAndEditChainActionDialog(
             }
         }
 
-        isModal = true
         isVisible = true
     }
 }

@@ -8,6 +8,8 @@ import ru.ezhov.rocket.action.application.chainaction.domain.model.AtomicAction
 import ru.ezhov.rocket.action.application.chainaction.domain.model.ChainAction
 import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.chainIcon
 import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.components.toIcon8x8
+import ru.ezhov.rocket.action.ui.utils.swing.common.toIcon
+import tips4java.CompoundIcon
 import java.awt.BorderLayout
 import java.awt.Component
 import java.awt.event.MouseAdapter
@@ -46,7 +48,13 @@ class SelectChainButtonsPanel(
             val chainButtons = chains.map { ch ->
 
                 JButton(ch.name).apply {
-                    icon = chainIcon(chain = ch, atomicActionService = actionService)
+                    val i = chainIcon(chain = ch, atomicActionService = actionService)
+                    ch.icon?.let {
+                        icon = CompoundIcon(i, it.toIcon())
+                    } ?: run {
+                        icon = i
+                    }
+
                     horizontalAlignment = SwingConstants.LEFT
                     addMouseListener(object : MouseAdapter() {
                         override fun mouseReleased(e: MouseEvent) {
@@ -60,7 +68,12 @@ class SelectChainButtonsPanel(
 
             val atomicButtons = atomics.map { at ->
                 JButton(at.name).apply {
-                    icon = at.contractType.toIcon8x8()
+                    at.icon?.let {
+                        icon = CompoundIcon(at.contractType.toIcon8x8(), it.toIcon())
+                    } ?: run {
+                        icon = at.contractType.toIcon8x8()
+                    }
+
                     horizontalAlignment = SwingConstants.LEFT
                     addMouseListener(object : MouseAdapter() {
                         override fun mouseReleased(e: MouseEvent) {

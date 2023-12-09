@@ -21,6 +21,7 @@ import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.renderer.Ato
 import ru.ezhov.rocket.action.application.event.domain.DomainEvent
 import ru.ezhov.rocket.action.application.event.domain.DomainEventSubscriber
 import ru.ezhov.rocket.action.application.event.infrastructure.DomainEventFactory
+import ru.ezhov.rocket.action.application.icon.infrastructure.IconRepository
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import java.beans.PropertyChangeListener
@@ -38,6 +39,7 @@ class ActionsConfigurationPanel(
     private val chainActionService: ChainActionService,
     private val createAndEditChainActionDialog: CreateAndEditChainActionDialog,
     private val actionExecutor: ActionExecutor,
+    private val iconRepository: IconRepository,
 ) : JPanel(MigLayout()) {
     private val sortActionPanelConfiguration = SortActionPanelConfiguration()
     private val searchActionPanelConfiguration = SearchActionPanelConfiguration()
@@ -55,6 +57,7 @@ class ActionsConfigurationPanel(
     private val createAndEditAtomicActionDialog = CreateAndEditAtomicActionDialog(
         atomicActionService = atomicActionService,
         actionExecutor = actionExecutor,
+        iconRepository = iconRepository,
     )
 
     init {

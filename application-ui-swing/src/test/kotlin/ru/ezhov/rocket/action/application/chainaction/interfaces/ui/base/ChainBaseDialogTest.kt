@@ -46,6 +46,7 @@ fun main(args: Array<String>) {
             chainActionService = chainActionService,
             atomicActionService = atomicActionService,
             configurationApplication = mockk(),
+            iconRepository = mockk(),
         )
         dialog.isVisible = true
     }

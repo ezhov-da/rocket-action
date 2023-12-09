@@ -9,4 +9,5 @@ class ChainActionDto(
     var name: String,
     var description: String,
     var actions: List<ActionOrder>,
+    var icon: String?,
 )

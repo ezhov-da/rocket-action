@@ -24,6 +24,7 @@ fun main() {
                 chainActionService = mockk(),
                 createAndEditChainActionDialog = mockk(),
                 actionExecutor = mockk(),
+                iconRepository = mockk(),
             )
         )
         frame.setSize(1000, 700)

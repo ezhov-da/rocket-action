@@ -4,9 +4,12 @@ import java.awt.Component
 import java.awt.Frame
 import java.awt.GraphicsEnvironment
 import java.awt.Image
+import java.util.*
 import javax.swing.Icon
 import javax.swing.ImageIcon
 import javax.swing.JFrame
+
+fun String.toIcon() = ImageIcon(Base64.getDecoder().decode(this))
 
 fun Icon.toImage(): Image =
     when (this is ImageIcon) {

@@ -77,6 +77,7 @@ class JsonChainActionRepository(
         name = name,
         description = description,
         actions = actions,
+        icon = icon,
     )
 
     private fun ChainActionDto.toChainAction(): ChainAction = ChainAction(
@@ -84,5 +85,6 @@ class JsonChainActionRepository(
         name = name,
         description = description,
         actions = actions,
+        icon = icon,
     )
 }

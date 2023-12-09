@@ -2,10 +2,11 @@ package ru.ezhov.rocket.action.application.icon.interfaces.ui
 
 import ru.ezhov.rocket.action.application.TestUtilsFactory
 import ru.ezhov.rocket.action.application.icon.infrastructure.IconRepository
+import javax.swing.JFrame
 import javax.swing.SwingUtilities
 import javax.swing.UIManager
 
-internal class IconSelectionPanelTest
+internal class SelectIconPanelTest
 
 fun main(args: Array<String>) {
     SwingUtilities.invokeLater {
@@ -15,8 +16,17 @@ fun main(args: Array<String>) {
             //
         }
 
-        IconsDialog(IconRepository(TestUtilsFactory.objectMapper)).selectIcon {
-            println(it)
-        }
+        val frame = JFrame("_________")
+
+        val panel = SelectIconPanel(IconRepository(TestUtilsFactory.objectMapper), null)
+
+        frame.add(panel)
+
+        frame.pack()
+        frame.setLocationRelativeTo(null)
+        frame.defaultCloseOperation = JFrame.EXIT_ON_CLOSE
+        frame.isAlwaysOnTop = true
+        frame.isVisible = true
     }
 }
+

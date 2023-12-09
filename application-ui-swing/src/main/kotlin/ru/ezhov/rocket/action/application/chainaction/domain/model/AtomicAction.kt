@@ -11,12 +11,15 @@ data class AtomicAction(
     var source: AtomicActionSource,
     var data: String,
     var alias: String? = null,
+    var icon: String? = null,
 ) : Action {
     override fun id(): String = id
 
     override fun name(): String = name
 
     override fun description(): String = description
+
+    override fun icon(): String? = icon
 
     fun duplicate(): AtomicAction = AtomicAction(
         id = UUID.randomUUID().toString(),

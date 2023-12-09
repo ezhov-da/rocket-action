@@ -33,10 +33,12 @@ import ru.ezhov.rocket.action.application.resources.Icons
 import ru.ezhov.rocket.action.plugin.clipboard.ClipboardUtil
 import ru.ezhov.rocket.action.ui.utils.swing.common.SizeUtil
 import ru.ezhov.rocket.action.ui.utils.swing.common.TextFieldWithText
+import ru.ezhov.rocket.action.ui.utils.swing.common.toIcon
 import java.awt.BorderLayout
 import java.awt.Component
 import java.util.*
 import javax.swing.Icon
+import javax.swing.ImageIcon
 import javax.swing.JButton
 import javax.swing.JMenu
 import javax.swing.JMenuItem
@@ -189,9 +191,10 @@ class ChainActionUi : AbstractRocketAction(), RocketActionPlugin {
                     updateActionListeners.add { ac ->
                         name = ac.name()
                         toolTipText = ac.description()
+                        icon = ac.calculateIcon()
                     }
                     toolTipText = action.description()
-                    icon = Icons.Advanced.ROCKET_BLACK_16x16
+                    icon = action.calculateIcon()
                     addActionListener {
                         RunWorker(
                             actionExecutor = actionExecutor,
@@ -205,7 +208,8 @@ class ChainActionUi : AbstractRocketAction(), RocketActionPlugin {
 
             TYPE_MENU_WITH_INPUT -> {
                 JMenu(action.name()).apply {
-                    icon = Icons.Advanced.ROCKET_BLACK_16x16
+                    icon = action.calculateIcon()
+
                     val textField = TextFieldWithText("Text")
                     textField.columns = 10
                     textField.toolTipText = action.description()
@@ -213,6 +217,7 @@ class ChainActionUi : AbstractRocketAction(), RocketActionPlugin {
                     updateActionListeners.add { ac ->
                         text = ac.name()
                         textField.toolTipText = ac.description()
+                        icon = ac.calculateIcon()
                     }
 
                     val actionOnTextField: (text: String) -> Unit = { text ->
@@ -239,9 +244,10 @@ class ChainActionUi : AbstractRocketAction(), RocketActionPlugin {
                     updateActionListeners.add { ac ->
                         text = ac.name()
                         toolTipText = ac.description()
+                        icon = ac.calculateIcon()
                     }
 
-                    icon = Icons.Advanced.ROCKET_BLACK_16x16
+                    icon = action.calculateIcon()
                     toolTipText = action.description()
                     add(RunPanel(actionExecutor = actionExecutor, action = action, showInputField = false))
                 }
@@ -253,9 +259,10 @@ class ChainActionUi : AbstractRocketAction(), RocketActionPlugin {
                     updateActionListeners.add { ac ->
                         text = ac.name()
                         toolTipText = ac.description()
+                        icon = ac.calculateIcon()
                     }
 
-                    icon = Icons.Advanced.ROCKET_BLACK_16x16
+                    icon = action.calculateIcon()
                     toolTipText = action.description()
                     add(RunPanel(actionExecutor = actionExecutor, action = action, showInputField = true))
                 }
@@ -267,6 +274,7 @@ class ChainActionUi : AbstractRocketAction(), RocketActionPlugin {
         return component
     }
 
+    private fun Action.calculateIcon(): ImageIcon = this.icon()?.toIcon() ?: Icons.Advanced.ROCKET_BLACK_16x16
 
     override fun name(): String = "Run chain or atomic action"
 

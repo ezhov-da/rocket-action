@@ -5,6 +5,7 @@ import ru.ezhov.rocket.action.application.chainaction.application.ChainActionSer
 import ru.ezhov.rocket.action.application.chainaction.domain.model.AtomicAction
 import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.components.toIcon8x8
 import ru.ezhov.rocket.action.plugin.markdown.Markdown
+import ru.ezhov.rocket.action.ui.utils.swing.common.toIcon
 import java.awt.Color
 import javax.swing.JLabel
 import javax.swing.JPanel
@@ -19,7 +20,11 @@ class AtomicActionListCellPanel(
     private val contractLabel = JLabel(atomicAction.contractType.toIcon8x8())
     private val engineLabel = JLabel(atomicAction.engine.toIcon8x8())
     private val sourceLabel = JLabel(atomicAction.source.toIcon8x8())
-    private val nameLabel = JLabel(createName(atomicAction, chainActionService))
+    private val nameLabel = JLabel(createName(atomicAction, chainActionService)).apply {
+        atomicAction.icon?.let {
+            icon = it.toIcon()
+        }
+    }
 
     private fun createName(atomicAction: AtomicAction, chainActionService: ChainActionService): String {
         val name = atomicAction.name

@@ -41,6 +41,7 @@ fun main(args: Array<String>) {
                 atomicActionRepository = JsonAtomicActionRepository(TestUtilsFactory.objectMapper),
             ),
             actionExecutor = mockk(),
+            iconRepository = mockk(),
         )
         frame.isVisible = true
         frame.defaultCloseOperation = JFrame.EXIT_ON_CLOSE

@@ -15,4 +15,5 @@ class AtomicActionDto(
     var source: AtomicActionSource,
     var data: String,
     var alias: String? = null,
+    var icon: String? = null,
 )

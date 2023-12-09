@@ -16,6 +16,7 @@ private fun create() {
             atomicActionRepository = InMemoryAtomicActionRepository(),
         ),
         actionExecutor = mockk(),
+        iconRepository = mockk(),
     )
     dialog.showCreateDialog()
     System.exit(0)
@@ -25,6 +26,7 @@ private fun edit() {
     val dialog = CreateAndEditAtomicActionDialog(
         atomicActionService = mockk(),
         actionExecutor = mockk(),
+        iconRepository = mockk(),
     )
     dialog.isVisible = true
     System.exit(0)

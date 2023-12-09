@@ -11,6 +11,7 @@ import ru.ezhov.rocket.action.application.eventui.ConfigurationUiListener
 import ru.ezhov.rocket.action.application.eventui.ConfigurationUiObserverFactory
 import ru.ezhov.rocket.action.application.eventui.model.ConfigurationUiEvent
 import ru.ezhov.rocket.action.application.eventui.model.ShowChainActionConfigurationUiEvent
+import ru.ezhov.rocket.action.application.icon.infrastructure.IconRepository
 import ru.ezhov.rocket.action.ui.utils.swing.common.SizeUtil
 import ru.ezhov.rocket.action.ui.utils.swing.common.showToFront
 import ru.ezhov.rocket.action.ui.utils.swing.common.toImage
@@ -27,6 +28,7 @@ class ChainConfigurationFrame(
     chainActionService: ChainActionService,
     atomicActionService: AtomicActionService,
     actionExecutor: ActionExecutor,
+    iconRepository: IconRepository,
 ) : JFrame() {
     private val contentPane = JPanel(MigLayout(/*"debug"*/))
 
@@ -34,6 +36,7 @@ class ChainConfigurationFrame(
         actionExecutorService = actionExecutorService,
         chainActionService = chainActionService,
         atomicActionService = atomicActionService,
+        iconRepository = iconRepository,
     )
 
     private val actionsConfigurationPanel = ActionsConfigurationPanel(
@@ -41,6 +44,7 @@ class ChainConfigurationFrame(
         chainActionService = chainActionService,
         createAndEditChainActionDialog = createChainActionDialog,
         actionExecutor = actionExecutor,
+        iconRepository = iconRepository,
     )
 
     private val chainsConfigurationPanel = ChainsConfigurationPanel(

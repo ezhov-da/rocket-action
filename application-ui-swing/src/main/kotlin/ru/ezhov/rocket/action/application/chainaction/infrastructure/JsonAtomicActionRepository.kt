@@ -74,6 +74,7 @@ class JsonAtomicActionRepository(
         source = source,
         data = data,
         alias = alias,
+        icon = icon,
     )
 
     private fun AtomicActionDto.toAtomicActionDto(): AtomicAction = AtomicAction(
@@ -85,5 +86,6 @@ class JsonAtomicActionRepository(
         source = source,
         data = data,
         alias = alias,
+        icon = icon,
     )
 }

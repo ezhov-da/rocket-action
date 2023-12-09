@@ -2,38 +2,52 @@ package ru.ezhov.rocket.action.application.icon.interfaces.ui
 
 import net.miginfocom.swing.MigLayout
 import ru.ezhov.rocket.action.application.icon.infrastructure.IconRepository
-import ru.ezhov.rocket.action.ui.utils.swing.common.toImage
+import java.awt.BorderLayout
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
-import javax.swing.JLabel
+import javax.swing.JButton
 import javax.swing.JPanel
+import javax.swing.JTabbedPane
 
 
 class IconsPanel(
-    private val iconRepository: IconRepository
-) : JPanel(MigLayout(/*"debug"*/)) {
+    private val iconRepository: IconRepository,
+) : JPanel(BorderLayout()) {
+    private var selectCallback: ((String) -> Unit)? = null
 
     init {
-        val icons = iconRepository.icons()
-        val chunks = icons.chunked(15)
+        val tabPane = JTabbedPane()
+        val bySize = iconRepository.icons().sortedBy { it.size }.groupBy { it.size }
 
-        chunks.forEach { chunkGroup ->
-            chunkGroup.forEachIndexed { index, chunk ->
-                val label = JLabel(chunk).apply {
-                    addMouseListener(object : MouseAdapter() {
-                        override fun mouseReleased(e: MouseEvent) {
-                            val icon = (e.source as JLabel).icon
+        bySize.forEach { (k, v) ->
+            val panel = JPanel(MigLayout())
+            val chunks = v.chunked(15)
 
-                            println(icon.iconWidth.toString() + " " + icon.iconWidth)
-                        }
-                    })
-                }
-                if (index == chunkGroup.size - 1) {
-                    add(label, "wrap")
-                } else {
-                    add(label)
+            chunks.forEach { chunkGroup ->
+                chunkGroup.forEachIndexed { index, chunk ->
+                    val button = JButton(chunk.icon()).apply {
+                        toolTipText = chunk.name
+                        addMouseListener(object : MouseAdapter() {
+                            override fun mouseReleased(e: MouseEvent) {
+                                selectCallback!!.invoke(chunk.base64)
+                            }
+                        })
+                    }
+                    if (index == chunkGroup.size - 1) {
+                        panel.add(button, "wrap")
+                    } else {
+                        panel.add(button)
+                    }
                 }
             }
+
+            tabPane.add(k.toString(), panel)
         }
+
+        add(tabPane, BorderLayout.CENTER)
+    }
+
+    fun setCallback(callback: (String) -> Unit) {
+        selectCallback = callback
     }
 }

@@ -21,7 +21,7 @@ fun main(args: Array<String>) {
             //
         }
         val dialog = CreateAndEditChainActionDialog(
-            ActionExecutorService(
+            actionExecutorService = ActionExecutorService(
                 ActionExecutorImpl(
                     engineFactory = EngineFactory(),
                     variablesApplication = mockk(),
@@ -30,12 +30,13 @@ fun main(args: Array<String>) {
                 mockk(),
                 mockk(),
             ),
-            ChainActionService(
+            chainActionService = ChainActionService(
                 JsonChainActionRepository(TestUtilsFactory.objectMapper),
             ),
-            AtomicActionService(
+            atomicActionService = AtomicActionService(
                 JsonAtomicActionRepository(TestUtilsFactory.objectMapper),
-            )
+            ),
+            iconRepository = mockk(),
         )
         dialog.isVisible = true
         System.exit(0)

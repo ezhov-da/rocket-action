@@ -6,4 +6,6 @@ interface Action {
     fun name(): String
 
     fun description(): String
+
+    fun icon(): String?
 }

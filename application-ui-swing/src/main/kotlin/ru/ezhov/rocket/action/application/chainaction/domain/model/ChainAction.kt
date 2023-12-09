@@ -7,12 +7,15 @@ data class ChainAction(
     var name: String,
     var description: String,
     var actions: List<ActionOrder>,
+    var icon: String? = null,
 ) : Action {
     override fun id(): String = id
 
     override fun name(): String = name
 
     override fun description(): String = description
+
+    override fun icon(): String? = icon
 
     fun duplicate(): ChainAction = ChainAction(
         id = UUID.randomUUID().toString(),

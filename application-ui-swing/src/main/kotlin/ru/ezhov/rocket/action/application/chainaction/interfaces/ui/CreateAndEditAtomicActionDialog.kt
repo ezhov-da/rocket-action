@@ -10,6 +10,8 @@ import ru.ezhov.rocket.action.application.chainaction.domain.model.AtomicAction
 import ru.ezhov.rocket.action.application.chainaction.domain.model.AtomicActionEngine
 import ru.ezhov.rocket.action.application.chainaction.domain.model.AtomicActionSource
 import ru.ezhov.rocket.action.application.chainaction.domain.model.ContractType
+import ru.ezhov.rocket.action.application.icon.infrastructure.IconRepository
+import ru.ezhov.rocket.action.application.icon.interfaces.ui.SelectIconPanel
 import ru.ezhov.rocket.action.application.resources.Icons
 import ru.ezhov.rocket.action.plugin.clipboard.ClipboardUtil
 import ru.ezhov.rocket.action.ui.utils.swing.common.SizeUtil
@@ -29,6 +31,7 @@ import javax.swing.KeyStroke
 
 class CreateAndEditAtomicActionDialog(
     private val atomicActionService: AtomicActionService,
+    private val iconRepository: IconRepository,
     actionExecutor: ActionExecutor,
 ) : JDialog() {
     private val contentPane = JPanel(MigLayout(/*"debug"*/))
@@ -37,12 +40,13 @@ class CreateAndEditAtomicActionDialog(
 
     private val idTextField: JTextField = JTextField().apply { isEditable = false }
     private val idLabel: JLabel = JLabel("ID:").apply { labelFor = idTextField }
-    private val idButton: JButton = JButton(Icons.Advanced.COPY_16x16).apply {
+    private val copyIdButton: JButton = JButton(Icons.Advanced.COPY_16x16).apply {
         toolTipText = "Copy ID to clipboard"
         addActionListener {
             ClipboardUtil.copyToClipboard(idTextField.text)
         }
     }
+    private val selectIconPanel: SelectIconPanel = SelectIconPanel(iconRepository)
 
     private val nameTextField: JTextField = JTextField()
     private val nameLabel: JLabel = JLabel("Name:").apply { labelFor = nameTextField }
@@ -94,9 +98,10 @@ class CreateAndEditAtomicActionDialog(
         contractButtonGroup.add(unitOutRadioButton)
         contractButtonGroup.add(unitUnitRadioButton)
 
-        contentPane.add(idLabel, "split 3")
+        contentPane.add(idLabel, "split 4")
         contentPane.add(idTextField, "wmin 25%")
-        contentPane.add(idButton, "wrap")
+        contentPane.add(copyIdButton)
+        contentPane.add(selectIconPanel, "wrap")
 
         contentPane.add(nameLabel, "split 4")
         contentPane.add(nameTextField, "wmin 25%")
@@ -132,7 +137,6 @@ class CreateAndEditAtomicActionDialog(
         )
 
         setContentPane(contentPane)
-        isModal = true
         getRootPane().defaultButton = buttonSave
         buttonSave.addActionListener { onOK() }
         buttonCancel.addActionListener { onCancel() }
@@ -208,6 +212,7 @@ class CreateAndEditAtomicActionDialog(
                         },
                         data = dataTextPane.text,
                         alias = aliasTextField.text.takeIf { it.isNotEmpty() },
+                        icon = selectIconPanel.selectedIcon(),
                     )
                 )
             }
@@ -237,6 +242,7 @@ class CreateAndEditAtomicActionDialog(
                     }
                     data = dataTextPane.text
                     alias = aliasTextField.text.takeIf { it.isNotEmpty() }
+                    icon = selectIconPanel.selectedIcon()
                 }
 
                 atomicActionService.updateAtomic(atomicAction = currentAction!!)
@@ -265,7 +271,8 @@ class CreateAndEditAtomicActionDialog(
         dataTextPane.text = ""
         aliasTextField.text = ""
 
-        isModal = true
+        selectIconPanel.setIcon(null)
+
         isVisible = true
     }
 
@@ -279,6 +286,8 @@ class CreateAndEditAtomicActionDialog(
         this.currentAction = action
 
         idTextField.text = action.id
+
+        selectIconPanel.setIcon(action.icon)
 
         nameTextField.text = action.name
 
@@ -303,7 +312,6 @@ class CreateAndEditAtomicActionDialog(
         dataTextPane.text = action.data
         aliasTextField.text = action.alias.orEmpty()
 
-        isModal = true
         isVisible = true
     }
 
