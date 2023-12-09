@@ -19,6 +19,8 @@ import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.renderer.Ord
 import ru.ezhov.rocket.action.application.event.domain.DomainEvent
 import ru.ezhov.rocket.action.application.event.domain.DomainEventSubscriber
 import ru.ezhov.rocket.action.application.event.infrastructure.DomainEventFactory
+import ru.ezhov.rocket.action.application.resources.Icons
+import ru.ezhov.rocket.action.plugin.clipboard.ClipboardUtil
 import ru.ezhov.rocket.action.ui.utils.swing.common.SizeUtil
 import java.awt.BorderLayout
 import java.awt.event.KeyEvent
@@ -50,6 +52,15 @@ class CreateAndEditChainActionDialog(
     private val contentPane = JPanel(MigLayout("insets 5"/*"debug"*/))
     private val buttonSave: JButton = JButton("Save")
     private val buttonCancel: JButton = JButton("Cancel")
+
+    private val idTextField: JTextField = JTextField().apply { isEditable = false }
+    private val idLabel: JLabel = JLabel("ID:").apply { labelFor = idTextField }
+    private val idButton: JButton = JButton(Icons.Advanced.COPY_16x16).apply {
+        toolTipText = "Copy ID to clipboard"
+        addActionListener {
+            ClipboardUtil.copyToClipboard(idTextField.text)
+        }
+    }
 
     private val nameTextField: JTextField = JTextField()
     private val nameLabel: JLabel = JLabel("Name:").apply { labelFor = nameTextField }
@@ -110,6 +121,10 @@ class CreateAndEditChainActionDialog(
                 }
             }
         })
+
+        contentPane.add(idLabel, "split 3")
+        contentPane.add(idTextField, "wmin 25%")
+        contentPane.add(idButton, "wrap")
 
         contentPane.add(nameLabel)
         contentPane.add(nameTextField, "span 2, wrap, width max, grow")
@@ -221,6 +236,7 @@ class CreateAndEditChainActionDialog(
         title = "Create chain action"
         dialogType = DialogType.CREATE
 
+        idTextField.text = ""
         nameTextField.text = ""
         descriptionTextPane.text = ""
         selectedListActionsModel.removeAllElements()
@@ -233,6 +249,7 @@ class CreateAndEditChainActionDialog(
         title = "Create chain action"
         dialogType = DialogType.CREATE
 
+        idTextField.text = ""
         nameTextField.text = ""
         descriptionTextPane.text = ""
 
@@ -251,6 +268,8 @@ class CreateAndEditChainActionDialog(
     fun showEditDialog(chainAction: ChainAction) {
         title = "Edit chain action"
         dialogType = DialogType.EDIT
+
+        idTextField.text = chainAction.id
 
         this.currentEditChainAction = chainAction
         nameTextField.text = chainAction.name
