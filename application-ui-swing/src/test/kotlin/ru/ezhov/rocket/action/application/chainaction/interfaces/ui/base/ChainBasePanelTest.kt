@@ -30,7 +30,6 @@ fun main(args: Array<String>) {
         val atomicActionService = AtomicActionService(JsonAtomicActionRepository(TestUtilsFactory.objectMapper))
         frame.add(
             ChainBasePanel(
-                movableComponent = frame,
                 actionExecutorService = ActionExecutorService(
                     actionExecutor = ActionExecutorImpl(
                         engineFactory = EngineFactory(),

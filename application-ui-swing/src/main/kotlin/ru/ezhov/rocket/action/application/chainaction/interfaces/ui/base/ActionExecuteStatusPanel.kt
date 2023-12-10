@@ -9,6 +9,8 @@ import ru.ezhov.rocket.action.application.chainaction.domain.model.ActionOrder
 import ru.ezhov.rocket.action.application.chainaction.domain.model.AtomicAction
 import ru.ezhov.rocket.action.application.chainaction.domain.model.ChainAction
 import ru.ezhov.rocket.action.application.chainaction.domain.model.ContractType
+import ru.ezhov.rocket.action.application.ui.color.ColorConstants.COLOR_ERROR
+import ru.ezhov.rocket.action.application.ui.color.ColorConstants.COLOR_SUCCESS
 import java.awt.Color
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
@@ -99,11 +101,6 @@ class ActionExecuteStatusPanel(
                 isOpaque = true
             },
     ) {
-
-        // https://www.canva.com/colors/color-wheel/
-        private val colorSuccess = Color.decode("#a7d827")
-        private val colorError = Color.decode("#dc2352")
-
         init {
             label.addMouseListener(object : MouseAdapter() {
                 override fun mouseReleased(e: MouseEvent) {
@@ -123,13 +120,13 @@ class ActionExecuteStatusPanel(
         fun setSuccess(result: Success) {
             this.success = result
 
-            label.background = colorSuccess
+            label.background = COLOR_SUCCESS
         }
 
         fun setFailure(result: Failure) {
             this.failure = result
 
-            label.background = colorError
+            label.background = COLOR_ERROR
         }
 
         data class Success(

@@ -1,25 +1,20 @@
 package ru.ezhov.rocket.action.application
 
 
-import com.formdev.flatlaf.FlatLightLaf
 import org.springframework.stereotype.Service
-import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.ChainBaseDialogBuilder
 import ru.ezhov.rocket.action.application.handlers.server.HttpServer
 import ru.ezhov.rocket.action.application.properties.GeneralPropertiesRepository
 import ru.ezhov.rocket.action.application.properties.UsedPropertiesName
 import java.util.*
-import javax.swing.LookAndFeel
-import javax.swing.SwingUtilities
 import javax.swing.UIManager
 import javax.swing.plaf.FontUIResource
 import kotlin.system.exitProcess
 
 @Service
 class AppRunService(
-    private val uiQuickActionService: UiQuickActionService,
     private val generalPropertiesRepository: GeneralPropertiesRepository,
     private val httpServer: HttpServer,
-    private val chainBaseDialogBuilder: ChainBaseDialogBuilder,
+    private val baseDialogFactory: BaseDialogFactory,
 ) {
 
     /**
@@ -28,40 +23,15 @@ class AppRunService(
     fun run(args: Array<String>) {
         runServer() // TODO decorate beautifully
 
-        SwingUtilities.invokeLater {
-            FlatLightLaf.setup(lookAndFeel())
-            try {
-                getFont()?.let { font -> setUIFont(font) }
+        try {
+            getFont()?.let { font -> setUIFont(font) }
 
+            baseDialogFactory.dialog.isVisible = true
 
-                BaseDialog.dialog.apply {
-                    jMenuBar = uiQuickActionService.createMenu(this)
-                    isUndecorated = true
-                    setLocationRelativeTo(null)
-                    isAlwaysOnTop = true
-                    pack()
-                    isVisible = true
-                }
-
-
-                if (generalPropertiesRepository.asBoolean(UsedPropertiesName.CHAIN_ACTION_ENABLE, false)) {
-                    chainBaseDialogBuilder.build().showDialog()
-                }
-            } catch (e: UiQuickActionServiceException) {
-                e.printStackTrace()
-                exitProcess(-1)
-            }
+        } catch (e: UiQuickActionServiceException) {
+            e.printStackTrace()
+            exitProcess(-1)
         }
-    }
-
-    private fun lookAndFeel(): LookAndFeel {
-        val className = generalPropertiesRepository
-            .asString(
-                name = UsedPropertiesName.UI_CONFIGURATION_LOOK_AND_FEEL_CLASS,
-                default = "com.formdev.flatlaf.FlatLightLaf"
-            )
-
-        return Class.forName(className).newInstance() as LookAndFeel
     }
 
     private fun getFont(): FontUIResource? {

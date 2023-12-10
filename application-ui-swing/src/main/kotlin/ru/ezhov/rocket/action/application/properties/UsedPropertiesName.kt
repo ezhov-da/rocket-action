@@ -99,4 +99,12 @@ enum class UsedPropertiesName(val propertyName: String, val description: String)
             Enable support for action chains
         """.trimIndent()
     ),
+
+    UI_BASE_DIALOG_OPACITY(
+        "$PREFIX.ui.base-dialog.opacity",
+        """
+            Setting the transparency of the basic dialog.
+            Example: `0.5`. Min - 0.1. Max - 1
+        """.trimIndent()
+    ),
 }

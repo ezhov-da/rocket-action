@@ -21,6 +21,7 @@ import ru.ezhov.rocket.action.application.properties.UsedPropertiesName
 import ru.ezhov.rocket.action.application.search.application.SearchService
 import ru.ezhov.rocket.action.application.tags.application.TagsService
 import ru.ezhov.rocket.action.application.tags.domain.TagNode
+import ru.ezhov.rocket.action.application.ui.color.ColorConstants
 import ru.ezhov.rocket.action.application.variables.application.VariablesApplication
 import ru.ezhov.rocket.action.ui.utils.swing.common.MoveUtil
 import ru.ezhov.rocket.action.ui.utils.swing.common.TextFieldWithText
@@ -127,7 +128,7 @@ class UiQuickActionService(
                                             .takeIf { it.isNotEmpty() }
                                             ?.let { ra ->
                                                 logger.info { "Found by search '$text': ${ra.size}" }
-                                                tf.background = Color.GREEN
+                                                tf.background = ColorConstants.COLOR_SUCCESS
                                                 fillMenuByRocketAction(ra, menu)
                                             }
                                     } else {

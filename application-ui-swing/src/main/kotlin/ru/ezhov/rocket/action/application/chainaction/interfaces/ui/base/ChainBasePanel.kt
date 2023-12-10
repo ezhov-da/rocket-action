@@ -8,10 +8,8 @@ import ru.ezhov.rocket.action.application.chainaction.application.ChainActionSer
 import ru.ezhov.rocket.action.application.eventui.ConfigurationUiObserverFactory
 import ru.ezhov.rocket.action.application.eventui.model.ShowChainActionConfigurationUiEvent
 import ru.ezhov.rocket.action.application.resources.Icons
-import ru.ezhov.rocket.action.ui.utils.swing.common.MoveUtil
 import ru.ezhov.rocket.action.ui.utils.swing.common.TextFieldWithText
 import java.awt.Color
-import java.awt.Component
 import java.awt.Toolkit
 import java.awt.datatransfer.Clipboard
 import java.awt.datatransfer.DataFlavor
@@ -30,22 +28,21 @@ import java.util.*
 import javax.swing.BorderFactory
 import javax.swing.JButton
 import javax.swing.JComponent
-import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.JTextField
-import javax.swing.SwingConstants
 import javax.swing.SwingUtilities
 
 class ChainBasePanel(
-    private val movableComponent: Component,
     actionExecutorService: ActionExecutorService,
     private val chainActionService: ChainActionService,
     private val atomicActionService: AtomicActionService,
     private val configurationApplication: ConfigurationApplication,
 ) : JPanel(MigLayout(/*"debug"*/)) {
-    private val labelDropDown =
-        JLabel("<html><center>Drag text to run chain<br>or paste here or type and `Enter`</center>")
-    private val textFieldPaste = TextFieldWithText()
+    private val textFieldPaste = TextFieldWithText(
+        "Drag, paste or type"
+    ).apply {
+        toolTipText = "<html><center>Drag text to run chain<br>or paste here or type and `Enter`</center>"
+    }
     private val actionExecuteStatusPanel =
         ActionExecuteStatusPanel(actionExecutorService).apply { isVisible = false }
     private val openAvailableActionsButton = JButton(Icons.Advanced.ROCKET_BLACK_16x16).apply {
@@ -58,17 +55,11 @@ class ChainBasePanel(
     private val currentTimer: Timer = Timer()
 
     init {
-        labelDropDown.horizontalTextPosition = SwingConstants.CENTER
-        labelDropDown.horizontalAlignment = SwingConstants.CENTER
-
-        MoveUtil.addMoveAction(movableComponent = movableComponent, grabbedComponent = labelDropDown)
-        addDropTargetTo(labelDropDown)
         addDropTargetTo(textFieldPaste)
         addCtrlV(textFieldPaste)
         addEnter(textFieldPaste)
 
-        add(labelDropDown, "wrap, width max, height max, id labelDropDown")
-        add(textFieldPaste, "width max, split")
+        add(textFieldPaste, "width 100%, split")
         add(openAvailableActionsButton, "wmax 25")
         add(openConfigurationButton, "wrap, wmax 25")
         add(actionExecuteStatusPanel, "hmax 6, width max, hidemode 2")
