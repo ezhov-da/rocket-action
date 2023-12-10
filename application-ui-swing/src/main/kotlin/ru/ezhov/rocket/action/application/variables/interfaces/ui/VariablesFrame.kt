@@ -9,11 +9,11 @@ import ru.ezhov.rocket.action.application.variables.application.VariableDto
 import ru.ezhov.rocket.action.application.variables.application.VariablesApplication
 import ru.ezhov.rocket.action.application.variables.application.VariablesDto
 import ru.ezhov.rocket.action.application.variables.domain.model.VariableType
+import ru.ezhov.rocket.action.ui.utils.swing.common.SizeUtil
 import ru.ezhov.rocket.action.ui.utils.swing.common.TextFieldWithText
 import ru.ezhov.rocket.action.ui.utils.swing.common.toImage
 import java.awt.BorderLayout
 import java.awt.Color
-import java.awt.Dimension
 import java.util.*
 import javax.swing.JButton
 import javax.swing.JFrame
@@ -84,7 +84,7 @@ class VariablesFrame(
         loadTable()
 
         iconImage = iconService.by(AppIcon.ROCKET_APP).toImage()
-        size = Dimension(600, 500)
+        size = SizeUtil.dimension(0.6, 0.5)
         defaultCloseOperation = HIDE_ON_CLOSE
 
         addRowButton.addActionListener {

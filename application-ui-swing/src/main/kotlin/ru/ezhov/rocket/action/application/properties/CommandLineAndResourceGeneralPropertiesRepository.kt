@@ -77,6 +77,16 @@ class CommandLineAndResourceGeneralPropertiesRepository(
             default
         }
 
+    override fun asDouble(name: UsedPropertiesName, default: Double): Double =
+        try {
+            (System.getProperty(name.propertyName)
+                ?: properties.getProperty(name.propertyName))?.toDouble()
+                ?: default
+        } catch (ex: Exception) {
+            logger.warn(ex) { "Error read property=$name" }
+            default
+        }
+
     override fun asStringOrNull(name: UsedPropertiesName): String? =
         try {
             System.getProperty(name.propertyName)

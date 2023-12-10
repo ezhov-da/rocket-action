@@ -11,13 +11,16 @@ object ConfigurationFrameTest {
                 ConfigurationFrame(
                     rocketActionPluginApplicationService = mockk(),
                     rocketActionSettingsService = mockk(),
-                    tagsService = mockk(),
                     rocketActionContextFactory = mockk(),
                     engineService = mockk(),
                     availableHandlersRepository = mockk(),
+                    tagsService = mockk(),
                     generalPropertiesRepository = mockk(),
                     variablesApplication = mockk(),
-                ) { }
+                    aboutDialogFactory = mockk(),
+                    httpServerService = mockk(),
+                    availablePropertiesFromCommandLineDialogFactory = mockk(),
+                )
                     .show()
             } catch (e: Exception) {
                 e.printStackTrace()

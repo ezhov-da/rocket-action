@@ -5,36 +5,31 @@ import org.springframework.stereotype.Service
 import ru.ezhov.rocket.action.api.RocketAction
 import ru.ezhov.rocket.action.api.context.icon.AppIcon
 import ru.ezhov.rocket.action.api.context.notification.NotificationType
-import ru.ezhov.rocket.action.application.configuration.ui.ConfigurationFrame
+import ru.ezhov.rocket.action.application.configuration.ui.ConfigurationFrameFactory
 import ru.ezhov.rocket.action.application.core.application.RocketActionSettingsService
-import ru.ezhov.rocket.action.application.core.domain.EngineService
 import ru.ezhov.rocket.action.application.core.event.RocketActionSettingsCreatedDomainEvent
 import ru.ezhov.rocket.action.application.event.domain.DomainEvent
 import ru.ezhov.rocket.action.application.event.domain.DomainEventSubscriber
 import ru.ezhov.rocket.action.application.event.infrastructure.DomainEventFactory
-import ru.ezhov.rocket.action.application.handlers.server.AvailableHandlersRepository
-import ru.ezhov.rocket.action.application.handlers.server.HttpServer
+import ru.ezhov.rocket.action.application.eventui.ConfigurationUiListener
+import ru.ezhov.rocket.action.application.eventui.ConfigurationUiObserverFactory
+import ru.ezhov.rocket.action.application.eventui.model.ConfigurationUiEvent
+import ru.ezhov.rocket.action.application.eventui.model.RefreshUiEvent
 import ru.ezhov.rocket.action.application.plugin.context.RocketActionContextFactory
-import ru.ezhov.rocket.action.application.plugin.manager.application.RocketActionPluginApplicationService
-import ru.ezhov.rocket.action.application.properties.GeneralPropertiesRepository
-import ru.ezhov.rocket.action.application.properties.UsedPropertiesName
 import ru.ezhov.rocket.action.application.search.application.SearchService
 import ru.ezhov.rocket.action.application.tags.application.TagsService
 import ru.ezhov.rocket.action.application.tags.domain.TagNode
 import ru.ezhov.rocket.action.application.ui.color.ColorConstants
-import ru.ezhov.rocket.action.application.variables.application.VariablesApplication
 import ru.ezhov.rocket.action.ui.utils.swing.common.MoveUtil
 import ru.ezhov.rocket.action.ui.utils.swing.common.TextFieldWithText
 import java.awt.Color
 import java.awt.Component
-import java.awt.Desktop
 import java.awt.FlowLayout
 import java.awt.event.ActionListener
 import java.awt.event.KeyAdapter
 import java.awt.event.KeyEvent
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
-import java.net.URI
 import javax.swing.BorderFactory
 import javax.swing.ImageIcon
 import javax.swing.JButton
@@ -44,8 +39,6 @@ import javax.swing.JMenu
 import javax.swing.JMenuBar
 import javax.swing.JMenuItem
 import javax.swing.JPanel
-import javax.swing.JSeparator
-import javax.swing.JTextArea
 import javax.swing.JTextField
 import javax.swing.SwingUtilities
 import javax.swing.SwingWorker
@@ -55,28 +48,30 @@ private val logger = KotlinLogging.logger { }
 
 @Service
 class UiQuickActionService(
-    private val rocketActionPluginApplicationService: RocketActionPluginApplicationService,
     private val rocketActionSettingsService: RocketActionSettingsService,
-    private val generalPropertiesRepository: GeneralPropertiesRepository,
     private val tagsService: TagsService,
     private val rocketActionContextFactory: RocketActionContextFactory,
     private val searchService: SearchService,
-    private val httpServer: HttpServer,
-    private val engineService: EngineService,
-    private val availableHandlersRepository: AvailableHandlersRepository,
-    private val variablesApplication: VariablesApplication,
+    private val configurationFrameFactory: ConfigurationFrameFactory
 ) {
     private var baseDialog: JDialog? = null
-    private var configurationFrame: ConfigurationFrame? = null
 
     init {
         DomainEventFactory.subscriberRegistrar.subscribe(object : DomainEventSubscriber {
             override fun handleEvent(event: DomainEvent) {
-                updateMenu()
+                SwingUtilities.invokeLater { updateMenu() }
             }
 
             override fun subscribedToEventType(): List<Class<*>> =
                 listOf(RocketActionSettingsCreatedDomainEvent::class.java)
+        })
+
+        ConfigurationUiObserverFactory.observer.register(object : ConfigurationUiListener {
+            override fun action(event: ConfigurationUiEvent) {
+                if (event is RefreshUiEvent) {
+                    SwingUtilities.invokeLater { updateMenu() }
+                }
+            }
         })
     }
 
@@ -257,52 +252,6 @@ class UiQuickActionService(
         menuItemEditor.addActionListener(createEditorActionListener())
         menuTools.add(menuItemEditor)
 
-        val menuInfo = JMenu("Information")
-        menuInfo.icon = rocketActionContextFactory.context.icon().by(AppIcon.INFO)
-        val notFound = { key: String -> "Information on field '$key' not found" }
-        menuInfo.add(
-            JMenuItem(
-                generalPropertiesRepository
-                    .asString(UsedPropertiesName.VERSION, notFound("version"))
-            )
-        )
-        menuInfo.add(
-            JMenuItem(
-                generalPropertiesRepository
-                    .asString(UsedPropertiesName.INFO, notFound("information"))
-            )
-        )
-        menuInfo.add(
-            JMenuItem(
-                generalPropertiesRepository
-                    .asString(UsedPropertiesName.REPOSITORY, notFound("link to repository"))
-            )
-                .apply {
-                    addActionListener {
-                        if (Desktop.isDesktopSupported()) {
-                            Desktop.getDesktop().browse(URI.create(text))
-                        }
-                    }
-                }
-        )
-
-        menuInfo.add(JSeparator())
-
-        menuInfo.add(
-            JMenuItem("Available Handlers")
-                .apply {
-                    addActionListener {
-                        if (Desktop.isDesktopSupported()) {
-                            Desktop.getDesktop().browse(URI.create("http://localhost:${httpServer.port()}"))
-                        }
-                    }
-                }
-        )
-
-        menuInfo.add(JSeparator())
-        menuInfo.add(createPropertyMenu())
-        menuTools.add(menuInfo)
-
         menuTools.add(JMenuItem("Exit").apply {
             icon = rocketActionContextFactory.context.icon().by(AppIcon.X)
             addActionListener {
@@ -318,28 +267,7 @@ class UiQuickActionService(
     private fun createEditorActionListener(): ActionListener =
         ActionListener {
             SwingUtilities.invokeLater {
-                if (configurationFrame == null) {
-                    try {
-                        configurationFrame = ConfigurationFrame(
-                            rocketActionPluginApplicationService = rocketActionPluginApplicationService,
-                            rocketActionSettingsService = rocketActionSettingsService,
-                            rocketActionContextFactory = rocketActionContextFactory,
-                            engineService = engineService,
-                            availableHandlersRepository = availableHandlersRepository,
-                            tagsService = tagsService,
-                            generalPropertiesRepository = generalPropertiesRepository,
-                            variablesApplication = variablesApplication,
-                            updateActionListener = updateListener()
-                        )
-                    } catch (ex: Exception) {
-                        ex.printStackTrace()
-                        rocketActionContextFactory.context.notification()
-                            .show(NotificationType.ERROR, "Error creating configuration menu")
-                    }
-                }
-                if (configurationFrame != null) {
-                    configurationFrame!!.show()
-                }
+                configurationFrameFactory.configurationFrame.show()
             }
         }
 
@@ -365,18 +293,6 @@ class UiQuickActionService(
             }
         }
     }
-
-    private fun createPropertyMenu(): JMenu =
-        JMenu("Available properties from the command line").apply {
-            UsedPropertiesName.values()
-                .forEach { pn ->
-                    this.add(
-                        JTextArea(
-                            "${pn.propertyName}\n${pn.description}"
-                        ).apply { isEditable = false }
-                    )
-                }
-        }
 
     private inner class CreateMenuOrGetExistsWorker(
         private val baseMenu: JMenu,

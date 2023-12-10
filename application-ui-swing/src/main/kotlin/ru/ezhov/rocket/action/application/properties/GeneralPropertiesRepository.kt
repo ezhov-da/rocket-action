@@ -6,6 +6,7 @@ interface GeneralPropertiesRepository {
     fun asLong(name: UsedPropertiesName, default: Long): Long
     fun asBoolean(name: UsedPropertiesName, default: Boolean): Boolean
     fun asFloat(name: UsedPropertiesName, default: Float): Float
+    fun asDouble(name: UsedPropertiesName, default: Double): Double
 
     fun asStringOrNull(name: UsedPropertiesName): String?
     fun asIntegerOrNull(name: UsedPropertiesName): Int?
