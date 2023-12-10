@@ -12,6 +12,9 @@ import ru.ezhov.rocket.action.application.chainaction.domain.event.AtomicActionU
 import ru.ezhov.rocket.action.application.chainaction.domain.model.ActionOrder
 import ru.ezhov.rocket.action.application.chainaction.domain.model.AtomicAction
 import ru.ezhov.rocket.action.application.chainaction.domain.model.ChainAction
+import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.configuration.actions.AtomicActionsFilter
+import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.configuration.actions.SearchActionPanelConfiguration
+import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.configuration.actions.SortActionPanelConfiguration
 import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.dnd.DragListener
 import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.dnd.ListDropHandler
 import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.renderer.AtomicActionListCellRenderer
@@ -24,12 +27,12 @@ import ru.ezhov.rocket.action.application.icon.interfaces.ui.SelectIconPanel
 import ru.ezhov.rocket.action.application.resources.Icons
 import ru.ezhov.rocket.action.plugin.clipboard.ClipboardUtil
 import ru.ezhov.rocket.action.ui.utils.swing.common.SizeUtil
-import java.awt.BorderLayout
 import java.awt.event.KeyEvent
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
+import java.beans.PropertyChangeListener
 import java.util.*
 import javax.swing.BorderFactory
 import javax.swing.DefaultListModel
@@ -53,6 +56,10 @@ class CreateAndEditChainActionDialog(
     private val iconRepository: IconRepository,
 ) : JDialog() {
     private val contentPane = JPanel(MigLayout("insets 5"/*"debug"*/))
+
+    private val sortActionPanelConfiguration = SortActionPanelConfiguration()
+    private val searchActionPanelConfiguration = SearchActionPanelConfiguration()
+
     private val buttonSave: JButton = JButton("Save")
     private val buttonCancel: JButton = JButton("Cancel")
 
@@ -87,19 +94,23 @@ class CreateAndEditChainActionDialog(
         selectedListActions.transferHandler = ListDropHandler(selectedListActions)
         DragListener(selectedListActions)
 
-        fun fillActions() {
-            allListActionsModel.removeAllElements()
-            val atomics = atomicActionService.atomics().sortedBy { it.name }
-            atomics.forEach {
-                allListActionsModel.addElement(it)
+        val propertyChangeListener = PropertyChangeListener {
+            if (
+                it.propertyName == SortActionPanelConfiguration.SORT_INFO_PROPERTY_NAME ||
+                it.propertyName == SearchActionPanelConfiguration.SEARCH_ACTION_PROPERTY_NAME
+            ) {
+                fillList()
             }
         }
 
-        fillActions()
+        fillList()
+
+        sortActionPanelConfiguration.addPropertyChangeListener(propertyChangeListener)
+        searchActionPanelConfiguration.addPropertyChangeListener(propertyChangeListener)
 
         DomainEventFactory.subscriberRegistrar.subscribe(object : DomainEventSubscriber {
             override fun handleEvent(event: DomainEvent) {
-                fillActions()
+                fillList()
             }
 
             override fun subscribedToEventType(): List<Class<*>> = listOf(
@@ -131,16 +142,18 @@ class CreateAndEditChainActionDialog(
         contentPane.add(copyIdButton)
         contentPane.add(selectIconPanel, "wrap")
 
-        contentPane.add(nameLabel)
-        contentPane.add(nameTextField, "span 2, wrap, width max, grow")
+        contentPane.add(nameLabel, "split 2")
+        contentPane.add(nameTextField, "wrap, width max, grow")
 
         contentPane.add(descriptionLabel, "wrap")
         contentPane.add(RTextScrollPane(descriptionTextPane, false), "span, wrap, width max, hmin 30%")
 
         contentPane.add(
-            JPanel(BorderLayout())
+            JPanel(MigLayout())
                 .apply {
-                    add(JScrollPane(allListActions), BorderLayout.CENTER)
+                    add(sortActionPanelConfiguration, "width 100%, wrap")
+                    add(searchActionPanelConfiguration, "width 100%, wrap")
+                    add(JScrollPane(allListActions), "height 100%, width 100%")
                     border = BorderFactory.createTitledBorder("All atomic actions")
                 },
             "grow, west, wmin 40%, height max"
@@ -168,8 +181,12 @@ class CreateAndEditChainActionDialog(
             }, "span, width max, height max"
         )
 
-        contentPane.add(buttonSave, "cell 2 4, split 2, align right")
-        contentPane.add(buttonCancel)
+        contentPane.add(
+            JPanel(MigLayout(/*"debug"*/"insets 0 0 0 0")).apply {
+                add(buttonSave, "push, align right")
+                add(buttonCancel)
+            }, "width max, span"
+        )
 
         getRootPane().defaultButton = buttonSave
         buttonSave.addActionListener { onOK() }
@@ -190,6 +207,18 @@ class CreateAndEditChainActionDialog(
 
         size = SizeUtil.dimension(0.8, 0.8)
         setLocationRelativeTo(null)
+    }
+
+    private fun fillList() {
+        val sortInfo = sortActionPanelConfiguration.sortInfo()
+        val searchAction = searchActionPanelConfiguration.searchAction()
+
+        val filtered = AtomicActionsFilter.filter(sortInfo, searchAction, atomicActionService.atomics())
+
+        allListActionsModel.removeAllElements()
+        filtered.forEach {
+            allListActionsModel.addElement(it)
+        }
     }
 
     private var dialogType: DialogType? = null

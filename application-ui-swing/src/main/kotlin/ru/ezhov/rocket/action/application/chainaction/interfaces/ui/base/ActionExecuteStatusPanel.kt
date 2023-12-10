@@ -99,6 +99,11 @@ class ActionExecuteStatusPanel(
                 isOpaque = true
             },
     ) {
+
+        // https://www.canva.com/colors/color-wheel/
+        private val colorSuccess = Color.decode("#a7d827")
+        private val colorError = Color.decode("#dc2352")
+
         init {
             label.addMouseListener(object : MouseAdapter() {
                 override fun mouseReleased(e: MouseEvent) {
@@ -118,13 +123,13 @@ class ActionExecuteStatusPanel(
         fun setSuccess(result: Success) {
             this.success = result
 
-            label.background = Color.GREEN
+            label.background = colorSuccess
         }
 
         fun setFailure(result: Failure) {
             this.failure = result
 
-            label.background = Color.RED
+            label.background = colorError
         }
 
         data class Success(

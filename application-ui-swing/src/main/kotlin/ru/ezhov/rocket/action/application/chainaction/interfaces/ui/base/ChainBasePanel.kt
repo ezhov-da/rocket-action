@@ -71,7 +71,7 @@ class ChainBasePanel(
         add(textFieldPaste, "width max, split")
         add(openAvailableActionsButton, "wmax 25")
         add(openConfigurationButton, "wrap, wmax 25")
-        add(actionExecuteStatusPanel, "width max, hidemode 2")
+        add(actionExecuteStatusPanel, "hmax 6, width max, hidemode 2")
 
         val chainBasePanel = this
 
