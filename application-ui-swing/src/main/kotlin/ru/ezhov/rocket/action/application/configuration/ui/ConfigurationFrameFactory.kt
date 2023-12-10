@@ -1,5 +1,6 @@
 package ru.ezhov.rocket.action.application.configuration.ui
 
+import org.springframework.beans.factory.InitializingBean
 import org.springframework.stereotype.Service
 import ru.ezhov.rocket.action.application.about.AboutDialogFactory
 import ru.ezhov.rocket.action.application.availableproperties.AvailablePropertiesFromCommandLineDialogFactory
@@ -12,7 +13,6 @@ import ru.ezhov.rocket.action.application.plugin.manager.application.RocketActio
 import ru.ezhov.rocket.action.application.properties.GeneralPropertiesRepository
 import ru.ezhov.rocket.action.application.tags.application.TagsService
 import ru.ezhov.rocket.action.application.variables.application.VariablesApplication
-import java.awt.event.ActionListener
 
 @Service
 class ConfigurationFrameFactory(
@@ -27,7 +27,7 @@ class ConfigurationFrameFactory(
     aboutDialogFactory: AboutDialogFactory,
     httpServerService: HttpServerService,
     availablePropertiesFromCommandLineDialogFactory: AvailablePropertiesFromCommandLineDialogFactory,
-) {
+) : InitializingBean {
     val configurationFrame = ConfigurationFrame(
         rocketActionPluginApplicationService = rocketActionPluginApplicationService,
         rocketActionSettingsService = rocketActionSettingsService,
@@ -42,4 +42,12 @@ class ConfigurationFrameFactory(
         availablePropertiesFromCommandLineDialogFactory = availablePropertiesFromCommandLineDialogFactory,
     )
 
+
+    companion object {
+        var INSTANCE: ConfigurationFrame? = null
+    }
+
+    override fun afterPropertiesSet() {
+        INSTANCE = configurationFrame
+    }
 }

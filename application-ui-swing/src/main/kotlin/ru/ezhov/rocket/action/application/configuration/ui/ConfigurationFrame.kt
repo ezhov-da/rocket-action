@@ -54,7 +54,7 @@ class ConfigurationFrame(
     private val httpServerService: HttpServerService,
     private val availablePropertiesFromCommandLineDialogFactory: AvailablePropertiesFromCommandLineDialogFactory,
 ) {
-    private val frame: JFrame = JFrame()
+    val frame: JFrame = JFrame()
     private val createRocketActionSettingsDialog: CreateRocketActionSettingsDialog
 
     init {

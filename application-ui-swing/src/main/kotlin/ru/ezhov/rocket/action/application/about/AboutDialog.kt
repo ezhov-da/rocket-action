@@ -1,6 +1,6 @@
 package ru.ezhov.rocket.action.application.about
 
-import ru.ezhov.rocket.action.application.BaseDialogFactory
+import ru.ezhov.rocket.action.application.configuration.ui.ConfigurationFrameFactory
 import ru.ezhov.rocket.action.application.properties.GeneralPropertiesRepository
 import ru.ezhov.rocket.action.application.properties.UsedPropertiesName
 import ru.ezhov.rocket.action.application.resources.Icons
@@ -40,7 +40,7 @@ class AboutDialog(
     }
 
     fun showAboutDialog() {
-        setLocationRelativeTo(BaseDialogFactory.INSTANCE!!)
+        setLocationRelativeTo(ConfigurationFrameFactory.INSTANCE!!.frame)
         isVisible = true
     }
 }

@@ -1,6 +1,6 @@
 package ru.ezhov.rocket.action.application.availableproperties
 
-import ru.ezhov.rocket.action.application.BaseDialogFactory
+import ru.ezhov.rocket.action.application.configuration.ui.ConfigurationFrameFactory
 import ru.ezhov.rocket.action.application.properties.UsedPropertiesName
 import ru.ezhov.rocket.action.application.resources.Icons
 import ru.ezhov.rocket.action.ui.utils.swing.MarkdownEditorPane
@@ -35,7 +35,7 @@ class AvailablePropertiesFromCommandLineDialog : JDialog() {
     }
 
     fun showDialog() {
-        setLocationRelativeTo(BaseDialogFactory.INSTANCE!!)
+        setLocationRelativeTo(ConfigurationFrameFactory.INSTANCE!!.frame)
         isVisible = true
     }
 }
