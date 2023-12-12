@@ -48,10 +48,9 @@ import javax.swing.SwingWorker
 private val logger = KotlinLogging.logger { }
 
 class ChainActionUi : AbstractRocketAction(), RocketActionPlugin {
-
-    private val chainActionService: ChainActionService = ChainActionService.INSTANCE!!
-    private val atomicActionService: AtomicActionService = AtomicActionService.INSTANCE!!
-    private val actionExecutor: ActionExecutor = ActionExecutorFactory.INSTANCE!!
+    private var chainActionService: ChainActionService? = null
+    private var atomicActionService: AtomicActionService? = null
+    private var actionExecutor: ActionExecutor? = null
 
     private var actionContext: RocketActionContext? = null
 
@@ -63,6 +62,9 @@ class ChainActionUi : AbstractRocketAction(), RocketActionPlugin {
     override fun configuration(context: RocketActionContext): RocketActionConfiguration = this
         .apply {
             actionContext = context
+            chainActionService = ChainActionService.INSTANCE
+            atomicActionService = AtomicActionService.INSTANCE
+            actionExecutor = ActionExecutorFactory.INSTANCE
         }
 
     override fun info(): RocketActionPluginInfo = object : RocketActionPluginInfo {
@@ -78,33 +80,9 @@ class ChainActionUi : AbstractRocketAction(), RocketActionPlugin {
 
     override fun create(settings: RocketActionSettings, context: RocketActionContext): RocketAction? =
         settings.settings()[ID]?.takeIf { it.isNotEmpty() }?.let { id ->
-            (chainActionService.byId(id) ?: atomicActionService.atomicBy(id))?.let { action ->
+            (chainActionService!!.byId(id) ?: atomicActionService!!.atomicBy(id))?.let { action ->
                 settings.settings()[UI_TYPE]?.let { uiType ->
                     createByType(action, uiType)?.let { component ->
-
-
-//                DomainEventFactory.subscriberRegistrar.subscribe(
-//                    object : DomainEventSubscriber {
-//                        override fun handleEvent(event: DomainEvent) {
-//                            if (menu.menuComponents.size != settings.actions().size) {
-//                                menu.removeAll()
-//                                logger.debug { "Refill group menu '$labelFinal' by event ${RestoreMenuDomainEvent::class.java.name}" }
-//
-//                                settings.actions().forEach { settings ->
-//                                    // the mandatory presence of a child component controls the creation of groups last
-//                                    menu.add(cache.by(settings.id())!!.origin.component())
-//                                }
-//                            }
-//                        }
-//
-//                        override fun subscribedToEventType(): List<Class<*>> =
-//                            listOf(
-//                                CreateMenuDomainEvent::class.java,
-//                                RestoreMenuDomainEvent::class.java,
-//                            )
-//                    }
-//                )
-
                         object : RocketAction {
                             override fun contains(search: String): Boolean = false
 
@@ -125,7 +103,7 @@ class ChainActionUi : AbstractRocketAction(), RocketActionPlugin {
     override fun asStringDynamic(settings: Map<String, String>): String? =
         settings[ID]
             ?.let {
-                (chainActionService.byId(it) ?: atomicActionService.atomicBy(it))
+                (chainActionService!!.byId(it) ?: atomicActionService!!.atomicBy(it))
                     ?.name()
             }
 
@@ -140,8 +118,8 @@ class ChainActionUi : AbstractRocketAction(), RocketActionPlugin {
                 required = true,
                 property = RocketActionPropertySpec.ComponentPropertySpec(
                     ActionsComponentPanel(
-                        chainActionService = chainActionService,
-                        atomicActionService = atomicActionService,
+                        chainActionService = chainActionService!!,
+                        atomicActionService = atomicActionService!!,
                     )
                 )
             ),
@@ -197,7 +175,7 @@ class ChainActionUi : AbstractRocketAction(), RocketActionPlugin {
                     icon = action.calculateIcon()
                     addActionListener {
                         RunWorker(
-                            actionExecutor = actionExecutor,
+                            actionExecutor = actionExecutor!!,
                             action = action,
                             input = null,
                             callback = null,
@@ -222,7 +200,7 @@ class ChainActionUi : AbstractRocketAction(), RocketActionPlugin {
 
                     val actionOnTextField: (text: String) -> Unit = { text ->
                         RunWorker(
-                            actionExecutor = actionExecutor,
+                            actionExecutor = actionExecutor!!,
                             action = action,
                             input = text,
                             callback = null,
@@ -249,7 +227,7 @@ class ChainActionUi : AbstractRocketAction(), RocketActionPlugin {
 
                     icon = action.calculateIcon()
                     toolTipText = action.description()
-                    add(RunPanel(actionExecutor = actionExecutor, action = action, showInputField = false))
+                    add(RunPanel(actionExecutor = actionExecutor!!, action = action, showInputField = false))
                 }
             }
 
@@ -264,7 +242,7 @@ class ChainActionUi : AbstractRocketAction(), RocketActionPlugin {
 
                     icon = action.calculateIcon()
                     toolTipText = action.description()
-                    add(RunPanel(actionExecutor = actionExecutor, action = action, showInputField = true))
+                    add(RunPanel(actionExecutor = actionExecutor!!, action = action, showInputField = true))
                 }
             }
 
