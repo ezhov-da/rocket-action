@@ -46,7 +46,7 @@ internal class RawTextValidatorTest {
                     MAX_LENGTH 5
                 """.trimIndent(),
                 "11111111111",
-                listOf("Максимальная длина '5' символов. Сейчас '11'")
+                listOf("Maximum length of '5' characters. Now'11'")
             ),
             Arguments.of(
                 """
