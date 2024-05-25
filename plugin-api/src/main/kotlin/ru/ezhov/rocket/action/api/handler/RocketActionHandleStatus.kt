@@ -11,7 +11,7 @@ sealed class RocketActionHandleStatus {
      *
      */
     class Success(
-        val values: Map<String, String?> = emptyMap()
+        val values: Map<String, Any?> = emptyMap()
     ) : RocketActionHandleStatus()
 
     /**

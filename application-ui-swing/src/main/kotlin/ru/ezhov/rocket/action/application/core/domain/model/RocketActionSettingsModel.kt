@@ -9,13 +9,14 @@ import java.util.*
 private val logger = KotlinLogging.logger { }
 
 data class RocketActionSettingsModel(
-    val id: String,
-    val type: String,
-    val settings: List<SettingsModel>,
-    val actions: List<RocketActionSettingsModel>,
-    val tags: List<String>,
+    // TODO ezhov change to val
+    var id: String,
+    var type: String,
+    var settings: List<SettingsModel>,
+    var actions: List<RocketActionSettingsModel>,
+    var tags: List<String>,
 ) {
-    fun to(): RocketActionSettings = object : RocketActionSettings {
+    fun to(engineService: EngineService): RocketActionSettings = object : RocketActionSettings {
         override fun id(): String = id
 
         override fun type(): RocketActionType = RocketActionType { type }
@@ -24,7 +25,7 @@ data class RocketActionSettingsModel(
             try {
                 settings.associate { set ->
                     // TODO ezhov opportunity for optimization
-                    val resultVal = EngineService().processWithEngine(set).toString()
+                    val resultVal = engineService.processWithEngine(set).toString()
                     set.name to resultVal
                 }
             } catch (ex: Exception) {
@@ -32,7 +33,7 @@ data class RocketActionSettingsModel(
                 emptyMap()
             }
 
-        override fun actions(): List<RocketActionSettings> = actions.map { it.to() }
+        override fun actions(): List<RocketActionSettings> = actions.map { it.to(engineService) }
     }
 
     companion object {

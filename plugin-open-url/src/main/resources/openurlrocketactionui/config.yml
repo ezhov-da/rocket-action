@@ -1,0 +1,14 @@
+_name: Open link
+_description: Open link
+label:
+    name: Title
+    description: Title
+description:
+    name: Description
+    description: Description
+url:
+    name: URL
+    description: URL
+iconUrl:
+    name: Icon URL
+    description: Icon URL

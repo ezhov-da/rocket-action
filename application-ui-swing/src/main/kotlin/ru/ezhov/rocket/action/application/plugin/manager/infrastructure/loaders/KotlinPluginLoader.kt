@@ -1,6 +1,7 @@
 package ru.ezhov.rocket.action.application.plugin.manager.infrastructure.loaders
 
 import mu.KotlinLogging
+import org.springframework.stereotype.Service
 import ru.ezhov.rocket.action.api.RocketActionPlugin
 import ru.ezhov.rocket.action.application.engine.application.EngineFactory
 import ru.ezhov.rocket.action.application.engine.domain.model.EngineType
@@ -8,7 +9,7 @@ import ru.ezhov.rocket.action.application.engine.domain.model.EngineVariable
 import ru.ezhov.rocket.action.application.plugin.manager.domain.RocketActionPluginSourceType
 import ru.ezhov.rocket.action.application.plugin.manager.domain.RocketActionPluginSpec
 import ru.ezhov.rocket.action.application.plugin.manager.infrastructure.RocketActionPluginDecorator
-import ru.ezhov.rocket.action.application.properties.GeneralPropertiesRepositoryFactory
+import ru.ezhov.rocket.action.application.properties.GeneralPropertiesRepository
 import ru.ezhov.rocket.action.application.properties.UsedPropertiesName
 import ru.ezhov.rocket.action.application.variables.application.VariablesApplication
 import java.io.File
@@ -18,12 +19,15 @@ import kotlin.system.measureTimeMillis
 
 private val logger = KotlinLogging.logger { }
 
-class KotlinPluginLoader {
-    private val variablesApplication: VariablesApplication = VariablesApplication()
-
+@Service
+class KotlinPluginLoader(
+    private val variablesApplication: VariablesApplication,
+    private val generalPropertiesRepository: GeneralPropertiesRepository,
+    private val engineFactory: EngineFactory,
+) {
     fun plugins(): List<File> =
         File(
-            GeneralPropertiesRepositoryFactory.repository.asString(
+            generalPropertiesRepository.asString(
                 UsedPropertiesName.KOTLIN_PLUGIN_FOLDER,
                 "./kotlin-plugins"
             )
@@ -42,7 +46,7 @@ class KotlinPluginLoader {
         return try {
             val rocketActionPlugin: RocketActionPlugin
             val ms = measureTimeMillis {
-                val executeResult = EngineFactory.by(EngineType.KOTLIN)
+                val executeResult = engineFactory.by(EngineType.KOTLIN)
                     .execute(
                         template = file.readText(),
                         variables = variablesApplication.all().variables.map {
@@ -59,6 +63,9 @@ class KotlinPluginLoader {
             RocketActionPluginSpec.Success(
                 rocketActionPlugin = RocketActionPluginDecorator(rocketActionPlugin),
                 from = from,
+                version = rocketActionPlugin.info().version(),
+                author = rocketActionPlugin.info().author(),
+                link = rocketActionPlugin.info().link(),
                 sourceType = sourceType,
                 loadTime = Duration.ofMillis(ms),
             )

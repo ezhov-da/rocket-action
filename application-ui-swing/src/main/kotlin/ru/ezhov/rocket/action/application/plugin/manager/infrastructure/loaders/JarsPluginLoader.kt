@@ -1,6 +1,7 @@
 package ru.ezhov.rocket.action.application.plugin.manager.infrastructure.loaders
 
 import mu.KotlinLogging
+import org.springframework.stereotype.Service
 import ru.ezhov.rocket.action.api.RocketActionPlugin
 import ru.ezhov.rocket.action.application.plugin.manager.domain.RocketActionPluginSourceType
 import ru.ezhov.rocket.action.application.plugin.manager.domain.RocketActionPluginSpec
@@ -14,6 +15,7 @@ import kotlin.system.measureTimeMillis
 
 private val logger = KotlinLogging.logger {}
 
+@Service
 class JarsPluginLoader {
     fun plugins(): List<File> =
         File("plugins")
@@ -46,19 +48,22 @@ class JarsPluginLoader {
                     val sourceType = RocketActionPluginSourceType.JAR
 
                     try {
-                        val ra: RocketActionPlugin
+                        val rocketActionPlugin: RocketActionPlugin
                         val initTimeClass = measureTimeMillis {
                             val clazz = classLoader.loadClass(clazzName)
                             val plugin = clazz.getDeclaredConstructor().newInstance() as RocketActionPlugin
-                            ra = RocketActionPluginDecorator(rocketActionPluginOriginal = plugin)
+                            rocketActionPlugin = RocketActionPluginDecorator(rocketActionPluginOriginal = plugin)
                         }
 
                         logger.debug { "Initialize timeMs='$initTimeClass' for jar='${jar.absolutePath}'}" }
 
                         plugins.add(
                             RocketActionPluginSpec.Success(
-                                rocketActionPlugin = ra,
+                                rocketActionPlugin = rocketActionPlugin,
                                 from = from,
+                                version = rocketActionPlugin.info().version(),
+                                author = rocketActionPlugin.info().author(),
+                                link = rocketActionPlugin.info().link(),
                                 sourceType = sourceType,
                                 loadTime = Duration.ofMillis(initTimeClass),
                             )

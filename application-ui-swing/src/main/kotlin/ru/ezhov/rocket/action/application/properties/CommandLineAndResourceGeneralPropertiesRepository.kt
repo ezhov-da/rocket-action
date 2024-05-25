@@ -1,13 +1,17 @@
 package ru.ezhov.rocket.action.application.properties
 
 import mu.KotlinLogging
+import org.springframework.stereotype.Component
+import ru.ezhov.rocket.action.api.context.notification.NotificationService
 import ru.ezhov.rocket.action.api.context.notification.NotificationType
-import ru.ezhov.rocket.action.application.plugin.context.RocketActionContextFactory
-import java.util.Properties
+import java.util.*
 
 private val logger = KotlinLogging.logger { }
 
-class CommandLineAndResourceGeneralPropertiesRepository : GeneralPropertiesRepository {
+@Component
+class CommandLineAndResourceGeneralPropertiesRepository(
+    private val notificationService: NotificationService
+) : GeneralPropertiesRepository {
 
     private val properties: Properties = Properties()
 
@@ -18,8 +22,7 @@ class CommandLineAndResourceGeneralPropertiesRepository : GeneralPropertiesRepos
             "Error read general properties"
                 .let { text ->
                     logger.error(e) { text }
-                    RocketActionContextFactory.context.notification()
-                        .show(type = NotificationType.ERROR, text = text)
+                    notificationService.show(type = NotificationType.ERROR, text = text)
                 }
         }
     }
@@ -68,6 +71,16 @@ class CommandLineAndResourceGeneralPropertiesRepository : GeneralPropertiesRepos
         try {
             (System.getProperty(name.propertyName)
                 ?: properties.getProperty(name.propertyName))?.toFloat()
+                ?: default
+        } catch (ex: Exception) {
+            logger.warn(ex) { "Error read property=$name" }
+            default
+        }
+
+    override fun asDouble(name: UsedPropertiesName, default: Double): Double =
+        try {
+            (System.getProperty(name.propertyName)
+                ?: properties.getProperty(name.propertyName))?.toDouble()
                 ?: default
         } catch (ex: Exception) {
             logger.warn(ex) { "Error read property=$name" }

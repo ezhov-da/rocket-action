@@ -19,7 +19,6 @@ import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Component
 import java.awt.Desktop
-import java.awt.FlowLayout
 import java.awt.Toolkit
 import java.awt.event.ActionEvent
 import java.awt.event.InputEvent
@@ -33,6 +32,8 @@ import java.time.format.DateTimeFormatter
 import javax.swing.AbstractAction
 import javax.swing.Action
 import javax.swing.BorderFactory
+import javax.swing.Box
+import javax.swing.BoxLayout
 import javax.swing.ImageIcon
 import javax.swing.JButton
 import javax.swing.JLabel
@@ -377,7 +378,7 @@ class CommitTimePanel(
         private val maxTimeInMinutes: Int?,
     ) : JPanel() {
         private val labelInfo: JLabel = JLabel()
-        private val errorsInfo: JTextPane = JTextPane()
+        private val errorsInfo: JTextPane = JTextPane().apply { isEditable = false }
         private val tableModel = object : DefaultTableModel() {
             override fun getColumnClass(columnIndex: Int): Class<TableTasksPanelTask> =
                 TableTasksPanelTask::class.java
@@ -481,43 +482,50 @@ class CommitTimePanel(
 
             add(
                 JPanel(BorderLayout()).apply {
-                    add(
-                        JPanel(FlowLayout(FlowLayout.LEFT))
-                            .apply {
-                                add(JButton("Pull up task names")
-                                    .also { button ->
-                                        button.addActionListener {
-                                            currentTasks
-                                                .filter { it.name == null }
-                                                .let { tasks ->
-                                                    NameWorker(
-                                                        commitTimeTasks = tasks,
-                                                        commitTimeTaskInfoRepository = commitTimeTaskInfoRepository,
-                                                        button = button,
-                                                        context = context,
-                                                        afterSearchName = { triple ->
-                                                            triple.third
-                                                                ?.let { ex ->
-                                                                    logger.warn(ex) { "Error get name for task ${triple.first}" }
-                                                                } ?: run {
-                                                                triple.second?.let { info ->
-                                                                    taskNamesCache[triple.first.task.id] = info.name
-                                                                    logger.debug {
-                                                                        "Put task name to cache '${triple.first.task.id}'='${info.name}'"
-                                                                    }
-                                                                    triple.first.name = info.name
-                                                                    SwingUtilities.invokeLater { tableModel.fireTableDataChanged() }
-                                                                }
+                    val infoPanel = JPanel().apply {
+                        add(labelInfo)
+                    }
+
+                    val buttonsPanel = JPanel().apply {
+                        layout = BoxLayout(this, BoxLayout.X_AXIS)
+                        add(JButton("Pull up task names")
+                            .also { button ->
+                                button.addActionListener {
+                                    currentTasks
+                                        .filter { it.name == null }
+                                        .let { tasks ->
+                                            NameWorker(
+                                                commitTimeTasks = tasks,
+                                                commitTimeTaskInfoRepository = commitTimeTaskInfoRepository,
+                                                button = button,
+                                                context = context,
+                                                afterSearchName = { triple ->
+                                                    triple.third
+                                                        ?.let { ex ->
+                                                            logger.warn(ex) { "Error get name for task ${triple.first}" }
+                                                        } ?: run {
+                                                        triple.second?.let { info ->
+                                                            taskNamesCache[triple.first.task.id] = info.name
+                                                            logger.debug {
+                                                                "Put task name to cache '${triple.first.task.id}'='${info.name}'"
                                                             }
+                                                            triple.first.name = info.name
+                                                            SwingUtilities.invokeLater { tableModel.fireTableDataChanged() }
                                                         }
-                                                    ).execute()
+                                                    }
                                                 }
+                                            ).execute()
                                         }
-                                    })
-                                add(labelInfo)
-                            }
-                    )
-                    add(JPanel().apply { add(buttonCommit) }, BorderLayout.EAST)
+                                }
+                            })
+
+                        add(Box.createHorizontalGlue())
+                        add(buttonCommit)
+                    }
+
+                    add(infoPanel, BorderLayout.NORTH)
+                    add(buttonsPanel, BorderLayout.CENTER)
+                    border = BorderFactory.createEmptyBorder(2, 2, 2, 2)
                 },
                 BorderLayout.NORTH
             )
@@ -561,7 +569,6 @@ class CommitTimePanel(
                 tableModel.addRow(listOf(it, it, it, it, it, it).toTypedArray())
             }
 
-            errorsInfo.isEditable = false
             errorsInfo.text = tasks.errors.takeIf { it.isNotEmpty() }
                 ?.joinToString(separator = "\n") { it.message }
                 ?: ""

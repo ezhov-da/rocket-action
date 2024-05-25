@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test
 import ru.ezhov.rocket.action.api.RocketActionConfiguration
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
 import ru.ezhov.rocket.action.api.RocketActionType
+import ru.ezhov.rocket.action.application.configuration.ui.tree.TreeRocketActionSettings
 import ru.ezhov.rocket.action.application.core.domain.model.SettingsModel
 import ru.ezhov.rocket.action.application.core.domain.model.SettingsValueType
 import ru.ezhov.rocket.action.application.core.infrastructure.MutableRocketActionSettings

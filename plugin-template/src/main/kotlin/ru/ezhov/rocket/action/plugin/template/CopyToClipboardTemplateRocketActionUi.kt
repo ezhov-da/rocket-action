@@ -5,6 +5,7 @@ import ru.ezhov.rocket.action.api.RocketActionConfiguration
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
 import ru.ezhov.rocket.action.api.RocketActionFactoryUi
 import ru.ezhov.rocket.action.api.RocketActionPlugin
+import ru.ezhov.rocket.action.api.RocketActionPluginInfo
 import ru.ezhov.rocket.action.api.RocketActionSettings
 import ru.ezhov.rocket.action.api.RocketActionType
 import ru.ezhov.rocket.action.api.context.RocketActionContext
@@ -12,11 +13,24 @@ import ru.ezhov.rocket.action.api.context.icon.AppIcon
 import ru.ezhov.rocket.action.api.support.AbstractRocketAction
 import ru.ezhov.rocket.action.plugin.template.infrastructure.VelocityEngineImpl
 import java.awt.Component
+import java.util.*
 import javax.swing.Icon
 import javax.swing.JMenu
 
 class CopyToClipboardTemplateRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
     private var actionContext: RocketActionContext? = null
+
+    override fun info(): RocketActionPluginInfo = Properties().let { properties ->
+        properties.load(this.javaClass.getResourceAsStream("/config/plugin-template.properties"))
+        object : RocketActionPluginInfo {
+            override fun version(): String = properties.getProperty("version")
+
+            override fun author(): String = properties.getProperty("author")
+
+            override fun link(): String? = properties.getProperty("link")
+        }
+    }
+
     override fun factory(context: RocketActionContext): RocketActionFactoryUi = this
         .apply {
             actionContext = context
@@ -67,7 +81,12 @@ class CopyToClipboardTemplateRocketActionUi : AbstractRocketAction(), RocketActi
     override fun properties(): List<RocketActionConfigurationProperty> {
         return listOf(
             createRocketActionProperty(key = LABEL, name = LABEL, description = "Header", required = false),
-            createRocketActionProperty(key = DESCRIPTION, name = DESCRIPTION, description = "Description", required = false),
+            createRocketActionProperty(
+                key = DESCRIPTION,
+                name = DESCRIPTION,
+                description = "Description",
+                required = false
+            ),
             createRocketActionProperty(key = TEXT, name = TEXT, description = "Template for copy", required = true)
         )
     }

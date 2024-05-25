@@ -2,10 +2,10 @@ package ru.ezhov.rocket.action.application.configuration.ui
 
 import mu.KotlinLogging
 import ru.ezhov.rocket.action.api.context.notification.NotificationType
+import ru.ezhov.rocket.action.application.core.domain.EngineService
 import ru.ezhov.rocket.action.application.core.infrastructure.MutableRocketActionSettings
 import ru.ezhov.rocket.action.application.plugin.context.RocketActionContextFactory
 import ru.ezhov.rocket.action.application.plugin.manager.application.RocketActionPluginApplicationService
-import ru.ezhov.rocket.action.application.plugin.manager.domain.RocketActionPluginRepository
 import java.awt.BorderLayout
 import javax.swing.JButton
 import javax.swing.JLabel
@@ -17,13 +17,15 @@ private val logger = KotlinLogging.logger { }
 
 class TestPanel(
     private val rocketActionPluginApplicationService: RocketActionPluginApplicationService,
-    private val callback: CreateTestCallback
+    private val rocketActionContextFactory: RocketActionContextFactory,
+    private val engineService: EngineService,
+    private val callback: CreateTestCallback,
 ) : JPanel(BorderLayout()) {
     private var panelTest: JPanel? = null
     private fun createTest(settings: MutableRocketActionSettings) {
         val panel: JPanel =
             when (val actionUi = rocketActionPluginApplicationService.by(settings.type)
-                ?.factory(RocketActionContextFactory.context)) {
+                ?.factory(rocketActionContextFactory.context)) {
                 null -> {
                     val p = JPanel(BorderLayout())
                     p.add(JLabel("Action not found for type '${settings.type}'"))
@@ -35,12 +37,12 @@ class TestPanel(
                     val menuBar = JMenuBar()
                     val component = try {
                         actionUi
-                            .create(settings = settings.to(), context = RocketActionContextFactory.context)
+                            .create(settings = settings.to(engineService), context = rocketActionContextFactory.context)
                             ?.component()
                             ?: JLabel("Component not created")
                     } catch (ex: Exception) {
                         logger.error(ex) { "Error when create action" }
-                        RocketActionContextFactory.context.notification()
+                        rocketActionContextFactory.context.notification()
                             .show(NotificationType.ERROR, "Error when create test action")
 
                         JLabel("Component creation error")

@@ -2,17 +2,18 @@ package ru.ezhov.rocket.action.application.variables.interfaces.ui
 
 import mu.KotlinLogging
 import ru.ezhov.rocket.action.api.context.icon.AppIcon
+import ru.ezhov.rocket.action.api.context.icon.IconService
+import ru.ezhov.rocket.action.api.context.notification.NotificationService
 import ru.ezhov.rocket.action.api.context.notification.NotificationType
-import ru.ezhov.rocket.action.application.plugin.context.RocketActionContextFactory
 import ru.ezhov.rocket.action.application.variables.application.VariableDto
 import ru.ezhov.rocket.action.application.variables.application.VariablesApplication
 import ru.ezhov.rocket.action.application.variables.application.VariablesDto
 import ru.ezhov.rocket.action.application.variables.domain.model.VariableType
+import ru.ezhov.rocket.action.ui.utils.swing.common.SizeUtil
 import ru.ezhov.rocket.action.ui.utils.swing.common.TextFieldWithText
 import ru.ezhov.rocket.action.ui.utils.swing.common.toImage
 import java.awt.BorderLayout
 import java.awt.Color
-import java.awt.Dimension
 import java.util.*
 import javax.swing.JButton
 import javax.swing.JFrame
@@ -25,8 +26,12 @@ import javax.swing.table.DefaultTableModel
 
 private val logger = KotlinLogging.logger { }
 
-class VariablesFrame(parent: JFrame? = null) : JFrame() {
-    private val variablesApplication = VariablesApplication()
+class VariablesFrame(
+    parent: JFrame? = null,
+    private val variablesApplication: VariablesApplication,
+    private val notificationService: NotificationService,
+    iconService: IconService,
+) : JFrame() {
     private val applicationTableModel = DefaultTableModel().apply {
         addColumn("*Name")
         addColumn("*Value")
@@ -44,12 +49,15 @@ class VariablesFrame(parent: JFrame? = null) : JFrame() {
 
     private val applicationTable = JTable(applicationTableModel).apply {
         tableHeader.reorderingAllowed = false
+        setDefaultRenderer(Any::class.java, PasswordDefaultTableRenderer(1))
     }
     private val propertiesTable = JTable(propertiesEnableModel).apply {
         tableHeader.reorderingAllowed = false
+        setDefaultRenderer(Any::class.java, PasswordDefaultTableRenderer(1))
     }
     private val environmentTable = JTable(environmentEnableModel).apply {
         tableHeader.reorderingAllowed = false
+        setDefaultRenderer(Any::class.java, PasswordDefaultTableRenderer(1))
     }
 
     private val keyTextField = TextFieldWithText("Key to encode variables")
@@ -75,8 +83,8 @@ class VariablesFrame(parent: JFrame? = null) : JFrame() {
 
         loadTable()
 
-        iconImage = RocketActionContextFactory.context.icon().by(AppIcon.ROCKET_APP).toImage()
-        size = Dimension(600, 500)
+        iconImage = iconService.by(AppIcon.ROCKET_APP).toImage()
+        size = SizeUtil.dimension(0.6, 0.5)
         defaultCloseOperation = HIDE_ON_CLOSE
 
         addRowButton.addActionListener {
@@ -199,16 +207,16 @@ class VariablesFrame(parent: JFrame? = null) : JFrame() {
         try {
             val key = keyTextField.text
             if (key.isBlank()) {
-                RocketActionContextFactory.context.notification()
+                notificationService
                     .show(NotificationType.WARN, "The key is required to specify")
             } else {
                 variablesApplication.save(VariablesDto(key = key, variables = variables))
 
-                RocketActionContextFactory.context.notification().show(NotificationType.INFO, "Variables saved")
+                notificationService.show(NotificationType.INFO, "Variables saved")
             }
         } catch (ex: Exception) {
             logger.error(ex) { "Variables unsaved" }
-            RocketActionContextFactory.context.notification().show(NotificationType.ERROR, "Variables unsaved")
+            notificationService.show(NotificationType.ERROR, "Variables unsaved")
         }
     }
 }

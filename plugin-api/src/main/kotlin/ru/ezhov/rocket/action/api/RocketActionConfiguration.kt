@@ -34,6 +34,12 @@ interface RocketActionConfiguration {
     fun asString(): List<String>
 
     /**
+     * Calculate configuration text dynamically.
+     * If null is returned, then the [asString] method is called.
+     */
+    fun asStringDynamic(settings: Map<String, String>): String? = null
+
+    /**
      * Action properties for configuration
      *
      * @return action properties

@@ -2,6 +2,7 @@ package ru.ezhov.rocket.action.plugin.jira.worklog.ui
 
 import arrow.core.Either
 import arrow.core.right
+import io.mockk.mockk
 import ru.ezhov.rocket.action.api.context.RocketActionContext
 import ru.ezhov.rocket.action.api.context.cache.CacheService
 import ru.ezhov.rocket.action.api.context.icon.IconService
@@ -103,21 +104,13 @@ fun main() {
                         CommitTimeTaskInfo(name = "$id + type name").right()
                 },
                 context = object : RocketActionContext {
-                    override fun icon(): IconService {
-                        TODO("Not yet implemented")
-                    }
+                    override fun icon(): IconService = mockk()
 
-                    override fun notification(): NotificationService {
-                        TODO("Not yet implemented")
-                    }
+                    override fun notification(): NotificationService = mockk()
 
-                    override fun cache(): CacheService {
-                        TODO("Not yet implemented")
-                    }
+                    override fun cache(): CacheService = mockk()
 
-                    override fun search(): Search {
-                        TODO("Not yet implemented")
-                    }
+                    override fun search(): Search = mockk()
                 },
                 validator = object : Validator {
                     override fun validate(source: String): List<String> = emptyList()

@@ -1,6 +1,7 @@
 package ru.ezhov.rocket.action.application.plugin.manager.infrastructure.loaders
 
 import mu.KotlinLogging
+import org.springframework.stereotype.Service
 import ru.ezhov.rocket.action.api.RocketActionPlugin
 import ru.ezhov.rocket.action.application.plugin.manager.domain.RocketActionPluginSourceType
 import ru.ezhov.rocket.action.application.plugin.manager.domain.RocketActionPluginSpec
@@ -10,6 +11,7 @@ import kotlin.system.measureTimeMillis
 
 private val logger = KotlinLogging.logger {}
 
+@Service
 class ClassPathPluginLoader {
     companion object {
         private const val PROPERTY_NAME = "rocket.action.extended.plugin.classess"
@@ -41,12 +43,19 @@ class ClassPathPluginLoader {
             RocketActionPluginSpec.Success(
                 rocketActionPlugin = rocketActionPlugin,
                 from = from,
+                version = rocketActionPlugin.info().version(),
+                author = rocketActionPlugin.info().author(),
+                link = rocketActionPlugin.info().link(),
                 sourceType = sourceType,
                 loadTime = Duration.ofMillis(initTimeClass),
             )
         } catch (e: Exception) {
             logger.warn(e) { "Error when load class $classAsName" }
-            RocketActionPluginSpec.Failure(from = from, sourceType = sourceType, error = "Error '${e.message}'")
+            RocketActionPluginSpec.Failure(
+                from = from,
+                sourceType = sourceType,
+                error = "Error '${e.message}'"
+            )
         }
     }
 }

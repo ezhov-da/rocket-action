@@ -15,4 +15,9 @@ interface RocketActionPlugin {
      * Action Configuration
      */
     fun configuration(context: RocketActionContext): RocketActionConfiguration
+
+    /**
+     * Info
+     */
+    fun info(): RocketActionPluginInfo
 }

@@ -12,7 +12,7 @@ class KotlinScriptEngineTest {
         val result = engine.execute(
             script = """
                 |val t = "test"
-                |val variables = _variables as Map<String, String>
+                |val variables = _VARIABLES as Map<String, String>
                 |t + "-" + testT + "-" + variables.get("testT")
             """.trimMargin(),
             variables = mapOf("testT" to "42")

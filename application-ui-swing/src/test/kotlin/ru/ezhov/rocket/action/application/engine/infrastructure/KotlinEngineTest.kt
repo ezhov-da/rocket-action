@@ -11,7 +11,7 @@ internal class KotlinEngineTest {
         val result = engine.execute(
             template = """
                 |val t = "test"
-                |val variables = _variables as Map<String, String>
+                |val variables = _VARIABLES as Map<String, String>
                 |t + "-" + testT + "-" + variables.get("testT")
             """.trimMargin(),
             variables = listOf(EngineVariable(name = "testT", value = "42"))

@@ -1,9 +1,11 @@
 .idea
 *.iml
 *.gv
-target
-/notes
-/application/plugins
-/plugins
 
-actions.yml
+target
+/plugins
+/.rocket-action/plugins/notes
+/.rocket-action/cache
+/.rocket-action/actions.yml
+/notes.s3db
+/plugin-note/test_notes.s3db

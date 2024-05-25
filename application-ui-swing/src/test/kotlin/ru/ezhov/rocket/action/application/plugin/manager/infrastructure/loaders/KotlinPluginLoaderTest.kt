@@ -5,7 +5,11 @@ import io.mockk.mockk
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
 import ru.ezhov.rocket.action.api.RocketActionPlugin
+import ru.ezhov.rocket.action.application.ApplicationContextFactory
+import ru.ezhov.rocket.action.application.engine.application.EngineFactory
+import ru.ezhov.rocket.action.application.properties.GeneralPropertiesRepository
 import ru.ezhov.rocket.action.application.properties.UsedPropertiesName
+import ru.ezhov.rocket.action.application.variables.application.VariablesApplication
 import java.io.File
 import javax.swing.ImageIcon
 import javax.swing.JMenuItem
@@ -13,9 +17,15 @@ import javax.swing.JMenuItem
 internal class KotlinPluginLoaderTest {
     @Test
     fun `should be success load groovy plugin`() {
+        val context = ApplicationContextFactory.context()
+
         System.setProperty(UsedPropertiesName.KOTLIN_PLUGIN_FOLDER.propertyName, "../kotlin-plugins")
 
-        val loader = KotlinPluginLoader()
+        val loader = KotlinPluginLoader(
+            context.getBean(VariablesApplication::class.java),
+            context.getBean(GeneralPropertiesRepository::class.java),
+            context.getBean(EngineFactory::class.java),
+        )
 
         val files = loader.plugins()
         Assertions.assertThat(files[0]).isFile.hasName("copy-to-clipboard-rocket-action-ui-plugin.kt")
@@ -58,7 +68,13 @@ internal class KotlinPluginLoaderTest {
 
     @Test
     fun `should be failure load groovy plugin when script is wrong`() {
-        val loader = KotlinPluginLoader()
+        val context = ApplicationContextFactory.context()
+
+        val loader = KotlinPluginLoader(
+            context.getBean(VariablesApplication::class.java),
+            context.getBean(GeneralPropertiesRepository::class.java),
+            context.getBean(EngineFactory::class.java),
+        )
         val rocketAction = loader.loadPlugin(
             File.createTempFile("kotlin", "test")
                 .apply {

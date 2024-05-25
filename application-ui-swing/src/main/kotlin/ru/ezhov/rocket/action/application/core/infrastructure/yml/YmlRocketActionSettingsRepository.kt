@@ -6,6 +6,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import mu.KotlinLogging
 import ru.ezhov.rocket.action.api.RocketActionSettings
+import ru.ezhov.rocket.action.application.core.domain.EngineService
 import ru.ezhov.rocket.action.application.core.domain.RocketActionSettingsRepository
 import ru.ezhov.rocket.action.application.core.domain.model.ActionsModel
 import ru.ezhov.rocket.action.application.core.domain.model.RocketActionSettingsModel
@@ -21,10 +22,14 @@ import java.net.URI
 private val logger = KotlinLogging.logger {}
 
 class YmlRocketActionSettingsRepository(
-    private val uri: URI
+    private val uri: URI,
+    engineService: EngineService
 ) : RocketActionSettingsRepository {
     // TODO ezhov temporary use, will be transferred to the service after refactoring
-    private val ymlRocketActionSettingsRepositoryOldFormat = YmlRocketActionSettingsRepositoryOldFormat(uri)
+    private val ymlRocketActionSettingsRepositoryOldFormat = YmlRocketActionSettingsRepositoryOldFormat(
+        uri = uri,
+        engineService = engineService
+    )
     private val mapper = ObjectMapper(YAMLFactory())
         .registerKotlinModule()
         .registerModule(JavaTimeModule())

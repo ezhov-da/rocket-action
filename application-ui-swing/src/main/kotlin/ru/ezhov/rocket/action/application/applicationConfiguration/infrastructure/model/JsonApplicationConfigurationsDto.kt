@@ -4,5 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class JsonApplicationConfigurationsDto(
-    var variablesKey: String?
+    var variablesKey: String?,
+    var numberButtonsOnChainActionSelectionPanel: Int?,
 )

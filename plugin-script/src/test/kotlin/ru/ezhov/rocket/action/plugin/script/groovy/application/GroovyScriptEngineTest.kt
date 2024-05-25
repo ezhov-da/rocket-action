@@ -9,7 +9,7 @@ internal class GroovyScriptEngineTest {
     fun `should evaluate groovy script`() {
         val result = GroovyScriptEngine()
             .execute(
-                script = "\"\${2 * 2 + test} from map:\${_variables['test']}\"",
+                script = "\"\${2 * 2 + test} from map:\${_VARIABLES['test']}\"",
                 variables = mapOf("test" to "45")
             )
 

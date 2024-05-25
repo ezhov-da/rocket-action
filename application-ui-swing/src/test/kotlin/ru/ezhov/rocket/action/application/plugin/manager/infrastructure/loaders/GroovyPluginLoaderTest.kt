@@ -4,6 +4,7 @@ import io.mockk.mockk
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import ru.ezhov.rocket.action.api.RocketActionPlugin
+import ru.ezhov.rocket.action.application.ApplicationContextFactory
 import ru.ezhov.rocket.action.application.properties.UsedPropertiesName
 import java.io.File
 import javax.swing.JLabel
@@ -13,7 +14,7 @@ internal class GroovyPluginLoaderTest {
     fun `should be success load groovy plugin`() {
         System.setProperty(UsedPropertiesName.GROOVY_PLUGIN_FOLDER.propertyName, "../groovy-plugins")
 
-        val loader = GroovyPluginLoader()
+        val loader = ApplicationContextFactory.context().getBean(GroovyPluginLoader::class.java)
 
         val files = loader.plugins()
         assertThat(files[0]).isFile.hasName("simple-groovy-plugin.groovy")
@@ -38,7 +39,7 @@ internal class GroovyPluginLoaderTest {
 
     @Test
     fun `should be failure load groovy plugin when script is wrong`() {
-        val loader = GroovyPluginLoader()
+        val loader = ApplicationContextFactory.context().getBean(GroovyPluginLoader::class.java)
         val rocketAction = loader.loadPlugin(
             File.createTempFile("groovy", "test")
                 .apply {

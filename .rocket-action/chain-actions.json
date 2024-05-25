@@ -1,0 +1,244 @@
+{
+  "changedDate" : [ 2023, 12, 10, 2, 41, 13, 802000000 ],
+  "chainActions" : [ {
+    "id" : "1a39305f-5ed2-469a-b84e-2692ac324976",
+    "name" : "Тест выполнения многих действий",
+    "description" : "12312312123",
+    "actions" : [ {
+      "chainOrderId" : "373d552d-da32-4903-8a2d-dd1078c23a1b",
+      "actionId" : "3ac9741e-9c63-410e-8488-3dc52e5c92f6"
+    }, {
+      "chainOrderId" : "d8e81170-7d73-4cd9-b518-75a8cea4140b",
+      "actionId" : "ccb3ea04-68ef-4988-84f1-2d95e14c0046"
+    }, {
+      "chainOrderId" : "2d0cea2d-47c1-4f23-941c-02d024ddd1f6",
+      "actionId" : "8dba925e-07fb-4d88-af27-18d38eefede0"
+    }, {
+      "chainOrderId" : "447dddef-d448-42c5-a797-a1d0785cdb85",
+      "actionId" : "ccb3ea04-68ef-4988-84f1-2d95e14c0046"
+    }, {
+      "chainOrderId" : "e2389f1b-360a-4e54-a814-9b49d00f0b67",
+      "actionId" : "8dba925e-07fb-4d88-af27-18d38eefede0"
+    }, {
+      "chainOrderId" : "8610c97a-46e9-419c-b6ee-c0486065dfcf",
+      "actionId" : "ccb3ea04-68ef-4988-84f1-2d95e14c0046"
+    }, {
+      "chainOrderId" : "d49d68fb-fec6-4ae3-9a39-e2b8bf25b367",
+      "actionId" : "8dba925e-07fb-4d88-af27-18d38eefede0"
+    }, {
+      "chainOrderId" : "58e3b2a5-80c7-418e-aa8c-44459bc02a2b",
+      "actionId" : "ccb3ea04-68ef-4988-84f1-2d95e14c0046"
+    }, {
+      "chainOrderId" : "8a7cca53-7c25-41be-9878-35909920d748",
+      "actionId" : "8dba925e-07fb-4d88-af27-18d38eefede0"
+    }, {
+      "chainOrderId" : "274b329b-e167-4a50-a58f-7be5f89eafbe",
+      "actionId" : "ccb3ea04-68ef-4988-84f1-2d95e14c0046"
+    }, {
+      "chainOrderId" : "21b9a300-08ba-4d6a-bc99-d33977be8e2b",
+      "actionId" : "8dba925e-07fb-4d88-af27-18d38eefede0"
+    }, {
+      "chainOrderId" : "b905cb9e-707e-4d7d-8c5a-f6d7b09a206c",
+      "actionId" : "ccb3ea04-68ef-4988-84f1-2d95e14c0046"
+    }, {
+      "chainOrderId" : "19c32396-8efc-4320-97b6-e79b46802bce",
+      "actionId" : "8dba925e-07fb-4d88-af27-18d38eefede0"
+    }, {
+      "chainOrderId" : "6345611f-b086-4c96-9d04-cef7189705b6",
+      "actionId" : "ccb3ea04-68ef-4988-84f1-2d95e14c0046"
+    } ],
+    "icon" : null
+  }, {
+    "id" : "6cb108c9-6772-4f56-bbeb-6a7837ec1fa1",
+    "name" : "Открытие ссылки по Jira задаче (Дубликат)",
+    "description" : "Дубликбат",
+    "actions" : [ {
+      "chainOrderId" : "d4c6db46-8f2a-434b-bb8c-3f7acd119bc4",
+      "actionId" : "ccb3ea04-68ef-4988-84f1-2d95e14c0046"
+    }, {
+      "chainOrderId" : "2d470ad0-c922-4fa1-9fe0-eb545d26b497",
+      "actionId" : "8dba925e-07fb-4d88-af27-18d38eefede0"
+    }, {
+      "chainOrderId" : "0871e6c2-00c2-4160-81fd-0be1b1d6df72",
+      "actionId" : "0f023251-5b90-44d2-bb40-2224f504bb92"
+    } ],
+    "icon" : null
+  }, {
+    "id" : "541921b7-9194-4211-b0c4-8d6ea38b8140",
+    "name" : "Тестовое",
+    "description" : "121212",
+    "actions" : [ {
+      "chainOrderId" : "d4c6db46-8f2a-434b-bb8c-3f7acd119bc4",
+      "actionId" : "ccb3ea04-68ef-4988-84f1-2d95e14c0046"
+    }, {
+      "chainOrderId" : "2d470ad0-c922-4fa1-9fe0-eb545d26b497",
+      "actionId" : "8dba925e-07fb-4d88-af27-18d38eefede0"
+    }, {
+      "chainOrderId" : "0871e6c2-00c2-4160-81fd-0be1b1d6df72",
+      "actionId" : "0f023251-5b90-44d2-bb40-2224f504bb92"
+    } ],
+    "icon" : "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAALEwAACxMBAJqcGAAAANpJREFUOI2d0lFKw1AQBdBDPky7ljQK6nLckkW0UboWKe5C6U8RXYTxo60fb1pCmoTGC8ODmXfv3HnzOMUVXrDGb8Qaz7jsuH/EBEvssO+JHSrkXeS3HlKOa9zjJ3Kr4ByxHOjaRIGvyFfNmYdst1GgDk5JerA+cpcAzKO2IL3wWIGbqH2Q1jRWYBq1Ouu5cDYyfP6DV8S5yaSdjsVdnCvS9xyzxlJa4xazQ7I6U6DEd+Qfm4U87HQJTHGLh+i8xysu2tYm4WRonG10PiG3bS6kT1JHvOOpOfMBf3ivdcA62MlrAAAAAElFTkSuQmCC"
+  }, {
+    "id" : "0e4e80b2-7861-4779-862d-abc1132a925e",
+    "name" : "Тест повтора одних и тех же действий",
+    "description" : "",
+    "actions" : [ {
+      "chainOrderId" : "d3eb2650-b557-40b9-a251-8028755aa946",
+      "actionId" : "0f023251-5b90-44d2-bb40-2224f504bb92"
+    }, {
+      "chainOrderId" : "56b4660b-6002-4537-a02e-f30ca53a592e",
+      "actionId" : "8dba925e-07fb-4d88-af27-18d38eefede0"
+    }, {
+      "chainOrderId" : "9f937f8f-b659-4b3d-b896-0ef1dfe803fd",
+      "actionId" : "ccb3ea04-68ef-4988-84f1-2d95e14c0046"
+    }, {
+      "chainOrderId" : "b8463964-56ba-4572-86ab-15585e6995e9",
+      "actionId" : "8dba925e-07fb-4d88-af27-18d38eefede0"
+    }, {
+      "chainOrderId" : "fbf91d2f-e301-44ff-afba-706245cc4000",
+      "actionId" : "0f023251-5b90-44d2-bb40-2224f504bb92"
+    } ],
+    "icon" : null
+  }, {
+    "id" : "ff5256bc-399e-4576-ac5a-21e70a677458",
+    "name" : "Просто много действий",
+    "description" : "12312312123",
+    "actions" : [ {
+      "chainOrderId" : "6345611f-b086-4c96-9d04-cef7189705b6",
+      "actionId" : "ccb3ea04-68ef-4988-84f1-2d95e14c0046"
+    }, {
+      "chainOrderId" : "d8e81170-7d73-4cd9-b518-75a8cea4140b",
+      "actionId" : "ccb3ea04-68ef-4988-84f1-2d95e14c0046"
+    }, {
+      "chainOrderId" : "2d0cea2d-47c1-4f23-941c-02d024ddd1f6",
+      "actionId" : "8dba925e-07fb-4d88-af27-18d38eefede0"
+    }, {
+      "chainOrderId" : "447dddef-d448-42c5-a797-a1d0785cdb85",
+      "actionId" : "ccb3ea04-68ef-4988-84f1-2d95e14c0046"
+    }, {
+      "chainOrderId" : "e2389f1b-360a-4e54-a814-9b49d00f0b67",
+      "actionId" : "8dba925e-07fb-4d88-af27-18d38eefede0"
+    }, {
+      "chainOrderId" : "8610c97a-46e9-419c-b6ee-c0486065dfcf",
+      "actionId" : "ccb3ea04-68ef-4988-84f1-2d95e14c0046"
+    }, {
+      "chainOrderId" : "d49d68fb-fec6-4ae3-9a39-e2b8bf25b367",
+      "actionId" : "8dba925e-07fb-4d88-af27-18d38eefede0"
+    }, {
+      "chainOrderId" : "274b329b-e167-4a50-a58f-7be5f89eafbe",
+      "actionId" : "ccb3ea04-68ef-4988-84f1-2d95e14c0046"
+    }, {
+      "chainOrderId" : "8a7cca53-7c25-41be-9878-35909920d748",
+      "actionId" : "8dba925e-07fb-4d88-af27-18d38eefede0"
+    }, {
+      "chainOrderId" : "21b9a300-08ba-4d6a-bc99-d33977be8e2b",
+      "actionId" : "8dba925e-07fb-4d88-af27-18d38eefede0"
+    }, {
+      "chainOrderId" : "8a7cca53-7c25-41be-9878-35909920d748",
+      "actionId" : "8dba925e-07fb-4d88-af27-18d38eefede0"
+    }, {
+      "chainOrderId" : "b905cb9e-707e-4d7d-8c5a-f6d7b09a206c",
+      "actionId" : "ccb3ea04-68ef-4988-84f1-2d95e14c0046"
+    }, {
+      "chainOrderId" : "19c32396-8efc-4320-97b6-e79b46802bce",
+      "actionId" : "8dba925e-07fb-4d88-af27-18d38eefede0"
+    } ],
+    "icon" : null
+  }, {
+    "id" : "ed2bd3f2-ea55-4b74-8162-2fb9a93ed8a7",
+    "name" : "Тоже просто много действий",
+    "description" : "12312312123",
+    "actions" : [ {
+      "chainOrderId" : "6345611f-b086-4c96-9d04-cef7189705b6",
+      "actionId" : "ccb3ea04-68ef-4988-84f1-2d95e14c0046"
+    }, {
+      "chainOrderId" : "d8e81170-7d73-4cd9-b518-75a8cea4140b",
+      "actionId" : "ccb3ea04-68ef-4988-84f1-2d95e14c0046"
+    }, {
+      "chainOrderId" : "2d0cea2d-47c1-4f23-941c-02d024ddd1f6",
+      "actionId" : "8dba925e-07fb-4d88-af27-18d38eefede0"
+    }, {
+      "chainOrderId" : "447dddef-d448-42c5-a797-a1d0785cdb85",
+      "actionId" : "ccb3ea04-68ef-4988-84f1-2d95e14c0046"
+    }, {
+      "chainOrderId" : "e2389f1b-360a-4e54-a814-9b49d00f0b67",
+      "actionId" : "8dba925e-07fb-4d88-af27-18d38eefede0"
+    }, {
+      "chainOrderId" : "8610c97a-46e9-419c-b6ee-c0486065dfcf",
+      "actionId" : "ccb3ea04-68ef-4988-84f1-2d95e14c0046"
+    }, {
+      "chainOrderId" : "d49d68fb-fec6-4ae3-9a39-e2b8bf25b367",
+      "actionId" : "8dba925e-07fb-4d88-af27-18d38eefede0"
+    }, {
+      "chainOrderId" : "274b329b-e167-4a50-a58f-7be5f89eafbe",
+      "actionId" : "ccb3ea04-68ef-4988-84f1-2d95e14c0046"
+    }, {
+      "chainOrderId" : "8a7cca53-7c25-41be-9878-35909920d748",
+      "actionId" : "8dba925e-07fb-4d88-af27-18d38eefede0"
+    }, {
+      "chainOrderId" : "21b9a300-08ba-4d6a-bc99-d33977be8e2b",
+      "actionId" : "8dba925e-07fb-4d88-af27-18d38eefede0"
+    }, {
+      "chainOrderId" : "8a7cca53-7c25-41be-9878-35909920d748",
+      "actionId" : "8dba925e-07fb-4d88-af27-18d38eefede0"
+    }, {
+      "chainOrderId" : "b905cb9e-707e-4d7d-8c5a-f6d7b09a206c",
+      "actionId" : "ccb3ea04-68ef-4988-84f1-2d95e14c0046"
+    }, {
+      "chainOrderId" : "19c32396-8efc-4320-97b6-e79b46802bce",
+      "actionId" : "8dba925e-07fb-4d88-af27-18d38eefede0"
+    } ],
+    "icon" : null
+  }, {
+    "id" : "0819e376-1684-4c0f-bd83-fe743e1921ce",
+    "name" : "Дубликать печати строки",
+    "description" : "Печатает строку",
+    "actions" : [ {
+      "chainOrderId" : "1650e567-8874-46aa-aacb-c14dcd22cec6",
+      "actionId" : "79ce0f96-08f9-4267-b9a2-cf58d86a8711"
+    } ],
+    "icon" : null
+  }, {
+    "id" : "e2a16de6-f1e4-4c4b-8086-15238f0290ad",
+    "name" : "Тестовая цепочка",
+    "description" : "Описания пока нет",
+    "actions" : [ {
+      "chainOrderId" : "1c7d5c9e-e58c-4029-9078-e279a90ad9dc",
+      "actionId" : "ccb3ea04-68ef-4988-84f1-2d95e14c0046"
+    } ],
+    "icon" : null
+  }, {
+    "id" : "7988fd08-9712-4396-a26b-ca9b5cfbcaee",
+    "name" : "01",
+    "description" : "asdasdvvd",
+    "actions" : [ {
+      "chainOrderId" : "a9689eb5-8d95-4a64-b6bd-2c3b6d323468",
+      "actionId" : "8dba925e-07fb-4d88-af27-18d38eefede0"
+    } ],
+    "icon" : "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAAOElEQVQ4jWNgGAU0B/+hGCdgJKCZoFpcBuCyFUM9NgPwOhldD7oBhDRj6GNCk9hChGZi1IwCUgAAm30HbfHmV2MAAAAASUVORK5CYII="
+  }, {
+    "id" : "f11efe30-2359-43aa-9d4a-eeb81d7b845d",
+    "name" : "Печатает строку",
+    "description" : "Печатает строку",
+    "actions" : [ {
+      "chainOrderId" : "1650e567-8874-46aa-aacb-c14dcd22cec6",
+      "actionId" : "79ce0f96-08f9-4267-b9a2-cf58d86a8711"
+    } ],
+    "icon" : null
+  }, {
+    "id" : "b40225cd-a024-4e66-b58e-9d8d5fd1d227",
+    "name" : "Открытие ссылки по Jira задаче",
+    "description" : "Открытие ссылки по Jira задаче",
+    "actions" : [ {
+      "chainOrderId" : "d4c6db46-8f2a-434b-bb8c-3f7acd119bc4",
+      "actionId" : "ccb3ea04-68ef-4988-84f1-2d95e14c0046"
+    }, {
+      "chainOrderId" : "2d470ad0-c922-4fa1-9fe0-eb545d26b497",
+      "actionId" : "8dba925e-07fb-4d88-af27-18d38eefede0"
+    }, {
+      "chainOrderId" : "0871e6c2-00c2-4160-81fd-0be1b1d6df72",
+      "actionId" : "0f023251-5b90-44d2-bb40-2224f504bb92"
+    } ],
+    "icon" : null
+  } ]
+}

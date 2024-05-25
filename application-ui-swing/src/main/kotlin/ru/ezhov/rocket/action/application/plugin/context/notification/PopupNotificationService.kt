@@ -1,6 +1,7 @@
 package ru.ezhov.rocket.action.application.plugin.context.notification
 
 import mu.KotlinLogging
+import org.springframework.stereotype.Service
 import ru.ezhov.rocket.action.api.context.notification.NotificationService
 import ru.ezhov.rocket.action.api.context.notification.NotificationType
 import java.awt.Dimension
@@ -13,6 +14,7 @@ import java.util.concurrent.Executors
 
 private val logger = KotlinLogging.logger { }
 
+@Service
 internal class PopupNotificationService : NotificationService {
     private val messages = ConcurrentLinkedDeque<Message>()
     private val executorService = Executors.newFixedThreadPool(4)

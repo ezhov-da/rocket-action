@@ -14,8 +14,8 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
 
-        <plugin-api.version>0.21.2</plugin-api.version>
-        <rocket-action-ui-utils.version>0.0.2</rocket-action-ui-utils.version>
+        <plugin-api.version>0.22.0</plugin-api.version>
+        <rocket-action-ui-utils.version>0.0.3</rocket-action-ui-utils.version>
         <rocket-action-utils.version>0.20.0</rocket-action-utils.version>
 
         <kotlin.version>1.8.10</kotlin.version>
@@ -31,6 +31,9 @@
         <mustache.version>0.9.10</mustache.version>
         <groovy.version>4.0.13</groovy.version>
         <mockk.version>1.13.4</mockk.version>
+        <jackson.version>2.13.3</jackson.version>
+        <snakeyaml.version>1.30</snakeyaml.version>
+        <commonmark.version>0.20.0</commonmark.version>
     </properties>
 
     <modules>
@@ -118,6 +121,30 @@
                 <version>${rsyntaxtextarea.version}</version>
             </dependency>
 
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-databind</artifactId>
+                <version>${jackson.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.fasterxml.jackson.datatype</groupId>
+                <artifactId>jackson-datatype-jsr310</artifactId>
+                <version>${jackson.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.fasterxml.jackson.module</groupId>
+                <artifactId>jackson-module-kotlin</artifactId>
+                <version>${jackson.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.yaml</groupId>
+                <artifactId>snakeyaml</artifactId>
+                <version>${snakeyaml.version}</version>
+            </dependency>
+
             <!-- ENGINES START -->
 
             <dependency>
@@ -168,6 +195,18 @@
                 <groupId>ch.qos.logback</groupId>
                 <artifactId>logback-classic</artifactId>
                 <version>${logback-classic.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.commonmark</groupId>
+                <artifactId>commonmark</artifactId>
+                <version>${commonmark.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.commonmark</groupId>
+                <artifactId>commonmark-ext-gfm-tables</artifactId>
+                <version>${commonmark.version}</version>
             </dependency>
 
             <!--TESTS-->

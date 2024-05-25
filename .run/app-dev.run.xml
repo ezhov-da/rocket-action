@@ -3,7 +3,7 @@
     <option name="MAIN_CLASS_NAME" value="ru.ezhov.rocket.action.application.AppKt" />
     <module name="rocket-action-application-ui-swing" />
     <shortenClasspath name="NONE" />
-    <option name="VM_PARAMETERS" value="-Drocket.action.is.developer=true -Drocket.action.handler.server.port=8080 -DLOGBACK_LOGGER_LEVEL=DEBUG" />
+    <option name="VM_PARAMETERS" value="-Drocket.action.is.developer=true -Drocket.action.handler.server.port=8080 -DLOGBACK_LOGGER_LEVEL=DEBUG -Drocket.action.chain-action.enabled=true" />
     <method v="2">
       <option name="Make" enabled="true" />
     </method>

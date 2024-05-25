@@ -6,7 +6,7 @@ import java.awt.event.FocusEvent
 import java.awt.event.FocusListener
 import javax.swing.JTextField
 
-open class TextFieldWithText(private val placeholder: String) : JTextField() {
+open class TextFieldWithText(var placeholder: String = "") : JTextField() {
     init {
         addFocusListener(object : FocusListener {
             override fun focusGained(e: FocusEvent?) {

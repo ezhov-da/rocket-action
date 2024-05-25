@@ -34,7 +34,7 @@ class ScriptSwingWorker(
                 type = NotificationType.WARN,
                 text = "Script execution error"
             )
-            it.message ?: "Error"
+            "Error.\nMessage: ${it.message}.\nStacktrace:\n${it.stackTraceToString()} "
         }
         val text = textAsObject?.toString() ?: "null result"
         afterExecuteCallback(text)

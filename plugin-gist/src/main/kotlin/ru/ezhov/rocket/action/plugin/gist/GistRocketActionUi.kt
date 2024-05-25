@@ -6,6 +6,7 @@ import ru.ezhov.rocket.action.api.RocketActionConfiguration
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
 import ru.ezhov.rocket.action.api.RocketActionFactoryUi
 import ru.ezhov.rocket.action.api.RocketActionPlugin
+import ru.ezhov.rocket.action.api.RocketActionPluginInfo
 import ru.ezhov.rocket.action.api.RocketActionSettings
 import ru.ezhov.rocket.action.api.RocketActionType
 import ru.ezhov.rocket.action.api.context.RocketActionContext
@@ -20,6 +21,7 @@ import java.awt.event.MouseEvent
 import java.io.IOException
 import java.net.URI
 import java.net.URISyntaxException
+import java.util.*
 import java.util.concurrent.ExecutionException
 import java.util.function.Consumer
 import javax.swing.DefaultListModel
@@ -34,16 +36,28 @@ import javax.swing.JScrollPane
 import javax.swing.JTextField
 import javax.swing.SwingUtilities
 import javax.swing.SwingWorker
+import kotlin.collections.ArrayList
 
 class GistRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
     private var actionContext: RocketActionContext? = null
 
-        override fun factory(context: RocketActionContext): RocketActionFactoryUi = this
+    override fun info(): RocketActionPluginInfo = Properties().let { properties ->
+        properties.load(this.javaClass.getResourceAsStream("/config/plugin-gist.properties"))
+        object : RocketActionPluginInfo {
+            override fun version(): String = properties.getProperty("version")
+
+            override fun author(): String = properties.getProperty("author")
+
+            override fun link(): String? = properties.getProperty("link")
+        }
+    }
+
+    override fun factory(context: RocketActionContext): RocketActionFactoryUi = this
         .apply {
             actionContext = context
         }
 
-        override fun configuration(context: RocketActionContext): RocketActionConfiguration = this
+    override fun configuration(context: RocketActionContext): RocketActionConfiguration = this
         .apply {
             actionContext = context
         }
@@ -194,7 +208,14 @@ class GistRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
             })
             val panelSearchAndUpdate = JPanel(BorderLayout())
             val buttonUpdate = JButton(actionContext!!.icon().by(AppIcon.RELOAD))
-            buttonUpdate.addActionListener { GistWorker(menu, gistUrl = gistUrl, token = token, username = username).execute() }
+            buttonUpdate.addActionListener {
+                GistWorker(
+                    menu,
+                    gistUrl = gistUrl,
+                    token = token,
+                    username = username
+                ).execute()
+            }
             panelSearchAndUpdate.add(textFieldSearch, BorderLayout.CENTER)
             panelSearchAndUpdate.add(buttonUpdate, BorderLayout.EAST)
             add(panelSearchAndUpdate, BorderLayout.NORTH)

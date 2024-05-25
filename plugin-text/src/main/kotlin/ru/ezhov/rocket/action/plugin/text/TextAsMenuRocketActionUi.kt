@@ -5,6 +5,7 @@ import ru.ezhov.rocket.action.api.RocketActionConfiguration
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
 import ru.ezhov.rocket.action.api.RocketActionFactoryUi
 import ru.ezhov.rocket.action.api.RocketActionPlugin
+import ru.ezhov.rocket.action.api.RocketActionPluginInfo
 import ru.ezhov.rocket.action.api.RocketActionSettings
 import ru.ezhov.rocket.action.api.RocketActionType
 import ru.ezhov.rocket.action.api.context.RocketActionContext
@@ -17,6 +18,7 @@ import java.awt.Component
 import java.awt.Toolkit
 import java.awt.datatransfer.StringSelection
 import java.awt.event.ActionEvent
+import java.util.*
 import javax.swing.AbstractAction
 import javax.swing.Icon
 import javax.swing.JButton
@@ -32,6 +34,17 @@ import javax.swing.WindowConstants
 
 class TextAsMenuRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
     private var actionContext: RocketActionContext? = null
+
+    override fun info(): RocketActionPluginInfo = Properties().let { properties ->
+        properties.load(this.javaClass.getResourceAsStream("/config/plugin-text.properties"))
+        object : RocketActionPluginInfo {
+            override fun version(): String = properties.getProperty("version")
+
+            override fun author(): String = properties.getProperty("author")
+
+            override fun link(): String? = properties.getProperty("link")
+        }
+    }
 
     override fun factory(context: RocketActionContext): RocketActionFactoryUi = this
         .apply {
@@ -49,7 +62,12 @@ class TextAsMenuRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
         listOf(
             createRocketActionProperty(key = LABEL, name = LABEL, description = "Title", required = true),
             createRocketActionProperty(key = TEXT, name = TEXT, description = "Text", required = true),
-            createRocketActionProperty(key = DESCRIPTION, name = DESCRIPTION, description = "Description", required = false),
+            createRocketActionProperty(
+                key = DESCRIPTION,
+                name = DESCRIPTION,
+                description = "Description",
+                required = false
+            ),
         )
 
     override fun create(settings: RocketActionSettings, context: RocketActionContext): RocketAction? =

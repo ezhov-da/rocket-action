@@ -5,6 +5,7 @@ import ru.ezhov.rocket.action.api.RocketAction
 import ru.ezhov.rocket.action.api.RocketActionConfiguration
 import ru.ezhov.rocket.action.api.RocketActionFactoryUi
 import ru.ezhov.rocket.action.api.RocketActionPlugin
+import ru.ezhov.rocket.action.api.RocketActionPluginInfo
 import ru.ezhov.rocket.action.api.RocketActionSettings
 import ru.ezhov.rocket.action.api.RocketActionType
 import ru.ezhov.rocket.action.api.context.RocketActionContext
@@ -27,6 +28,8 @@ class RocketActionPluginDecorator(
 
     override fun configuration(context: RocketActionContext): RocketActionConfiguration =
         rocketActionPluginOriginal.configuration(context)
+
+    override fun info(): RocketActionPluginInfo = rocketActionPluginOriginal.info()
 }
 
 class RocketActionFactoryUiDecorator(

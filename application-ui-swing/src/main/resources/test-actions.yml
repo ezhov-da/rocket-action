@@ -1,5 +1,11 @@
 ---
 actions:
+    -   type: GROUP
+        _id: de16aba8-c229-11ec-9d64-0242ac3420002
+        label: GROUP FOR ADD FROM HTTP
+        iconUrl: null
+        description: description
+        actions: [ ]
 
     -   type: TODOIST
         _id: de1a6ba8-c229-11ec-9d64-0242ac120002
@@ -652,7 +658,7 @@ actions:
         _id: de30aba8-c229-11ec-9d64-0242ac120002
         label: "Test File"
         description: "Описание"
-        pathAndName: "./notes/d9530ff6-a228-11ec-b909-0242ac120002.txt"
+        pathAndName: "./.rocket-action/plugins/notes/d9530ff6-a228-11ec-b909-0242ac120002.txt"
 
     -   type: JIRA_WORK_LOG
         _id: de31aba8-c229-11ec-9d64-0242ac120002

@@ -24,10 +24,10 @@ class InMemoryRocketActionComponentCache : RocketActionComponentCache {
     override fun handlers(): List<RocketActionHandler> =
         map
             .values
-            .mapNotNull { it as? RocketActionHandler }
+            .mapNotNull { it.origin as? RocketActionHandler }
             .toList()
 
-    override fun handlerBy(id: String): RocketActionHandler? = map[id] as? RocketActionHandler
+    override fun handlerBy(id: String): RocketActionHandler? = map[id]?.origin as? RocketActionHandler
 
     override fun clear() {
         map.clear()
