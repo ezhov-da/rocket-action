@@ -107,6 +107,8 @@ class UiQuickActionService(
             val textField =
                 TextFieldWithText("Search")
                     .apply { ->
+                        toolTipText = searchService.searchDescription()
+
                         val tf = this
                         columns = 5
                         addKeyListener(object : KeyAdapter() {
