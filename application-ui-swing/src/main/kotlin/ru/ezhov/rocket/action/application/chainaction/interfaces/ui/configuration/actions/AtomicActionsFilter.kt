@@ -38,7 +38,8 @@ object AtomicActionsFilter {
                 } else {
                     sortedAtomics
                         .filter {
-                            it.name.lowercase().contains(searchAction.text.lowercase()) ||
+                            it.id.lowercase().contains(searchAction.text.lowercase()) ||
+                                it.name.lowercase().contains(searchAction.text.lowercase()) ||
                                 it.description.lowercase().contains(searchAction.text.lowercase()) ||
                                 it.data.lowercase().contains(searchAction.text.lowercase()) ||
                                 it.alias?.lowercase()?.contains(searchAction.text.lowercase()) ?: false

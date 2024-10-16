@@ -105,8 +105,8 @@ class ActionExecuteStatusPanel(
             label.addMouseListener(object : MouseAdapter() {
                 override fun mouseReleased(e: MouseEvent) {
                     val text = when {
-                        success == null -> failure!!.exception.stackTraceToString()
-                        failure == null -> success!!.result?.toString().orEmpty()
+                        success == null -> failure?.exception?.stackTraceToString() ?: "Not success"
+                        failure == null -> success?.result?.toString().orEmpty()
                         else -> "No execution result"
                     }
 

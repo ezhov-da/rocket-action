@@ -23,7 +23,7 @@ fun main() {
                 atomicActionService = AtomicActionService(JsonAtomicActionRepository(TestUtilsFactory.objectMapper)),
                 chainActionService = mockk(),
                 createAndEditChainActionDialog = mockk(),
-                actionExecutor = mockk(),
+                actionExecutorService = mockk(),
                 iconRepository = mockk(),
             )
         )

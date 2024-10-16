@@ -12,6 +12,7 @@ import ru.ezhov.rocket.action.application.chainaction.domain.event.AtomicActionU
 import ru.ezhov.rocket.action.application.chainaction.domain.model.ActionOrder
 import ru.ezhov.rocket.action.application.chainaction.domain.model.AtomicAction
 import ru.ezhov.rocket.action.application.chainaction.domain.model.ChainAction
+import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.base.ActionExecutePanel
 import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.configuration.actions.AtomicActionsFilter
 import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.configuration.actions.SearchActionPanelConfiguration
 import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.configuration.actions.SortActionPanelConfiguration
@@ -55,12 +56,20 @@ class CreateAndEditChainActionDialog(
     private val atomicActionService: AtomicActionService,
     private val iconRepository: IconRepository,
 ) : JDialog() {
+
+    private val createAndEditAtomicActionDialog = CreateAndEditAtomicActionDialog(
+        atomicActionService = atomicActionService,
+        actionExecutorService = actionExecutorService,
+        iconRepository = iconRepository,
+    )
+
     private val contentPane = JPanel(MigLayout("insets 5"/*"debug"*/))
 
     private val sortActionPanelConfiguration = SortActionPanelConfiguration()
     private val searchActionPanelConfiguration = SearchActionPanelConfiguration()
 
     private val buttonSave: JButton = JButton("Save")
+    private val buttonSaveAndClose: JButton = JButton("Save & Close")
     private val buttonCancel: JButton = JButton("Cancel")
 
     private val idTextField: JTextField = JTextField().apply { isEditable = false }
@@ -83,6 +92,8 @@ class CreateAndEditChainActionDialog(
     private val allListActions = JList(allListActionsModel)
     private val selectedListActionsModel = DefaultListModel<SelectedAtomicAction>()
     private val selectedListActions = JList(selectedListActionsModel)
+
+    private val actionExecutePanel = ActionExecutePanel(actionExecutorService)
 
     init {
         allListActions.cellRenderer = AtomicActionListCellRenderer(chainActionService)
@@ -137,6 +148,16 @@ class CreateAndEditChainActionDialog(
             }
         })
 
+        selectedListActions.addMouseListener(object : MouseAdapter() {
+            override fun mouseClicked(e: MouseEvent) {
+                if (e.clickCount == 2) {
+                    selectedListActions.selectedValue?.let { value ->
+                        createAndEditAtomicActionDialog.showEditDialog(value.atomicAction)
+                    }
+                }
+            }
+        })
+
         contentPane.add(idLabel, "split 4")
         contentPane.add(idTextField, "wmin 25%")
         contentPane.add(copyIdButton)
@@ -181,15 +202,19 @@ class CreateAndEditChainActionDialog(
             }, "span, width max, height max"
         )
 
+        contentPane.add(actionExecutePanel, "span, width max, hidemode 3")
+
         contentPane.add(
             JPanel(MigLayout(/*"debug"*/"insets 0 0 0 0")).apply {
                 add(buttonSave, "push, align right")
+                add(buttonSaveAndClose)
                 add(buttonCancel)
             }, "width max, span"
         )
 
         getRootPane().defaultButton = buttonSave
-        buttonSave.addActionListener { onOK() }
+        buttonSave.addActionListener { onOK(isClosed = false) }
+        buttonSaveAndClose.addActionListener { onOK(isClosed = true) }
         buttonCancel.addActionListener { onCancel() }
 
         // call onCancel() when cross is clicked
@@ -223,7 +248,7 @@ class CreateAndEditChainActionDialog(
 
     private var dialogType: DialogType? = null
     private var currentEditChainAction: ChainAction? = null
-    private fun onOK() {
+    private fun onOK(isClosed: Boolean) {
         when (dialogType!!) {
             DialogType.CREATE -> {
                 chainActionService.addChain(
@@ -254,12 +279,12 @@ class CreateAndEditChainActionDialog(
                     }
                     icon = selectIconPanel.selectedIcon()
                 })
-
-                isVisible = false
             }
         }
 
-        dispose()
+        if (isClosed) {
+            dispose()
+        }
     }
 
     private fun onCancel() {
@@ -276,6 +301,8 @@ class CreateAndEditChainActionDialog(
         descriptionTextPane.text = ""
         selectedListActionsModel.removeAllElements()
 
+        actionExecutePanel.isVisible = false
+
         selectIconPanel.setIcon(null)
 
         isVisible = true
@@ -290,6 +317,8 @@ class CreateAndEditChainActionDialog(
         descriptionTextPane.text = ""
 
         selectedListActionsModel.removeAllElements()
+
+        actionExecutePanel.isVisible = false
 
         selectIconPanel.setIcon(null)
 
@@ -311,6 +340,9 @@ class CreateAndEditChainActionDialog(
         this.currentEditChainAction = chainAction
         nameTextField.text = chainAction.name
         descriptionTextPane.text = chainAction.description
+
+        actionExecutePanel.isVisible = true
+        actionExecutePanel.setCurrentAction(chainAction)
 
         selectedListActionsModel.removeAllElements()
 

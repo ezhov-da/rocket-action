@@ -43,7 +43,7 @@ class ChainConfigurationFrame(
         atomicActionService = atomicActionService,
         chainActionService = chainActionService,
         createAndEditChainActionDialog = createChainActionDialog,
-        actionExecutor = actionExecutor,
+        actionExecutorService = actionExecutorService,
         iconRepository = iconRepository,
     )
 
@@ -83,7 +83,7 @@ class ChainConfigurationFrame(
             }
         })
 
-        // call onCancel() on ESCAPE
+        // call onCancel() or ESCAPE
         contentPane.registerKeyboardAction(
             { onCancel() },
             KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),

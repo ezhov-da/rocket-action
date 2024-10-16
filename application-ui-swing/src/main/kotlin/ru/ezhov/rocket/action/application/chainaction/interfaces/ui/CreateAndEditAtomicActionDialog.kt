@@ -4,12 +4,13 @@ import net.miginfocom.swing.MigLayout
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants
 import org.fife.ui.rtextarea.RTextScrollPane
+import ru.ezhov.rocket.action.application.chainaction.application.ActionExecutorService
 import ru.ezhov.rocket.action.application.chainaction.application.AtomicActionService
-import ru.ezhov.rocket.action.application.chainaction.domain.ActionExecutor
 import ru.ezhov.rocket.action.application.chainaction.domain.model.AtomicAction
 import ru.ezhov.rocket.action.application.chainaction.domain.model.AtomicActionEngine
 import ru.ezhov.rocket.action.application.chainaction.domain.model.AtomicActionSource
 import ru.ezhov.rocket.action.application.chainaction.domain.model.ContractType
+import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.base.ActionExecutePanel
 import ru.ezhov.rocket.action.application.icon.infrastructure.IconRepository
 import ru.ezhov.rocket.action.application.icon.interfaces.ui.SelectIconPanel
 import ru.ezhov.rocket.action.application.resources.Icons
@@ -31,11 +32,12 @@ import javax.swing.KeyStroke
 
 class CreateAndEditAtomicActionDialog(
     private val atomicActionService: AtomicActionService,
-    private val iconRepository: IconRepository,
-    actionExecutor: ActionExecutor,
+    iconRepository: IconRepository,
+    actionExecutorService: ActionExecutorService,
 ) : JDialog() {
     private val contentPane = JPanel(MigLayout(/*"debug"*/))
     private val buttonSave: JButton = JButton("Save")
+    private val buttonSaveAndClose: JButton = JButton("Save & Close")
     private val buttonCancel: JButton = JButton("Cancel")
 
     private val idTextField: JTextField = JTextField().apply { isEditable = false }
@@ -75,10 +77,12 @@ class CreateAndEditAtomicActionDialog(
 
     private val dataText = listOf(
         "Data:",
-    ) + actionExecutor.additionalVariables().map { "<b>${it.name}</b> - ${it.description}" }
+    ) + actionExecutorService.actionExecutor.additionalVariables().map { "<b>${it.name}</b> - ${it.description}" }
 
     private val dataLabel: JLabel =
         JLabel("<html>${dataText.joinToString(separator = "<br>")}").apply { labelFor = dataTextPane }
+
+    private val actionExecutePanel = ActionExecutePanel(actionExecutorService)
 
     init {
         kotlinEngine.isSelected = true
@@ -129,16 +133,21 @@ class CreateAndEditAtomicActionDialog(
         contentPane.add(dataLabel, "wrap")
         contentPane.add(RTextScrollPane(dataTextPane), "span, height max, width max")
 
+        contentPane.add(actionExecutePanel, "span, width max, hidemode 3")
+
         contentPane.add(
             JPanel(MigLayout(/*"debug"*/"insets 0 0 0 0")).apply {
                 add(buttonSave, "push, align right")
+                add(buttonSaveAndClose)
                 add(buttonCancel)
-            }, "width max, span"
+            },
+            "width max, span"
         )
 
         setContentPane(contentPane)
         getRootPane().defaultButton = buttonSave
-        buttonSave.addActionListener { onOK() }
+        buttonSave.addActionListener { onOK(isClosed = false) }
+        buttonSaveAndClose.addActionListener { onOK(isClosed = true) }
         buttonCancel.addActionListener { onCancel() }
 
         setKotlinSyntax()
@@ -183,7 +192,7 @@ class CreateAndEditAtomicActionDialog(
     }
 
     // TODO ezhov
-    private fun onOK() {
+    private fun onOK(isClosed: Boolean) {
         when (dialogType!!) {
             DialogType.CREATE -> {
                 atomicActionService.addAtomic(
@@ -249,7 +258,9 @@ class CreateAndEditAtomicActionDialog(
             }
         }
 
-        dispose()
+        if (isClosed) {
+            dispose()
+        }
     }
 
     private fun onCancel() {
@@ -264,6 +275,7 @@ class CreateAndEditAtomicActionDialog(
 
         dialogType = DialogType.CREATE
 
+        idTextField.text = ""
         nameTextField.text = ""
         descriptionTextPane.text = ""
         kotlinEngine.isSelected = true
@@ -273,13 +285,15 @@ class CreateAndEditAtomicActionDialog(
 
         selectIconPanel.setIcon(null)
 
+        actionExecutePanel.isVisible = false
+
         isVisible = true
     }
 
     private var currentAction: AtomicAction? = null
 
     fun showEditDialog(action: AtomicAction) {
-        title = "Edit atomic action"
+        title = "Edit atomic action '${action.id}'"
 
         dialogType = DialogType.EDIT
 
@@ -292,6 +306,9 @@ class CreateAndEditAtomicActionDialog(
         nameTextField.text = action.name
 
         descriptionTextPane.text = action.description
+
+        actionExecutePanel.isVisible = true
+        actionExecutePanel.setCurrentAction(action)
 
         when (action.contractType) {
             ContractType.IN_OUT -> inOutRadioButton.isSelected = true

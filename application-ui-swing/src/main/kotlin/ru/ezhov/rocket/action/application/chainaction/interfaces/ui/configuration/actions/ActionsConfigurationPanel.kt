@@ -1,9 +1,9 @@
 package ru.ezhov.rocket.action.application.chainaction.interfaces.ui.configuration.actions
 
 import net.miginfocom.swing.MigLayout
+import ru.ezhov.rocket.action.application.chainaction.application.ActionExecutorService
 import ru.ezhov.rocket.action.application.chainaction.application.AtomicActionService
 import ru.ezhov.rocket.action.application.chainaction.application.ChainActionService
-import ru.ezhov.rocket.action.application.chainaction.domain.ActionExecutor
 import ru.ezhov.rocket.action.application.chainaction.domain.event.AtomicActionCreatedDomainEvent
 import ru.ezhov.rocket.action.application.chainaction.domain.event.AtomicActionDeletedDomainEvent
 import ru.ezhov.rocket.action.application.chainaction.domain.event.AtomicActionUpdatedDomainEvent
@@ -35,8 +35,8 @@ class ActionsConfigurationPanel(
     private val atomicActionService: AtomicActionService,
     private val chainActionService: ChainActionService,
     private val createAndEditChainActionDialog: CreateAndEditChainActionDialog,
-    private val actionExecutor: ActionExecutor,
-    private val iconRepository: IconRepository,
+    actionExecutorService: ActionExecutorService,
+    iconRepository: IconRepository,
 ) : JPanel(MigLayout()) {
     private val sortActionPanelConfiguration = SortActionPanelConfiguration()
     private val searchActionPanelConfiguration = SearchActionPanelConfiguration()
@@ -53,7 +53,7 @@ class ActionsConfigurationPanel(
 
     private val createAndEditAtomicActionDialog = CreateAndEditAtomicActionDialog(
         atomicActionService = atomicActionService,
-        actionExecutor = actionExecutor,
+        actionExecutorService = actionExecutorService,
         iconRepository = iconRepository,
     )
 

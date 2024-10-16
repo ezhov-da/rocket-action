@@ -50,7 +50,7 @@ First argument is file with actions.
 
 ## Release
 
-Change version in application-ui-swing/pom.xml#version
+Change version in [application-ui-swing/pom.xml](application-ui-swing/pom.xml)
 
 ```bash
 mvn clean package

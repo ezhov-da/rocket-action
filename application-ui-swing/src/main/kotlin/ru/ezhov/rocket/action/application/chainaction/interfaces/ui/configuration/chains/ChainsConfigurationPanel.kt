@@ -182,7 +182,8 @@ class ChainsConfigurationPanel(
                 } else {
                     sortedChains
                         .filter {
-                            it.name.lowercase().contains(searchAction.text.lowercase()) ||
+                            it.id.lowercase().contains(searchAction.text.lowercase()) ||
+                                it.name.lowercase().contains(searchAction.text.lowercase()) ||
                                 it.description.lowercase().contains(searchAction.text.lowercase())
                         }
                 }

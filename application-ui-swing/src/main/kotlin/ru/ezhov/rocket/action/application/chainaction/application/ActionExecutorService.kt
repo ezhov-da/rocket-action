@@ -6,7 +6,8 @@ import ru.ezhov.rocket.action.application.chainaction.domain.ProgressExecutingAc
 
 @Service
 class ActionExecutorService(
-    private val actionExecutor: ActionExecutor,
+    // TODO We'll open it temporarily
+    val actionExecutor: ActionExecutor,
     private val chainActionService: ChainActionService,
     private val atomicActionService: AtomicActionService,
 ) {
