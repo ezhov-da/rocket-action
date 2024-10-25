@@ -59,7 +59,7 @@ class ChainBasePanel(
         addCtrlV(textFieldPaste)
         addEnter(textFieldPaste)
 
-        add(textFieldPaste, "width 100%, split")
+        add(textFieldPaste, "width 100%, growx 0, split") // growx 0 не должно расти по ширине
         add(openAvailableActionsButton, "wmax 25")
         add(openConfigurationButton, "wrap, wmax 25")
         add(actionExecuteStatusPanel, "hmax 6, width max, hidemode 2")

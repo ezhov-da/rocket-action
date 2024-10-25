@@ -22,13 +22,13 @@ fun main(args: Array<String>) {
         }
         val dialog = CreateAndEditChainActionDialog(
             actionExecutorService = ActionExecutorService(
-                ActionExecutorImpl(
+                actionExecutor = ActionExecutorImpl(
                     engineFactory = EngineFactory(),
                     variablesApplication = mockk(),
                     atomicActionService = mockk(),
                 ),
-                mockk(),
-                mockk(),
+                chainActionService = mockk(),
+                atomicActionService = mockk(),
             ),
             chainActionService = ChainActionService(
                 JsonChainActionRepository(TestUtilsFactory.objectMapper),

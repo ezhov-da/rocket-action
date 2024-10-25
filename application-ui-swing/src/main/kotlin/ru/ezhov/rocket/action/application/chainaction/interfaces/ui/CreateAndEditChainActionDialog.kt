@@ -167,7 +167,7 @@ class CreateAndEditChainActionDialog(
         contentPane.add(nameTextField, "wrap, width max, grow")
 
         contentPane.add(descriptionLabel, "wrap")
-        contentPane.add(RTextScrollPane(descriptionTextPane, false), "span, wrap, width max, hmin 30%")
+        contentPane.add(RTextScrollPane(descriptionTextPane, false), "span, wrap, width max, hmin 18%")
 
         contentPane.add(
             JPanel(MigLayout())
@@ -202,11 +202,12 @@ class CreateAndEditChainActionDialog(
             }, "span, width max, height max"
         )
 
-        contentPane.add(actionExecutePanel, "span, width max, hidemode 3")
+        contentPane.add(actionExecutePanel, "hidemode 3, span, grow, h 150!")
 
         contentPane.add(
             JPanel(MigLayout(/*"debug"*/"insets 0 0 0 0")).apply {
-                add(buttonSave, "push, align right")
+                add(JLabel(), "push, align right")
+                add(buttonSave)
                 add(buttonSaveAndClose)
                 add(buttonCancel)
             }, "width max, span"
@@ -302,6 +303,7 @@ class CreateAndEditChainActionDialog(
         selectedListActionsModel.removeAllElements()
 
         actionExecutePanel.isVisible = false
+        buttonSave.isVisible = false
 
         selectIconPanel.setIcon(null)
 
@@ -319,6 +321,7 @@ class CreateAndEditChainActionDialog(
         selectedListActionsModel.removeAllElements()
 
         actionExecutePanel.isVisible = false
+        buttonSave.isVisible = false
 
         selectIconPanel.setIcon(null)
 
@@ -347,6 +350,8 @@ class CreateAndEditChainActionDialog(
         selectedListActionsModel.removeAllElements()
 
         selectIconPanel.setIcon(chainAction.icon)
+
+        buttonSave.isVisible = true
 
         val actions = atomicActionService.atomics().associateBy { it.id }
         chainAction.actions.forEach { order ->

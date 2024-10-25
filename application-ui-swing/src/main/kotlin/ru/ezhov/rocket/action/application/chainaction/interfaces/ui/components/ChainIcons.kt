@@ -11,11 +11,11 @@ import javax.swing.Icon
 
 object ChainIcons {
     val IN_IMAGE_ICON_8x8 = Icons.Standard.CHEVRON_RIGHT_8x8
-    val OUT_IMAGE_ICON_8x8 = Icons.Standard.CHEVRON_LEFT_8x8
+    val OUT_IMAGE_ICON_8x8 = Icons.Standard.CHEVRON_RIGHT_8x8
     val UNIT_IMAGE_ICON_8x8 = Icons.Standard.MEDIA_RECORD_8x8
 
     val IN_IMAGE_ICON_16x16 = Icons.Standard.CHEVRON_RIGHT_16x16
-    val OUT_IMAGE_ICON_16x16 = Icons.Standard.CHEVRON_LEFT_16x16
+    val OUT_IMAGE_ICON_16x16 = Icons.Standard.CHEVRON_RIGHT_16x16
     val UNIT_IMAGE_ICON_16x16 = Icons.Standard.MEDIA_RECORD_16x16
 
     val IN_OUT_ICON_8x8 = CompoundIcon(IN_IMAGE_ICON_8x8, OUT_IMAGE_ICON_8x8)

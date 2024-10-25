@@ -133,11 +133,12 @@ class CreateAndEditAtomicActionDialog(
         contentPane.add(dataLabel, "wrap")
         contentPane.add(RTextScrollPane(dataTextPane), "span, height max, width max")
 
-        contentPane.add(actionExecutePanel, "span, width max, hidemode 3")
+        contentPane.add(actionExecutePanel, "hidemode 3, span, grow, h 150!")
 
         contentPane.add(
             JPanel(MigLayout(/*"debug"*/"insets 0 0 0 0")).apply {
-                add(buttonSave, "push, align right")
+                add(JLabel(), "push, align right")
+                add(buttonSave)
                 add(buttonSaveAndClose)
                 add(buttonCancel)
             },
@@ -287,6 +288,8 @@ class CreateAndEditAtomicActionDialog(
 
         actionExecutePanel.isVisible = false
 
+        buttonSave.isVisible = false
+
         isVisible = true
     }
 
@@ -309,6 +312,8 @@ class CreateAndEditAtomicActionDialog(
 
         actionExecutePanel.isVisible = true
         actionExecutePanel.setCurrentAction(action)
+
+        buttonSave.isVisible = true
 
         when (action.contractType) {
             ContractType.IN_OUT -> inOutRadioButton.isSelected = true
