@@ -9,7 +9,6 @@ import ru.ezhov.rocket.action.application.eventui.ConfigurationUiObserverFactory
 import ru.ezhov.rocket.action.application.eventui.model.ShowChainActionConfigurationUiEvent
 import ru.ezhov.rocket.action.application.resources.Icons
 import ru.ezhov.rocket.action.ui.utils.swing.common.TextFieldWithText
-import java.awt.Color
 import java.awt.Toolkit
 import java.awt.datatransfer.Clipboard
 import java.awt.datatransfer.DataFlavor
@@ -73,8 +72,6 @@ class ChainBasePanel(
         openConfigurationButton.addActionListener {
             ConfigurationUiObserverFactory.observer.notify(ShowChainActionConfigurationUiEvent(chainBasePanel))
         }
-
-        border = BorderFactory.createLineBorder(Color.GRAY)
     }
 
     private fun addDropTargetTo(component: JComponent) {

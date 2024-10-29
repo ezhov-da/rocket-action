@@ -4,6 +4,8 @@ import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.ChainBasePan
 import ru.ezhov.rocket.action.application.properties.GeneralPropertiesRepository
 import ru.ezhov.rocket.action.application.properties.UsedPropertiesName
 import java.awt.BorderLayout
+import java.awt.Color
+import javax.swing.BorderFactory
 import javax.swing.JDialog
 
 class BaseDialog(
@@ -12,9 +14,12 @@ class BaseDialog(
     chainBasePanelFactory: ChainBasePanelFactory,
 ) : JDialog() {
     init {
-        jMenuBar = uiQuickActionService.createMenu(this)
+        val menuAndSearch = uiQuickActionService.createMenu(this)
+
+        jMenuBar = menuAndSearch.menu
 
         if (generalPropertiesRepository.asBoolean(UsedPropertiesName.CHAIN_ACTION_ENABLE, false)) {
+            add(menuAndSearch.search, BorderLayout.NORTH)
             add(chainBasePanelFactory.chainBasePanel, BorderLayout.CENTER)
         }
 
@@ -22,6 +27,8 @@ class BaseDialog(
 
         opacity = generalPropertiesRepository
             .asFloat(name = UsedPropertiesName.UI_BASE_DIALOG_OPACITY, default = 0.7F)
+
+        rootPane.border = BorderFactory.createLineBorder(Color.GRAY)
 
         isAlwaysOnTop = true
         setLocationRelativeTo(null)

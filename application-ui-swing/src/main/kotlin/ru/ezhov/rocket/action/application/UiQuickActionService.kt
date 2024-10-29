@@ -22,15 +22,16 @@ import ru.ezhov.rocket.action.application.tags.domain.TagNode
 import ru.ezhov.rocket.action.application.ui.color.ColorConstants
 import ru.ezhov.rocket.action.ui.utils.swing.common.MoveUtil
 import ru.ezhov.rocket.action.ui.utils.swing.common.TextFieldWithText
+import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Component
-import java.awt.FlowLayout
 import java.awt.event.ActionListener
 import java.awt.event.KeyAdapter
 import java.awt.event.KeyEvent
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import javax.swing.BorderFactory
+import javax.swing.Box
 import javax.swing.ImageIcon
 import javax.swing.JButton
 import javax.swing.JDialog
@@ -75,7 +76,7 @@ class UiQuickActionService(
         })
     }
 
-    fun createMenu(baseDialog: JDialog): JMenuBar {
+    fun createMenu(baseDialog: JDialog): ManuAndSearchPanel {
         this.baseDialog = baseDialog
         return try {
             val menuBar = JMenuBar()
@@ -86,7 +87,8 @@ class UiQuickActionService(
 
             val tagsMenu = createEmptyTagsMenu()
             menuBar.add(tagsMenu);
-            menuBar.add(createSearchField(menu))
+
+            menuBar.add(Box.createHorizontalGlue());
 
             val moveLabel = JLabel(rocketActionContextFactory.context.icon().by(AppIcon.MOVE))
             MoveUtil.addMoveAction(movableComponent = baseDialog, grabbedComponent = moveLabel)
@@ -95,14 +97,19 @@ class UiQuickActionService(
 
             menuBar.add(moveLabel)
             CreateMenuOrGetExistsWorker(menu, Action.Create(tagsMenu)).execute()
-            menuBar
+
+
+            ManuAndSearchPanel(
+                menu = menuBar,
+                search = createSearchField(menu)
+            )
         } catch (e: Exception) {
             throw UiQuickActionServiceException("Error", e)
         }
     }
 
     private fun createSearchField(menu: JMenu): Component =
-        JPanel(FlowLayout(FlowLayout.LEFT, 2, 1)).apply {
+        JPanel(BorderLayout()).apply {
             border = BorderFactory.createEmptyBorder()
             val textField =
                 TextFieldWithText("Search")
@@ -138,7 +145,7 @@ class UiQuickActionService(
                             }
                         })
                     }
-            add(textField)
+            add(textField, BorderLayout.CENTER)
 
             val backgroundColor = JMenu().background
             background = backgroundColor
@@ -153,7 +160,8 @@ class UiQuickActionService(
                                 resetSearch(textField = textField, menu = menu)
                             }
                         })
-                    }
+                    },
+                BorderLayout.EAST
             )
         }
 
@@ -280,7 +288,7 @@ class UiQuickActionService(
         SwingUtilities.invokeLater {
             var newMenuBar: JMenuBar? = null
             try {
-                newMenuBar = createMenu(baseDialog!!)
+                newMenuBar = createMenu(baseDialog!!).menu
             } catch (ex: UiQuickActionServiceException) {
                 ex.printStackTrace()
                 rocketActionContextFactory.context.notification()
@@ -337,3 +345,9 @@ class UiQuickActionService(
         object Restore : Action()
     }
 }
+
+
+data class ManuAndSearchPanel(
+    val menu: JMenuBar,
+    val search: Component,
+)
