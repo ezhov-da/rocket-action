@@ -36,7 +36,7 @@ class ChainBasePanel(
     private val chainActionService: ChainActionService,
     private val atomicActionService: AtomicActionService,
     private val configurationApplication: ConfigurationApplication,
-) : JPanel(MigLayout(/*"debug"*/)) {
+) : JPanel(MigLayout(/*"debug"*/"insets 0" /*убираем отступы*/)) {
     private val textFieldPaste = TextFieldWithText(
         "Drag, paste or type"
     ).apply {

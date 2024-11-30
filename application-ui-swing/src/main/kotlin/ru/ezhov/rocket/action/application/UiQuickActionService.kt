@@ -1,6 +1,7 @@
 package ru.ezhov.rocket.action.application
 
 import mu.KotlinLogging
+import net.miginfocom.swing.MigLayout
 import org.springframework.stereotype.Service
 import ru.ezhov.rocket.action.api.RocketAction
 import ru.ezhov.rocket.action.api.context.icon.AppIcon
@@ -22,7 +23,6 @@ import ru.ezhov.rocket.action.application.tags.domain.TagNode
 import ru.ezhov.rocket.action.application.ui.color.ColorConstants
 import ru.ezhov.rocket.action.ui.utils.swing.common.MoveUtil
 import ru.ezhov.rocket.action.ui.utils.swing.common.TextFieldWithText
-import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Component
 import java.awt.event.ActionListener
@@ -40,6 +40,7 @@ import javax.swing.JMenu
 import javax.swing.JMenuBar
 import javax.swing.JMenuItem
 import javax.swing.JPanel
+import javax.swing.JSeparator
 import javax.swing.JTextField
 import javax.swing.SwingUtilities
 import javax.swing.SwingWorker
@@ -56,6 +57,12 @@ class UiQuickActionService(
     private val configurationFrameFactory: ConfigurationFrameFactory
 ) {
     private var baseDialog: JDialog? = null
+
+    // The field is required for synchronization throughout the class
+    private var currentMenu: JMenu? = null
+
+    private var minimiseMaximiseAction: ((WindowState) -> Unit)? = null
+    private var currentWindowState = WindowState.MAXIMISE
 
     init {
         DomainEventFactory.subscriberRegistrar.subscribe(object : DomainEventSubscriber {
@@ -76,8 +83,11 @@ class UiQuickActionService(
         })
     }
 
-    fun createMenu(baseDialog: JDialog): ManuAndSearchPanel {
+    fun currentMenu(): JMenu? = currentMenu
+
+    fun createMenu(baseDialog: JDialog, minimiseMaximiseAction: (WindowState) -> Unit): ManuAndSearchPanel {
         this.baseDialog = baseDialog
+        this.minimiseMaximiseAction = minimiseMaximiseAction
         return try {
             val menuBar = JMenuBar()
             val menu = JMenu()
@@ -98,18 +108,19 @@ class UiQuickActionService(
             menuBar.add(moveLabel)
             CreateMenuOrGetExistsWorker(menu, Action.Create(tagsMenu)).execute()
 
+            currentMenu = menu
 
             ManuAndSearchPanel(
                 menu = menuBar,
-                search = createSearchField(menu)
+                search = createSearchField()
             )
         } catch (e: Exception) {
             throw UiQuickActionServiceException("Error", e)
         }
     }
 
-    private fun createSearchField(menu: JMenu): Component =
-        JPanel(BorderLayout()).apply {
+    private fun createSearchField(): Component =
+        JPanel(MigLayout(/*"debug"*/"insets 0" /*убираем отступы*/)).apply {
             border = BorderFactory.createEmptyBorder()
             val textField =
                 TextFieldWithText("Search")
@@ -122,7 +133,6 @@ class UiQuickActionService(
                             override fun keyPressed(e: KeyEvent) {
                                 if (e.keyCode == KeyEvent.VK_ENTER) {
                                     if (text.isNotEmpty()) {
-
                                         val idsRA = searchService.search(text).toSet()
                                         val raByFullText = rocketActionSettingsService.actionsByIds(idsRA)
                                         val raByContains = rocketActionSettingsService.actionsByContains(text)
@@ -133,36 +143,35 @@ class UiQuickActionService(
                                             ?.let { ra ->
                                                 logger.info { "Found by search '$text': ${ra.size}" }
                                                 tf.background = ColorConstants.COLOR_SUCCESS
-                                                fillMenuByRocketAction(ra, menu)
+                                                fillMenuByRocketAction(ra, currentMenu!!)
                                             }
                                     } else {
                                         SwingUtilities.invokeLater { tf.background = Color.WHITE }
-                                        CreateMenuOrGetExistsWorker(menu, Action.Restore).execute()
+                                        CreateMenuOrGetExistsWorker(currentMenu!!, Action.Restore).execute()
                                     }
                                 } else if (e.keyCode == KeyEvent.VK_ESCAPE) {
-                                    resetSearch(textField = tf, menu = menu)
+                                    resetSearch(textField = tf, menu = currentMenu!!)
                                 }
                             }
                         })
                     }
-            add(textField, BorderLayout.CENTER)
 
             val backgroundColor = JMenu().background
             background = backgroundColor
-            add(
-                JButton(rocketActionContextFactory.context.icon().by(AppIcon.CLEAR))
-                    .apply {
-                        toolTipText = "Clear search"
-                        background = backgroundColor
-                        isBorderPainted = false
-                        addMouseListener(object : MouseAdapter() {
-                            override fun mouseReleased(e: MouseEvent?) {
-                                resetSearch(textField = textField, menu = menu)
-                            }
-                        })
-                    },
-                BorderLayout.EAST
-            )
+            val button = JButton(rocketActionContextFactory.context.icon().by(AppIcon.CLEAR))
+                .apply {
+                    toolTipText = "Clear search"
+                    background = backgroundColor
+                    isBorderPainted = false
+                    addMouseListener(object : MouseAdapter() {
+                        override fun mouseReleased(e: MouseEvent?) {
+                            resetSearch(textField = textField, menu = currentMenu!!)
+                        }
+                    })
+                }
+
+            add(textField, "width 100%, growx 0, split") // growx 0 не должно расти по ширине
+            add(button, "wmax 25")
         }
 
     private fun fillMenuByRocketAction(rocketActions: Set<RocketAction>, menu: JMenu) {
@@ -257,10 +266,30 @@ class UiQuickActionService(
         menuItemUpdate.addActionListener(updateListener())
         menuTools.add(menuItemUpdate)
 
+        val minimiseItem = JMenuItem(currentWindowState.opposite().stateName)
+        minimiseItem.icon = rocketActionContextFactory.context.icon().by(currentWindowState.opposite().icon)
+        minimiseItem.addActionListener {
+            val newState = currentWindowState.opposite()
+
+            SwingUtilities.invokeLater {
+                minimiseItem.text = currentWindowState.stateName
+                minimiseItem.icon = rocketActionContextFactory.context.icon().by(currentWindowState.icon)
+                currentWindowState = newState
+                minimiseMaximiseAction!!.invoke(newState)
+            }
+
+        }
+        menuTools.add(minimiseItem)
+
+        menuTools.add(JSeparator())
+
         val menuItemEditor = JMenuItem("Editor")
         menuItemEditor.icon = rocketActionContextFactory.context.icon().by(AppIcon.PENCIL)
         menuItemEditor.addActionListener(createEditorActionListener())
         menuTools.add(menuItemEditor)
+
+
+        menuTools.add(JSeparator())
 
         menuTools.add(JMenuItem("Exit").apply {
             icon = rocketActionContextFactory.context.icon().by(AppIcon.X)
@@ -288,7 +317,7 @@ class UiQuickActionService(
         SwingUtilities.invokeLater {
             var newMenuBar: JMenuBar? = null
             try {
-                newMenuBar = createMenu(baseDialog!!).menu
+                newMenuBar = createMenu(baseDialog!!, minimiseMaximiseAction!!).menu
             } catch (ex: UiQuickActionServiceException) {
                 ex.printStackTrace()
                 rocketActionContextFactory.context.notification()
@@ -351,3 +380,14 @@ data class ManuAndSearchPanel(
     val menu: JMenuBar,
     val search: Component,
 )
+
+
+enum class WindowState(val stateName: String, val icon: AppIcon) {
+    MINIMISE("Minimise", AppIcon.MINUS),
+    MAXIMISE("Maximise", AppIcon.PLUS);
+
+    fun opposite(): WindowState = when (this) {
+        MAXIMISE -> MINIMISE
+        MINIMISE -> MAXIMISE
+    }
+}
