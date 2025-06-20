@@ -75,7 +75,6 @@ class ConfigurationFrame(
                         UsedPropertiesName.UI_CONFIGURATION_DIALOG_HEIGHT_IN_PERCENT,
                         0.6
                     )
-
             )
 
         frame.setLocationRelativeTo(null)
@@ -85,6 +84,7 @@ class ConfigurationFrame(
             rocketActionContextFactory = rocketActionContextFactory,
             engineService = engineService,
             tagsService = tagsService,
+            generalPropertiesRepository = generalPropertiesRepository,
         )
 
         val basePanel = JPanel(BorderLayout())
@@ -129,6 +129,7 @@ class ConfigurationFrame(
             engineService = engineService,
             availableHandlersRepository = availableHandlersRepository,
             tagsService = tagsService,
+            generalPropertiesRepository = generalPropertiesRepository,
         )
         val panel = JPanel(BorderLayout())
 
@@ -157,6 +158,10 @@ class ConfigurationFrame(
         frame.showToFront()
     }
 
+    private var variablesFrame: VariablesFrame? = null
+
+    fun getVariablesFrame(): VariablesFrame = variablesFrame!!
+
     private fun createToolBar(): JToolBar {
         val menuBar = JToolBar()
 
@@ -174,7 +179,7 @@ class ConfigurationFrame(
 
         // Variables
         menuBar.add(JButton("Variables").apply {
-            val variablesFrame = VariablesFrame(
+            variablesFrame = VariablesFrame(
                 parent = frame,
                 variablesApplication = variablesApplication,
                 notificationService = rocketActionContextFactory.context.notification(),
@@ -183,7 +188,7 @@ class ConfigurationFrame(
             icon = rocketActionContextFactory.context.icon().by(AppIcon.FORK)
             addActionListener {
                 SwingUtilities.invokeLater {
-                    variablesFrame.isVisible = true
+                    variablesFrame!!.isVisible = true
                 }
             }
         })

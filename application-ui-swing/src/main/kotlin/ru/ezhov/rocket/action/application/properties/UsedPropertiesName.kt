@@ -177,4 +177,13 @@ enum class UsedPropertiesName(val propertyName: String, val description: String)
             Example: 150
         """.trimIndent()
     ),
+
+    IS_ENABLE_TAGS(
+        "$PREFIX.ui.tags.isEnabled",
+        """
+            Turn on the functionality of tags
+
+            Example: false
+        """.trimIndent()
+    ),
 }

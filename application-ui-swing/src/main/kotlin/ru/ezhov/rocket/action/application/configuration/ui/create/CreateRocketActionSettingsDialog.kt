@@ -7,6 +7,7 @@ import ru.ezhov.rocket.action.application.configuration.ui.tree.TreeRocketAction
 import ru.ezhov.rocket.action.application.core.domain.EngineService
 import ru.ezhov.rocket.action.application.plugin.context.RocketActionContextFactory
 import ru.ezhov.rocket.action.application.plugin.manager.application.RocketActionPluginApplicationService
+import ru.ezhov.rocket.action.application.properties.GeneralPropertiesRepository
 import ru.ezhov.rocket.action.application.tags.application.TagsService
 import ru.ezhov.rocket.action.application.tags.ui.create.TagsPanelFactory
 import ru.ezhov.rocket.action.ui.utils.swing.common.toImage
@@ -32,12 +33,14 @@ class CreateRocketActionSettingsDialog(
     private val rocketActionContextFactory: RocketActionContextFactory,
     engineService: EngineService,
     tagsService: TagsService,
+    generalPropertiesRepository: GeneralPropertiesRepository,
 ) {
     private val comboBoxModel = DefaultComboBoxModel<RocketActionConfiguration>()
     private var comboBox: JComboBox<RocketActionConfiguration> = JComboBox(comboBoxModel)
     private val actionSettingsPanel: CreateRocketActionSettingsPanel =
         CreateRocketActionSettingsPanel(
             tagsPanel = TagsPanelFactory.panel(tagsService = tagsService),
+            generalPropertiesRepository = generalPropertiesRepository,
         )
     private var currentCallback: CreatedRocketActionSettingsCallback? = null
     private val testPanel: TestPanel =

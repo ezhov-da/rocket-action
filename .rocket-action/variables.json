@@ -1,1 +1,16 @@
-{"encryption":{"algorithm":"BLOWFISH"},"variables":[{"name":"TEST","value":"g0jMJiHytQDSy94gNrrxR292cDfWVRU/GLjZb/HPfKKyc2hCtcZvPza2koIzeFinAL1F+DQC7Qxqczl+Z5r60A==","description":"Что то","type":"APPLICATION"}]}
+{
+  "encryption" : {
+    "algorithm" : "BLOWFISH"
+  },
+  "variables" : [ {
+    "name" : "TEST",
+    "value" : "g0jMJiHytQDSy94gNrrxR292cDfWVRU/GLjZb/HPfKKyc2hCtcZvPza2koIzeFinAL1F+DQC7Qxqczl+Z5r60A==",
+    "description" : "Что то",
+    "type" : "APPLICATION"
+  }, {
+    "name" : "fxgnxgnx",
+    "value" : "z+jE9AVBOkBo4lFRem7Y/Q==",
+    "description" : "xcgnxcnxcgn",
+    "type" : "APPLICATION"
+  } ]
+}

@@ -17,6 +17,8 @@ import ru.ezhov.rocket.action.application.eventui.ConfigurationUiObserverFactory
 import ru.ezhov.rocket.action.application.eventui.model.ConfigurationUiEvent
 import ru.ezhov.rocket.action.application.eventui.model.RefreshUiEvent
 import ru.ezhov.rocket.action.application.plugin.context.RocketActionContextFactory
+import ru.ezhov.rocket.action.application.properties.GeneralPropertiesRepository
+import ru.ezhov.rocket.action.application.properties.UsedPropertiesName
 import ru.ezhov.rocket.action.application.search.application.SearchService
 import ru.ezhov.rocket.action.application.tags.application.TagsService
 import ru.ezhov.rocket.action.application.tags.domain.TagNode
@@ -54,7 +56,8 @@ class UiQuickActionService(
     private val tagsService: TagsService,
     private val rocketActionContextFactory: RocketActionContextFactory,
     private val searchService: SearchService,
-    private val configurationFrameFactory: ConfigurationFrameFactory
+    private val configurationFrameFactory: ConfigurationFrameFactory,
+    private val generalPropertiesRepository: GeneralPropertiesRepository,
 ) {
     private var baseDialog: JDialog? = null
 
@@ -96,7 +99,10 @@ class UiQuickActionService(
             //menuBar.add(createFavoriteComponent());
 
             val tagsMenu = createEmptyTagsMenu()
-            menuBar.add(tagsMenu);
+
+            if (generalPropertiesRepository.asBoolean(UsedPropertiesName.IS_ENABLE_TAGS, false)) {
+                menuBar.add(tagsMenu)
+            }
 
             menuBar.add(Box.createHorizontalGlue());
 
@@ -283,6 +289,17 @@ class UiQuickActionService(
 
         menuTools.add(JSeparator())
 
+        // Variables
+        val menuItemVariables = JMenuItem("Variables")
+        menuItemVariables.icon = rocketActionContextFactory.context.icon().by(AppIcon.FORK)
+        menuItemVariables.addActionListener {
+            SwingUtilities.invokeLater {
+                configurationFrameFactory.configurationFrame.getVariablesFrame().isVisible = true
+            }
+        }
+        menuTools.add(menuItemVariables)
+
+        // Editor
         val menuItemEditor = JMenuItem("Editor")
         menuItemEditor.icon = rocketActionContextFactory.context.icon().by(AppIcon.PENCIL)
         menuItemEditor.addActionListener(createEditorActionListener())

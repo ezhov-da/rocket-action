@@ -11,6 +11,7 @@ import ru.ezhov.rocket.action.application.core.infrastructure.MutableRocketActio
 import ru.ezhov.rocket.action.application.handlers.server.AvailableHandlersRepository
 import ru.ezhov.rocket.action.application.plugin.context.RocketActionContextFactory
 import ru.ezhov.rocket.action.application.plugin.manager.application.RocketActionPluginApplicationService
+import ru.ezhov.rocket.action.application.properties.GeneralPropertiesRepository
 import ru.ezhov.rocket.action.application.tags.application.TagsService
 import java.awt.BorderLayout
 import javax.swing.JLabel
@@ -23,6 +24,7 @@ class EditorRocketActionSettingsPanel(
     engineService: EngineService,
     availableHandlersRepository: AvailableHandlersRepository,
     tagsService: TagsService,
+    generalPropertiesRepository: GeneralPropertiesRepository,
 ) : JPanel(BorderLayout()) {
     private var currentSettings: TreeRocketActionSettings? = null
 
@@ -33,6 +35,7 @@ class EditorRocketActionSettingsPanel(
         engineService = engineService,
         availableHandlersRepository = availableHandlersRepository,
         tagsService = tagsService,
+        generalPropertiesRepository = generalPropertiesRepository,
     )
     private var currentPanel: JPanel = stubPanel
 

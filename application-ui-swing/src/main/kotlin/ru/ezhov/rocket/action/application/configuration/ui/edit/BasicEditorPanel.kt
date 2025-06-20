@@ -11,6 +11,7 @@ import ru.ezhov.rocket.action.application.core.domain.EngineService
 import ru.ezhov.rocket.action.application.handlers.server.AvailableHandlersRepository
 import ru.ezhov.rocket.action.application.plugin.context.RocketActionContextFactory
 import ru.ezhov.rocket.action.application.plugin.manager.application.RocketActionPluginApplicationService
+import ru.ezhov.rocket.action.application.properties.GeneralPropertiesRepository
 import ru.ezhov.rocket.action.application.tags.application.TagsService
 import java.awt.BorderLayout
 import javax.swing.BoxLayout
@@ -20,6 +21,7 @@ import javax.swing.JPanel
 class BasicEditorPanel(
     private val rocketActionPluginApplicationService: RocketActionPluginApplicationService,
     private val rocketActionContextFactory: RocketActionContextFactory,
+    generalPropertiesRepository: GeneralPropertiesRepository,
     engineService: EngineService,
     availableHandlersRepository: AvailableHandlersRepository,
     tagsService: TagsService,
@@ -28,7 +30,8 @@ class BasicEditorPanel(
         InfoPanel(availableHandlersRepository)
     private val rocketActionSettingsPanel = RocketActionSettingsPanel(
         tagsService = tagsService,
-        rocketActionContextFactory = rocketActionContextFactory
+        rocketActionContextFactory = rocketActionContextFactory,
+        generalPropertiesRepository = generalPropertiesRepository,
     )
     private val testPanel: TestPanel =
         TestPanel(

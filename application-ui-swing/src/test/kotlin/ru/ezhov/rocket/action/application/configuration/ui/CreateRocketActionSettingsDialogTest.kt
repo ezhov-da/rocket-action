@@ -7,6 +7,7 @@ import ru.ezhov.rocket.action.application.configuration.ui.tree.TreeRocketAction
 import ru.ezhov.rocket.action.application.core.domain.EngineService
 import ru.ezhov.rocket.action.application.plugin.context.RocketActionContextFactory
 import ru.ezhov.rocket.action.application.plugin.manager.application.RocketActionPluginApplicationService
+import ru.ezhov.rocket.action.application.properties.GeneralPropertiesRepository
 import ru.ezhov.rocket.action.application.tags.application.TagsService
 import javax.swing.JFrame
 import javax.swing.SwingUtilities
@@ -26,6 +27,7 @@ object CreateRocketActionSettingsDialogTest {
                     rocketActionContextFactory = context.getBean(RocketActionContextFactory::class.java),
                     engineService = context.getBean(EngineService::class.java),
                     tagsService = context.getBean(TagsService::class.java),
+                    generalPropertiesRepository = context.getBean(GeneralPropertiesRepository::class.java)
                 )
                     .show(object : CreatedRocketActionSettingsCallback {
                         override fun create(settings: TreeRocketActionSettings) {

@@ -6,6 +6,8 @@ import ru.ezhov.rocket.action.application.configuration.ContractGenerator
 import ru.ezhov.rocket.action.application.core.domain.model.RocketActionSettingsModel
 import ru.ezhov.rocket.action.application.core.infrastructure.MutableRocketActionSettings
 import ru.ezhov.rocket.action.application.plugin.group.GroupRocketActionUi
+import ru.ezhov.rocket.action.application.properties.GeneralPropertiesRepository
+import ru.ezhov.rocket.action.application.properties.UsedPropertiesName
 import ru.ezhov.rocket.action.application.tags.ui.create.TagsPanel
 import ru.ezhov.rocket.action.ui.utils.swing.MarkdownEditorPane
 import java.awt.BorderLayout
@@ -15,6 +17,7 @@ import javax.swing.JTabbedPane
 
 class CreateRocketActionSettingsPanel(
     private val tagsPanel: TagsPanel,
+    private val generalPropertiesRepository: GeneralPropertiesRepository,
 ) : JPanel() {
     private val settingPanels = mutableListOf<SettingPanel>()
     private var currentConfiguration: RocketActionConfiguration? = null
@@ -62,7 +65,9 @@ class CreateRocketActionSettingsPanel(
             BorderFactory.createTitledBorder("Tags")
         )
         // disable tags for group plugin
-        if (configuration.type().value() != GroupRocketActionUi.TYPE) {
+        if (configuration.type().value() != GroupRocketActionUi.TYPE &&
+            generalPropertiesRepository.asBoolean(UsedPropertiesName.IS_ENABLE_TAGS, false)
+        ) {
             this.add(tagsPanel, BorderLayout.SOUTH)
         }
         tagsPanel.clearTags()
