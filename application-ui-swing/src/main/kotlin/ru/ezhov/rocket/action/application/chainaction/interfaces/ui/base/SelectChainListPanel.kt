@@ -10,6 +10,8 @@ import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.renderer.Cha
 import ru.ezhov.rocket.action.application.resources.Icons
 import ru.ezhov.rocket.action.ui.utils.swing.common.TextFieldWithText
 import java.awt.BorderLayout
+import java.awt.event.KeyAdapter
+import java.awt.event.KeyEvent
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import javax.swing.DefaultListModel
@@ -54,6 +56,38 @@ class SelectChainListPanel(
                 }
             }
 
+            // Поддержать нажатие вниз и переход к списку из поиска
+            searchTextField.addKeyListener(object : KeyAdapter() {
+                override fun keyReleased(e: KeyEvent) {
+                    if (e.keyCode == KeyEvent.VK_DOWN && !listModel.isEmpty) {
+                        SwingUtilities.invokeLater {
+                            actionsList.selectionModel.setSelectionInterval(0, 0)
+                            actionsList.requestFocusInWindow()
+                        }
+                    }
+                }
+            })
+
+            actionsList.addKeyListener(object : KeyAdapter() {
+                override fun keyPressed(e: KeyEvent) {
+                    // Поддержать нажатие вверх в списке на первом пункте и переход к поиску
+                    if (e.keyCode == KeyEvent.VK_UP && actionsList.selectionModel.minSelectionIndex == 0) {
+                        SwingUtilities.invokeLater {
+                            searchTextField.requestFocusInWindow()
+                        }
+                    }
+                }
+
+                override fun keyReleased(e: KeyEvent) {
+                    // Поддержать нажатие ENTER
+                    if (e.keyCode == KeyEvent.VK_ENTER) {
+                        actionsList.selectedValue?.let { selected ->
+                            selectedChainCallback(selected)
+                        }
+                    }
+                }
+            })
+
             add(searchTextField, "width 100%")
             add(clearSearchButton)
         }, BorderLayout.NORTH)
@@ -81,6 +115,12 @@ class SelectChainListPanel(
     fun setSelectedAction(id: String) {
         listModel.elements().toList().firstOrNull { it.id() == id }?.let { action ->
             actionsList.setSelectedValue(action, true)
+        }
+    }
+
+    fun activateSearchField() {
+        SwingUtilities.invokeLater {
+            searchTextField.requestFocusInWindow()
         }
     }
 }

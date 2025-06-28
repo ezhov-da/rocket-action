@@ -21,10 +21,12 @@ class SelectChainPopupMenu(
     private val configurationApplication: ConfigurationApplication,
     private val actionService: AtomicActionService,
     private val chainActionService: ChainActionService,
-    private val chains: List<ChainAction>,
-    private val atomics: List<AtomicAction>,
+    chains: List<ChainAction>,
+    atomics: List<AtomicAction>,
     private val selectedChainCallback: (Action) -> Unit
 ) : JPopupMenu() {
+    private var selectChainListPanel: SelectChainListPanel? = null
+
     init {
         val chainsSortedByName = chains.sortedBy { it.name }
         val atomicsSortedByName = atomics.sortedBy { it.name }
@@ -67,6 +69,7 @@ class SelectChainPopupMenu(
                             partCount = part,
                             selectChainDialog = selectChainDialog,
                         )?.let {
+                            selectChainListPanel = it
                             stubBottomPanel.add(it, BorderLayout.CENTER)
                         }
 
@@ -120,6 +123,7 @@ class SelectChainPopupMenu(
             partCount = partCount,
             selectChainDialog = selectChainDialog,
         )?.let {
+            selectChainListPanel = it
             stubBottomPanel.add(
                 it, BorderLayout.CENTER
             )
@@ -128,6 +132,12 @@ class SelectChainPopupMenu(
 
         add(panel, BorderLayout.CENTER)
         pack()
+    }
+
+    fun activateSearchField() {
+        SwingUtilities.invokeLater {
+            selectChainListPanel?.activateSearchField()
+        }
     }
 
     private fun buildButtonsPanel(
