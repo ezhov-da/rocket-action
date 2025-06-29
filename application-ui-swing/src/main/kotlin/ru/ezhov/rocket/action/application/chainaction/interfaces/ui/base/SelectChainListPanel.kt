@@ -38,9 +38,11 @@ class SelectChainListPanel(
         actionsList.cellRenderer = ChainAndAtomicActionListCellRenderer(actionService, chainActionService)
 
         actionsList.addMouseListener(object : MouseAdapter() {
-            override fun mouseReleased(e: MouseEvent?) {
-                actionsList.selectedValue?.let { selected ->
-                    selectedChainCallback(selected)
+            override fun mouseReleased(e: MouseEvent) {
+                if (e.button == MouseEvent.BUTTON1) {
+                    actionsList.selectedValue?.let { selected ->
+                        selectedChainCallback(selected)
+                    }
                 }
             }
         })

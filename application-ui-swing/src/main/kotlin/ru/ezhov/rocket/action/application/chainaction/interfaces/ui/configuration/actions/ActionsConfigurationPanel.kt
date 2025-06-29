@@ -14,6 +14,7 @@ import ru.ezhov.rocket.action.application.chainaction.domain.model.AtomicAction
 import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.ChainsSelectPanel
 import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.CreateAndEditAtomicActionDialog
 import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.CreateAndEditChainActionDialog
+import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.InfoActionPopupMenuPanel
 import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.renderer.AtomicActionListCellRenderer
 import ru.ezhov.rocket.action.application.event.domain.DomainEvent
 import ru.ezhov.rocket.action.application.event.domain.DomainEventSubscriber
@@ -207,15 +208,24 @@ class ActionsConfigurationPanel(
         val chains = chainActionService.usageAction(element.id)
 
         val popup = JPopupMenu()
-        popup.add(JMenu("Usage").apply {
-            add(
-                ChainsSelectPanel(
-                    chains = chains,
-                    atomicActionService = atomicActionService,
-                    selectChainCallback = { chain -> createAndEditChainActionDialog.showEditDialog(chain) }
+        popup.add(
+            JMenu("Info").apply {
+                add(
+                    InfoActionPopupMenuPanel(action = element)
                 )
-            )
-        })
+            }
+        )
+        popup.add(
+            JMenu("Usage").apply {
+                add(
+                    ChainsSelectPanel(
+                        chains = chains,
+                        atomicActionService = atomicActionService,
+                        selectChainCallback = { chain -> createAndEditChainActionDialog.showEditDialog(chain) }
+                    )
+                )
+            }
+        )
 
         popup.show(allListActions, event.x, event.y)
     }

@@ -10,16 +10,21 @@ import ru.ezhov.rocket.action.application.chainaction.domain.event.ChainActionDe
 import ru.ezhov.rocket.action.application.chainaction.domain.event.ChainActionUpdatedDomainEvent
 import ru.ezhov.rocket.action.application.chainaction.domain.model.ChainAction
 import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.CreateAndEditChainActionDialog
+import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.InfoActionPopupMenuPanel
 import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.renderer.ChainActionListCellRenderer
 import ru.ezhov.rocket.action.application.event.domain.DomainEvent
 import ru.ezhov.rocket.action.application.event.domain.DomainEventSubscriber
 import ru.ezhov.rocket.action.application.event.infrastructure.DomainEventFactory
+import java.awt.event.MouseAdapter
+import java.awt.event.MouseEvent
 import java.beans.PropertyChangeListener
 import javax.swing.BorderFactory
 import javax.swing.DefaultListModel
 import javax.swing.JButton
 import javax.swing.JList
+import javax.swing.JMenu
 import javax.swing.JPanel
+import javax.swing.JPopupMenu
 import javax.swing.JScrollPane
 
 class ChainsConfigurationPanel(
@@ -69,6 +74,16 @@ class ChainsConfigurationPanel(
                 buttonDuplicate.isEnabled = true
             }
         }
+
+        allListChains.addMouseListener(object : MouseAdapter() {
+            override fun mouseReleased(e: MouseEvent) {
+                if (e.button == MouseEvent.BUTTON3) {
+                    allListChainsModel.getElementAt(allListChains.locationToIndex(e.point))?.let {
+                        showPopupMenu(element = it, event = e)
+                    }
+                }
+            }
+        })
 
         DomainEventFactory.subscriberRegistrar.subscribe(object : DomainEventSubscriber {
             override fun handleEvent(event: DomainEvent) {
@@ -225,5 +240,17 @@ class ChainsConfigurationPanel(
         filterByConditions.forEach {
             allListChainsModel.addElement(it)
         }
+    }
+
+    private fun showPopupMenu(element: ChainAction, event: MouseEvent) {
+        val popup = JPopupMenu()
+        popup.add(
+            JMenu("Info").apply {
+                add(
+                    InfoActionPopupMenuPanel(action = element)
+                )
+            }
+        )
+        popup.show(allListChains, event.x, event.y)
     }
 }
