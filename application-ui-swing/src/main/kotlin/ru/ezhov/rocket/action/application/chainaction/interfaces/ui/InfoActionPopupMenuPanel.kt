@@ -3,14 +3,14 @@ package ru.ezhov.rocket.action.application.chainaction.interfaces.ui
 import ru.ezhov.rocket.action.application.chainaction.domain.model.Action
 import ru.ezhov.rocket.action.ui.utils.swing.common.SizeUtil
 import java.awt.BorderLayout
+import javax.swing.JEditorPane
 import javax.swing.JPanel
 import javax.swing.JScrollPane
-import javax.swing.JTextField
 
 class InfoActionPopupMenuPanel(
     private val action: Action,
 ) : JPanel(BorderLayout()) {
-    private val descriptionTextField = JTextField().apply {
+    private val descriptionTextField = JEditorPane().apply {
         isEditable = false
     }
 

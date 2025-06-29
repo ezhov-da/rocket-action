@@ -5,8 +5,4 @@ data class Variable(
     val value: String,
     val description: String? = null,
     val type: VariableType,
-){
-    fun withDecodeValue(value: String) = this.copy(value = value)
-
-    fun withEncodeValue(value: String) = this.copy(value = value)
-}
+)

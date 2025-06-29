@@ -22,6 +22,7 @@ import javax.swing.JPanel
 import javax.swing.JScrollPane
 import javax.swing.JTabbedPane
 import javax.swing.JTable
+import javax.swing.SwingUtilities
 import javax.swing.table.DefaultTableModel
 
 private val logger = KotlinLogging.logger { }
@@ -32,6 +33,8 @@ class VariablesFrame(
     private val notificationService: NotificationService,
     iconService: IconService,
 ) : JFrame() {
+    private var variablesImportDialog: VariablesImportDialog? = null
+
     private val applicationTableModel = DefaultTableModel().apply {
         addColumn("*Name")
         addColumn("*Value")
@@ -64,6 +67,7 @@ class VariablesFrame(
 
     private val addRowButton = JButton("Add line")
     private val removeRowButton = JButton("Delete line")
+    private val importVariablesButton = JButton("Import")
 
     private val saveButton = JButton("Save")
     private val refreshButton = JButton("Refresh")
@@ -99,6 +103,25 @@ class VariablesFrame(
             applicationTable.repaint()
         }
 
+        importVariablesButton.addActionListener {
+            if (variablesImportDialog == null) {
+                variablesImportDialog = VariablesImportDialog(this) { variables ->
+                    variables.forEach {
+                        SwingUtilities.invokeLater {
+                            applicationTableModel.addRow(
+                                arrayOf(
+                                    it.name,
+                                    it.value,
+                                    it.description
+                                )
+                            )
+                        }
+                    }
+                }
+            }
+            variablesImportDialog!!.showDialog()
+        }
+
         saveButton.addActionListener { saveTable() }
         refreshButton.addActionListener { loadTable() }
 
@@ -129,6 +152,7 @@ class VariablesFrame(
             })
             add(addRowButton)
             add(removeRowButton)
+            add(importVariablesButton)
         }, BorderLayout.NORTH)
         panel.add(JScrollPane(applicationTable), BorderLayout.CENTER)
         panel.add(JPanel().apply {
