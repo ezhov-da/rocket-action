@@ -43,7 +43,9 @@ import javax.swing.JComponent
 import javax.swing.JDialog
 import javax.swing.JLabel
 import javax.swing.JList
+import javax.swing.JMenu
 import javax.swing.JPanel
+import javax.swing.JPopupMenu
 import javax.swing.JScrollPane
 import javax.swing.JTextField
 import javax.swing.KeyStroke
@@ -145,6 +147,12 @@ class CreateAndEditChainActionDialog(
                         )
                     }
                 }
+
+                if (e.button == MouseEvent.BUTTON3) {
+                    allListActions.selectedValue?.let {
+                        showPopupMenu(component = allListActions, element = it, event = e)
+                    }
+                }
             }
         })
 
@@ -153,6 +161,12 @@ class CreateAndEditChainActionDialog(
                 if (e.clickCount == 2) {
                     selectedListActions.selectedValue?.let { value ->
                         createAndEditAtomicActionDialog.showEditDialog(value.atomicAction)
+                    }
+                }
+
+                if (e.button == MouseEvent.BUTTON3) {
+                    selectedListActions.selectedValue?.let {
+                        showPopupMenu(component = selectedListActions, element = it.atomicAction, event = e)
                     }
                 }
             }
@@ -365,6 +379,19 @@ class CreateAndEditChainActionDialog(
         }
 
         isVisible = true
+    }
+
+    private fun showPopupMenu(component: JComponent, element: AtomicAction, event: MouseEvent) {
+        val popup = JPopupMenu()
+        popup.add(
+            JMenu("Info").apply {
+                add(
+                    InfoActionPopupMenuPanel(action = element)
+                )
+            }
+        )
+
+        popup.show(component, event.x, event.y)
     }
 }
 

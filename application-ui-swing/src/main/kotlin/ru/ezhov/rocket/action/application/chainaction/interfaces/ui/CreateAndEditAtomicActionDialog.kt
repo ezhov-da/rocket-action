@@ -182,13 +182,13 @@ class CreateAndEditAtomicActionDialog(
 
     private fun setKotlinSyntax() {
         if (kotlinEngine.isSelected) {
-            dataTextPane.syntaxEditingStyle = SyntaxConstants.SYNTAX_STYLE_KOTLIN;
+            dataTextPane.syntaxEditingStyle = SyntaxConstants.SYNTAX_STYLE_KOTLIN
         }
     }
 
     private fun setGroovySyntax() {
         if (groovyEngine.isSelected) {
-            dataTextPane.syntaxEditingStyle = SyntaxConstants.SYNTAX_STYLE_GROOVY;
+            dataTextPane.syntaxEditingStyle = SyntaxConstants.SYNTAX_STYLE_GROOVY
         }
     }
 

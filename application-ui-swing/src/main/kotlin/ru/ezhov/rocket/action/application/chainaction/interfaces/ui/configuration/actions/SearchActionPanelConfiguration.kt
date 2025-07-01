@@ -11,6 +11,7 @@ import javax.swing.BorderFactory
 import javax.swing.ButtonGroup
 import javax.swing.JButton
 import javax.swing.JPanel
+import javax.swing.JSeparator
 import javax.swing.JToggleButton
 
 class SearchActionPanelConfiguration : JPanel(MigLayout()) {
@@ -62,16 +63,19 @@ class SearchActionPanelConfiguration : JPanel(MigLayout()) {
         add(inUnitButton, "wmax 35, hmax 25")
         add(unitOutButton, "wmax 35, hmax 25")
         add(unitUnitButton, "wmax 35, hmax 25")
+        add(JSeparator(JSeparator.VERTICAL), "wmin 10, wmax 35, hmax 25")
 
         allEngineButton.isSelected = true
         add(allEngineButton)
         add(kotlinButton, "wmax 35, hmax 25")
         add(groovyButton, "wmax 35, hmax 25")
+        add(JSeparator(JSeparator.VERTICAL), "wmin 10, wmax 35, hmax 25")
 
         allSourceButton.isSelected = true
         add(allSourceButton)
         add(textButton, "wmax 35, hmax 25")
         add(fileButton, "wmax 35, hmax 25")
+        add(JSeparator(JSeparator.VERTICAL), "wmin 10, wmax 35, hmax 25")
 
         add(textField, "width 100%")
         add(resetButton, "wmax 25, hmax 25")
