@@ -6,6 +6,7 @@ import ru.ezhov.rocket.action.application.about.AboutDialogFactory
 import ru.ezhov.rocket.action.application.availableproperties.AvailablePropertiesFromCommandLineDialogFactory
 import ru.ezhov.rocket.action.application.core.application.RocketActionSettingsService
 import ru.ezhov.rocket.action.application.core.domain.EngineService
+import ru.ezhov.rocket.action.application.handlers.apikey.application.ApiKeysApplication
 import ru.ezhov.rocket.action.application.handlers.server.AvailableHandlersRepository
 import ru.ezhov.rocket.action.application.handlers.server.HttpServerService
 import ru.ezhov.rocket.action.application.plugin.context.RocketActionContextFactory
@@ -27,6 +28,7 @@ class ConfigurationFrameFactory(
     aboutDialogFactory: AboutDialogFactory,
     httpServerService: HttpServerService,
     availablePropertiesFromCommandLineDialogFactory: AvailablePropertiesFromCommandLineDialogFactory,
+    apiKeysApplication: ApiKeysApplication,
 ) : InitializingBean {
     val configurationFrame = ConfigurationFrame(
         rocketActionPluginApplicationService = rocketActionPluginApplicationService,
@@ -40,6 +42,7 @@ class ConfigurationFrameFactory(
         aboutDialogFactory = aboutDialogFactory,
         httpServerService = httpServerService,
         availablePropertiesFromCommandLineDialogFactory = availablePropertiesFromCommandLineDialogFactory,
+        apiKeysApplication = apiKeysApplication,
     )
 
 

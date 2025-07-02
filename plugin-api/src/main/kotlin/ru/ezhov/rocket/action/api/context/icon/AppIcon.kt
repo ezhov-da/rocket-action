@@ -34,4 +34,5 @@ enum class AppIcon {
     SAVE,
     EXPAND,
     COLLAPSE,
+    SHIELD,
 }

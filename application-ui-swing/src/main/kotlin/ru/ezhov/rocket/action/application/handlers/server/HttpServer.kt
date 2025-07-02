@@ -5,6 +5,7 @@ import mu.KotlinLogging
 import org.springframework.stereotype.Service
 import ru.ezhov.rocket.action.api.handler.RocketActionHandleStatus
 import ru.ezhov.rocket.action.api.handler.RocketActionHandlerCommand
+import ru.ezhov.rocket.action.application.handlers.apikey.application.ApiKeysApplication
 import ru.ezhov.rocket.action.application.handlers.server.swagger.JsonSwaggerGenerator
 import ru.ezhov.rocket.action.application.properties.GeneralPropertiesRepository
 import ru.ezhov.rocket.action.application.properties.UsedPropertiesName
@@ -15,7 +16,6 @@ import spark.kotlin.ignite
 
 private val logger = KotlinLogging.logger {}
 private const val HEADER_NAME = "X-Rocket-Action-Handler-Key"
-private const val HEADER_VALUE = "1234"
 const val BASE_API_PATH = "/api/v1/handlers"
 
 @Service
@@ -23,6 +23,7 @@ class HttpServer(
     private val generalPropertiesRepository: GeneralPropertiesRepository,
     private val rocketActionHandlerService: RocketActionHandlerService,
     private val objectMapper: ObjectMapper,
+    private val apiKeysApplication: ApiKeysApplication,
 ) {
 
     fun port(): Int = generalPropertiesRepository
@@ -44,7 +45,7 @@ class HttpServer(
         swaggerJson(http)
         executeHandlerEndpoint(http)
 
-        logger.info { "Server started. port='${http.port()}' auth-header-name='$HEADER_NAME' auth-header-value='$HEADER_VALUE'" }
+        logger.info { "Server started. port='${http.port()}' auth-header-name='$HEADER_NAME'. Use 'API keys' for access to the API" }
     }
 
     private fun disableCors(http: Http) {
@@ -130,11 +131,17 @@ class HttpServer(
     private fun checkKeyAndExecuteBlock(routeHandler: RouteHandler, block: () -> Any): Any =
         routeHandler.request.headers(HEADER_NAME)
             .let { keyValue ->
-                if (keyValue != HEADER_VALUE) {
-                    routeHandler.response.status(403)
-                    "Forbidden"
-                } else {
-                    block.invoke()
+                when (val apiKey = apiKeysApplication.apiKey(keyValue)) {
+                    null -> {
+                        logger.warn { "Forbidden API Key='$keyValue'. IP='${routeHandler.request.ip()}'" }
+                        routeHandler.response.status(403)
+                        "Forbidden. Check API key '$HEADER_NAME'"
+                    }
+
+                    else -> {
+                        logger.info { "Used API Key='${apiKey.description}'. IP='${routeHandler.request.ip()}'" }
+                        block.invoke()
+                    }
                 }
             }
 }

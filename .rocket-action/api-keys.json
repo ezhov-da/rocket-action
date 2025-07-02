@@ -1,0 +1,9 @@
+{
+  "keys" : [ {
+    "value" : "1234",
+    "description" : "Старый ключ. Вывести из использования"
+  }, {
+    "value" : "2cc423a2-e2e3-4c6e-9fa2-288ee2b4096f",
+    "description" : "Test"
+  } ]
+}

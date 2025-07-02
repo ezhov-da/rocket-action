@@ -128,6 +128,17 @@ enum class UsedPropertiesName(val propertyName: String, val description: String)
         """.trimIndent()
     ),
 
+    API_KEYS_FILE_REPOSITORY_PATH(
+        "$PREFIX.api-keys.file.repository.path",
+        """
+            Path to a file to store api keys.
+
+            Example:
+            - relative path `./folder/api-keys.json`
+            - absolute path `C:/folder/api-keys.json`
+        """.trimIndent()
+    ),
+
     APPLICATION_CONFIGURATION_FILE_REPOSITORY_PATH(
         "$PREFIX.application.configuration.file.repository.path",
         """

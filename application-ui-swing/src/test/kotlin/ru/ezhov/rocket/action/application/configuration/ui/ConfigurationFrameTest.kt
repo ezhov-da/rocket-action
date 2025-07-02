@@ -20,6 +20,7 @@ object ConfigurationFrameTest {
                     aboutDialogFactory = mockk(),
                     httpServerService = mockk(),
                     availablePropertiesFromCommandLineDialogFactory = mockk(),
+                    apiKeysApplication = mockk(),
                 )
                     .show()
             } catch (e: Exception) {

@@ -14,6 +14,8 @@ import ru.ezhov.rocket.action.application.event.domain.DomainEventSubscriber
 import ru.ezhov.rocket.action.application.event.infrastructure.DomainEventFactory
 import ru.ezhov.rocket.action.application.eventui.ConfigurationUiObserverFactory
 import ru.ezhov.rocket.action.application.eventui.model.RefreshUiEvent
+import ru.ezhov.rocket.action.application.handlers.apikey.application.ApiKeysApplication
+import ru.ezhov.rocket.action.application.handlers.apikey.interfaces.ui.ApiKeysFrame
 import ru.ezhov.rocket.action.application.handlers.server.AvailableHandlersRepository
 import ru.ezhov.rocket.action.application.handlers.server.HttpServerService
 import ru.ezhov.rocket.action.application.plugin.context.RocketActionContextFactory
@@ -34,6 +36,7 @@ import java.awt.event.ActionEvent
 import java.net.URI
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import javax.swing.Box
 import javax.swing.JButton
 import javax.swing.JFrame
 import javax.swing.JPanel
@@ -53,6 +56,7 @@ class ConfigurationFrame(
     private val aboutDialogFactory: AboutDialogFactory,
     private val httpServerService: HttpServerService,
     private val availablePropertiesFromCommandLineDialogFactory: AvailablePropertiesFromCommandLineDialogFactory,
+    private val apiKeysApplication: ApiKeysApplication,
 ) {
     val frame: JFrame = JFrame()
     private val createRocketActionSettingsDialog: CreateRocketActionSettingsDialog
@@ -89,9 +93,9 @@ class ConfigurationFrame(
 
         val basePanel = JPanel(BorderLayout())
 
-        val menuBar = createToolBar()
+        val toolBar = createToolBar()
 
-        basePanel.add(menuBar, BorderLayout.NORTH)
+        basePanel.add(toolBar, BorderLayout.PAGE_START)
         basePanel.add(panel(), BorderLayout.CENTER)
 
         frame.add(basePanel, BorderLayout.CENTER)
@@ -159,15 +163,16 @@ class ConfigurationFrame(
     }
 
     private var variablesFrame: VariablesFrame? = null
+    private var apiKeysFrame: ApiKeysFrame? = null
 
     fun getVariablesFrame(): VariablesFrame = variablesFrame!!
 
     private fun createToolBar(): JToolBar {
-        val menuBar = JToolBar()
+        val toolBar = JToolBar()
 
-        // Refresh
-        menuBar.add(
-            JButton("Refresh").apply {
+        toolBar.add(
+            JButton().apply {
+                toolTipText = "Reload actions and close config window"
                 icon = rocketActionContextFactory.context.icon().by(AppIcon.RELOAD)
                 addActionListener { e: ActionEvent? ->
                     SwingUtilities.invokeLater {
@@ -177,8 +182,8 @@ class ConfigurationFrame(
                 }
             })
 
-        // Variables
-        menuBar.add(JButton("Variables").apply {
+        toolBar.add(JButton().apply {
+            toolTipText = "Variables"
             variablesFrame = VariablesFrame(
                 parent = frame,
                 variablesApplication = variablesApplication,
@@ -193,8 +198,42 @@ class ConfigurationFrame(
             }
         })
 
-        // Plugin Download Information
-        menuBar.add(JButton("Plugin Download Information").apply {
+        toolBar.addSeparator()
+
+        toolBar.add(
+            JButton().apply {
+                toolTipText = "API handlers"
+                icon = rocketActionContextFactory.context.icon().by(AppIcon.LINK_INTACT)
+                addActionListener {
+                    if (Desktop.isDesktopSupported()) {
+                        Desktop.getDesktop().browse(URI.create(httpServerService.serverUrl()))
+                    }
+                }
+            }
+        )
+
+        toolBar.add(
+            JButton().apply {
+                toolTipText = "API keys"
+                icon = rocketActionContextFactory.context.icon().by(AppIcon.SHIELD)
+                addActionListener {
+                    apiKeysFrame = ApiKeysFrame(
+                        parent = frame,
+                        apiKeysApplication = apiKeysApplication,
+                        notificationService = rocketActionContextFactory.context.notification(),
+                        iconService = rocketActionContextFactory.context.icon()
+                    )
+                    SwingUtilities.invokeLater {
+                        apiKeysFrame!!.isVisible = true
+                    }
+                }
+            }
+        )
+
+        toolBar.addSeparator()
+
+        toolBar.add(JButton().apply {
+            toolTipText = "Plugins download information"
             val pluginManagerFrame = PluginManagerFrame(
                 rocketActionPluginApplicationService = rocketActionPluginApplicationService,
                 parent = frame
@@ -207,19 +246,9 @@ class ConfigurationFrame(
             }
         })
 
-        menuBar.add(
-            JButton("Available Handlers")
-                .apply {
-                    addActionListener {
-                        if (Desktop.isDesktopSupported()) {
-                            Desktop.getDesktop().browse(URI.create(httpServerService.serverUrl()))
-                        }
-                    }
-                }
-        )
-
-        // About
-        menuBar.add(JButton("Available properties from the command line").apply {
+        toolBar.add(JButton().apply
+        {
+            toolTipText = "Properties from the command line"
             icon = Icons.Standard.LIST_16x16
             addActionListener {
                 SwingUtilities.invokeLater {
@@ -228,9 +257,9 @@ class ConfigurationFrame(
             }
         })
 
-
-        // About
-        menuBar.add(JButton("About").apply {
+        toolBar.add(JButton().apply
+        {
+            toolTipText = "About"
             icon = Icons.Standard.QUESTION_MARK_16x16
             addActionListener {
                 SwingUtilities.invokeLater {
@@ -239,6 +268,8 @@ class ConfigurationFrame(
             }
         })
 
-        return menuBar
+        toolBar.add(Box.createHorizontalGlue())
+
+        return toolBar
     }
 }
