@@ -125,9 +125,9 @@ class UiQuickActionService(
         }
     }
 
-    private fun createSearchField(): Component =
-        JPanel(MigLayout(/*"debug"*/"insets 0" /*убираем отступы*/)).apply {
-            border = BorderFactory.createEmptyBorder()
+    private fun createSearchField(): SearchComponent =
+        JPanel(MigLayout(/*"debug"*/"insets 0" /*убираем отступы*/)).let { panel ->
+            panel.border = BorderFactory.createEmptyBorder()
             val textField =
                 TextFieldWithText("Search")
                     .apply { ->
@@ -163,7 +163,7 @@ class UiQuickActionService(
                     }
 
             val backgroundColor = JMenu().background
-            background = backgroundColor
+            panel.background = backgroundColor
             val button = JButton(rocketActionContextFactory.context.icon().by(AppIcon.CLEAR))
                 .apply {
                     toolTipText = "Clear search"
@@ -176,8 +176,13 @@ class UiQuickActionService(
                     })
                 }
 
-            add(textField, "width 100%, growx 0, split") // growx 0 не должно расти по ширине
-            add(button, "wmax 25")
+            panel.add(textField, "width 100%, growx 0, split") // growx 0 не должно расти по ширине
+            panel.add(button, "wmax 25")
+
+            SearchComponent(
+                component = panel,
+                searchTextField = textField,
+            )
         }
 
     private fun fillMenuByRocketAction(rocketActions: Set<RocketAction>, menu: JMenu) {
@@ -395,9 +400,13 @@ class UiQuickActionService(
 
 data class ManuAndSearchPanel(
     val menu: JMenuBar,
-    val search: Component,
+    val search: SearchComponent,
 )
 
+data class SearchComponent(
+    val component: Component,
+    val searchTextField: JTextField,
+)
 
 enum class WindowState(val stateName: String, val icon: AppIcon) {
     MINIMISE("Minimise", AppIcon.MINUS),

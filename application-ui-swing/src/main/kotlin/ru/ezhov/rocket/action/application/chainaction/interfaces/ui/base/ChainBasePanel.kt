@@ -161,6 +161,8 @@ class ChainBasePanel(
         }
     }
 
+    fun getSearchTextField() = textFieldPaste
+
     //http://www.javapractices.com/topic/TopicAction.do?Id=82
     private fun getClipboardContents(): String? {
         var result: String? = null

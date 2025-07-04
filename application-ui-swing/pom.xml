@@ -11,7 +11,7 @@
     </parent>
 
     <artifactId>rocket-action-application-ui-swing</artifactId>
-    <version>0.22.2.8-alfa</version>
+    <version>0.22.2.9-alfa</version>
 
     <name>rocket-action</name>
 
@@ -273,6 +273,12 @@
             <groupId>org.commonmark</groupId>
             <artifactId>commonmark-ext-gfm-tables</artifactId>
             <version>${commonmark.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.github.tulskiy</groupId>
+            <artifactId>jkeymaster</artifactId>
+            <version>${jkeymaster.version}</version>
         </dependency>
 
         <dependency>
