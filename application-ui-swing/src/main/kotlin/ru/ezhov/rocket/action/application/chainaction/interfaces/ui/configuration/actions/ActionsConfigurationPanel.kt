@@ -16,6 +16,8 @@ import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.CreateAndEdi
 import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.CreateAndEditChainActionDialog
 import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.InfoActionPopupMenuPanel
 import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.renderer.AtomicActionListCellRenderer
+import ru.ezhov.rocket.action.application.chainaction.scheduler.application.ActionSchedulerService
+import ru.ezhov.rocket.action.application.chainaction.scheduler.interfaces.ui.ActionSchedulerJMenu
 import ru.ezhov.rocket.action.application.event.domain.DomainEvent
 import ru.ezhov.rocket.action.application.event.domain.DomainEventSubscriber
 import ru.ezhov.rocket.action.application.event.infrastructure.DomainEventFactory
@@ -36,6 +38,7 @@ class ActionsConfigurationPanel(
     private val atomicActionService: AtomicActionService,
     private val chainActionService: ChainActionService,
     private val createAndEditChainActionDialog: CreateAndEditChainActionDialog,
+    private val actionSchedulerService: ActionSchedulerService,
     actionExecutorService: ActionExecutorService,
     iconRepository: IconRepository,
 ) : JPanel(MigLayout()) {
@@ -59,7 +62,10 @@ class ActionsConfigurationPanel(
     )
 
     init {
-        allListActions.cellRenderer = AtomicActionListCellRenderer(chainActionService)
+        allListActions.cellRenderer = AtomicActionListCellRenderer(
+            chainActionService = chainActionService,
+            actionSchedulerService = actionSchedulerService,
+        )
 
         allListActions.addListSelectionListener {
             allListActions.selectedValue?.let {
@@ -221,11 +227,18 @@ class ActionsConfigurationPanel(
                     ChainsSelectPanel(
                         chains = chains,
                         atomicActionService = atomicActionService,
+                        actionSchedulerService = actionSchedulerService,
                         selectChainCallback = { chain -> createAndEditChainActionDialog.showEditDialog(chain) }
                     )
                 )
             }
         )
+
+        if (element.contractType.isUnitInputContract()) {
+            popup.add(
+                ActionSchedulerJMenu(element.id, actionSchedulerService)
+            )
+        }
 
         popup.show(allListActions, event.x, event.y)
     }

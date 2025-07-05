@@ -23,6 +23,7 @@ import ru.ezhov.rocket.action.application.plugin.context.RocketActionContextFact
 import ru.ezhov.rocket.action.application.plugin.group.GroupRocketActionUi
 import ru.ezhov.rocket.action.application.plugin.manager.application.RocketActionPluginApplicationService
 import ru.ezhov.rocket.action.application.resources.Icons
+import ru.ezhov.rocket.action.application.search.application.SearchTextTransformer
 import java.awt.BorderLayout
 import java.awt.event.ActionEvent
 import java.awt.event.MouseAdapter
@@ -56,6 +57,7 @@ class ConfigurationTreePanel(
     private val rocketActionContextFactory: RocketActionContextFactory,
     private val createRocketActionSettingsDialog: CreateRocketActionSettingsDialog,
     private val editorRocketActionSettingsPanel: EditorRocketActionSettingsPanel,
+    private val searchTextTransformer: SearchTextTransformer,
 ) : JPanel(BorderLayout()) {
     private val root = DefaultMutableTreeNode(null, true)
     private val defaultTreeModel = DefaultTreeModel(root)
@@ -326,7 +328,8 @@ class ConfigurationTreePanel(
                 root = root,
                 treeModel = defaultTreeModel,
                 tree = tree,
-                rocketActionContextFactory = rocketActionContextFactory
+                rocketActionContextFactory = rocketActionContextFactory,
+                searchTextTransformer = searchTextTransformer,
             ),
             BorderLayout.NORTH
         )

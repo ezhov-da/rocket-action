@@ -26,10 +26,12 @@ import ru.ezhov.rocket.action.application.chainaction.domain.model.Action
 import ru.ezhov.rocket.action.application.chainaction.domain.model.AtomicAction
 import ru.ezhov.rocket.action.application.chainaction.infrastructure.ActionExecutorFactory
 import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.base.SelectChainListPanel
+import ru.ezhov.rocket.action.application.chainaction.scheduler.application.ActionSchedulerService
 import ru.ezhov.rocket.action.application.event.domain.DomainEvent
 import ru.ezhov.rocket.action.application.event.domain.DomainEventSubscriber
 import ru.ezhov.rocket.action.application.event.infrastructure.DomainEventFactory
 import ru.ezhov.rocket.action.application.resources.Icons
+import ru.ezhov.rocket.action.application.search.application.SearchTextTransformer
 import ru.ezhov.rocket.action.plugin.clipboard.ClipboardUtil
 import ru.ezhov.rocket.action.ui.utils.swing.common.SizeUtil
 import ru.ezhov.rocket.action.ui.utils.swing.common.TextFieldWithText
@@ -51,6 +53,8 @@ class ChainActionUi : AbstractRocketAction(), RocketActionPlugin {
     private var chainActionService: ChainActionService? = null
     private var atomicActionService: AtomicActionService? = null
     private var actionExecutor: ActionExecutor? = null
+    private var searchTextTransformer: SearchTextTransformer? = null
+    private var actionSchedulerService: ActionSchedulerService? = null
 
     private var actionContext: RocketActionContext? = null
 
@@ -65,6 +69,8 @@ class ChainActionUi : AbstractRocketAction(), RocketActionPlugin {
             chainActionService = ChainActionService.INSTANCE
             atomicActionService = AtomicActionService.INSTANCE
             actionExecutor = ActionExecutorFactory.INSTANCE
+            searchTextTransformer = SearchTextTransformer.INSTANCE
+            actionSchedulerService = ActionSchedulerService.INSTANCE
         }
 
     override fun info(): RocketActionPluginInfo = object : RocketActionPluginInfo {
@@ -120,6 +126,8 @@ class ChainActionUi : AbstractRocketAction(), RocketActionPlugin {
                     ActionsComponentPanel(
                         chainActionService = chainActionService!!,
                         atomicActionService = atomicActionService!!,
+                        searchTextTransformer = searchTextTransformer!!,
+                        actionSchedulerService = actionSchedulerService!!,
                     )
                 )
             ),
@@ -273,6 +281,8 @@ class ChainActionUi : AbstractRocketAction(), RocketActionPlugin {
 private class ActionsComponentPanel(
     chainActionService: ChainActionService,
     atomicActionService: AtomicActionService,
+    searchTextTransformer: SearchTextTransformer,
+    actionSchedulerService: ActionSchedulerService,
 ) : JPanel(BorderLayout()), PropertyComponent {
     private var selectedPanel: SelectChainListPanel
 
@@ -282,6 +292,8 @@ private class ActionsComponentPanel(
             chainActionService = chainActionService,
             chains = chainActionService.chains(),
             atomics = atomicActionService.atomics(),
+            searchTextTransformer = searchTextTransformer,
+            actionSchedulerService = actionSchedulerService,
             selectedChainCallback = { },
         )
 

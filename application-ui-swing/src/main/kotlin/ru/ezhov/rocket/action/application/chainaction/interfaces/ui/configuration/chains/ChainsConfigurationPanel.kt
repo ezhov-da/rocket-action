@@ -11,7 +11,10 @@ import ru.ezhov.rocket.action.application.chainaction.domain.event.ChainActionUp
 import ru.ezhov.rocket.action.application.chainaction.domain.model.ChainAction
 import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.CreateAndEditChainActionDialog
 import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.InfoActionPopupMenuPanel
+import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.renderer.ActionSchedulerStatusComponentService
 import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.renderer.ChainActionListCellRenderer
+import ru.ezhov.rocket.action.application.chainaction.scheduler.application.ActionSchedulerService
+import ru.ezhov.rocket.action.application.chainaction.scheduler.interfaces.ui.ActionSchedulerJMenu
 import ru.ezhov.rocket.action.application.event.domain.DomainEvent
 import ru.ezhov.rocket.action.application.event.domain.DomainEventSubscriber
 import ru.ezhov.rocket.action.application.event.infrastructure.DomainEventFactory
@@ -32,6 +35,7 @@ class ChainsConfigurationPanel(
     private val chainActionService: ChainActionService,
     private val atomicActionService: AtomicActionService,
     private val createAndEditChainActionDialog: CreateAndEditChainActionDialog,
+    private val actionSchedulerService: ActionSchedulerService,
 ) : JPanel(MigLayout()) {
     private val sortChainPanelConfiguration = SortChainPanelConfiguration()
     private val searchChainPanelConfiguration = SearchChainPanelConfiguration()
@@ -45,7 +49,10 @@ class ChainsConfigurationPanel(
     private val allListChains = JList(allListChainsModel)
 
     init {
-        allListChains.cellRenderer = ChainActionListCellRenderer(atomicActionService)
+        allListChains.cellRenderer = ChainActionListCellRenderer(
+            atomicActionService = atomicActionService,
+            actionSchedulerStatusComponentService = ActionSchedulerStatusComponentService(actionSchedulerService)
+        )
 
         buttonEditChain.addActionListener {
             allListChains.selectedValue?.let {
@@ -196,10 +203,12 @@ class ChainsConfigurationPanel(
                     sortedChains
                 } else {
                     sortedChains
-                        .filter {
-                            it.id.lowercase().contains(searchAction.text.lowercase()) ||
-                                it.name.lowercase().contains(searchAction.text.lowercase()) ||
-                                it.description.lowercase().contains(searchAction.text.lowercase())
+                        .filter { ch ->
+                            searchAction.text.any { st ->
+                                ch.id.lowercase().lowercase().contains(st) ||
+                                    ch.name.lowercase().lowercase().contains(st) ||
+                                    ch.description.lowercase().lowercase().contains(st)
+                            }
                         }
                 }
             }
@@ -251,6 +260,18 @@ class ChainsConfigurationPanel(
                 )
             }
         )
+
+        element.actions.firstOrNull()
+            ?.let { actionOrder -> atomicActionService.atomicBy(actionOrder.actionId) }
+            ?.let { act ->
+
+                if (act.contractType.isUnitInputContract()) {
+                    popup.add(
+                        ActionSchedulerJMenu(element.id, actionSchedulerService)
+                    )
+                }
+            }
+
         popup.show(allListChains, event.x, event.y)
     }
 }

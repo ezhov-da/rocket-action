@@ -2,7 +2,9 @@ package ru.ezhov.rocket.action.application.chainaction.interfaces.ui
 
 import ru.ezhov.rocket.action.application.chainaction.application.AtomicActionService
 import ru.ezhov.rocket.action.application.chainaction.domain.model.ChainAction
+import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.renderer.ActionSchedulerStatusComponentService
 import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.renderer.ChainActionListCellRenderer
+import ru.ezhov.rocket.action.application.chainaction.scheduler.application.ActionSchedulerService
 import ru.ezhov.rocket.action.ui.utils.swing.common.SizeUtil
 import java.awt.BorderLayout
 import java.awt.event.MouseAdapter
@@ -17,13 +19,17 @@ import javax.swing.SwingConstants
 class ChainsSelectPanel(
     private val chains: List<ChainAction>,
     atomicActionService: AtomicActionService,
+    actionSchedulerService: ActionSchedulerService,
     private val selectChainCallback: (chain: ChainAction) -> Unit
 ) : JPanel(BorderLayout()) {
     private val allListChainsModel = DefaultListModel<ChainAction>()
     private val allListChains = JList(allListChainsModel)
 
     init {
-        allListChains.cellRenderer = ChainActionListCellRenderer(atomicActionService)
+        allListChains.cellRenderer = ChainActionListCellRenderer(
+            atomicActionService = atomicActionService,
+            actionSchedulerStatusComponentService = ActionSchedulerStatusComponentService(actionSchedulerService)
+        )
 
         allListChains.addMouseListener(object : MouseAdapter() {
             override fun mouseClicked(e: MouseEvent) {

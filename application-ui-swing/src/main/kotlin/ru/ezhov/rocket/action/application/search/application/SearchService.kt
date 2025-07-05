@@ -3,13 +3,13 @@ package ru.ezhov.rocket.action.application.search.application
 import mu.KotlinLogging
 import org.springframework.stereotype.Service
 import ru.ezhov.rocket.action.api.context.search.Search
-import ru.ezhov.rocket.action.application.search.infrastructure.regex.RegExSearchEngine
+import ru.ezhov.rocket.action.application.search.infrastructure.plain.PlainSearchEngine
 
 private val logger = KotlinLogging.logger { }
 
 @Service
 class SearchService {
-    private val searchEngine = RegExSearchEngine()
+    private val searchEngine = PlainSearchEngine()
 
     fun search(text: String): List<String> {
         val result = searchEngine.ids(text)

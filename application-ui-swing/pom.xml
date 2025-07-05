@@ -11,7 +11,7 @@
     </parent>
 
     <artifactId>rocket-action-application-ui-swing</artifactId>
-    <version>0.22.2.9-alfa</version>
+    <version>0.22.2.10-alfa</version>
 
     <name>rocket-action</name>
 
@@ -280,6 +280,14 @@
             <artifactId>jkeymaster</artifactId>
             <version>${jkeymaster.version}</version>
         </dependency>
+
+        <dependency>
+            <groupId>org.quartz-scheduler</groupId>
+            <artifactId>quartz</artifactId>
+            <version>${quartz.version}</version>
+        </dependency>
+
+        <!--TEST-->
 
         <dependency>
             <groupId>org.junit.jupiter</groupId>

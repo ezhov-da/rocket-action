@@ -7,7 +7,9 @@ import ru.ezhov.rocket.action.application.chainaction.domain.model.Action
 import ru.ezhov.rocket.action.application.chainaction.domain.model.AtomicAction
 import ru.ezhov.rocket.action.application.chainaction.domain.model.ChainAction
 import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.renderer.ChainAndAtomicActionListCellRenderer
+import ru.ezhov.rocket.action.application.chainaction.scheduler.application.ActionSchedulerService
 import ru.ezhov.rocket.action.application.resources.Icons
+import ru.ezhov.rocket.action.application.search.application.SearchTextTransformer
 import ru.ezhov.rocket.action.ui.utils.swing.common.TextFieldWithText
 import java.awt.BorderLayout
 import java.awt.event.KeyAdapter
@@ -26,7 +28,9 @@ class SelectChainListPanel(
     chainActionService: ChainActionService,
     private val chains: List<ChainAction>,
     private val atomics: List<AtomicAction>,
-    selectedChainCallback: (Action) -> Unit
+    private val searchTextTransformer: SearchTextTransformer,
+    actionSchedulerService: ActionSchedulerService,
+    selectedChainCallback: (Action) -> Unit,
 ) : JPanel(BorderLayout()) {
     private val searchTextField = TextFieldWithText("Search")
     private val clearSearchButton = JButton(Icons.Standard.X_16x16)
@@ -35,7 +39,11 @@ class SelectChainListPanel(
 
     init {
         fillList()
-        actionsList.cellRenderer = ChainAndAtomicActionListCellRenderer(actionService, chainActionService)
+        actionsList.cellRenderer = ChainAndAtomicActionListCellRenderer(
+            atomicActionService = actionService,
+            chainActionService = chainActionService,
+            actionSchedulerService = actionSchedulerService
+        )
 
         actionsList.addMouseListener(object : MouseAdapter() {
             override fun mouseReleased(e: MouseEvent) {
@@ -103,12 +111,15 @@ class SelectChainListPanel(
             chains.forEach { listModel.addElement(it) }
             atomics.forEach { listModel.addElement(it) }
         } else {
-            chains.filter { it.name.lowercase().contains(text.lowercase()) }.forEach {
-                listModel.addElement(it)
-            }
-            atomics.filter { it.name.lowercase().contains(text.lowercase()) }.forEach {
-                listModel.addElement(it)
-            }
+            val searchTexts = searchTextTransformer.transformedText(text)
+
+            chains
+                .filter { ch -> searchTexts.any { st -> ch.name.lowercase().contains(st) } }
+                .forEach { listModel.addElement(it) }
+
+            atomics
+                .filter { aa -> searchTexts.any { st -> aa.name.lowercase().contains(st) } }
+                .forEach { listModel.addElement(it) }
         }
     }
 

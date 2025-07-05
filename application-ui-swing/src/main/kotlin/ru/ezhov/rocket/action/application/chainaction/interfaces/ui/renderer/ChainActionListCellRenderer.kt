@@ -10,7 +10,8 @@ import javax.swing.JLabel
 import javax.swing.JList
 
 class ChainActionListCellRenderer(
-    private val atomicActionService: AtomicActionService
+    private val atomicActionService: AtomicActionService,
+    private val actionSchedulerStatusComponentService: ActionSchedulerStatusComponentService,
 ) : DefaultListCellRenderer() {
     override fun getListCellRendererComponent(
         list: JList<*>?,
@@ -25,6 +26,7 @@ class ChainActionListCellRenderer(
                 chainAction = value,
                 chainIcon = chainIcon(value, atomicActionService),
                 backgroundColor = label.background,
+                actionSchedulerStatusComponentService = actionSchedulerStatusComponentService,
             )
         } else {
             label

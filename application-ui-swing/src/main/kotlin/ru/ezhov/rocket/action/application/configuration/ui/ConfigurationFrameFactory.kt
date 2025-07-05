@@ -12,6 +12,7 @@ import ru.ezhov.rocket.action.application.handlers.server.HttpServerService
 import ru.ezhov.rocket.action.application.plugin.context.RocketActionContextFactory
 import ru.ezhov.rocket.action.application.plugin.manager.application.RocketActionPluginApplicationService
 import ru.ezhov.rocket.action.application.properties.GeneralPropertiesRepository
+import ru.ezhov.rocket.action.application.search.application.SearchTextTransformer
 import ru.ezhov.rocket.action.application.tags.application.TagsService
 import ru.ezhov.rocket.action.application.variables.application.VariablesApplication
 
@@ -29,6 +30,7 @@ class ConfigurationFrameFactory(
     httpServerService: HttpServerService,
     availablePropertiesFromCommandLineDialogFactory: AvailablePropertiesFromCommandLineDialogFactory,
     apiKeysApplication: ApiKeysApplication,
+    searchTextTransformer: SearchTextTransformer,
 ) : InitializingBean {
     val configurationFrame = ConfigurationFrame(
         rocketActionPluginApplicationService = rocketActionPluginApplicationService,
@@ -43,6 +45,7 @@ class ConfigurationFrameFactory(
         httpServerService = httpServerService,
         availablePropertiesFromCommandLineDialogFactory = availablePropertiesFromCommandLineDialogFactory,
         apiKeysApplication = apiKeysApplication,
+        searchTextTransformer = searchTextTransformer,
     )
 
 

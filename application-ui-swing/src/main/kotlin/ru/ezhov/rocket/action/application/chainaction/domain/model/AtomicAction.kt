@@ -38,6 +38,11 @@ enum class ContractType(val inputValue: InputValueContractType, val output: Outp
     IN_UNIT(InputValueContractType.IN, OutputValueContractType.UNIT),
     UNIT_OUT(InputValueContractType.UNIT, OutputValueContractType.OUT),
     UNIT_UNIT(InputValueContractType.UNIT, OutputValueContractType.UNIT),
+    ;
+
+    fun isUnitInputContract(): Boolean =
+        this == UNIT_OUT ||
+            this == UNIT_UNIT
 }
 
 enum class InputValueContractType {

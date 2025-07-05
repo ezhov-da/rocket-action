@@ -37,12 +37,14 @@ object AtomicActionsFilter {
                     sortedAtomics
                 } else {
                     sortedAtomics
-                        .filter {
-                            it.id.lowercase().contains(searchAction.text.lowercase()) ||
-                                it.name.lowercase().contains(searchAction.text.lowercase()) ||
-                                it.description.lowercase().contains(searchAction.text.lowercase()) ||
-                                it.data.lowercase().contains(searchAction.text.lowercase()) ||
-                                it.alias?.lowercase()?.contains(searchAction.text.lowercase()) ?: false
+                        .filter { aa ->
+                            searchAction.text.any { st ->
+                                aa.id.lowercase().contains(st) ||
+                                    aa.name.lowercase().contains(st) ||
+                                    aa.description.lowercase().contains(st) ||
+                                    aa.data.lowercase().contains(st) ||
+                                    aa.alias?.lowercase()?.contains(st) ?: false
+                            }
                         }
                 }
             }

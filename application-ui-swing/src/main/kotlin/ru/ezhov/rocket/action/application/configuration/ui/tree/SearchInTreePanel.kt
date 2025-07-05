@@ -6,6 +6,7 @@ import ru.ezhov.rocket.action.application.eventui.ConfigurationUiObserverFactory
 import ru.ezhov.rocket.action.application.eventui.model.ConfigurationUiEvent
 import ru.ezhov.rocket.action.application.eventui.model.SettingMovedUiEvent
 import ru.ezhov.rocket.action.application.plugin.context.RocketActionContextFactory
+import ru.ezhov.rocket.action.application.search.application.SearchTextTransformer
 import ru.ezhov.rocket.action.ui.utils.swing.common.TextFieldWithText
 import java.awt.BorderLayout
 import java.awt.event.KeyAdapter
@@ -25,6 +26,7 @@ class SearchInTreePanel(
     private val treeModel: DefaultTreeModel,
     private val tree: JTree,
     private val rocketActionContextFactory: RocketActionContextFactory,
+    private val searchTextTransformer: SearchTextTransformer,
 ) : JPanel() {
     private val textField = TextFieldWithText("Search")
     private var currentResultPanel: ResultPanel? = null
@@ -42,13 +44,17 @@ class SearchInTreePanel(
         textField.addKeyListener(object : KeyAdapter() {
             override fun keyReleased(e: KeyEvent) {
                 if (textField.text.isNotEmpty() && e.keyCode == KeyEvent.VK_ENTER) {
+                    val searchText = searchTextTransformer.transformedText(textField.text)
+
                     val nodes = SearchInTreeUtil.searchInTree(
                         condition = { settings ->
-                            settings.settings.settings.any { set ->
-                                set.value.contains(
-                                    other = textField.text,
-                                    ignoreCase = true
-                                )
+                            searchText.any { st ->
+                                settings.settings.settings.any { set ->
+                                    set.value.contains(
+                                        other = st,
+                                        ignoreCase = true
+                                    )
+                                }
                             }
                         },
                         root = root,

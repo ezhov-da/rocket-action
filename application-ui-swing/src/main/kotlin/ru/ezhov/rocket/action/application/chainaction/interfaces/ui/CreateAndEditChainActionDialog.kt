@@ -20,6 +20,7 @@ import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.dnd.DragList
 import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.dnd.ListDropHandler
 import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.renderer.AtomicActionListCellRenderer
 import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.renderer.OrderAtomicActionListCellRenderer
+import ru.ezhov.rocket.action.application.chainaction.scheduler.application.ActionSchedulerService
 import ru.ezhov.rocket.action.application.event.domain.DomainEvent
 import ru.ezhov.rocket.action.application.event.domain.DomainEventSubscriber
 import ru.ezhov.rocket.action.application.event.infrastructure.DomainEventFactory
@@ -57,6 +58,7 @@ class CreateAndEditChainActionDialog(
     private val chainActionService: ChainActionService,
     private val atomicActionService: AtomicActionService,
     private val iconRepository: IconRepository,
+    private val actionSchedulerService: ActionSchedulerService,
 ) : JDialog() {
 
     private val createAndEditAtomicActionDialog = CreateAndEditAtomicActionDialog(
@@ -98,8 +100,14 @@ class CreateAndEditChainActionDialog(
     private val actionExecutePanel = ActionExecutePanel(actionExecutorService)
 
     init {
-        allListActions.cellRenderer = AtomicActionListCellRenderer(chainActionService)
-        selectedListActions.cellRenderer = OrderAtomicActionListCellRenderer(chainActionService)
+        allListActions.cellRenderer = AtomicActionListCellRenderer(
+            chainActionService = chainActionService,
+            actionSchedulerService = actionSchedulerService,
+        )
+        selectedListActions.cellRenderer = OrderAtomicActionListCellRenderer(
+            chainActionService = chainActionService,
+            actionSchedulerService = actionSchedulerService
+        )
         selectedListActions.selectionMode = ListSelectionModel.SINGLE_SELECTION
 
         selectedListActions.dragEnabled = true

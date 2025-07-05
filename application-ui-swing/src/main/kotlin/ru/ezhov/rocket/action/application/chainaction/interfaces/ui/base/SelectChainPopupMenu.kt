@@ -7,6 +7,8 @@ import ru.ezhov.rocket.action.application.chainaction.application.ChainActionSer
 import ru.ezhov.rocket.action.application.chainaction.domain.model.Action
 import ru.ezhov.rocket.action.application.chainaction.domain.model.AtomicAction
 import ru.ezhov.rocket.action.application.chainaction.domain.model.ChainAction
+import ru.ezhov.rocket.action.application.chainaction.scheduler.application.ActionSchedulerService
+import ru.ezhov.rocket.action.application.search.application.SearchTextTransformer
 import java.awt.BorderLayout
 import java.awt.FlowLayout
 import java.awt.event.ActionListener
@@ -21,6 +23,8 @@ class SelectChainPopupMenu(
     private val configurationApplication: ConfigurationApplication,
     private val actionService: AtomicActionService,
     private val chainActionService: ChainActionService,
+    private val searchTextTransformer: SearchTextTransformer,
+    private val actionSchedulerService: ActionSchedulerService,
     chains: List<ChainAction>,
     atomics: List<AtomicAction>,
     private val selectedChainCallback: (Action) -> Unit
@@ -176,6 +180,8 @@ class SelectChainPopupMenu(
                 chainActionService = chainActionService,
                 chains = chainsForList,
                 atomics = atomicsForList,
+                actionSchedulerService = actionSchedulerService,
+                searchTextTransformer = searchTextTransformer,
                 selectedChainCallback = { sv ->
                     selectChainDialog.isVisible = false
                     selectedChainCallback(sv)

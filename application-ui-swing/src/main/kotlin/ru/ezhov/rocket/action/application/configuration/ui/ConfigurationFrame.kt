@@ -24,6 +24,7 @@ import ru.ezhov.rocket.action.application.plugin.manager.ui.PluginManagerFrame
 import ru.ezhov.rocket.action.application.properties.GeneralPropertiesRepository
 import ru.ezhov.rocket.action.application.properties.UsedPropertiesName
 import ru.ezhov.rocket.action.application.resources.Icons
+import ru.ezhov.rocket.action.application.search.application.SearchTextTransformer
 import ru.ezhov.rocket.action.application.tags.application.TagsService
 import ru.ezhov.rocket.action.application.variables.application.VariablesApplication
 import ru.ezhov.rocket.action.application.variables.interfaces.ui.VariablesFrame
@@ -57,6 +58,7 @@ class ConfigurationFrame(
     private val httpServerService: HttpServerService,
     private val availablePropertiesFromCommandLineDialogFactory: AvailablePropertiesFromCommandLineDialogFactory,
     private val apiKeysApplication: ApiKeysApplication,
+    private val searchTextTransformer: SearchTextTransformer,
 ) {
     val frame: JFrame = JFrame()
     private val createRocketActionSettingsDialog: CreateRocketActionSettingsDialog
@@ -143,6 +145,7 @@ class ConfigurationFrame(
             rocketActionContextFactory = rocketActionContextFactory,
             createRocketActionSettingsDialog = createRocketActionSettingsDialog,
             editorRocketActionSettingsPanel = editorRocketActionSettingsPanel,
+            searchTextTransformer = searchTextTransformer,
         )
         splitPane.rightComponent = editorRocketActionSettingsPanel
 

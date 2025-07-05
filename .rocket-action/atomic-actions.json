@@ -1,5 +1,5 @@
 {
-  "changedDate" : [ 2024, 10, 25, 6, 13, 36, 9000000 ],
+  "changedDate" : [ 2025, 7, 5, 12, 6, 13, 708000000 ],
   "atomicActions" : [ {
     "id" : "ccb3ea04-68ef-4988-84f1-2d95e14c0046",
     "name" : "Убирает начальные и конечные пробелы у строки (test)",
@@ -118,6 +118,26 @@
     "engine" : "KOTLIN",
     "source" : "TEXT",
     "data" : "",
+    "alias" : null,
+    "icon" : null
+  }, {
+    "id" : "1a997d34-d98f-47d6-830d-e5dbad65ddaa",
+    "name" : "Test job",
+    "description" : "Тестирование задания",
+    "contractType" : "UNIT_UNIT",
+    "engine" : "KOTLIN",
+    "source" : "TEXT",
+    "data" : "println(\"I'am from JOB\")",
+    "alias" : null,
+    "icon" : null
+  }, {
+    "id" : "c79aff58-c84f-400a-a539-88ee8bcb86bd",
+    "name" : "Test job с ошибкой",
+    "description" : "Тестирование задания",
+    "contractType" : "UNIT_UNIT",
+    "engine" : "KOTLIN",
+    "source" : "TEXT",
+    "data" : "throw Exception(\"ERROR\")",
     "alias" : null,
     "icon" : null
   } ]

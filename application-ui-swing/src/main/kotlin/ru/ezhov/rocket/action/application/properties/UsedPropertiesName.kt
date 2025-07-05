@@ -139,6 +139,28 @@ enum class UsedPropertiesName(val propertyName: String, val description: String)
         """.trimIndent()
     ),
 
+    ACTION_SCHEDULERS_FILE_FOLDER_REPOSITORY_PATH(
+        "$PREFIX.action-schedulers.folder.repository.path",
+        """
+            Path to a file to store api keys.
+
+            Example:
+            - relative path `./folder`
+            - absolute path `C:/folder`
+        """.trimIndent()
+    ),
+
+    ACTION_SCHEDULERS_LOG_FILE_FOLDER_PATH(
+        "$PREFIX.action-scheduler-logs.folder.repository.path",
+        """
+            Path to a file to store api keys.
+
+            Example:
+            - relative path `./folder`
+            - absolute path `C:/folder`
+        """.trimIndent()
+    ),
+
     APPLICATION_CONFIGURATION_FILE_REPOSITORY_PATH(
         "$PREFIX.application.configuration.file.repository.path",
         """

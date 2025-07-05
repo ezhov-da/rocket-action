@@ -47,6 +47,8 @@ fun main(args: Array<String>) {
                 chainActionService = chainActionService,
                 atomicActionService = atomicActionService,
                 configurationApplication = mockk(),
+                searchTextTransformer = mockk(),
+                actionSchedulerService = mockk()
             )
         )
         frame.setSize(300, 200)

@@ -7,6 +7,7 @@ import ru.ezhov.rocket.action.application.chainaction.application.ChainActionSer
 import ru.ezhov.rocket.action.application.chainaction.domain.ActionExecutor
 import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.configuration.actions.ActionsConfigurationPanel
 import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.configuration.chains.ChainsConfigurationPanel
+import ru.ezhov.rocket.action.application.chainaction.scheduler.application.ActionSchedulerService
 import ru.ezhov.rocket.action.application.eventui.ConfigurationUiListener
 import ru.ezhov.rocket.action.application.eventui.ConfigurationUiObserverFactory
 import ru.ezhov.rocket.action.application.eventui.model.ConfigurationUiEvent
@@ -29,6 +30,7 @@ class ChainConfigurationFrame(
     atomicActionService: AtomicActionService,
     actionExecutor: ActionExecutor,
     iconRepository: IconRepository,
+    actionSchedulerService: ActionSchedulerService
 ) : JFrame() {
     private val contentPane = JPanel(MigLayout(/*"debug"*/))
 
@@ -37,6 +39,7 @@ class ChainConfigurationFrame(
         chainActionService = chainActionService,
         atomicActionService = atomicActionService,
         iconRepository = iconRepository,
+        actionSchedulerService = actionSchedulerService,
     )
 
     private val actionsConfigurationPanel = ActionsConfigurationPanel(
@@ -45,6 +48,7 @@ class ChainConfigurationFrame(
         createAndEditChainActionDialog = createChainActionDialog,
         actionExecutorService = actionExecutorService,
         iconRepository = iconRepository,
+        actionSchedulerService = actionSchedulerService,
     )
 
     private val chainsConfigurationPanel = ChainsConfigurationPanel(
@@ -52,6 +56,7 @@ class ChainConfigurationFrame(
         atomicActionService = atomicActionService,
         chainActionService = chainActionService,
         createAndEditChainActionDialog = createChainActionDialog,
+        actionSchedulerService = actionSchedulerService
     )
 
     init {

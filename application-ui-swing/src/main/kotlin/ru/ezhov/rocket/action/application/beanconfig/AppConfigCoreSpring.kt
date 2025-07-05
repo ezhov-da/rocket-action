@@ -22,7 +22,7 @@ import java.io.File
 private val logger = KotlinLogging.logger { }
 
 @Configuration
-@ComponentScan(basePackages = ["ru.ezhov.rocket.action"])
+@ComponentScan(basePackages = ["ru.ezhov.rocket.action"], lazyInit = false /*load all beans*/)
 open class AppConfigCoreSpring {
     /**
      * Usage for sync in Group plugin

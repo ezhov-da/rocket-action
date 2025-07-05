@@ -5,6 +5,7 @@ import ru.ezhov.rocket.action.application.chainaction.domain.model.InputValueCon
 import ru.ezhov.rocket.action.application.chainaction.domain.model.OutputValueContractType
 import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.components.ChainIcons
 import ru.ezhov.rocket.action.application.resources.Icons
+import ru.ezhov.rocket.action.application.search.application.SearchTextTransformer
 import ru.ezhov.rocket.action.ui.utils.swing.common.TextFieldWithText
 import java.awt.event.ActionListener
 import java.awt.event.KeyAdapter
@@ -20,6 +21,7 @@ class SearchChainPanelConfiguration : JPanel(MigLayout()) {
         const val SEARCH_ACTION_PROPERTY_NAME = "changed"
     }
 
+    private val searchTextTransformer = SearchTextTransformer.INSTANCE!!
     private val allContractButton = JToggleButton("All")
     private val inOutButton = JToggleButton(ChainIcons.IN_OUT_ICON_16x16)
     private val inUnitButton = JToggleButton(ChainIcons.IN_UNIT_ICON_16x16)
@@ -54,7 +56,7 @@ class SearchChainPanelConfiguration : JPanel(MigLayout()) {
             firePropertyChange(
                 SEARCH_ACTION_PROPERTY_NAME,
                 null,
-                SearchAction.SearchInfo(conditions = searchConditions(), text = textField.text)
+                SearchAction.SearchInfo(conditions = searchConditions(), text = searchText(textField.text))
             )
         }
 
@@ -69,7 +71,7 @@ class SearchChainPanelConfiguration : JPanel(MigLayout()) {
                 firePropertyChange(
                     SEARCH_ACTION_PROPERTY_NAME,
                     null,
-                    SearchAction.SearchInfo(conditions = searchConditions(), text = textField.text)
+                    SearchAction.SearchInfo(conditions = searchConditions(), text = searchText(textField.text))
                 )
             }
         })
@@ -79,7 +81,7 @@ class SearchChainPanelConfiguration : JPanel(MigLayout()) {
         }
     }
 
-    fun searchAction(): SearchAction = SearchAction.SearchInfo(conditions = searchConditions(), text = textField.text)
+    fun searchAction(): SearchAction = SearchAction.SearchInfo(conditions = searchConditions(), text = searchText(textField.text))
 
     private fun searchConditions(): List<SearchAction.SearchCondition> =
         mutableListOf<SearchAction.SearchCondition>().apply {
@@ -88,6 +90,9 @@ class SearchChainPanelConfiguration : JPanel(MigLayout()) {
             unitOutButton.takeIf { it.isSelected }?.let { add(SearchAction.SearchCondition.UNIT_OUT) }
             unitUnitButton.takeIf { it.isSelected }?.let { add(SearchAction.SearchCondition.UNIT_UNIT) }
         }
+
+    private fun searchText(inputText: String): List<String> =
+        searchTextTransformer.transformedText(inputText)
 }
 
 sealed class SearchAction(
@@ -99,7 +104,7 @@ sealed class SearchAction(
 
     class SearchInfo(
         conditions: List<SearchCondition>,
-        val text: String
+        val text: List<String>
     ) : SearchAction(conditions)
 
     enum class SearchCondition(

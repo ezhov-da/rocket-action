@@ -21,6 +21,7 @@ object ConfigurationFrameTest {
                     httpServerService = mockk(),
                     availablePropertiesFromCommandLineDialogFactory = mockk(),
                     apiKeysApplication = mockk(),
+                    searchTextTransformer = mockk()
                 )
                     .show()
             } catch (e: Exception) {

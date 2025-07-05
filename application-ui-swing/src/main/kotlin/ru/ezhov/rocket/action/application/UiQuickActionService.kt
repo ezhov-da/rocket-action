@@ -20,6 +20,7 @@ import ru.ezhov.rocket.action.application.plugin.context.RocketActionContextFact
 import ru.ezhov.rocket.action.application.properties.GeneralPropertiesRepository
 import ru.ezhov.rocket.action.application.properties.UsedPropertiesName
 import ru.ezhov.rocket.action.application.search.application.SearchService
+import ru.ezhov.rocket.action.application.search.application.SearchTextTransformer
 import ru.ezhov.rocket.action.application.tags.application.TagsService
 import ru.ezhov.rocket.action.application.tags.domain.TagNode
 import ru.ezhov.rocket.action.application.ui.color.ColorConstants
@@ -58,6 +59,7 @@ class UiQuickActionService(
     private val searchService: SearchService,
     private val configurationFrameFactory: ConfigurationFrameFactory,
     private val generalPropertiesRepository: GeneralPropertiesRepository,
+    private val searchTextTransformer: SearchTextTransformer,
 ) {
     private var baseDialog: JDialog? = null
 
@@ -139,7 +141,12 @@ class UiQuickActionService(
                             override fun keyPressed(e: KeyEvent) {
                                 if (e.keyCode == KeyEvent.VK_ENTER) {
                                     if (text.isNotEmpty()) {
-                                        val idsRA = searchService.search(text).toSet()
+                                        val searchTexts = searchTextTransformer.transformedText(text)
+                                        val idsRA = searchTexts
+                                            .map { searchService.search(it).toSet() }
+                                            .flatten()
+                                            .toSet()
+
                                         val raByFullText = rocketActionSettingsService.actionsByIds(idsRA)
                                         val raByContains = rocketActionSettingsService.actionsByContains(text)
 
@@ -147,7 +154,7 @@ class UiQuickActionService(
                                             .toSet()
                                             .takeIf { it.isNotEmpty() }
                                             ?.let { ra ->
-                                                logger.info { "Found by search '$text': ${ra.size}" }
+                                                logger.info { "Found by search '$text': '${ra.size}'. Result search '$searchTexts'" }
                                                 tf.background = ColorConstants.COLOR_SUCCESS
                                                 fillMenuByRocketAction(ra, currentMenu!!)
                                             }

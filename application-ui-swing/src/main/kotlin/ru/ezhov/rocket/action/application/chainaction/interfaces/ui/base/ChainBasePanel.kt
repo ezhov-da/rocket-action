@@ -5,9 +5,11 @@ import ru.ezhov.rocket.action.application.applicationConfiguration.application.C
 import ru.ezhov.rocket.action.application.chainaction.application.ActionExecutorService
 import ru.ezhov.rocket.action.application.chainaction.application.AtomicActionService
 import ru.ezhov.rocket.action.application.chainaction.application.ChainActionService
+import ru.ezhov.rocket.action.application.chainaction.scheduler.application.ActionSchedulerService
 import ru.ezhov.rocket.action.application.eventui.ConfigurationUiObserverFactory
 import ru.ezhov.rocket.action.application.eventui.model.ShowChainActionConfigurationUiEvent
 import ru.ezhov.rocket.action.application.resources.Icons
+import ru.ezhov.rocket.action.application.search.application.SearchTextTransformer
 import ru.ezhov.rocket.action.ui.utils.swing.common.TextFieldWithText
 import java.awt.Toolkit
 import java.awt.datatransfer.Clipboard
@@ -36,6 +38,8 @@ class ChainBasePanel(
     private val chainActionService: ChainActionService,
     private val atomicActionService: AtomicActionService,
     private val configurationApplication: ConfigurationApplication,
+    private val searchTextTransformer: SearchTextTransformer,
+    private val actionSchedulerService: ActionSchedulerService,
 ) : JPanel(MigLayout(/*"debug"*/"insets 0 0 5 0" /*Убираем отступы, оставляем только снизу для отображения действий*/)) {
     private val textFieldPaste = TextFieldWithText(
         "Drag, paste or type"
@@ -138,7 +142,9 @@ class ChainBasePanel(
             chainActionService = chainActionService,
             chains = chainActionService.chains(),
             atomics = atomicActionService.atomics(),
+            searchTextTransformer = searchTextTransformer,
             configurationApplication = configurationApplication,
+            actionSchedulerService = actionSchedulerService,
         ) { chain ->
             actionExecuteStatusPanel.isVisible = true
 
