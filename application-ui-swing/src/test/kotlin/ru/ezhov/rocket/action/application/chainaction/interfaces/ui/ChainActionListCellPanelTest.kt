@@ -45,7 +45,8 @@ fun main(args: Array<String>) {
                     every { atomicBy("22") } returns mockk {
                         every { contractType } returns ContractType.IN_UNIT
                     }
-                })
+                }),
+                actionSchedulerStatusComponentService = mockk(),
             )
         )
         frame.setSize(1000, 600);

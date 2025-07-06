@@ -42,6 +42,7 @@ fun main(args: Array<String>) {
             ),
             actionExecutor = mockk(),
             iconRepository = mockk(),
+            actionSchedulerService = mockk(),
         )
         frame.isVisible = true
         frame.defaultCloseOperation = JFrame.EXIT_ON_CLOSE

@@ -37,6 +37,7 @@ fun main(args: Array<String>) {
                 JsonAtomicActionRepository(TestUtilsFactory.objectMapper),
             ),
             iconRepository = mockk(),
+            actionSchedulerService = mockk(),
         )
         dialog.isVisible = true
         System.exit(0)

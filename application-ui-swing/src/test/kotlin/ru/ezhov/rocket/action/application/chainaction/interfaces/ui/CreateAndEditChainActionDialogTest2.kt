@@ -25,6 +25,7 @@ fun main(args: Array<String>) {
             chainActionService = ChainActionService(JsonChainActionRepository(TestUtilsFactory.objectMapper)),
             atomicActionService = AtomicActionService(JsonAtomicActionRepository(TestUtilsFactory.objectMapper)),
             iconRepository = mockk(),
+            actionSchedulerService = mockk(),
         ).showEditDialog(
             ChainAction(
                 id = "123",

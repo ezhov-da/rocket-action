@@ -25,6 +25,7 @@ fun main() {
                 createAndEditChainActionDialog = mockk(),
                 actionExecutorService = mockk(),
                 iconRepository = mockk(),
+                actionSchedulerService = mockk(),
             )
         )
         frame.setSize(1000, 700)
