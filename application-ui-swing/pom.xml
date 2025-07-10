@@ -11,7 +11,7 @@
     </parent>
 
     <artifactId>rocket-action-application-ui-swing</artifactId>
-    <version>0.22.2.10-alfa</version>
+    <version>0.22.2.11-alfa</version>
 
     <name>rocket-action</name>
 

@@ -10,7 +10,7 @@ import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.JToggleButton
 
-class SortActionPanelConfiguration : JPanel(MigLayout()) {
+class SortActionPanelConfiguration : JPanel(MigLayout("insets 0")) {
     companion object {
         const val SORT_INFO_PROPERTY_NAME = "sortInfo"
     }
@@ -53,7 +53,7 @@ enum class SortField {
     NAME, CONTRACT, ENGINE, SOURCE
 }
 
-private class SortDirectionPanel : JPanel(MigLayout()) {
+private class SortDirectionPanel : JPanel(MigLayout("insets 0")) {
     private val directionLabel = JLabel("Direction:")
     private val azButton = JToggleButton(Icons.Standard.ARROW_BOTTOM_16x16)
     private val zaButton = JToggleButton(Icons.Standard.ARROW_TOP_16x16)
@@ -83,7 +83,7 @@ private class SortDirectionPanel : JPanel(MigLayout()) {
     }
 }
 
-private class SortFieldsPanel : JPanel(MigLayout()) {
+private class SortFieldsPanel : JPanel(MigLayout("insets 0")) {
     private val fieldLabel = JLabel("Field:")
     private val nameButton = JToggleButton("Name")
     private val contractButton = JToggleButton("Contract")

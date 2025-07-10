@@ -15,7 +15,7 @@ import javax.swing.JPanel
 import javax.swing.JSeparator
 import javax.swing.JToggleButton
 
-class SearchActionPanelConfiguration : JPanel(MigLayout()) {
+class SearchActionPanelConfiguration : JPanel(MigLayout("insets 0")) {
     companion object {
         const val SEARCH_ACTION_PROPERTY_NAME = "changed"
     }
