@@ -65,4 +65,5 @@ private fun AppIcon.toInner() = when (this) {
     AppIcon.COLLAPSE -> AppIconInner.COLLAPSE
     AppIcon.EXPAND -> AppIconInner.EXPAND
     AppIcon.SHIELD -> AppIconInner.SHIELD
+    AppIcon.EXPORT -> AppIconInner.EXPORT
 }

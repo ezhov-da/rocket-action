@@ -31,6 +31,7 @@ enum class AppIconInner(val iconName: String) {
     FORK("fork-2x"),
     CLOCK("clock-2x"),
     SHIELD("shield-2x"),
+    EXPORT("external-link-2x"),
 
     LOADER("/icons/load_16x16.gif"),
     SAVE("/icons/save_16x16.png"),

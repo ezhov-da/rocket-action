@@ -19,6 +19,7 @@ import ru.ezhov.rocket.action.application.event.domain.DomainEventSubscriber
 import ru.ezhov.rocket.action.application.event.infrastructure.DomainEventFactory
 import ru.ezhov.rocket.action.application.eventui.ConfigurationUiObserverFactory
 import ru.ezhov.rocket.action.application.eventui.model.RemoveSettingUiEvent
+import ru.ezhov.rocket.action.application.export.RocketActionExporterFactory
 import ru.ezhov.rocket.action.application.plugin.context.RocketActionContextFactory
 import ru.ezhov.rocket.action.application.plugin.group.GroupRocketActionUi
 import ru.ezhov.rocket.action.application.plugin.manager.application.RocketActionPluginApplicationService
@@ -32,8 +33,10 @@ import javax.swing.AbstractAction
 import javax.swing.DropMode
 import javax.swing.ImageIcon
 import javax.swing.JButton
+import javax.swing.JFileChooser
 import javax.swing.JMenu
 import javax.swing.JMenuItem
+import javax.swing.JOptionPane
 import javax.swing.JPanel
 import javax.swing.JPopupMenu
 import javax.swing.JScrollPane
@@ -43,6 +46,7 @@ import javax.swing.SwingUtilities
 import javax.swing.event.TreeExpansionEvent
 import javax.swing.event.TreeExpansionListener
 import javax.swing.event.TreeSelectionEvent
+import javax.swing.filechooser.FileNameExtensionFilter
 import javax.swing.tree.DefaultMutableTreeNode
 import javax.swing.tree.DefaultTreeModel
 import javax.swing.tree.MutableTreeNode
@@ -396,6 +400,45 @@ class ConfigurationTreePanel(
                                     }
                                 }
                             })
+                        }
+                    }
+            )
+
+            addSeparator()
+
+            add(
+                JButton()
+                    .apply {
+                        toolTipText = "Export to SQLite"
+                        icon = rocketActionContextFactory.context.icon().by(AppIcon.EXPORT)
+
+                        addActionListener {
+                            val fileChooser = JFileChooser()
+                            fileChooser.fileFilter = FileNameExtensionFilter("Database file (*.sqlite, *.db, *.db3)", "sqlite", "db", "db3")
+                            val result = fileChooser.showSaveDialog(null)
+                            if (result == JFileChooser.APPROVE_OPTION) {
+                                val file = fileChooser.selectedFile
+                                try {
+                                    RocketActionExporterFactory
+                                        .sqlLite(file)
+                                        .export(rocketActionSettingsService.actionsModel())
+
+                                    JOptionPane.showMessageDialog(
+                                        null,
+                                        "Export to SQLite is completed",
+                                        "Success",
+                                        JOptionPane.INFORMATION_MESSAGE
+                                    )
+                                } catch (e: Exception) {
+                                    logger.error(e) { "Error when export to SQLite" }
+                                    JOptionPane.showMessageDialog(
+                                        null,
+                                        "Error when export to SQLite. Detail in logs",
+                                        "Error",
+                                        JOptionPane.ERROR_MESSAGE
+                                    )
+                                }
+                            }
                         }
                     }
             )

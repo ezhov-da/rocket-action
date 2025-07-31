@@ -35,4 +35,5 @@ enum class AppIcon {
     EXPAND,
     COLLAPSE,
     SHIELD,
+    EXPORT,
 }

@@ -16,25 +16,26 @@ data class RocketActionSettingsModel(
     var actions: List<RocketActionSettingsModel>,
     var tags: List<String>,
 ) {
-    fun to(engineService: EngineService): RocketActionSettings = object : RocketActionSettings {
-        override fun id(): String = id
+    fun to(engineService: EngineService): RocketActionSettings =
+        object : RocketActionSettings {
+            override fun id(): String = id
 
-        override fun type(): RocketActionType = RocketActionType { type }
+            override fun type(): RocketActionType = RocketActionType { type }
 
-        override fun settings(): Map<String, String> =
-            try {
-                settings.associate { set ->
-                    // TODO ezhov opportunity for optimization
-                    val resultVal = engineService.processWithEngine(set).toString()
-                    set.name to resultVal
+            override fun settings(): Map<String, String> =
+                try {
+                    settings.associate { set ->
+                        // TODO ezhov opportunity for optimization
+                        val resultVal = engineService.processWithEngine(set).toString()
+                        set.name to resultVal
+                    }
+                } catch (ex: Exception) {
+                    logger.warn(ex) { "Error when get settings for action with id='$id'" }
+                    emptyMap()
                 }
-            } catch (ex: Exception) {
-                logger.warn(ex) { "Error when get settings for action with id='$id'" }
-                emptyMap()
-            }
 
-        override fun actions(): List<RocketActionSettings> = actions.map { it.to(engineService) }
-    }
+            override fun actions(): List<RocketActionSettings> = actions.map { it.to(engineService) }
+        }
 
     companion object {
         fun generateId() = UUID.randomUUID().toString()
