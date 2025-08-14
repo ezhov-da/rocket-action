@@ -3,22 +3,19 @@ package ru.ezhov.rocket.action.plugin.jira.worklog.infrastructure
 import arrow.core.Either
 import arrow.core.left
 import arrow.core.right
+import com.atlassian.jira.rest.client.api.JiraRestClient
 import com.atlassian.jira.rest.client.api.domain.input.WorklogInput
-import com.atlassian.jira.rest.client.internal.async.AsynchronousJiraRestClientFactory
 import org.joda.time.DateTime
 import ru.ezhov.rocket.action.plugin.jira.worklog.domain.CommitTimeService
 import ru.ezhov.rocket.action.plugin.jira.worklog.domain.CommitTimeServiceException
 import ru.ezhov.rocket.action.plugin.jira.worklog.domain.model.CommitTimeTask
-import java.net.URI
 
 class JiraCommitTimeService(
-    private val username: String,
-    private val password: String,
-    private val url: URI,
+    private val jiraRestClient: JiraRestClient,
 ) : CommitTimeService {
     override fun commit(task: CommitTimeTask): Either<CommitTimeServiceException, Unit> =
         try {
-            client()
+            jiraRestClient
                 .let { client ->
                     client.issueClient.getIssue(task.id).claim()?.let { issue ->
                         client.issueClient.addWorklog(
@@ -47,9 +44,4 @@ class JiraCommitTimeService(
                 cause = ex
             ).left()
         }
-
-
-    private fun client() = AsynchronousJiraRestClientFactory()
-        .createWithBasicHttpAuthentication(url, username, password)
-
 }

@@ -28,6 +28,7 @@ import ru.ezhov.rocket.action.plugin.jira.worklog.domain.validations.RawTextVali
 import ru.ezhov.rocket.action.plugin.jira.worklog.domain.validations.ValidationRule
 import ru.ezhov.rocket.action.plugin.jira.worklog.infrastructure.JiraCommitTimeService
 import ru.ezhov.rocket.action.plugin.jira.worklog.infrastructure.JiraCommitTimeTaskInfoRepository
+import ru.ezhov.rocket.action.plugin.jira.worklog.infrastructure.JiraRestClientBuilder
 import ru.ezhov.rocket.action.plugin.jira.worklog.ui.JiraWorkLogUIFrame
 import ru.ezhov.rocket.action.ui.utils.swing.common.showToFront
 import java.awt.Component
@@ -72,6 +73,7 @@ class JiraWorklogRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
 
                 val username = settings.settings()[USERNAME].orEmpty()
                 val password = settings.settings()[PASSWORD].orEmpty()
+                val cookie = settings.settings()[COOKIE].orEmpty()
                 val url = try {
                     URI.create(settings.settings()[URL].orEmpty())
                 } catch (ex: Exception) {
@@ -96,15 +98,17 @@ class JiraWorklogRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
                 menuItem.icon = actionContext!!.icon().by(AppIcon.CLOCK)
                 menuItem.toolTipText = description
 
+                val jiraRestClient = JiraRestClientBuilder.build(
+                    username = username,
+                    password = password,
+                    cookie = cookie,
+                    url = url
+                )
                 jiraWorkLogUIFrame =
                     JiraWorkLogUIFrame(
                         tasks = tasks,
-                        commitTimeService = JiraCommitTimeService(username = username, password = password, url = url),
-                        commitTimeTaskInfoRepository = JiraCommitTimeTaskInfoRepository(
-                            username = username,
-                            password = password,
-                            url = url
-                        ),
+                        commitTimeService = JiraCommitTimeService(jiraRestClient),
+                        commitTimeTaskInfoRepository = JiraCommitTimeTaskInfoRepository(jiraRestClient),
                         delimiter = settings.settings()[DELIMITER_TASK_INFO] ?: DEFAULT_DELIMITER_TASK_INFO,
                         dateFormatPattern = "yyyyMMddHHmm",
                         constantsNowDate =
@@ -232,13 +236,19 @@ class JiraWorklogRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
                 key = USERNAME,
                 name = "Username",
                 description = "Username",
-                required = true
+                required = false
             ),
             createRocketActionProperty(
                 key = PASSWORD,
                 name = "Password",
                 description = "Password",
-                required = true
+                required = false
+            ),
+            createRocketActionProperty(
+                key = COOKIE,
+                name = "Cookie",
+                description = "Cookie. For example auth cookie",
+                required = false
             ),
             createRocketActionProperty(
                 key = PREDEFINED_TASKS,
@@ -317,6 +327,7 @@ class JiraWorklogRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
         private const val DESCRIPTION = "description"
         private const val USERNAME = "username"
         private const val PASSWORD = "password"
+        private const val COOKIE = "cookie"
         private const val URL = "url"
 
         private const val PREDEFINED_TASKS = "predefinedTasks"
