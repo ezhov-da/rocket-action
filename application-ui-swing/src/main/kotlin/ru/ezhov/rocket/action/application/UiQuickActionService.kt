@@ -129,54 +129,24 @@ class UiQuickActionService(
     }
 
     private fun createSearchField(): SearchComponent =
-        JPanel(MigLayout(/*"debug"*/"insets 0" /*убираем отступы*/)).let { panel ->
+        JPanel(MigLayout(/*debug*/"insets 0")).let { panel ->
             panel.border = BorderFactory.createEmptyBorder()
             val textField =
                 TextFieldWithText("Search")
                     .apply { ->
                         toolTipText = searchService.searchDescription()
-
                         val tf = this
-                        columns = 5
+//                        columns = 5
                         addKeyListener(object : KeyAdapter() {
                             override fun keyPressed(e: KeyEvent) {
-                                if (e.keyCode == KeyEvent.VK_ENTER) {
-                                    if (text.isNotEmpty()) {
-                                        val searchTexts = searchTextTransformer.transformedText(text)
-                                        val idsRA = searchTexts
-                                            .map { searchService.search(it).toSet() }
-                                            .flatten()
-                                            .toSet()
-
-                                        val raByFullText = rocketActionSettingsService.actionsByIds(idsRA)
-                                        val raByContains = rocketActionSettingsService.actionsByContains(text)
-
-                                        (raByFullText + raByContains)
-                                            .toSet()
-                                            .takeIf { it.isNotEmpty() }
-                                            ?.let { ra ->
-                                                logger.info { "Found by search '$text': '${ra.size}'. Result search '$searchTexts'" }
-                                                tf.background = ColorConstants.COLOR_SUCCESS
-                                                fillMenuByRocketAction(ra, currentMenu!!)
-                                            }
-                                    } else {
-                                        SwingUtilities.invokeLater { tf.background = Color.WHITE }
-                                        CreateMenuOrGetExistsWorker(currentMenu!!, Action.Restore).execute()
-                                    }
-                                } else if (e.keyCode == KeyEvent.VK_ESCAPE) {
-                                    resetSearch(textField = tf, menu = currentMenu!!)
-                                }
+                                executeSearch(e = e, tf = tf)
                             }
                         })
                     }
 
-            val backgroundColor = JMenu().background
-            panel.background = backgroundColor
             val button = JButton(rocketActionContextFactory.context.icon().by(AppIcon.CLEAR))
                 .apply {
                     toolTipText = "Clear search"
-                    background = backgroundColor
-                    isBorderPainted = false
                     addMouseListener(object : MouseAdapter() {
                         override fun mouseReleased(e: MouseEvent?) {
                             resetSearch(textField = textField, menu = currentMenu!!)
@@ -185,13 +155,45 @@ class UiQuickActionService(
                 }
 
             panel.add(textField, "width 100%, growx 0, split") // growx 0 не должно расти по ширине
-            panel.add(button, "wmax 25")
+            panel.add(button)
 
             SearchComponent(
                 component = panel,
                 searchTextField = textField,
             )
         }
+
+    private fun TextFieldWithText.executeSearch(
+        e: KeyEvent,
+        tf: TextFieldWithText
+    ) {
+        if (e.keyCode == KeyEvent.VK_ENTER) {
+            if (text.isNotEmpty()) {
+                val searchTexts = searchTextTransformer.transformedText(text)
+                val idsRA = searchTexts
+                    .map { searchService.search(it).toSet() }
+                    .flatten()
+                    .toSet()
+
+                val raByFullText = rocketActionSettingsService.actionsByIds(idsRA)
+                val raByContains = rocketActionSettingsService.actionsByContains(text)
+
+                (raByFullText + raByContains)
+                    .toSet()
+                    .takeIf { it.isNotEmpty() }
+                    ?.let { ra ->
+                        logger.info { "Found by search '$text': '${ra.size}'. Result search '$searchTexts'" }
+                        tf.background = ColorConstants.COLOR_SUCCESS
+                        fillMenuByRocketAction(ra, currentMenu!!)
+                    }
+            } else {
+                SwingUtilities.invokeLater { tf.background = Color.WHITE }
+                CreateMenuOrGetExistsWorker(currentMenu!!, Action.Restore).execute()
+            }
+        } else if (e.keyCode == KeyEvent.VK_ESCAPE) {
+            resetSearch(textField = tf, menu = currentMenu!!)
+        }
+    }
 
     private fun fillMenuByRocketAction(rocketActions: Set<RocketAction>, menu: JMenu) {
         rocketActions.takeIf { it.isNotEmpty() }

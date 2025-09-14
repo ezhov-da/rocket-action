@@ -41,11 +41,10 @@ class ChainBasePanel(
     private val searchTextTransformer: SearchTextTransformer,
     private val actionSchedulerService: ActionSchedulerService,
 ) : JPanel(MigLayout(/*"debug"*/"insets 0 0 5 0" /*Убираем отступы, оставляем только снизу для отображения действий*/)) {
-    private val textFieldPaste = TextFieldWithText(
-        "Drag, paste or type"
-    ).apply {
-        toolTipText = "<html><center>Drag text to run chain<br>or paste here or type and `Enter`</center>"
-    }
+    private val textFieldPaste = TextFieldWithText("Input")
+        .apply {
+            toolTipText = "<html><center>Drag text to run chain<br>or paste here or type and `Enter`</center>"
+        }
     private val actionExecuteStatusPanel =
         ActionExecuteStatusPanel(actionExecutorService).apply { isVisible = false }
     private val openAvailableActionsButton = JButton(Icons.Advanced.ROCKET_BLACK_16x16).apply {

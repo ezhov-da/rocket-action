@@ -21,7 +21,7 @@ class BaseDialog(
     private val configurationApplication: ConfigurationApplication,
 ) : JDialog() {
     init {
-        val basePanel = JPanel(MigLayout(/*"debug"*/ "insets 0"))
+        val basePanel = JPanel(MigLayout(/*"debug"*/"insets 0"))
 
         val menuAndSearch = uiQuickActionService.createMenu(this) { state ->
             when (state) {
@@ -43,11 +43,11 @@ class BaseDialog(
 
         jMenuBar = menuAndSearch.menu
 
-        val baseDialogWidth = generalPropertiesRepository.asInteger(UsedPropertiesName.UI_BASE_DIALOG_WIDTH, 130)
+        val baseDialogWidth = generalPropertiesRepository.asInteger(UsedPropertiesName.UI_BASE_DIALOG_WIDTH, 40)
 
         if (generalPropertiesRepository.asBoolean(UsedPropertiesName.CHAIN_ACTION_ENABLE, false)) {
             // growx 0 не должно расти по ширине
-            basePanel.add(menuAndSearch.search.component, "width ${baseDialogWidth}px, wrap")
+            basePanel.add(menuAndSearch.search.component, "wrap")
             basePanel.add(chainBasePanelFactory.chainBasePanel, "width ${baseDialogWidth}px")
         } else {
             basePanel.add(menuAndSearch.search.component, "width ${baseDialogWidth}px")
