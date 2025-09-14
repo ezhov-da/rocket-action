@@ -42,6 +42,7 @@ import javax.swing.JLabel
 import javax.swing.JMenu
 import javax.swing.JMenuBar
 import javax.swing.JMenuItem
+import javax.swing.JOptionPane
 import javax.swing.JPanel
 import javax.swing.JSeparator
 import javax.swing.JTextField
@@ -317,15 +318,22 @@ class UiQuickActionService(
         menuItemEditor.addActionListener(createEditorActionListener())
         menuTools.add(menuItemEditor)
 
-
         menuTools.add(JSeparator())
 
         menuTools.add(JMenuItem("Exit").apply {
             icon = rocketActionContextFactory.context.icon().by(AppIcon.X)
             addActionListener {
-                SwingUtilities.invokeLater {
-                    baseDialog.dispose()
-                    exitProcess(0)
+                val answer = JOptionPane.showConfirmDialog(
+                    baseDialog,
+                    "Are you sure you want to close the application?",
+                    "Exit",
+                    JOptionPane.YES_NO_OPTION,
+                )
+                if (answer == JOptionPane.YES_OPTION) {
+                    SwingUtilities.invokeLater {
+                        baseDialog.dispose()
+                        exitProcess(0)
+                    }
                 }
             }
         })
