@@ -40,15 +40,21 @@ class AtomicActionScriptExecutor(
                         )
                     } +
                     EngineVariable(
-                        name = ActionExecutor.INPUT_NAME_ARG,
+                        name = ActionExecutor.INPUT_ARG_NAME,
                         value = inputValue,
                     ) +
                     EngineVariable(
-                        name = ActionExecutor.ATOMIC_ACTION_EXECUTOR_ARG,
+                        name = ActionExecutor.ATOMIC_ACTION_EXECUTOR_ARG_NAME,
                         value = AtomicActionExecutorPublicApiImpl(
                             engineFactory = engineFactory,
                             variablesApplication = variablesApplication,
                             atomicActionService = atomicActionService,
+                        ),
+                    ) +
+                    EngineVariable(
+                        name = ActionExecutor.ATOMIC_ACTION_VARIABLE_UPDATER_ARG_NAME,
+                        value = AtomicActionVariablePublicApiImpl(
+                            variablesApplication = variablesApplication,
                         ),
                     )
             )

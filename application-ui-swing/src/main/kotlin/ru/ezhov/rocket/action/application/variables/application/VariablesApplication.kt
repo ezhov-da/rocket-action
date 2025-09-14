@@ -87,6 +87,28 @@ class VariablesApplication(
         variableRepository.save(resultVariables)
         configurationApplication.save(applicationConfig)
     }
+
+    fun updateVariable(key: String, value: String) {
+        val configuration = configurationApplication.all()
+        val all = all().variables.filter { it.type == VariableType.APPLICATION }.toMutableList()
+        val variableForUpdate = all()
+            .variables
+            .firstOrNull { it.name == key && it.type == VariableType.APPLICATION }
+            ?: throw RuntimeException("Not found application variable '$key'")
+
+        val withNewValue = variableForUpdate.updateValue(value)
+        all.remove(variableForUpdate)
+        all.add(withNewValue)
+
+        val resultVariables = encode(
+            variables = VariablesDto(
+                key = configuration.variablesKey,
+                variables = all
+            ), encryptionService = encryptionService
+        )
+
+        variableRepository.save(resultVariables)
+    }
 }
 
 private fun Variables.toVariablesDto(key: String): VariablesDto =

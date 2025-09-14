@@ -7,4 +7,11 @@ data class VariableDto(
     val value: String,
     val description: String? = null,
     val type: VariableType,
-)
+) {
+    fun updateValue(newValue: String): VariableDto = VariableDto(
+        name = name,
+        value = newValue,
+        description = description,
+        type = type,
+    )
+}
