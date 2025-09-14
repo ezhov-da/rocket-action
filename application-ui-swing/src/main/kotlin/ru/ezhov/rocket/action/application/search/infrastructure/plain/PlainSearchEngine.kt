@@ -19,13 +19,28 @@ class PlainSearchEngine : SearchEngine {
     }
 
     override fun ids(text: String): List<String> {
-        val searchText = text.lowercase().trim()
+        val searchTextArrayBySpace = text.lowercase().trim().split(" ")
 
-        val result = map.filter { it.value.any { v -> v.lowercase().contains(searchText) } }
+        val result = when (searchTextArrayBySpace.size) {
+            1 -> map.filter { it.value.any { v -> v.lowercase().contains(searchTextArrayBySpace.first()) } }.keys.toList()
+            else -> {
+                val idsList = searchTextArrayBySpace.map { sw ->
+                    map.filter { it.value.any { v -> v.lowercase().contains(sw) } }.keys.toList()
+                }.flatten()
+
+                // We group and take only those that coincided in all input words
+                idsList
+                    .groupingBy { it }
+                    .eachCount()
+                    .filter { (_, v) -> v == searchTextArrayBySpace.size }
+                    .keys
+            }
+
+        }
 
         logger.info { "Found actions by text='$text'. Count '${result.size}'" }
 
-        return result.keys.toList()
+        return result.toList()
     }
 
     override fun delete(id: String) {
