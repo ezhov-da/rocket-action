@@ -23,6 +23,7 @@ import ru.ezhov.rocket.action.api.handler.RocketActionHandler
 import ru.ezhov.rocket.action.api.handler.RocketActionHandlerProperty
 import ru.ezhov.rocket.action.api.handler.RocketActionHandlerPropertySpec
 import ru.ezhov.rocket.action.application.handlers.server.BASE_API_PATH
+import ru.ezhov.rocket.action.application.handlers.server.HEADER_NAME
 import ru.ezhov.rocket.action.application.handlers.server.RocketActionHandlerService
 import ru.ezhov.rocket.action.application.handlers.server.extendedhandlers.ExtendedRocketActionHandler
 
@@ -33,7 +34,7 @@ class JsonSwaggerGenerator(
     override fun generate(): String {
         val openApi =
             OpenAPI(SpecVersion.V30)
-                .paths(createPaths(listOf(constructHandler())))
+                .paths(createPaths(listOf(constructHandlers())))
         return ObjectMapper()
             .setSerializationInclusion(JsonInclude.Include.NON_NULL)
             .writeValueAsString(openApi)
@@ -62,13 +63,48 @@ class JsonSwaggerGenerator(
         return paths
     }
 
-    private fun constructHandler(): Pair<String, PathItem> =
+    private fun constructHandlers(): Pair<String, PathItem> =
         Pair(
             "$BASE_API_PATH/{id}/{commandName}",
             PathItem()
+                .get(
+                    Operation()
+                        .operationId("executeGetCommand")
+                        .description("Run command")
+                        .addTagsItem("Handler")
+                        .summary("Run command")
+                        .parameters(
+                            listOf(
+                                Parameter()
+                                    .name("id")
+                                    .`in`("path")
+                                    .schema(StringSchema())
+                                    .required(true),
+                                Parameter()
+                                    .name("commandName")
+                                    .`in`("path")
+                                    .schema(StringSchema())
+                                    .required(true),
+                                Parameter()
+                                    .name(HEADER_NAME)
+                                    .`in`("query")
+                                    .schema(StringSchema())
+                                    .required(true)
+                                    .example("1234"),
+                                Parameter()
+                                    .name("any")
+                                    .`in`("query")
+                                    .schema(StringSchema())
+                                    .required(false)
+                                    .example("1234")
+
+                            )
+                        )
+                        .responses(constructResponses())
+                )
                 .post(
                     Operation()
-                        .operationId("executeCommand")
+                        .operationId("executePostCommand")
                         .description("Run command")
                         .addTagsItem("Handler")
                         .summary("Run command")
@@ -116,7 +152,7 @@ class JsonSwaggerGenerator(
 
     private fun headerKeyParameter(): Parameter =
         Parameter()
-            .name("X-Rocket-Action-Handler-Key")
+            .name(HEADER_NAME)
             .`in`("header")
             .schema(StringSchema())
             .required(true)

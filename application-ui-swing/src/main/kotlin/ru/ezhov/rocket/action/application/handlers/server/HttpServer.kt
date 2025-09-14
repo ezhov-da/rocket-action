@@ -15,7 +15,7 @@ import spark.kotlin.RouteHandler
 import spark.kotlin.ignite
 
 private val logger = KotlinLogging.logger {}
-private const val HEADER_NAME = "X-Rocket-Action-Handler-Key"
+const val HEADER_NAME = "X-Rocket-Action-Handler-Key"
 const val BASE_API_PATH = "/api/v1/handlers"
 
 @Service
@@ -86,64 +86,83 @@ class HttpServer(
                 logger.info { "Handler called. id=$id command=$command body=$body" }
 
                 val map = objectMapper.readValue(body, Map::class.java)
-                val handler = rocketActionHandlerService.handlerBy(id)
-                val status = handler
-                    ?.handle(
-                        RocketActionHandlerCommand(
-                            commandName = command,
-                            arguments = map
-                                .map { (k, v) -> k.toString() to v.toString() }
-                                .toMap()
-                        )
-                    )
+                processRequest(id, command, map)
+            }
+        }
 
-                when (status) {
-                    null -> response.status(404)
+        http.get("$BASE_API_PATH/:id/:commandName") {
+            checkKeyAndExecuteBlock(this) {
+                val id = params("id")
+                val command = params("commandName")
+                val map = request.queryMap().toMap().map { it.key to it.value.firstOrNull().orEmpty() }.toMap()
 
-                    is RocketActionHandleStatus.Success -> {
-                        response.status(200)
+                logger.info { "Handler called. id=$id command=$command body=$map" }
 
-                        objectMapper.writeValueAsString(
-                            status.values.map { it.key to it.value }.toMap()
-                        )
-                    }
+                processRequest(id, command, map)
+            }
+        }
+    }
 
-                    is RocketActionHandleStatus.InvalidInputData -> {
-                        response.status(400)
-                        objectMapper.writeValueAsString(
-                            InvalidInputDataDto(status.errors)
-                        )
-                    }
+    private fun RouteHandler.processRequest(id: String, command: String, map: Map<*, *>): Any {
+        val handler = rocketActionHandlerService.handlerBy(id)
+        val status = handler
+            ?.handle(
+                RocketActionHandlerCommand(
+                    commandName = command,
+                    arguments = map
+                        .map { (k, v) -> k.toString() to v.toString() }
+                        .toMap()
+                )
+            )
 
-                    is RocketActionHandleStatus.Error -> {
-                        response.status(500)
-                        logger.error(status.cause) { "Error ${status.message}" }
+        return when (status) {
+            null -> response.status(404)
 
-                        objectMapper.writeValueAsString(
-                            ErrorDto(message = status.message)
-                        )
-                    }
-                }
+            is RocketActionHandleStatus.Success -> {
+                response.status(200)
+
+                objectMapper.writeValueAsString(
+                    status.values.map { it.key to it.value }.toMap()
+                )
+            }
+
+            is RocketActionHandleStatus.InvalidInputData -> {
+                response.status(400)
+                objectMapper.writeValueAsString(
+                    InvalidInputDataDto(status.errors)
+                )
+            }
+
+            is RocketActionHandleStatus.Error -> {
+                response.status(500)
+                logger.error(status.cause) { "Error ${status.message}" }
+
+                objectMapper.writeValueAsString(
+                    ErrorDto(message = status.message)
+                )
             }
         }
     }
 
     private fun checkKeyAndExecuteBlock(routeHandler: RouteHandler, block: () -> Any): Any =
-        routeHandler.request.headers(HEADER_NAME)
-            .let { keyValue ->
-                when (val apiKey = apiKeysApplication.apiKey(keyValue)) {
-                    null -> {
-                        logger.warn { "Forbidden API Key='$keyValue'. IP='${routeHandler.request.ip()}'" }
-                        routeHandler.response.status(403)
-                        "Forbidden. Check API key '$HEADER_NAME'"
-                    }
+        when (routeHandler.request.requestMethod()) {
+            "POST" -> routeHandler.request.headers(HEADER_NAME)
+            "GET" -> routeHandler.request.queryParams(HEADER_NAME)
+            else -> "stub for forbidden"
+        }.let { keyValue ->
+            when (val apiKey = apiKeysApplication.apiKey(keyValue)) {
+                null -> {
+                    logger.warn { "Forbidden API Key='$keyValue'. IP='${routeHandler.request.ip()}'" }
+                    routeHandler.response.status(403)
+                    "Forbidden. Check API key '$HEADER_NAME'"
+                }
 
-                    else -> {
-                        logger.info { "Used API Key='${apiKey.description}'. IP='${routeHandler.request.ip()}'" }
-                        block.invoke()
-                    }
+                else -> {
+                    logger.info { "Used API Key='${apiKey.description}'. IP='${routeHandler.request.ip()}'" }
+                    block.invoke()
                 }
             }
+        }
 }
 
 data class InvalidInputDataDto(
