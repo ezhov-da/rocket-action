@@ -14,6 +14,7 @@ import ru.ezhov.rocket.action.application.ui.color.ColorConstants.COLOR_SUCCESS
 import java.awt.Color
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
+import javax.swing.BorderFactory
 import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.JPopupMenu
@@ -99,6 +100,7 @@ class ActionExecuteStatusPanel(
             .apply {
                 background = Color.GRAY
                 isOpaque = true
+                border = BorderFactory.createEmptyBorder()
             },
     ) {
         init {

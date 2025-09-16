@@ -47,7 +47,7 @@ class BaseDialog(
 
         if (generalPropertiesRepository.asBoolean(UsedPropertiesName.CHAIN_ACTION_ENABLE, false)) {
             // growx 0 не должно расти по ширине
-            basePanel.add(menuAndSearch.search.component, "wrap")
+            basePanel.add(menuAndSearch.search.component, "width ${baseDialogWidth}px, wrap")
             basePanel.add(chainBasePanelFactory.chainBasePanel, "width ${baseDialogWidth}px")
         } else {
             basePanel.add(menuAndSearch.search.component, "width ${baseDialogWidth}px")

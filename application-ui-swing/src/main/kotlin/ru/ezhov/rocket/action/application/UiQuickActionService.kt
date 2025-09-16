@@ -129,7 +129,7 @@ class UiQuickActionService(
     }
 
     private fun createSearchField(): SearchComponent =
-        JPanel(MigLayout(/*debug*/"insets 0")).let { panel ->
+        JPanel(MigLayout(/*debug*/"insets 0 0 0 0")).let { panel ->
             panel.border = BorderFactory.createEmptyBorder()
             val textField =
                 TextFieldWithText("Search")
@@ -154,8 +154,8 @@ class UiQuickActionService(
                     })
                 }
 
-            panel.add(textField, "width 100%, growx 0, split") // growx 0 не должно расти по ширине
-            panel.add(button)
+            panel.add(textField, "wmax 55px, growx 0") // growx 0 не должно расти по ширине
+            panel.add(button, "wmax 25")
 
             SearchComponent(
                 component = panel,
