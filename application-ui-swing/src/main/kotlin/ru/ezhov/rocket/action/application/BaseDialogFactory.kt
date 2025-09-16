@@ -10,13 +10,11 @@ import ru.ezhov.rocket.action.application.properties.GeneralPropertiesRepository
 class BaseDialogFactory(
     uiQuickActionService: UiQuickActionService,
     generalPropertiesRepository: GeneralPropertiesRepository,
-    chainBasePanelFactory: ChainBasePanelFactory,
     configurationApplication: ConfigurationApplication,
 ) : InitializingBean {
     val dialog: BaseDialog = BaseDialog(
         uiQuickActionService = uiQuickActionService,
         generalPropertiesRepository = generalPropertiesRepository,
-        chainBasePanelFactory = chainBasePanelFactory,
         configurationApplication = configurationApplication
     )
 

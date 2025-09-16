@@ -41,7 +41,7 @@ class ChainBasePanel(
     private val searchTextTransformer: SearchTextTransformer,
     private val actionSchedulerService: ActionSchedulerService,
 ) : JPanel(MigLayout(/*"debug"*/"insets 0 0 5 0" /*Убираем отступы, оставляем только снизу для отображения действий*/)) {
-    private val textFieldPaste = TextFieldWithText("In")
+    private val textFieldPaste = TextFieldWithText("...")
         .apply {
             toolTipText = "<html><center>Drag text to run chain<br>or paste here or type and `Enter`</center>"
         }
@@ -61,10 +61,10 @@ class ChainBasePanel(
         addCtrlV(textFieldPaste)
         addEnter(textFieldPaste)
 
-        add(textFieldPaste, "wmax 30px, growx 0, split") // growx 0 не должно расти по ширине
-        add(openAvailableActionsButton, "wmax 25")
-        add(openConfigurationButton, "wmax 25, wrap")
-        add(actionExecuteStatusPanel, "hmax 6, width max, hidemode 2")
+        add(textFieldPaste, "wmax 25px, grow 0, split")
+        add(openAvailableActionsButton, "wmax 25px")
+        add(openConfigurationButton, "wmax 25px, wrap")
+        add(actionExecuteStatusPanel, "hmax 6, width 100%, hidemode 2")
 
         val chainBasePanel = this
 

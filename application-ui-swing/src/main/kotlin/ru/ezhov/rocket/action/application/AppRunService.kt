@@ -15,6 +15,7 @@ class AppRunService(
     private val generalPropertiesRepository: GeneralPropertiesRepository,
     private val httpServer: HttpServer,
     private val baseDialogFactory: BaseDialogFactory,
+    private val chainActionDialogFactory: ChainActionDialogFactory,
 ) {
 
     /**
@@ -27,6 +28,7 @@ class AppRunService(
             getFont()?.let { font -> setUIFont(font) }
 
             baseDialogFactory.dialog.isVisible = true
+            chainActionDialogFactory.dialog?.isVisible = true
 
         } catch (e: UiQuickActionServiceException) {
             e.printStackTrace()

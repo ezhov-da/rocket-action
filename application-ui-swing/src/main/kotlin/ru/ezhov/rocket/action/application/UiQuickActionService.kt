@@ -26,6 +26,7 @@ import ru.ezhov.rocket.action.application.tags.domain.TagNode
 import ru.ezhov.rocket.action.application.ui.color.ColorConstants
 import ru.ezhov.rocket.action.ui.utils.swing.common.MoveUtil
 import ru.ezhov.rocket.action.ui.utils.swing.common.TextFieldWithText
+import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Component
 import java.awt.event.ActionListener
@@ -34,7 +35,6 @@ import java.awt.event.KeyEvent
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import javax.swing.BorderFactory
-import javax.swing.Box
 import javax.swing.ImageIcon
 import javax.swing.JButton
 import javax.swing.JDialog
@@ -63,6 +63,7 @@ class UiQuickActionService(
     private val searchTextTransformer: SearchTextTransformer,
 ) {
     private var baseDialog: JDialog? = null
+    private var searchComponent: SearchComponent? = null
 
     // The field is required for synchronization throughout the class
     private var currentMenu: JMenu? = null
@@ -89,12 +90,10 @@ class UiQuickActionService(
         })
     }
 
-    fun currentMenu(): JMenu? = currentMenu
-
-    fun createMenu(baseDialog: JDialog, minimiseMaximiseAction: (WindowState) -> Unit): ManuAndSearchPanel {
+    fun createMenu(baseDialog: JDialog): ManuAndSearchPanel {
         this.baseDialog = baseDialog
-        this.minimiseMaximiseAction = minimiseMaximiseAction
         return try {
+
             val menuBar = JMenuBar()
             val menu = JMenu()
             menuBar.add(menu)
@@ -107,7 +106,9 @@ class UiQuickActionService(
                 menuBar.add(tagsMenu)
             }
 
-            menuBar.add(Box.createHorizontalGlue());
+            val searchField = searchComponent ?: createSearchField()
+
+            menuBar.add(searchField.component);
 
             val moveLabel = JLabel(rocketActionContextFactory.context.icon().by(AppIcon.MOVE))
             MoveUtil.addMoveAction(movableComponent = baseDialog, grabbedComponent = moveLabel)
@@ -121,7 +122,7 @@ class UiQuickActionService(
 
             ManuAndSearchPanel(
                 menu = menuBar,
-                search = createSearchField()
+                search = searchField
             )
         } catch (e: Exception) {
             throw UiQuickActionServiceException("Error", e)
@@ -132,7 +133,7 @@ class UiQuickActionService(
         JPanel(MigLayout(/*debug*/"insets 0 0 0 0")).let { panel ->
             panel.border = BorderFactory.createEmptyBorder()
             val textField =
-                TextFieldWithText("Search")
+                TextFieldWithText("...")
                     .apply { ->
                         toolTipText = searchService.searchDescription()
                         val tf = this
@@ -154,11 +155,14 @@ class UiQuickActionService(
                     })
                 }
 
-            panel.add(textField, "wmax 55px, growx 0") // growx 0 не должно расти по ширине
-            panel.add(button, "wmax 25")
+            panel.add(textField, "wmax 25px, split") // growx 0 не должно расти по ширине
+            panel.add(button, "wmax 25px")
 
             SearchComponent(
-                component = panel,
+                component = JPanel(BorderLayout()).apply {
+                    border = BorderFactory.createEmptyBorder()
+                    add(panel, BorderLayout.CENTER)
+                },
                 searchTextField = textField,
             )
         }
@@ -287,21 +291,6 @@ class UiQuickActionService(
         menuItemUpdate.addActionListener(updateListener())
         menuTools.add(menuItemUpdate)
 
-        val minimiseItem = JMenuItem(currentWindowState.opposite().stateName)
-        minimiseItem.icon = rocketActionContextFactory.context.icon().by(currentWindowState.opposite().icon)
-        minimiseItem.addActionListener {
-            val newState = currentWindowState.opposite()
-
-            SwingUtilities.invokeLater {
-                minimiseItem.text = currentWindowState.stateName
-                minimiseItem.icon = rocketActionContextFactory.context.icon().by(currentWindowState.icon)
-                currentWindowState = newState
-                minimiseMaximiseAction!!.invoke(newState)
-            }
-
-        }
-        menuTools.add(minimiseItem)
-
         menuTools.add(JSeparator())
 
         // Variables
@@ -356,7 +345,7 @@ class UiQuickActionService(
         SwingUtilities.invokeLater {
             var newMenuBar: JMenuBar? = null
             try {
-                newMenuBar = createMenu(baseDialog!!, minimiseMaximiseAction!!).menu
+                newMenuBar = createMenu(baseDialog!!).menu
             } catch (ex: UiQuickActionServiceException) {
                 ex.printStackTrace()
                 rocketActionContextFactory.context.notification()

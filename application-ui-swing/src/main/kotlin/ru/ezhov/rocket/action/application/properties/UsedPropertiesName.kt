@@ -202,15 +202,6 @@ enum class UsedPropertiesName(val propertyName: String, val description: String)
         """.trimIndent()
     ),
 
-    UI_BASE_DIALOG_WIDTH(
-        "$PREFIX.ui.base-dialog.width",
-        """
-            Set the width of the base dialog in pixels.
-
-            Example: 150
-        """.trimIndent()
-    ),
-
     IS_ENABLE_TAGS(
         "$PREFIX.ui.tags.isEnabled",
         """
