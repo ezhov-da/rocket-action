@@ -191,14 +191,52 @@ class JiraWorklogRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
 
                                     override fun outputParams(): List<RocketActionHandlerProperty> = emptyList()
 
+                                },
+                                object : RocketActionHandlerCommandContract {
+                                    override fun commandName(): String = "set-text-and-prepare-for-commit"
+
+                                    override fun title(): String = label
+
+                                    override fun description(): String =
+                                        "Installation of text and preparation for fixation"
+
+                                    override fun inputArguments(): List<RocketActionHandlerProperty> =
+                                        listOf(object : RocketActionHandlerProperty {
+                                            override fun key(): RocketActionHandlerPropertyKey =
+                                                RocketActionHandlerPropertyKey("text")
+
+                                            override fun name(): String = "Text"
+
+                                            override fun description(): String = "Text to set"
+
+                                            override fun isRequired(): Boolean = true
+
+                                            override fun property(): RocketActionHandlerPropertySpec =
+                                                RocketActionHandlerPropertySpec.StringPropertySpec()
+
+                                        })
+
+                                    override fun outputParams(): List<RocketActionHandlerProperty> = emptyList()
+
                                 }
+
                             )
 
                         override fun handle(command: RocketActionHandlerCommand): RocketActionHandleStatus {
-                            if (command.commandName == "append-text-to-end-and-save") {
-                                command.arguments["text"]?.let { text ->
-                                    jiraWorkLogUIFrame!!.appendTextToCurrentAndSave(text)
+                            when (command.commandName) {
+                                "append-text-to-end-and-save" -> {
+                                    command.arguments["text"]?.let { text ->
+                                        jiraWorkLogUIFrame!!.appendTextToCurrentAndSave(text)
+                                    }
                                 }
+
+                                "set-text-and-prepare-for-commit" -> {
+                                    command.arguments["text"]?.let { text ->
+                                        jiraWorkLogUIFrame!!.setTextShowFrameAndShowContributeQuestion(text)
+                                    }
+                                }
+
+                                else -> Unit
                             }
                             return RocketActionHandleStatus.Success()
                         }

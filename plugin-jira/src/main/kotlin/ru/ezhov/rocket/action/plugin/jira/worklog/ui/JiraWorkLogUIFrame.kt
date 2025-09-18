@@ -7,6 +7,7 @@ import ru.ezhov.rocket.action.plugin.jira.worklog.domain.CommitTimeTaskInfoRepos
 import ru.ezhov.rocket.action.plugin.jira.worklog.domain.model.AliasForTaskIds
 import ru.ezhov.rocket.action.plugin.jira.worklog.domain.model.Task
 import ru.ezhov.rocket.action.plugin.jira.worklog.domain.validations.Validator
+import ru.ezhov.rocket.action.ui.utils.swing.common.showToFront
 import ru.ezhov.rocket.action.ui.utils.swing.common.toImage
 import java.awt.BorderLayout
 import java.awt.Dimension
@@ -16,6 +17,7 @@ import java.net.URI
 import javax.swing.JButton
 import javax.swing.JFrame
 import javax.swing.JToolBar
+import javax.swing.SwingUtilities
 
 class JiraWorkLogUIFrame(
     tasks: List<Task> = emptyList(),
@@ -72,6 +74,14 @@ class JiraWorkLogUIFrame(
 
     fun appendTextToCurrentAndSave(text: String) {
         commitTimePanel.appendTextToCurrentAndSave(text)
+    }
+
+    fun setTextShowFrameAndShowContributeQuestion(text: String) {
+        SwingUtilities.invokeLater {
+            commitTimePanel.setText(text)
+            this.showToFront()
+            commitTimePanel.doClickButtonCommit()
+        }
     }
 
     private fun calculateSize() = Toolkit.getDefaultToolkit().screenSize.let {

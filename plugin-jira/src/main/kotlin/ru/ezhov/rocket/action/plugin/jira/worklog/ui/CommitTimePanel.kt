@@ -181,6 +181,10 @@ class CommitTimePanel(
         })
     }
 
+    fun doClickButtonCommit() {
+        tasksPanel.doClickButtonCommit()
+    }
+
     private fun setUndoAndRedo() {
         val manager = UndoManager()
         textPane.document.addUndoableEditListener(manager)
@@ -206,6 +210,12 @@ class CommitTimePanel(
         SwingUtilities.invokeLater {
             textPane.document.insertString(textPane.text.length, "\n$text", null)
             WriteFile(text = textPane.text, file = fileForSave, context = context).execute()
+        }
+    }
+
+    fun setText(text: String) {
+        SwingUtilities.invokeLater {
+            textPane.text = text
         }
     }
 
@@ -537,6 +547,10 @@ class CommitTimePanel(
                     },
                 BorderLayout.CENTER
             )
+        }
+
+        fun doClickButtonCommit() {
+            buttonCommit.doClick()
         }
 
         fun setCurrentCommitTimeTasks(tasks: CommitTimeTasks) {
