@@ -156,8 +156,8 @@ class JiraWorklogRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
                             .or(description.contains(search, ignoreCase = true))
 
                     override fun isChanged(actionSettings: RocketActionSettings): Boolean =
-                        !(settings.id() == actionSettings.id() &&
-                            settings.settings() == actionSettings.settings())
+                        settings.id() != actionSettings.id() ||
+                            settings.settings() != actionSettings.settings()
 
                     override fun component(): Component = menuItem
                     override fun handler(): RocketActionHandler = object : RocketActionHandler {
