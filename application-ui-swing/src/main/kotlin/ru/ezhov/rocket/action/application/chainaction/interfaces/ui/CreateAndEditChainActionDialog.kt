@@ -41,7 +41,7 @@ import javax.swing.DefaultListModel
 import javax.swing.DropMode
 import javax.swing.JButton
 import javax.swing.JComponent
-import javax.swing.JDialog
+import javax.swing.JFrame
 import javax.swing.JLabel
 import javax.swing.JList
 import javax.swing.JMenu
@@ -54,12 +54,12 @@ import javax.swing.ListSelectionModel
 import javax.swing.SwingUtilities
 
 class CreateAndEditChainActionDialog(
-    private val actionExecutorService: ActionExecutorService,
+    actionExecutorService: ActionExecutorService,
     private val chainActionService: ChainActionService,
     private val atomicActionService: AtomicActionService,
-    private val iconRepository: IconRepository,
-    private val actionSchedulerService: ActionSchedulerService,
-) : JDialog() {
+    iconRepository: IconRepository,
+    actionSchedulerService: ActionSchedulerService,
+) : JFrame() {
 
     private val createAndEditAtomicActionDialog = CreateAndEditAtomicActionDialog(
         atomicActionService = atomicActionService,

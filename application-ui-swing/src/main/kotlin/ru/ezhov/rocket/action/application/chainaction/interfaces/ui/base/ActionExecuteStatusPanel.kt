@@ -59,9 +59,11 @@ class ActionExecuteStatusPanel(
                             lastAtomicAction.contractType == ContractType.UNIT_OUT
                         ) {
                             result?.let {
-                                ResultChainDialog(result.toString())
+                                ResultChainDialog(
+                                    result = result,
+                                    parent = chainExecuteStatusPanel
+                                )
                                     .apply {
-                                        setLocationRelativeTo(chainExecuteStatusPanel)
                                         isVisible = true
                                     }
                             }

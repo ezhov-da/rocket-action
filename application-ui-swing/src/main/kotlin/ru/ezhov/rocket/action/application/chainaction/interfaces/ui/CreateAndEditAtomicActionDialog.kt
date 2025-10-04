@@ -23,7 +23,7 @@ import java.util.*
 import javax.swing.ButtonGroup
 import javax.swing.JButton
 import javax.swing.JComponent
-import javax.swing.JDialog
+import javax.swing.JFrame
 import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.JRadioButton
@@ -34,7 +34,7 @@ class CreateAndEditAtomicActionDialog(
     private val atomicActionService: AtomicActionService,
     iconRepository: IconRepository,
     actionExecutorService: ActionExecutorService,
-) : JDialog() {
+) : JFrame() {
     private val contentPane = JPanel(MigLayout(/*"debug"*/))
     private val buttonSave: JButton = JButton("Save")
     private val buttonSaveAndClose: JButton = JButton("Save & Close")

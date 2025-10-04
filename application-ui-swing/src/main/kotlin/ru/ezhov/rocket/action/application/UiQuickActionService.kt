@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service
 import ru.ezhov.rocket.action.api.RocketAction
 import ru.ezhov.rocket.action.api.context.icon.AppIcon
 import ru.ezhov.rocket.action.api.context.notification.NotificationType
+import ru.ezhov.rocket.action.application.applicationConfiguration.application.ConfigurationApplication
 import ru.ezhov.rocket.action.application.configuration.ui.ConfigurationFrameFactory
 import ru.ezhov.rocket.action.application.core.application.RocketActionSettingsService
 import ru.ezhov.rocket.action.application.core.event.RocketActionSettingsCreatedDomainEvent
@@ -16,6 +17,7 @@ import ru.ezhov.rocket.action.application.eventui.ConfigurationUiListener
 import ru.ezhov.rocket.action.application.eventui.ConfigurationUiObserverFactory
 import ru.ezhov.rocket.action.application.eventui.model.ConfigurationUiEvent
 import ru.ezhov.rocket.action.application.eventui.model.RefreshUiEvent
+import ru.ezhov.rocket.action.application.hotkey.HotKeyProviderSingleton
 import ru.ezhov.rocket.action.application.plugin.context.RocketActionContextFactory
 import ru.ezhov.rocket.action.application.properties.GeneralPropertiesRepository
 import ru.ezhov.rocket.action.application.properties.UsedPropertiesName
@@ -46,6 +48,7 @@ import javax.swing.JOptionPane
 import javax.swing.JPanel
 import javax.swing.JSeparator
 import javax.swing.JTextField
+import javax.swing.KeyStroke
 import javax.swing.SwingUtilities
 import javax.swing.SwingWorker
 import kotlin.system.exitProcess
@@ -61,15 +64,13 @@ class UiQuickActionService(
     private val configurationFrameFactory: ConfigurationFrameFactory,
     private val generalPropertiesRepository: GeneralPropertiesRepository,
     private val searchTextTransformer: SearchTextTransformer,
+    private val configurationApplication: ConfigurationApplication,
 ) {
     private var baseDialog: JDialog? = null
     private var searchComponent: SearchComponent? = null
 
     // The field is required for synchronization throughout the class
     private var currentMenu: JMenu? = null
-
-    private var minimiseMaximiseAction: ((WindowState) -> Unit)? = null
-    private var currentWindowState = WindowState.MAXIMISE
 
     init {
         DomainEventFactory.subscriberRegistrar.subscribe(object : DomainEventSubscriber {
@@ -107,6 +108,7 @@ class UiQuickActionService(
             }
 
             val searchField = searchComponent ?: createSearchField()
+            searchComponent = searchField
 
             menuBar.add(searchField.component);
 
@@ -129,6 +131,28 @@ class UiQuickActionService(
         }
     }
 
+    private fun registerGlobalHotKeys(
+        textField: TextFieldWithText,
+    ) {
+        HotKeyProviderSingleton
+            .PROVIDER
+            .apply {
+                configurationApplication
+                    .all()
+                    .globalHotKeys
+                    ?.activateSearchField
+                    ?.let { activateSearchField ->
+                        this.register(KeyStroke.getKeyStroke(activateSearchField)) {
+                            SwingUtilities.invokeLater {
+                                baseDialog!!.toFront()
+                                baseDialog!!.requestFocusInWindow()
+                                textField.requestFocusInWindow()
+                            }
+                        }
+                    }
+            }
+    }
+
     private fun createSearchField(): SearchComponent =
         JPanel(MigLayout(/*debug*/"insets 0 0 0 0")).let { panel ->
             panel.border = BorderFactory.createEmptyBorder()
@@ -144,6 +168,8 @@ class UiQuickActionService(
                             }
                         })
                     }
+
+            registerGlobalHotKeys(textField)
 
             val button = JButton(rocketActionContextFactory.context.icon().by(AppIcon.CLEAR))
                 .apply {

@@ -1,5 +1,5 @@
 {
-  "changedDate" : [ 2025, 9, 14, 8, 19, 58, 581000000 ],
+  "changedDate" : [ 2025, 10, 4, 22, 12, 7, 215000000 ],
   "atomicActions" : [ {
     "id" : "ccb3ea04-68ef-4988-84f1-2d95e14c0046",
     "name" : "Убирает начальные и конечные пробелы у строки (test)",
@@ -148,6 +148,16 @@
     "engine" : "KOTLIN",
     "source" : "TEXT",
     "data" : "_V.updateValue(\"TEST\", \"33333333333333333\")\n\n_V.updateValue(\"111111111111\", \"33333333333333333\")",
+    "alias" : null,
+    "icon" : null
+  }, {
+    "id" : "9fbd793c-1ac2-4a77-b5ee-c3021decb4fd",
+    "name" : "Пример действия с конфигурированием ответа",
+    "description" : "",
+    "contractType" : "UNIT_OUT",
+    "engine" : "GROOVY",
+    "source" : "TEXT",
+    "data" : "ru.ezhov.rocket.action.application.chainaction.api.ResultApi.withPercentSize(\n\t\t\"Это пример текста111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111\",\n\t\t0.9D,\n\t\t0.9D,\n\t\tfalse\n\t)",
     "alias" : null,
     "icon" : null
   } ]

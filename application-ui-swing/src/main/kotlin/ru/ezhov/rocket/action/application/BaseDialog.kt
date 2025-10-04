@@ -1,20 +1,15 @@
 package ru.ezhov.rocket.action.application
 
-import ru.ezhov.rocket.action.application.applicationConfiguration.application.ConfigurationApplication
-import ru.ezhov.rocket.action.application.hotkey.HotKeyProviderSingleton
 import ru.ezhov.rocket.action.application.properties.GeneralPropertiesRepository
 import ru.ezhov.rocket.action.application.properties.UsedPropertiesName
 import java.awt.Color
 import javax.swing.BorderFactory
 import javax.swing.JDialog
-import javax.swing.KeyStroke
-import javax.swing.SwingUtilities
 
 
 class BaseDialog(
     uiQuickActionService: UiQuickActionService,
     generalPropertiesRepository: GeneralPropertiesRepository,
-    private val configurationApplication: ConfigurationApplication,
 ) : JDialog() {
     init {
         val menuAndSearch = uiQuickActionService.createMenu(this)
@@ -24,31 +19,8 @@ class BaseDialog(
             .asFloat(name = UsedPropertiesName.UI_BASE_DIALOG_OPACITY, default = 0.4F)
 
         rootPane.border = BorderFactory.createLineBorder(Color.GRAY)
-        registerGlobalHotKeys(menuAndSearch = menuAndSearch)
         isAlwaysOnTop = true
         setLocationRelativeTo(null)
         pack()
-    }
-
-    private fun registerGlobalHotKeys(
-        menuAndSearch: ManuAndSearchPanel,
-    ) {
-        HotKeyProviderSingleton
-            .PROVIDER
-            .apply {
-                configurationApplication
-                    .all()
-                    .globalHotKeys
-                    ?.activateSearchField
-                    ?.let { activateSearchField ->
-                        this.register(KeyStroke.getKeyStroke(activateSearchField)) {
-                            SwingUtilities.invokeLater {
-                                BaseDialog@ toFront()
-                                BaseDialog@ requestFocusInWindow()
-                                menuAndSearch.search.searchTextField.requestFocusInWindow()
-                            }
-                        }
-                    }
-            }
     }
 }
