@@ -16,8 +16,10 @@ import java.awt.BorderLayout
 import java.awt.Color
 import java.util.*
 import javax.swing.JButton
+import javax.swing.JCheckBox
 import javax.swing.JFrame
 import javax.swing.JMenuBar
+import javax.swing.JOptionPane
 import javax.swing.JPanel
 import javax.swing.JScrollPane
 import javax.swing.JTabbedPane
@@ -37,38 +39,86 @@ class VariablesFrame(
 
     private val applicationTableModel = DefaultTableModel().apply {
         addColumn("*Name")
+        addColumn("N")
         addColumn("*Value")
+        addColumn("V")
         addColumn("*Description")
     }
 
     private val propertiesEnableModel = DefaultTableModel().apply {
         addColumn("*Name")
+        addColumn("N")
         addColumn("*Value")
+        addColumn("V")
     }
     private val environmentEnableModel = DefaultTableModel().apply {
         addColumn("*Name")
+        addColumn("N")
         addColumn("*Value")
+        addColumn("V")
     }
     private val keePassEnableModel = DefaultTableModel().apply {
         addColumn("*Name")
+        addColumn("N")
         addColumn("*Value")
+        addColumn("V")
     }
 
     private val applicationTable = JTable(applicationTableModel).apply {
         tableHeader.reorderingAllowed = false
-        setDefaultRenderer(Any::class.java, PasswordDefaultTableRenderer(1))
+        getColumn("N").apply {
+            maxWidth = 16
+            setCellRenderer(VariableButtonRenderer())
+            setCellEditor(VariableButtonEditor(JCheckBox(), notificationService))
+        }
+        getColumn("V").apply {
+            maxWidth = 16
+            setCellRenderer(VariableButtonRenderer())
+            setCellEditor(VariableButtonEditor(JCheckBox(), notificationService))
+        }
+        getColumn("*Value").setCellRenderer(VariablesDefaultTableRenderer(2))
     }
     private val propertiesTable = JTable(propertiesEnableModel).apply {
         tableHeader.reorderingAllowed = false
-        setDefaultRenderer(Any::class.java, PasswordDefaultTableRenderer(1))
+        getColumn("N").apply {
+            maxWidth = 16
+            setCellRenderer(VariableButtonRenderer())
+            setCellEditor(VariableButtonEditor(JCheckBox(), notificationService))
+        }
+        getColumn("V").apply {
+            maxWidth = 16
+            setCellRenderer(VariableButtonRenderer())
+            setCellEditor(VariableButtonEditor(JCheckBox(), notificationService))
+        }
+        getColumn("*Value").setCellRenderer(VariablesDefaultTableRenderer(2))
     }
     private val environmentTable = JTable(environmentEnableModel).apply {
         tableHeader.reorderingAllowed = false
-        setDefaultRenderer(Any::class.java, PasswordDefaultTableRenderer(1))
+        getColumn("N").apply {
+            maxWidth = 16
+            setCellRenderer(VariableButtonRenderer())
+            setCellEditor(VariableButtonEditor(JCheckBox(), notificationService))
+        }
+        getColumn("V").apply {
+            maxWidth = 16
+            setCellRenderer(VariableButtonRenderer())
+            setCellEditor(VariableButtonEditor(JCheckBox(), notificationService))
+        }
+        getColumn("*Value").setCellRenderer(VariablesDefaultTableRenderer(2))
     }
     private val keePassTable = JTable(keePassEnableModel).apply {
         tableHeader.reorderingAllowed = false
-        setDefaultRenderer(Any::class.java, PasswordDefaultTableRenderer(1))
+        getColumn("N").apply {
+            maxWidth = 16
+            setCellRenderer(VariableButtonRenderer())
+            setCellEditor(VariableButtonEditor(JCheckBox(), notificationService))
+        }
+        getColumn("V").apply {
+            maxWidth = 16
+            setCellRenderer(VariableButtonRenderer())
+            setCellEditor(VariableButtonEditor(JCheckBox(), notificationService))
+        }
+        getColumn("*Value").setCellRenderer(VariablesDefaultTableRenderer(2))
     }
 
     private val keyTextField = TextFieldWithText("Key to encode variables")
@@ -199,7 +249,9 @@ class VariablesFrame(
                         model.addRow(
                             arrayOf(
                                 vari.name,
+                                "",
                                 vari.value,
+                                "",
                                 vari.description,
                             )
                         )
@@ -215,7 +267,9 @@ class VariablesFrame(
                         model.addRow(
                             arrayOf(
                                 vari.name,
+                                "",
                                 vari.value,
+                                "",
                             )
                         )
                     }
@@ -227,11 +281,11 @@ class VariablesFrame(
 
     private fun saveTable() {
         val data = applicationTableModel.dataVector
-        val variables = data.mapNotNull { rawRow ->
+        val variables = data.mapIndexedNotNull { index, rawRow ->
             val row = rawRow as Vector<String>
             val name = row[0]
-            val value = row[1]
-            val description = row[2]
+            val value = row[2]
+            val description = row[4]
 
             if (name != null && description != null && value != null) {
                 VariableDto(
@@ -240,7 +294,17 @@ class VariablesFrame(
                     value = value,
                     type = VariableType.APPLICATION,
                 )
-            } else null
+            } else {
+                JOptionPane.showMessageDialog(
+                    this,
+                    "All fields are required. Error in row '${index + 1}'",
+                    "Error when save variables",
+                    JOptionPane.WARNING_MESSAGE
+                )
+                index
+
+                return
+            }
         }
 
         try {

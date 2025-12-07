@@ -13,6 +13,11 @@
     "description" : "",
     "type" : "APPLICATION"
   }, {
+    "name" : "KEE_PASS_PASSWORD",
+    "value" : "lppltDMB8/o=",
+    "description" : "KeePass password",
+    "type" : "APPLICATION"
+  }, {
     "name" : "TEST",
     "value" : "y+3A3ISFvm7L7cDchIW+buHiNQptu9Vh",
     "description" : "Что то",
@@ -28,9 +33,9 @@
     "description" : "xcgnxcnxcgn",
     "type" : "APPLICATION"
   }, {
-    "name" : "KEE_PASS_PASSWORD",
-    "value" : "lppltDMB8/o=",
-    "description" : "KeePass password",
+    "name" : "123",
+    "value" : "0kl+DAHGMPI=",
+    "description" : "123",
     "type" : "APPLICATION"
   } ]
 }

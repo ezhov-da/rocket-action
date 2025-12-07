@@ -1,6 +1,8 @@
 package ru.ezhov.rocket.action.application.variables.interfaces.ui
 
+import io.mockk.Runs
 import io.mockk.every
+import io.mockk.just
 import io.mockk.mockk
 import ru.ezhov.rocket.action.application.variables.application.VariableDto
 import ru.ezhov.rocket.action.application.variables.application.VariablesDto
@@ -46,8 +48,11 @@ fun main() {
             parent = null,
             variablesApplication = mockk {
                 every { all() } returns variablesDto
+                every { save(any()) } just Runs
             },
-            notificationService = mockk {},
+            notificationService = mockk {
+                every { show(any(), any()) } just Runs
+            },
             iconService = mockk { every { by(any()) } returns ImageIcon(this::class.java.getResource("/icons/rocket_16x16.png")) },
         )
 
