@@ -19,6 +19,24 @@ fun main() {
                 value = "text value",
                 description = "test description",
                 type = VariableType.APPLICATION,
+            ),
+            VariableDto(
+                name = "text name",
+                value = "text value",
+                description = "test description",
+                type = VariableType.ENVIRONMENT,
+            ),
+            VariableDto(
+                name = "text name",
+                value = "text value",
+                description = "test description",
+                type = VariableType.PROPERTIES,
+            ),
+            VariableDto(
+                name = "text name",
+                value = "text value",
+                description = "test description",
+                type = VariableType.KEE_PASS,
             )
         )
     )

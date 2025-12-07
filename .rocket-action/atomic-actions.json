@@ -1,5 +1,5 @@
 {
-  "changedDate" : [ 2025, 10, 4, 22, 12, 7, 215000000 ],
+  "changedDate" : [ 2025, 12, 7, 6, 25, 11, 964000000 ],
   "atomicActions" : [ {
     "id" : "ccb3ea04-68ef-4988-84f1-2d95e14c0046",
     "name" : "Убирает начальные и конечные пробелы у строки (test)",
@@ -158,6 +158,16 @@
     "engine" : "GROOVY",
     "source" : "TEXT",
     "data" : "ru.ezhov.rocket.action.application.chainaction.api.ResultApi.withPercentSize(\n\t\t\"Это пример текста111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111\",\n\t\t0.9D,\n\t\t0.9D,\n\t\tfalse\n\t)",
+    "alias" : null,
+    "icon" : null
+  }, {
+    "id" : "5ff1263b-81a0-433f-b234-2b1284131f1c",
+    "name" : "KeePass password show",
+    "description" : "Out - password `VERY_SECRET_SECRET`",
+    "contractType" : "UNIT_OUT",
+    "engine" : "KOTLIN",
+    "source" : "TEXT",
+    "data" : "VERY_SECRET_SECRET",
     "alias" : null,
     "icon" : null
   } ]

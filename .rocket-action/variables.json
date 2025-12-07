@@ -13,6 +13,11 @@
     "description" : "",
     "type" : "APPLICATION"
   }, {
+    "name" : "TEST",
+    "value" : "y+3A3ISFvm7L7cDchIW+buHiNQptu9Vh",
+    "description" : "Что то",
+    "type" : "APPLICATION"
+  }, {
     "name" : "adASVasdsdv",
     "value" : "8ZHYSgUGcUG0xfSJY6ei4Q==",
     "description" : "",
@@ -23,9 +28,9 @@
     "description" : "xcgnxcnxcgn",
     "type" : "APPLICATION"
   }, {
-    "name" : "TEST",
-    "value" : "y+3A3ISFvm7L7cDchIW+buHiNQptu9Vh",
-    "description" : "Что то",
+    "name" : "KEE_PASS_PASSWORD",
+    "value" : "lppltDMB8/o=",
+    "description" : "KeePass password",
     "type" : "APPLICATION"
   } ]
 }

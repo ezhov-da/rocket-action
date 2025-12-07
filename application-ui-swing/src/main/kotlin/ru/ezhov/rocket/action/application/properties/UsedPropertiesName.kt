@@ -172,6 +172,13 @@ enum class UsedPropertiesName(val propertyName: String, val description: String)
         """.trimIndent()
     ),
 
+    JAR_PLUGIN_FOLDER(
+        "$PREFIX.jar.plugin.folder",
+        """
+            Path to folder with jar plugins. Default 'plugins'
+        """.trimIndent()
+    ),
+
     GROOVY_PLUGIN_FOLDER(
         "$PREFIX.groovy.plugin.folder",
         """

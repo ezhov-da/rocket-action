@@ -4,4 +4,5 @@ enum class VariableType {
     APPLICATION,
     PROPERTIES,
     ENVIRONMENT,
+    KEE_PASS,
 }

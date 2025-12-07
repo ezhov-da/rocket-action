@@ -11,6 +11,7 @@ import ru.ezhov.rocket.action.application.variables.domain.model.Encryption
 import ru.ezhov.rocket.action.application.variables.domain.model.Variable
 import ru.ezhov.rocket.action.application.variables.domain.model.VariableType
 import ru.ezhov.rocket.action.application.variables.domain.model.Variables
+import ru.ezhov.rocket.action.application.variables.infrastructure.KeePassVariableRepository
 
 private val logger = KotlinLogging.logger { }
 
@@ -25,7 +26,7 @@ class VariablesApplication(
     fun all(): VariablesDto {
         val key = configurationApplication.all().variablesKey
         val originVariables = variableRepository.all()
-        return if (originVariables.encryption != null) {
+        val variables = if (originVariables.encryption != null) {
             val algorithm = Algorithm.of(originVariables.encryption.algorithm)
             if (algorithm != null) {
                 val service = EncryptionServiceFactory.get(algorithm)
@@ -43,6 +44,14 @@ class VariablesApplication(
             logger.warn { "User variables is not encoded! Please save variables with encode" }
             originVariables.toVariablesDto(key)
         }
+
+        // For KeePass you need to get all the variables and get the password
+        val keePassVariables = KeePassVariableRepository(
+            variables.variables,
+            configurationApplication.all().variablesManagers
+        ).all()
+
+        return VariablesDto(variables.key, variables = variables.variables + keePassVariables.map { it.toDto() })
     }
 
     private fun decode(variables: Variables, key: String, encryptionService: EncryptionService): VariablesDto =
@@ -114,12 +123,12 @@ class VariablesApplication(
 private fun Variables.toVariablesDto(key: String): VariablesDto =
     VariablesDto(
         key = key,
-        variables = this.variables.map {
-            VariableDto(
-                name = it.name,
-                value = it.value,
-                description = it.description,
-                type = it.type,
-            )
-        }
+        variables = this.variables.map { it.toDto() }
     )
+
+private fun Variable.toDto() = VariableDto(
+    name = this.name,
+    value = this.value,
+    description = this.description,
+    type = this.type,
+)

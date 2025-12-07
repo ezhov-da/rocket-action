@@ -3,6 +3,7 @@ package ru.ezhov.rocket.action.application.tags.ui.view
 import ru.ezhov.rocket.action.application.tags.application.TagAndKeys
 import ru.ezhov.rocket.action.application.tags.application.TagsService
 import java.awt.BorderLayout
+import java.util.*
 import javax.swing.ImageIcon
 import javax.swing.JPanel
 import javax.swing.JScrollPane
@@ -52,7 +53,7 @@ class ViewTagsPanel(
     fun load(invokeSearch: (keys: Set<String>) -> Unit) {
         tableModel.dataVector.removeAllElements()
         tagsService.tagAndKeys().forEach { t ->
-            tableModel.dataVector.add(TagUi(t, invokeSearch))
+            tableModel.dataVector.add(Vector<TagUi>().apply { add(TagUi(t, invokeSearch)) })
         }
     }
 

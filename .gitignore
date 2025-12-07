@@ -3,7 +3,7 @@
 *.gv
 
 target
-/plugins
+/plugin-jars
 /.rocket-action/plugins/notes
 /.rocket-action/cache
 /.rocket-action/actions.yml

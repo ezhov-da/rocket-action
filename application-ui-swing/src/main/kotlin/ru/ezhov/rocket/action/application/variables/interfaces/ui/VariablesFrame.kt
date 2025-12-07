@@ -49,6 +49,10 @@ class VariablesFrame(
         addColumn("*Name")
         addColumn("*Value")
     }
+    private val keePassEnableModel = DefaultTableModel().apply {
+        addColumn("*Name")
+        addColumn("*Value")
+    }
 
     private val applicationTable = JTable(applicationTableModel).apply {
         tableHeader.reorderingAllowed = false
@@ -59,6 +63,10 @@ class VariablesFrame(
         setDefaultRenderer(Any::class.java, PasswordDefaultTableRenderer(1))
     }
     private val environmentTable = JTable(environmentEnableModel).apply {
+        tableHeader.reorderingAllowed = false
+        setDefaultRenderer(Any::class.java, PasswordDefaultTableRenderer(1))
+    }
+    private val keePassTable = JTable(keePassEnableModel).apply {
         tableHeader.reorderingAllowed = false
         setDefaultRenderer(Any::class.java, PasswordDefaultTableRenderer(1))
     }
@@ -85,7 +93,14 @@ class VariablesFrame(
             add(JScrollPane(environmentTable), BorderLayout.CENTER)
         })
 
-        loadTable()
+        // Add if KeePass exists
+        variables.variables.firstOrNull { it.type == VariableType.KEE_PASS }?.let {
+            tabbedPane.addTab("KeePass", JPanel(BorderLayout()).apply {
+                add(JScrollPane(keePassTable), BorderLayout.CENTER)
+            })
+        }
+
+        loadTable(variables)
 
         iconImage = iconService.by(AppIcon.ROCKET_APP).toImage()
         size = SizeUtil.dimension(0.6, 0.5)
@@ -123,7 +138,7 @@ class VariablesFrame(
         }
 
         saveButton.addActionListener { saveTable() }
-        refreshButton.addActionListener { loadTable() }
+        refreshButton.addActionListener { loadTable(variablesApplication.all()) }
 
         add(JMenuBar().apply {
             add(refreshButton)
@@ -162,11 +177,11 @@ class VariablesFrame(
         return panel
     }
 
-    private fun loadTable() {
-        val variables = variablesApplication.all()
+    private fun loadTable(variables: VariablesDto) {
         loadTable(applicationTable, applicationTableModel, VariableType.APPLICATION, variables)
         loadTable(propertiesTable, propertiesEnableModel, VariableType.PROPERTIES, variables)
         loadTable(environmentTable, environmentEnableModel, VariableType.ENVIRONMENT, variables)
+        loadTable(keePassTable, keePassEnableModel, VariableType.KEE_PASS, variables)
     }
 
     private fun loadTable(table: JTable, model: DefaultTableModel, type: VariableType, variables: VariablesDto) {

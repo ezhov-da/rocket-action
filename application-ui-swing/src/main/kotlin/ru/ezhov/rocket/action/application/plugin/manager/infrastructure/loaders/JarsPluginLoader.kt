@@ -6,6 +6,8 @@ import ru.ezhov.rocket.action.api.RocketActionPlugin
 import ru.ezhov.rocket.action.application.plugin.manager.domain.RocketActionPluginSourceType
 import ru.ezhov.rocket.action.application.plugin.manager.domain.RocketActionPluginSpec
 import ru.ezhov.rocket.action.application.plugin.manager.infrastructure.RocketActionPluginDecorator
+import ru.ezhov.rocket.action.application.properties.GeneralPropertiesRepository
+import ru.ezhov.rocket.action.application.properties.UsedPropertiesName
 import java.io.File
 import java.net.URLClassLoader
 import java.time.Duration
@@ -16,9 +18,11 @@ import kotlin.system.measureTimeMillis
 private val logger = KotlinLogging.logger {}
 
 @Service
-class JarsPluginLoader {
+class JarsPluginLoader(
+    private val generalPropertiesRepository: GeneralPropertiesRepository
+) {
     fun plugins(): List<File> =
-        File("plugins")
+        File(generalPropertiesRepository.asString(UsedPropertiesName.JAR_PLUGIN_FOLDER, "plugins"))
             .takeIf {
                 logger.info { "Plugins folder='${it.absolutePath}' exists=${it.exists()}" }
                 it.exists()

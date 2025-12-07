@@ -45,6 +45,16 @@ class JsonFileVariableRepository(
             )
         }
 
+        val userVar = userVariables(file)
+
+        val variables = systemEnv.toMutableList() +
+            systemProp.toMutableList() +
+            userVar.variables.toMutableList()
+
+        return Variables(encryption = userVar.encryption, variables = variables)
+    }
+
+    private fun userVariables(file: File): Variables {
         val userVar = try {
             if (file.exists()) {
                 objectMapper.readValue(file, JsonVariablesDto::class.java).toVariables()
@@ -55,9 +65,7 @@ class JsonFileVariableRepository(
             logger.error(ex) { "Error when read variables from file '$filePath'. Empty list returned" }
             Variables.EMPTY
         }
-
-        val variables = systemEnv.toMutableList() + systemProp.toMutableList() + userVar.variables.toMutableList()
-        return Variables(encryption = userVar.encryption, variables = variables)
+        return userVar
     }
 
     private fun file(): File {

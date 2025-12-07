@@ -6,8 +6,10 @@ import org.springframework.stereotype.Component
 import ru.ezhov.rocket.action.application.applicationConfiguration.domain.ConfigurationRepository
 import ru.ezhov.rocket.action.application.applicationConfiguration.domain.model.ApplicationConfigurations
 import ru.ezhov.rocket.action.application.applicationConfiguration.domain.model.GlobalHotKeys
+import ru.ezhov.rocket.action.application.applicationConfiguration.domain.model.VariablesManager
 import ru.ezhov.rocket.action.application.applicationConfiguration.infrastructure.model.JsonApplicationConfigurationsDto
 import ru.ezhov.rocket.action.application.applicationConfiguration.infrastructure.model.JsonGlobalHotKeys
+import ru.ezhov.rocket.action.application.applicationConfiguration.infrastructure.model.JsonVariablesManager
 import ru.ezhov.rocket.action.application.properties.GeneralPropertiesRepository
 import ru.ezhov.rocket.action.application.properties.UsedPropertiesName
 import java.io.File
@@ -40,6 +42,7 @@ class JsonFileConfigurationRepository(
                     variablesKey = DEFAULT_VARIABLES_KEY,
                     numberButtonsOnChainActionSelectionPanel = DEFAULT_NUMBER_BUTTONS_ON_CHAIN_ACTION_SELECTION_PANEL,
                     globalHotKeys = null,
+                    variablesManagers = emptyList(),
                 )
             }
         }
@@ -69,16 +72,36 @@ class JsonFileConfigurationRepository(
 private fun ApplicationConfigurations.toJsonApplicationConfigurationsDto(): JsonApplicationConfigurationsDto =
     JsonApplicationConfigurationsDto(
         variablesKey = this.variablesKey,
+        variablesManagers = this.variablesManagers.map { vm ->
+            when (vm) {
+                is VariablesManager.KeePassVariablesManager -> JsonVariablesManager.KeePassVariablesManager(
+                    dbPath = vm.dbPath,
+                    passwordVariableName = vm.passwordVariableName,
+                    variableRegExp = vm.variableRegExp,
+                )
+            }
+        },
         numberButtonsOnChainActionSelectionPanel = this.numberButtonsOnChainActionSelectionPanel,
         globalHotKeys = JsonGlobalHotKeys(
             activateSearchField = this.globalHotKeys?.activateSearchField,
-            activateChainActionField = this.globalHotKeys?.activateChainActionField
+            activateChainActionField = this.globalHotKeys?.activateChainActionField,
         )
     )
 
 private fun JsonApplicationConfigurationsDto.toApplicationConfigurations(): ApplicationConfigurations =
     ApplicationConfigurations(
         variablesKey = this.variablesKey ?: DEFAULT_VARIABLES_KEY,
+        variablesManagers = this.variablesManagers
+            ?.map { vm ->
+                when (vm) {
+                    is JsonVariablesManager.KeePassVariablesManager -> VariablesManager.KeePassVariablesManager(
+                        dbPath = vm.dbPath,
+                        passwordVariableName = vm.passwordVariableName,
+                        variableRegExp = vm.variableRegExp,
+                    )
+                }
+            }
+            .orEmpty(),
         numberButtonsOnChainActionSelectionPanel = numberButtonsOnChainActionSelectionPanel
             ?: DEFAULT_NUMBER_BUTTONS_ON_CHAIN_ACTION_SELECTION_PANEL,
         globalHotKeys = GlobalHotKeys(

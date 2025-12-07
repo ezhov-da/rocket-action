@@ -385,7 +385,7 @@ class ConfigurationTreePanel(
                 JButton()
                     .apply {
                         toolTipText = "Add a new action configuration to the end of root"
-                        icon = ImageIcon(this::class.java.getResource("/icons/add_16x16.png"))
+                        icon = ImageIcon(ConfigurationTreePanel::class.java.getResource("/icons/add_16x16.png"))
 
                         addActionListener {
                             createRocketActionSettingsDialog.show(object : CreatedRocketActionSettingsCallback {

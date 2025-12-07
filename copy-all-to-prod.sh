@@ -12,7 +12,7 @@ fi
 
 # Copy common plugins
 
-PLUGINS_DIRECTORY=${ROOT_ROCKET_ACTION}/plugins
+PLUGINS_DIRECTORY=${ROOT_ROCKET_ACTION}/plugin-jars
 
 rm -rf $PLUGINS_DIRECTORY && mkdir -p $PLUGINS_DIRECTORY && cp -f \
 plugin-copy-to-clipboard/target/*fat.jar \
