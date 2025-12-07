@@ -11,8 +11,7 @@ import java.io.File
 
 private val logger = KotlinLogging.logger { }
 
-class KeePassManagerRepository(
-) {
+class KeePassManagerRepository {
     fun variables(
         password: String,
         manager: VariablesManager.KeePassVariablesManager
@@ -35,6 +34,7 @@ class KeePassManagerRepository(
             return try {
                 entries
                     .distinctBy { it.uuid }
+                    .filter { it.title != null }
                     .mapNotNull {
                         regex
                             .find(it.title)
@@ -42,15 +42,24 @@ class KeePassManagerRepository(
                             ?.get(1)
                             ?.value
                             ?.let { varName ->
-                                Variable(
-                                    name = varName,
-                                    value = it.password,
-                                    type = VariableType.KEE_PASS,
+                                listOf(
+                                    Variable(
+                                        name = "${varName}_USERNAME",
+                                        value = it.username.orEmpty(),
+                                        type = VariableType.KEE_PASS,
+                                    ),
+
+                                    Variable(
+                                        name = "${varName}_PASSWORD",
+                                        value = it.password.orEmpty(),
+                                        type = VariableType.KEE_PASS,
+                                    )
                                 )
                             }
                     }
+                    .flatten()
             } catch (ex: Exception) {
-                logger.error { "Error when read KeePass database by $manager" }
+                logger.error(ex) { "Error when read KeePass database by $manager" }
                 emptyList()
             }
         }

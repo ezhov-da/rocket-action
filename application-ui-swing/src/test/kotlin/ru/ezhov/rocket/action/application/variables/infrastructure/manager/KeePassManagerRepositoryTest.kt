@@ -20,9 +20,13 @@ class KeePassManagerRepositoryTest {
                 }
             )
 
-        assertThat(variables).hasSize(1)
-        assertThat(variables[0].name).isEqualTo("TEST_SECRET")
-        assertThat(variables[0].value).isEqualTo("ndNKZ7dRbFGwQDHjK3jO")
+        assertThat(variables).hasSize(6)
+        assertThat(variables[0].name).isEqualTo("TEST_SECRET_USERNAME")
+        assertThat(variables[0].value).isEqualTo("")
         assertThat(variables[0].type).isEqualTo(VariableType.KEE_PASS)
+
+        assertThat(variables[1].name).isEqualTo("TEST_SECRET_PASSWORD")
+        assertThat(variables[1].value).isEqualTo("ndNKZ7dRbFGwQDHjK3jO")
+        assertThat(variables[1].type).isEqualTo(VariableType.KEE_PASS)
     }
 }
