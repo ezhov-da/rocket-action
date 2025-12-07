@@ -21,6 +21,7 @@ import javax.swing.JFrame
 import javax.swing.JMenuBar
 import javax.swing.JOptionPane
 import javax.swing.JPanel
+import javax.swing.JPasswordField
 import javax.swing.JScrollPane
 import javax.swing.JTabbedPane
 import javax.swing.JTable
@@ -121,7 +122,10 @@ class VariablesFrame(
         getColumn("*Value").setCellRenderer(VariablesDefaultTableRenderer(2))
     }
 
-    private val keyTextField = TextFieldWithText("Key to encode variables")
+    private val keyTextField = TextFieldWithText("Key to encode variables").apply { columns = 20 }
+    private val keyPasswordTextField = JPasswordField(20).apply { isEditable = false }
+    private var isShowPassword = false
+    private val showHideKeyButton = JButton("Show key")
 
     private val addRowButton = JButton("Add line")
     private val removeRowButton = JButton("Delete line")
@@ -203,21 +207,53 @@ class VariablesFrame(
     private fun applicationPanel(variables: VariablesDto): JPanel {
         val panel = JPanel(BorderLayout())
 
-        panel.add(JPanel().apply {
-            add(keyTextField.apply {
-                val defaultColor = keyTextField.background
-                addCaretListener {
-                    if (keyTextField.text.isBlank()) {
-                        keyTextField.background = Color.RED
-                    } else {
-                        keyTextField.background = defaultColor
+        panel.add(JPanel(BorderLayout()).apply {
+            val keyPanel = JPanel().apply {
+                keyTextField.apply {
+                    val defaultColor = keyTextField.background
+                    addCaretListener {
+                        if (keyTextField.text.isBlank()) {
+                            keyTextField.background = Color.RED
+                        } else {
+                            keyTextField.background = defaultColor
+                        }
                     }
+                    text = variables.key
                 }
-                text = variables.key
-            })
-            add(addRowButton)
-            add(removeRowButton)
-            add(importVariablesButton)
+                keyPasswordTextField.text = keyTextField.text
+                add(keyPasswordTextField)
+            }
+            showHideKeyButton.addActionListener {
+                isShowPassword = !isShowPassword
+                keyPanel.removeAll()
+                if (isShowPassword) {
+                    keyPanel.add(keyTextField)
+                    showHideKeyButton.text = "Hide key"
+                } else {
+                    showHideKeyButton.text = "Show key"
+                    keyPasswordTextField.text = keyTextField.text
+                    keyPanel.add(keyPasswordTextField, BorderLayout.CENTER)
+                }
+                keyPanel.revalidate()
+                keyPanel.repaint()
+            }
+
+            add(
+                JPanel().apply {
+                    add(keyPanel)
+                    add(showHideKeyButton)
+                },
+                BorderLayout.WEST
+            )
+
+            add(
+                JPanel().apply {
+                    add(addRowButton)
+                    add(removeRowButton)
+                    add(importVariablesButton)
+                },
+                BorderLayout.EAST
+            )
         }, BorderLayout.NORTH)
         panel.add(JScrollPane(applicationTable), BorderLayout.CENTER)
         panel.add(JPanel().apply {
