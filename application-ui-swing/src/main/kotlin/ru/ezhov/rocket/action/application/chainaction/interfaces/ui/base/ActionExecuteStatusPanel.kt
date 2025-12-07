@@ -25,7 +25,6 @@ private val logger = KotlinLogging.logger {}
 class ActionExecuteStatusPanel(
     private val actionExecutorService: ActionExecutorService
 ) : JPanel(MigLayout(/*"debug"*/"insets 0 0 0 0")) {
-
     fun executeChain(input: String?, action: Action, onComplete: () -> Unit) {
         removeAll()
 

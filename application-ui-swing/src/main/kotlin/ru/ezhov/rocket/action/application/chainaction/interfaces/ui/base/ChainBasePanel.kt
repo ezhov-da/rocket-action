@@ -41,12 +41,13 @@ class ChainBasePanel(
     private val searchTextTransformer: SearchTextTransformer,
     private val actionSchedulerService: ActionSchedulerService,
 ) : JPanel(MigLayout(/*"debug"*/"insets 0 0 5 0" /*Убираем отступы, оставляем только снизу для отображения действий*/)) {
-    private val textFieldPaste = TextFieldWithText("...")
+    private var textFieldPaste = TextFieldWithText("...")
         .apply {
             toolTipText = "<html><center>Drag text to run chain<br>or paste here or type and `Enter`</center>"
         }
     private val actionExecuteStatusPanel =
-        ActionExecuteStatusPanel(actionExecutorService).apply { isVisible = false }
+        ActionExecuteStatusPanel(actionExecutorService)
+
     private val openAvailableActionsButton = JButton(Icons.Advanced.ROCKET_BLACK_16x16).apply {
         toolTipText = "Open available actions"
     }
@@ -75,6 +76,25 @@ class ChainBasePanel(
         openConfigurationButton.addActionListener {
             ConfigurationUiObserverFactory.observer.notify(ShowChainActionConfigurationUiEvent(chainBasePanel))
         }
+    }
+
+    // Для общей формы приложения
+    fun setTextFieldPaste(textFieldPaste: TextFieldWithText) {
+        this.textFieldPaste = textFieldPaste
+        addDropTargetTo(textFieldPaste)
+        addCtrlV(textFieldPaste)
+        addEnter(textFieldPaste)
+    }
+
+    // Для общей формы приложения
+    fun openAvailableActionsButton() = openAvailableActionsButton
+
+    // Для общей формы приложения
+    fun actionExecuteStatusPanel() = actionExecuteStatusPanel
+
+    // Для общей формы приложения
+    fun openEditor() {
+        ConfigurationUiObserverFactory.observer.notify(ShowChainActionConfigurationUiEvent(this))
     }
 
     private fun addDropTargetTo(component: JComponent) {
@@ -126,7 +146,7 @@ class ChainBasePanel(
     private fun addEnter(component: JTextField) {
         component.addKeyListener(object : KeyAdapter() {
             override fun keyReleased(e: KeyEvent) {
-                if (e.keyCode == KeyEvent.VK_ENTER) {
+                if (!e.isControlDown && e.keyCode == KeyEvent.VK_ENTER) {
                     val text = component.text
                     text?.let { showSelectedChain(it) }
                 }
@@ -135,7 +155,6 @@ class ChainBasePanel(
     }
 
     private fun showSelectedChain(text: String?) {
-        val chainBasePanel = this
         SelectChainPopupMenu(
             actionService = atomicActionService,
             chainActionService = chainActionService,
@@ -160,7 +179,7 @@ class ChainBasePanel(
             }
         }.apply {
             SwingUtilities.invokeLater {
-                show(chainBasePanel, 0, 0)
+                show(textFieldPaste, 0, 0)
                 activateSearchField()
             }
         }

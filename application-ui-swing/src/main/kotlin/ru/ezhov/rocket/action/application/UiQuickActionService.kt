@@ -7,6 +7,7 @@ import ru.ezhov.rocket.action.api.RocketAction
 import ru.ezhov.rocket.action.api.context.icon.AppIcon
 import ru.ezhov.rocket.action.api.context.notification.NotificationType
 import ru.ezhov.rocket.action.application.applicationConfiguration.application.ConfigurationApplication
+import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.ChainBasePanelFactory
 import ru.ezhov.rocket.action.application.configuration.ui.ConfigurationFrameFactory
 import ru.ezhov.rocket.action.application.core.application.RocketActionSettingsService
 import ru.ezhov.rocket.action.application.core.event.RocketActionSettingsCreatedDomainEvent
@@ -65,6 +66,7 @@ class UiQuickActionService(
     private val generalPropertiesRepository: GeneralPropertiesRepository,
     private val searchTextTransformer: SearchTextTransformer,
     private val configurationApplication: ConfigurationApplication,
+    private val chainBasePanelFactory: ChainBasePanelFactory,
 ) {
     private var baseDialog: JDialog? = null
     private var searchComponent: SearchComponent? = null
@@ -110,7 +112,9 @@ class UiQuickActionService(
             val searchField = searchComponent ?: createSearchField()
             searchComponent = searchField
 
-            menuBar.add(searchField.component);
+            menuBar.add(searchField.component)
+
+            menuBar.add(chainBasePanelFactory.chainBasePanel.openAvailableActionsButton())
 
             val moveLabel = JLabel(rocketActionContextFactory.context.icon().by(AppIcon.MOVE))
             MoveUtil.addMoveAction(movableComponent = baseDialog, grabbedComponent = moveLabel)
@@ -124,7 +128,8 @@ class UiQuickActionService(
 
             ManuAndSearchPanel(
                 menu = menuBar,
-                search = searchField
+                search = searchField,
+                executeStatusPanel = chainBasePanelFactory.chainBasePanel.actionExecuteStatusPanel()
             )
         } catch (e: Exception) {
             throw UiQuickActionServiceException("Error", e)
@@ -169,6 +174,8 @@ class UiQuickActionService(
                         })
                     }
 
+            chainBasePanelFactory.chainBasePanel.setTextFieldPaste(textField)
+
             registerGlobalHotKeys(textField)
 
             val button = JButton(rocketActionContextFactory.context.icon().by(AppIcon.CLEAR))
@@ -197,7 +204,7 @@ class UiQuickActionService(
         e: KeyEvent,
         tf: TextFieldWithText
     ) {
-        if (e.keyCode == KeyEvent.VK_ENTER) {
+        if (e.keyCode == KeyEvent.VK_ENTER && e.isControlDown) {
             if (text.isNotEmpty()) {
                 val searchTexts = searchTextTransformer.transformedText(text)
                 val idsRA = searchTexts
@@ -330,10 +337,19 @@ class UiQuickActionService(
         menuTools.add(menuItemVariables)
 
         // Editor
-        val menuItemEditor = JMenuItem("Editor")
-        menuItemEditor.icon = rocketActionContextFactory.context.icon().by(AppIcon.PENCIL)
-        menuItemEditor.addActionListener(createEditorActionListener())
-        menuTools.add(menuItemEditor)
+        val menuItemRocketEditor = JMenuItem("Rocket Action Editor")
+        menuItemRocketEditor.icon = rocketActionContextFactory.context.icon().by(AppIcon.PENCIL)
+        menuItemRocketEditor.addActionListener(createEditorActionListener())
+        menuTools.add(menuItemRocketEditor)
+
+        val menuItemChainEditor = JMenuItem("Chain Action Editor")
+        menuItemChainEditor.icon = rocketActionContextFactory.context.icon().by(AppIcon.PENCIL)
+        menuItemChainEditor.addActionListener {
+            SwingUtilities.invokeLater {
+                chainBasePanelFactory.chainBasePanel.openEditor()
+            }
+        }
+        menuTools.add(menuItemChainEditor)
 
         menuTools.add(JSeparator())
 
@@ -433,19 +449,10 @@ class UiQuickActionService(
 data class ManuAndSearchPanel(
     val menu: JMenuBar,
     val search: SearchComponent,
+    val executeStatusPanel: JPanel,
 )
 
 data class SearchComponent(
     val component: Component,
     val searchTextField: JTextField,
 )
-
-enum class WindowState(val stateName: String, val icon: AppIcon) {
-    MINIMISE("Minimise", AppIcon.MINUS),
-    MAXIMISE("Maximise", AppIcon.PLUS);
-
-    fun opposite(): WindowState = when (this) {
-        MAXIMISE -> MINIMISE
-        MINIMISE -> MAXIMISE
-    }
-}

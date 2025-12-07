@@ -28,7 +28,8 @@ class AppRunService(
             getFont()?.let { font -> setUIFont(font) }
 
             baseDialogFactory.dialog.isVisible = true
-            chainActionDialogFactory.dialog?.isVisible = true
+            // Пока отключаем для тестирования // TODO ezhov
+            //  chainActionDialogFactory.dialog?.isVisible = true
 
         } catch (e: UiQuickActionServiceException) {
             e.printStackTrace()
