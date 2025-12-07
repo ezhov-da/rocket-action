@@ -42,18 +42,28 @@ class KeePassManagerRepository {
                             ?.get(1)
                             ?.value
                             ?.let { varName ->
-                                listOf(
-                                    Variable(
-                                        name = "${varName}_USERNAME",
-                                        value = it.username.orEmpty(),
-                                        type = VariableType.KEE_PASS,
-                                    ),
-
-                                    Variable(
-                                        name = "${varName}_PASSWORD",
-                                        value = it.password.orEmpty(),
-                                        type = VariableType.KEE_PASS,
-                                    )
+                                listOfNotNull(
+                                    it.username?.let { username ->
+                                        Variable(
+                                            name = "${varName}_USERNAME",
+                                            value = username,
+                                            type = VariableType.KEE_PASS,
+                                        )
+                                    },
+                                    it.password?.let { password ->
+                                        Variable(
+                                            name = "${varName}_PASSWORD",
+                                            value = password,
+                                            type = VariableType.KEE_PASS,
+                                        )
+                                    },
+                                    it.url?.let { url ->
+                                        Variable(
+                                            name = "${varName}_URL",
+                                            value = url,
+                                            type = VariableType.KEE_PASS,
+                                        )
+                                    },
                                 )
                             }
                     }
