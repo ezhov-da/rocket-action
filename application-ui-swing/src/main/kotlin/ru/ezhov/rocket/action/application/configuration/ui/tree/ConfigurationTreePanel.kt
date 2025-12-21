@@ -83,8 +83,8 @@ class ConfigurationTreePanel(
                         defaultTreeModel.reload(root)
                     } else {
                         SearchInTreeUtil.searchInTree(
-                            condition = { settings -> settings.settings.id == event.groupId },
                             root = root,
+                            condition = { settings -> settings.settings.id == event.groupId },
                         )
                             .firstOrNull()
                             ?.let { parent ->
@@ -193,7 +193,6 @@ class ConfigurationTreePanel(
                                             )
                                         }
                                     }
-
                                 })
                             }
 
@@ -240,17 +239,19 @@ class ConfigurationTreePanel(
                                     val settings = userObject.settings
                                     val duplicate = settings.copy(userObject.settings)
                                     SwingUtilities.invokeLater {
-                                        defaultTreeModel.insertNodeInto(
-                                            DefaultMutableTreeNode(
-                                                TreeRocketActionSettings(
-                                                    configuration = userObject.configuration,
-                                                    settings = duplicate,
-                                                ),
-                                                false
+                                        val node = DefaultMutableTreeNode(
+                                            TreeRocketActionSettings(
+                                                configuration = userObject.configuration,
+                                                settings = duplicate,
                                             ),
+                                            false
+                                        )
+                                        defaultTreeModel.insertNodeInto(
+                                            node,
                                             selectedTreeNode.parent as MutableTreeNode,
                                             selectedTreeNode.parent.getIndex(selectedTreeNode) + 1
                                         )
+                                        tree.selectionModel.selectionPath = TreePath(node.path)
                                     }
                                 }
 
@@ -277,10 +278,10 @@ class ConfigurationTreePanel(
                         }
 
                         val nodes = SearchInTreeUtil.searchInTree(
-                            { settings ->
+                            root = root,
+                            condition = { settings ->
                                 settings.configuration.type().value() == GroupRocketActionUi.TYPE
                             },
-                            root
                         ) + root
 
                         add(

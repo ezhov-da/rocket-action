@@ -5,8 +5,8 @@ import javax.swing.tree.DefaultMutableTreeNode
 
 object SearchInTreeUtil {
     fun searchInTree(
-        condition: (settings: TreeRocketActionSettings) -> Boolean,
         root: DefaultMutableTreeNode,
+        condition: (settings: TreeRocketActionSettings) -> Boolean,
     ): List<DefaultMutableTreeNode> {
         val mutableList: MutableList<DefaultMutableTreeNode> = mutableListOf()
         var node: DefaultMutableTreeNode?

@@ -47,6 +47,7 @@ class SearchInTreePanel(
                     val searchText = searchTextTransformer.transformedText(textField.text)
 
                     val nodes = SearchInTreeUtil.searchInTree(
+                        root = root,
                         condition = { settings ->
                             searchText.any { st ->
                                 settings.settings.settings.any { set ->
@@ -57,7 +58,6 @@ class SearchInTreePanel(
                                 }
                             }
                         },
-                        root = root,
                     )
                     if (nodes.isNotEmpty()) {
                         if (currentResultPanel != null) {
