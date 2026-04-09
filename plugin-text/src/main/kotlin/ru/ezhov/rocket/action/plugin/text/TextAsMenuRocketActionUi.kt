@@ -1,5 +1,6 @@
 package ru.ezhov.rocket.action.plugin.text
 
+import mu.KotlinLogging
 import ru.ezhov.rocket.action.api.RocketAction
 import ru.ezhov.rocket.action.api.RocketActionConfiguration
 import ru.ezhov.rocket.action.api.RocketActionConfigurationProperty
@@ -15,6 +16,8 @@ import ru.ezhov.rocket.action.api.support.AbstractRocketAction
 import ru.ezhov.rocket.action.ui.utils.swing.common.toImage
 import java.awt.BorderLayout
 import java.awt.Component
+import java.awt.Font
+import java.awt.GraphicsEnvironment
 import java.awt.Toolkit
 import java.awt.datatransfer.StringSelection
 import java.awt.event.ActionEvent
@@ -31,6 +34,8 @@ import javax.swing.JTextPane
 import javax.swing.JToolBar
 import javax.swing.SwingUtilities
 import javax.swing.WindowConstants
+
+private val logger = KotlinLogging.logger {}
 
 class TextAsMenuRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
     private var actionContext: RocketActionContext? = null
@@ -61,6 +66,7 @@ class TextAsMenuRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
     override fun properties(): List<RocketActionConfigurationProperty> =
         listOf(
             createRocketActionProperty(key = LABEL, name = LABEL, description = "Title", required = true),
+            createRocketActionProperty(key = LABEL, name = LABEL, description = "Title", required = true),
             createRocketActionProperty(key = TEXT, name = TEXT, description = "Text", required = true),
             createRocketActionProperty(
                 key = DESCRIPTION,
@@ -68,7 +74,20 @@ class TextAsMenuRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
                 description = "Description",
                 required = false
             ),
+            createRocketActionProperty(
+                key = FONT_NAME,
+                name = FONT_NAME,
+                description = "System font for text. If not specified, the default one is used.",
+                required = false
+            ),
         )
+
+    private fun getFonts(): List<String> =
+        GraphicsEnvironment
+            .getLocalGraphicsEnvironment()
+            .availableFontFamilyNames
+            .toList()
+            .sorted()
 
     override fun create(settings: RocketActionSettings, context: RocketActionContext): RocketAction? =
         settings.settings()[LABEL]?.takeIf { it.isNotEmpty() }?.let { label ->
@@ -79,59 +98,73 @@ class TextAsMenuRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
                     val panel = JPanel(BorderLayout())
                     panel.add(
                         JToolBar().apply {
-                            add(JButton(
-                                object : AbstractAction() {
-                                    init {
-                                        putValue(SHORT_DESCRIPTION, "Copy text to clipboard")
-                                        putValue(SMALL_ICON, actionContext!!.icon().by(AppIcon.COPY_WRITING))
-                                    }
+                            add(
+                                JButton(
+                                    object : AbstractAction() {
+                                        init {
+                                            putValue(SHORT_DESCRIPTION, "Copy text to clipboard")
+                                            putValue(SMALL_ICON, actionContext!!.icon().by(AppIcon.COPY_WRITING))
+                                        }
 
-                                    override fun actionPerformed(e: ActionEvent?) {
-                                        val defaultToolkit = Toolkit.getDefaultToolkit()
-                                        val clipboard = defaultToolkit.systemClipboard
-                                        clipboard.setContents(StringSelection(text), null)
-                                        actionContext!!.notification().show(
-                                            type = NotificationType.INFO,
-                                            text = "Text copied to clipboard"
-                                        )
-                                    }
-                                }
-                            ))
-                            add(JButton(
-                                object : AbstractAction() {
-                                    init {
-                                        putValue(SHORT_DESCRIPTION, "Open in a separate window")
-                                        putValue(SMALL_ICON, actionContext!!.icon().by(AppIcon.ARROW_TOP))
-                                    }
-
-                                    override fun actionPerformed(e: ActionEvent?) {
-                                        SwingUtilities.invokeLater {
-                                            val dimension = Toolkit.getDefaultToolkit().screenSize
-                                            val frame = JFrame(label)
-                                            frame.iconImage = actionContext!!
-                                                .icon()
-                                                .by(AppIcon.ROCKET_APP)
-                                                .toImage()
-                                            frame.add(JScrollPane(JTextPane().apply {
-                                                this.text = text
-                                                isEditable = false
-                                            }))
-                                            frame.defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
-                                            frame.setSize(
-                                                (dimension.width * 0.8).toInt(),
-                                                (dimension.height * 0.8).toInt()
+                                        override fun actionPerformed(e: ActionEvent?) {
+                                            val defaultToolkit = Toolkit.getDefaultToolkit()
+                                            val clipboard = defaultToolkit.systemClipboard
+                                            clipboard.setContents(StringSelection(text), null)
+                                            actionContext!!.notification().show(
+                                                type = NotificationType.INFO,
+                                                text = "Text copied to clipboard"
                                             )
-                                            frame.setLocationRelativeTo(null)
-                                            frame.isVisible = true
                                         }
                                     }
-                                }
-                            ))
+                                ))
+                            add(
+                                JButton(
+                                    object : AbstractAction() {
+                                        init {
+                                            putValue(SHORT_DESCRIPTION, "Open in a separate window")
+                                            putValue(SMALL_ICON, actionContext!!.icon().by(AppIcon.ARROW_TOP))
+                                        }
+
+                                        override fun actionPerformed(e: ActionEvent?) {
+                                            SwingUtilities.invokeLater {
+                                                val dimension = Toolkit.getDefaultToolkit().screenSize
+                                                val frame = JFrame(label)
+                                                frame.iconImage = actionContext!!
+                                                    .icon()
+                                                    .by(AppIcon.ROCKET_APP)
+                                                    .toImage()
+                                                frame.add(JScrollPane(JTextPane().apply {
+                                                    this.text = text
+                                                    isEditable = false
+                                                }))
+                                                frame.defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
+                                                frame.setSize(
+                                                    (dimension.width * 0.8).toInt(),
+                                                    (dimension.height * 0.8).toInt()
+                                                )
+                                                frame.setLocationRelativeTo(null)
+                                                frame.isVisible = true
+                                            }
+                                        }
+                                    }
+                                ))
                         },
                         BorderLayout.NORTH
                     )
+
+                    val newFont = settings.settings()[FONT_NAME]
+                        ?.let { fontName ->
+                            try {
+                                Font(fontName, Font.PLAIN, 12)
+                            } catch (ex: Exception) {
+                                logger.warn(ex) { "Wrong font name '$fontName' for set font" }
+                                null
+                            }
+                        }
+
                     panel.add(
                         JTextPane().apply {
+                            newFont?.let { font = it }
                             val textPane = this
                             textPane.text = text
                             isEditable = false
@@ -172,6 +205,7 @@ class TextAsMenuRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
         private val LABEL = "label"
         private val DESCRIPTION = "description"
         private val TEXT = "text"
+        private val FONT_NAME = "fontName"
     }
 
     override fun name(): String = "Display text as menu item"
