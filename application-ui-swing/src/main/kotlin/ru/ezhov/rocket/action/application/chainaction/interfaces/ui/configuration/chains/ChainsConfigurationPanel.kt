@@ -29,6 +29,7 @@ import javax.swing.JMenu
 import javax.swing.JPanel
 import javax.swing.JPopupMenu
 import javax.swing.JScrollPane
+import javax.swing.SwingWorker
 
 class ChainsConfigurationPanel(
     private val actionExecutorService: ActionExecutorService,
@@ -183,40 +184,55 @@ class ChainsConfigurationPanel(
     }
 
     private fun fillActions(sortInfo: SortInfo, searchAction: SearchAction) {
-        val chains = chainActionService.chains()
+        SearchWorker(
+            sortInfo = sortInfo,
+            searchAction = searchAction,
+            chainActionService = chainActionService,
+            allListChainsModel = allListChainsModel,
+        ).execute()
+    }
 
-        val sortedChains = when (sortInfo.sortField) {
-            SortField.NAME -> when (sortInfo.direction) {
-                Direction.ASC -> chains.sortedBy { it.name }
-                Direction.DESC -> chains.sortedByDescending { it.name }
-            }
+    private class SearchWorker(
+        private val sortInfo: SortInfo,
+        private val searchAction: SearchAction,
+        private val chainActionService: ChainActionService,
+        private val allListChainsModel: DefaultListModel<ChainAction>,
+    ) : SwingWorker<List<ChainAction>, Unit>() {
+        override fun doInBackground(): List<ChainAction> {
+            val chains = chainActionService.chains()
 
-            SortField.ACTIONS_COUNT -> when (sortInfo.direction) {
-                Direction.ASC -> chains.sortedBy { it.actions.size }
-                Direction.DESC -> chains.sortedByDescending { it.actions.size }
-            }
-        }
+            val sortedChains = when (sortInfo.sortField) {
+                SortField.NAME -> when (sortInfo.direction) {
+                    Direction.ASC -> chains.sortedBy { it.name }
+                    Direction.DESC -> chains.sortedByDescending { it.name }
+                }
 
-        val filterByText = when (searchAction) {
-            is SearchAction.SearchInfo -> {
-                if (searchAction.text.isEmpty()) {
-                    sortedChains
-                } else {
-                    sortedChains
-                        .filter { ch ->
-                            searchAction.text.any { st ->
-                                ch.id.lowercase().lowercase().contains(st) ||
-                                    ch.name.lowercase().lowercase().contains(st) ||
-                                    ch.description.lowercase().lowercase().contains(st)
-                            }
-                        }
+                SortField.ACTIONS_COUNT -> when (sortInfo.direction) {
+                    Direction.ASC -> chains.sortedBy { it.actions.size }
+                    Direction.DESC -> chains.sortedByDescending { it.actions.size }
                 }
             }
 
-            is SearchAction.Reset -> sortedChains
-        }
+            val filterByText = when (searchAction) {
+                is SearchAction.SearchInfo -> {
+                    if (searchAction.text.isEmpty()) {
+                        sortedChains
+                    } else {
+                        sortedChains
+                            .filter { ch ->
+                                searchAction.text.any { st ->
+                                    ch.id.lowercase().lowercase().contains(st) ||
+                                        ch.name.lowercase().lowercase().contains(st) ||
+                                        ch.description.lowercase().lowercase().contains(st)
+                                }
+                            }
+                    }
+                }
 
-        var filterByConditions = filterByText
+                is SearchAction.Reset -> sortedChains
+            }
+
+            var filterByConditions = filterByText
 //        searchAction.conditions.forEach { condition ->
 //            when (condition) {
 //                SearchAction.SearchCondition.IN_OUT -> filterByConditions =
@@ -244,10 +260,16 @@ class ChainsConfigurationPanel(
 //                    filterByConditions.filter { it.source == AtomicActionSource.FILE }
 //            }
 //        }
+            return filterByConditions
+        }
 
-        allListChainsModel.removeAllElements()
-        filterByConditions.forEach {
-            allListChainsModel.addElement(it)
+        override fun done() {
+            get().let {
+                allListChainsModel.removeAllElements()
+                it.forEach {
+                    allListChainsModel.addElement(it)
+                }
+            }
         }
     }
 

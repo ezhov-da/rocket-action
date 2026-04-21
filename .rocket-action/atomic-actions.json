@@ -1,5 +1,5 @@
 {
-  "changedDate" : [ 2025, 12, 7, 6, 25, 11, 964000000 ],
+  "changedDate" : [ 2026, 4, 23, 10, 17, 41, 908000000 ],
   "atomicActions" : [ {
     "id" : "ccb3ea04-68ef-4988-84f1-2d95e14c0046",
     "name" : "Убирает начальные и конечные пробелы у строки (test)",
@@ -168,6 +168,16 @@
     "engine" : "KOTLIN",
     "source" : "TEXT",
     "data" : "VERY_SECRET_SECRET",
+    "alias" : null,
+    "icon" : null
+  }, {
+    "id" : "bd17e314-3d7b-4ac0-8772-ded761fa68ac",
+    "name" : "Долгое действие",
+    "description" : "",
+    "contractType" : "UNIT_UNIT",
+    "engine" : "GROOVY",
+    "source" : "TEXT",
+    "data" : "Thread.sleep(60000)",
     "alias" : null,
     "icon" : null
   } ]

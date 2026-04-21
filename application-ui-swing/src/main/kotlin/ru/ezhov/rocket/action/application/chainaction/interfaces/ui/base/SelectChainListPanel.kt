@@ -22,6 +22,7 @@ import javax.swing.JList
 import javax.swing.JPanel
 import javax.swing.JScrollPane
 import javax.swing.SwingUtilities
+import javax.swing.SwingWorker
 
 class SelectChainListPanel(
     actionService: AtomicActionService,
@@ -60,11 +61,15 @@ class SelectChainListPanel(
                 SwingUtilities.invokeLater { searchTextField.text = "" }
             }
 
-            searchTextField.addCaretListener {
-                SwingUtilities.invokeLater {
-                    fillList(searchTextField.text.takeIf { it.isNotEmpty() })
+            searchTextField.addKeyListener(object : KeyAdapter() {
+                override fun keyReleased(e: KeyEvent) {
+                    if (e.keyCode == KeyEvent.VK_ENTER) {
+                        SwingUtilities.invokeLater {
+                            fillList(searchTextField.text.takeIf { it.isNotEmpty() })
+                        }
+                    }
                 }
-            }
+            })
 
             // Поддержать нажатие вниз и переход к списку из поиска
             searchTextField.addKeyListener(object : KeyAdapter() {
@@ -105,21 +110,41 @@ class SelectChainListPanel(
     }
 
     private fun fillList(text: String? = null) {
-        listModel.removeAllElements()
+        SearchWorker(
+            text = text,
+            searchTextTransformer = searchTextTransformer,
+            listModel = listModel,
+            chains = chains,
+            atomics = atomics,
+        ).execute()
+    }
 
-        if (text == null) {
-            chains.forEach { listModel.addElement(it) }
-            atomics.forEach { listModel.addElement(it) }
-        } else {
-            val searchTexts = searchTextTransformer.transformedText(text)
+    private class SearchWorker(
+        private val text: String?,
+        private val searchTextTransformer: SearchTextTransformer,
+        private val listModel: DefaultListModel<Action>,
+        private val chains: List<ChainAction>,
+        private val atomics: List<AtomicAction>,
+    ) : SwingWorker<List<Action>, Unit>() {
+        override fun doInBackground(): List<Action> =
+            if (text == null) {
+                chains + atomics
+            } else {
+                val searchTexts = searchTextTransformer.transformedText(text)
 
-            chains
-                .filter { ch -> searchTexts.any { st -> ch.name.lowercase().contains(st) } }
-                .forEach { listModel.addElement(it) }
+                chains
+                    .filter { ch -> searchTexts.any { st -> ch.name.lowercase().contains(st) } } +
+                    atomics
+                        .filter { aa -> searchTexts.any { st -> aa.name.lowercase().contains(st) } }
+            }
 
-            atomics
-                .filter { aa -> searchTexts.any { st -> aa.name.lowercase().contains(st) } }
-                .forEach { listModel.addElement(it) }
+        override fun done() {
+            get().let {
+                listModel.removeAllElements()
+                it.forEach {
+                    listModel.addElement(it)
+                }
+            }
         }
     }
 

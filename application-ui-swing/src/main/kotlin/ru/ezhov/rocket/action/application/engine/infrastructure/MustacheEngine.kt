@@ -22,7 +22,7 @@ class MustacheEngine : Engine {
 
         logger.debug {
             "Time execute mustache script '$time'ms. " +
-                "Template='$template', variables=${variables.associate { it.name to it.value }}"
+                "Template='$template', variables=${variables.associate { it.name to it.value?.toString()?.take(3) }}}"
         }
 
         return result

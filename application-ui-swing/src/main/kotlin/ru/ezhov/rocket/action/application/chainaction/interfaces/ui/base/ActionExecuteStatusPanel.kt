@@ -15,9 +15,9 @@ import java.awt.Color
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import javax.swing.BorderFactory
-import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.JPopupMenu
+import javax.swing.JProgressBar
 import javax.swing.SwingUtilities
 
 private val logger = KotlinLogging.logger {}
@@ -37,7 +37,7 @@ class ActionExecuteStatusPanel(
             else -> throw UnsupportedOperationException("Unsupported action type")
         }
 
-        map.values.forEach { add(it.label, "width max") }
+        map.values.forEach { add(it.executionProgress, "width max") }
 
         repaint()
         revalidate()
@@ -97,15 +97,16 @@ class ActionExecuteStatusPanel(
         },
         private var success: Success? = null,
         private var failure: Failure? = null,
-        val label: JLabel = JLabel(" ")
+        val executionProgress: JProgressBar = JProgressBar()
             .apply {
                 background = Color.GRAY
+                isIndeterminate = true
                 isOpaque = true
                 border = BorderFactory.createEmptyBorder()
             },
     ) {
         init {
-            label.addMouseListener(object : MouseAdapter() {
+            executionProgress.addMouseListener(object : MouseAdapter() {
                 override fun mouseReleased(e: MouseEvent) {
                     val text = when {
                         success == null -> failure?.exception?.stackTraceToString() ?: "Not success"
@@ -115,21 +116,21 @@ class ActionExecuteStatusPanel(
 
                     resultChainPanel.setText(text)
 
-                    popupMenu.show(label, e.x, e.y)
+                    popupMenu.show(executionProgress, e.x, e.y)
                 }
             })
         }
 
         fun setSuccess(result: Success) {
             this.success = result
-
-            label.background = COLOR_SUCCESS
+            executionProgress.isIndeterminate = false
+            executionProgress.background = COLOR_SUCCESS
         }
 
         fun setFailure(result: Failure) {
             this.failure = result
-
-            label.background = COLOR_ERROR
+            executionProgress.isIndeterminate = false
+            executionProgress.background = COLOR_ERROR
         }
 
         data class Success(

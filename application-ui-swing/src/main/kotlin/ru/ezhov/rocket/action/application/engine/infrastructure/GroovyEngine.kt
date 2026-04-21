@@ -24,7 +24,7 @@ class GroovyEngine : Engine {
 
         logger.debug {
             "Time execute groovy script '$time'ms. " +
-                "Template='$template', variables=${variables.associate { it.name to it.value }}"
+                "Template='$template', variables=${variables.associate { it.name to it.value?.toString()?.take(3) }}"
         }
 
         return result

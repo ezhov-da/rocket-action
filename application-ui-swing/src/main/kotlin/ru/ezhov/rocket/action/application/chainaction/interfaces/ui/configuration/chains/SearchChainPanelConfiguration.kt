@@ -67,12 +67,14 @@ class SearchChainPanelConfiguration : JPanel(MigLayout("insets 0")) {
         unitUnitButton.addActionListener(actionListener)
 
         textField.addKeyListener(object : KeyAdapter() {
-            override fun keyReleased(e: KeyEvent?) {
-                firePropertyChange(
-                    SEARCH_ACTION_PROPERTY_NAME,
-                    null,
-                    SearchAction.SearchInfo(conditions = searchConditions(), text = searchText(textField.text))
-                )
+            override fun keyReleased(e: KeyEvent) {
+                if (e.keyCode == KeyEvent.VK_ENTER) {
+                    firePropertyChange(
+                        SEARCH_ACTION_PROPERTY_NAME,
+                        null,
+                        SearchAction.SearchInfo(conditions = searchConditions(), text = searchText(textField.text))
+                    )
+                }
             }
         })
         resetButton.addActionListener {

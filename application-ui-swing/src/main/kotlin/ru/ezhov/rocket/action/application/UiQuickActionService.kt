@@ -206,29 +206,53 @@ class UiQuickActionService(
     ) {
         if (e.keyCode == KeyEvent.VK_ENTER && e.isControlDown) {
             if (text.isNotEmpty()) {
-                val searchTexts = searchTextTransformer.transformedText(text)
-                val idsRA = searchTexts
-                    .map { searchService.search(it).toSet() }
-                    .flatten()
-                    .toSet()
+                val executor = SearchServiceExecutor(
+                    text,
+                    searchService = searchService,
+                    searchTextTransformer = searchTextTransformer,
+                    rocketActionSettingsService = rocketActionSettingsService,
+                ) { ra ->
+                    tf.background = ColorConstants.COLOR_SUCCESS
+                    fillMenuByRocketAction(ra, currentMenu!!)
+                }
 
-                val raByFullText = rocketActionSettingsService.actionsByIds(idsRA)
-                val raByContains = rocketActionSettingsService.actionsByContains(text)
-
-                (raByFullText + raByContains)
-                    .toSet()
-                    .takeIf { it.isNotEmpty() }
-                    ?.let { ra ->
-                        logger.info { "Found by search '$text': '${ra.size}'. Result search '$searchTexts'" }
-                        tf.background = ColorConstants.COLOR_SUCCESS
-                        fillMenuByRocketAction(ra, currentMenu!!)
-                    }
+                executor.execute()
             } else {
                 SwingUtilities.invokeLater { tf.background = Color.WHITE }
                 CreateMenuOrGetExistsWorker(currentMenu!!, Action.Restore).execute()
             }
         } else if (e.keyCode == KeyEvent.VK_ESCAPE) {
             resetSearch(textField = tf, menu = currentMenu!!)
+        }
+    }
+
+    private class SearchServiceExecutor(
+        private val searchText: String,
+        private val searchService: SearchService,
+        private val searchTextTransformer: SearchTextTransformer,
+        private val rocketActionSettingsService: RocketActionSettingsService,
+        private val actionWithActions: (Set<RocketAction>) -> Unit,
+    ) : SwingWorker<Set<RocketAction>?, Unit>() {
+        override fun doInBackground(): Set<RocketAction>? {
+            val searchTexts = searchTextTransformer.transformedText(searchText)
+            logger.info { "Result search '$searchTexts'" }
+            val idsRA = searchTexts
+                .flatMap { searchService.search(it).toSet() }
+                .toSet()
+
+            val raByFullText = rocketActionSettingsService.actionsByIds(idsRA)
+            val raByContains = rocketActionSettingsService.actionsByContains(searchText)
+
+            return (raByFullText + raByContains)
+                .toSet()
+                .takeIf { it.isNotEmpty() }
+        }
+
+        override fun done() {
+            get()?.let { ra ->
+                logger.info { "Found by search '$searchText': '${ra.size}'" }
+                actionWithActions(ra)
+            }
         }
     }
 
@@ -263,13 +287,14 @@ class UiQuickActionService(
 
         fun recursive(parent: JMenu, child: TagNode) {
             if (child.children.isEmpty()) {
-                parent.add(JMenuItem("${child.name} (${child.keys.size})")
-                    .apply {
-                        icon = iconTag
-                        addActionListener {
-                            invokeSearch(child.keys.toSet())
+                parent.add(
+                    JMenuItem("${child.name} (${child.keys.size})")
+                        .apply {
+                            icon = iconTag
+                            addActionListener {
+                                invokeSearch(child.keys.toSet())
+                            }
                         }
-                    }
                 )
             } else {
                 parent.add(
@@ -406,8 +431,7 @@ class UiQuickActionService(
     private inner class CreateMenuOrGetExistsWorker(
         private val baseMenu: JMenu,
         private val action: Action
-    ) :
-        SwingWorker<List<Component>, String?>() {
+    ) : SwingWorker<List<Component>, String?>() {
 
         init {
             baseMenu.icon = rocketActionContextFactory.context.icon().by(AppIcon.LOADER)

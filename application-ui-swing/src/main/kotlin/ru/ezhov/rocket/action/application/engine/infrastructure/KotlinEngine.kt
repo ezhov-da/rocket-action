@@ -27,7 +27,7 @@ class KotlinEngine : Engine {
 
             logger.debug {
                 "Time execute kotlin script '$time'ms. " +
-                    "Template='$template', variables=${variables.associate { it.name to it.value }}"
+                    "Template='$template', variables=${variables.associate { it.name to it.value?.toString()?.take(3) }}}"
             }
 
             result

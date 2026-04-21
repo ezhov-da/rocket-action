@@ -33,6 +33,7 @@ import javax.swing.JMenu
 import javax.swing.JPanel
 import javax.swing.JPopupMenu
 import javax.swing.JScrollPane
+import javax.swing.SwingWorker
 
 class ActionsConfigurationPanel(
     private val atomicActionService: AtomicActionService,
@@ -201,14 +202,32 @@ class ActionsConfigurationPanel(
     private fun fillList() {
         val sortInfo = sortActionPanelConfiguration.sortInfo()
         val searchAction = searchActionPanelConfiguration.searchAction()
+        SearchWorker(sortInfo, searchAction, atomicActionService, allListActionsModel).execute()
+    }
 
-        val filtered = AtomicActionsFilter.filter(sortInfo, searchAction, atomicActionService.atomics())
+    private class SearchWorker(
+        private val sortInfo: SortInfo,
+        private val searchAction: SearchAction,
+        private val atomicActionService: AtomicActionService,
+        private val allListActionsModel: DefaultListModel<AtomicAction>,
+    ) : SwingWorker<List<AtomicAction>, Unit>() {
+        override fun doInBackground(): List<AtomicAction> =
+            AtomicActionsFilter.filter(
+                sortInfo = sortInfo,
+                searchAction = searchAction,
+                actions = atomicActionService.atomics()
+            )
 
-        allListActionsModel.removeAllElements()
-        filtered.forEach {
-            allListActionsModel.addElement(it)
+        override fun done() {
+            get().let {
+                allListActionsModel.removeAllElements()
+                it.forEach {
+                    allListActionsModel.addElement(it)
+                }
+            }
         }
     }
+
 
     private fun showPopupMenu(element: AtomicAction, event: MouseEvent) {
         val chains = chainActionService.usageAction(element.id)

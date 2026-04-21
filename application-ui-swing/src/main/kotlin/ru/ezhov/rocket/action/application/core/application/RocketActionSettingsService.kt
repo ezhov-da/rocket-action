@@ -17,6 +17,8 @@ import ru.ezhov.rocket.action.application.plugin.group.GroupRocketActionUi
 import ru.ezhov.rocket.action.application.plugin.manager.application.RocketActionPluginApplicationService
 import ru.ezhov.rocket.action.application.tags.application.TagsService
 import java.awt.Component
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 import kotlin.system.measureTimeMillis
 
 private val logger = KotlinLogging.logger {}
@@ -60,7 +62,8 @@ class RocketActionSettingsService(
     fun loadAndGetAllComponents(): List<Component> {
         val measureTimeMillis = measureTimeMillis {
             val actionsModel = actionsModel()
-            fillTags(actionsModel)
+            // Tags are temporarily disabled
+            // fillTags(actionsModel)
             fillCache(actionsModel.actions)
             val cache = rocketActionComponentCache
             val components = mutableListOf<RocketActionAndComponent>()
@@ -122,9 +125,15 @@ class RocketActionSettingsService(
 
         val groupAndAnother = allActionSettings
             .groupBy { it.type == GroupRocketActionUi.TYPE }
-        groupAndAnother[false]?.forEach { settings -> createAndPutToCache(settings) }
-        // expand the list of groups, as we begin to create groups from child
-        groupAndAnother[true]?.reversed()?.forEach { settings -> createAndPutToCache(settings) }
+        // Non-group actions can be created in parallel
+        groupAndAnother[false]?.let { settings ->
+            createAndPutToCache(settings = settings, isUsedConcurrency = true)
+        }
+
+        // Expand the list of groups, as we begin to create groups from child
+        groupAndAnother[true]?.reversed()?.let { settings ->
+            createAndPutToCache(settings = settings, isUsedConcurrency = false)
+        }
     }
 
     private fun getAllActionSettings(
@@ -145,34 +154,64 @@ class RocketActionSettingsService(
         }
     }
 
-    private fun createAndPutToCache(settings: RocketActionSettingsModel) {
-        val rau = rocketActionPluginApplicationService.by(settings.type)
-            ?.factory(rocketActionContextFactory.context)
-        val cache = rocketActionComponentCache
-        if (rau != null) {
-            val rocketActionCached = cache.by(settings.id)
-            val isChanged =
-                rocketActionCached
-                    ?.origin
-                    ?.isChanged(settings.to(engineService))
-                    ?: true
-
-            logger.debug { "must be create '$isChanged' type='${settings.type}' id='${settings.id}'" }
-
-            if (isChanged) {
-                val newAction = rau.create(
-                    settings = settings.to(engineService),
-                    context = rocketActionContextFactory.context
-                )
-
-                logger.debug { "added to cache type='${settings.type}' id='${settings.id}'" }
-
-                newAction?.let {
-                    cache.add(settings.id, RocketActionCached.newRocketAction(it))
+    private fun createAndPutToCache(settings: List<RocketActionSettingsModel>, isUsedConcurrency: Boolean) {
+        val tasks = settings.map { setting ->
+            Runnable {
+                logger.debug {
+                    "Start fill cache by type '${setting.type}' and id '${setting.id}'. " +
+                        "isUsedConcurrency '$isUsedConcurrency'"
                 }
-            } else {
-                rocketActionCached?.let { cache.add(settings.id, it.toNotChanged()) }
+
+                val rau = rocketActionPluginApplicationService.by(setting.type)
+                    ?.factory(rocketActionContextFactory.context)
+
+                val cache = rocketActionComponentCache
+
+                if (rau != null) {
+                    val rocketActionCached = cache.by(setting.id)
+                    val isChanged =
+                        rocketActionCached
+                            ?.origin
+                            ?.isChanged(setting.to(engineService))
+                            ?: true
+
+                    logger.debug { "must be create '$isChanged' type='${setting.type}' id='${setting.id}'" }
+
+                    if (isChanged) {
+                        val newAction = rau.create(
+                            settings = setting.to(engineService),
+                            context = rocketActionContextFactory.context
+                        )
+
+                        logger.debug { "added to cache type='${setting.type}' id='${setting.id}'" }
+
+                        newAction?.let {
+                            cache.add(setting.id, RocketActionCached.newRocketAction(it))
+                        }
+                    } else {
+                        rocketActionCached?.let { cache.add(setting.id, it.toNotChanged()) }
+                    }
+                }
             }
+        }
+
+        if (isUsedConcurrency) {
+            val executor = Executors.newFixedThreadPool(20)
+            tasks.forEach { executor.execute(it) }
+            executor.shutdown()
+
+            try {
+                if (!executor.awaitTermination(5, TimeUnit.MINUTES)) {
+                    System.err.println("Tasks took too long; forcing shutdown.")
+                    executor.shutdownNow()
+                }
+            } catch (ex: Exception) {
+                logger.error(ex) { "Error when shutdown executor for fill cache rocket actions" }
+                executor.shutdownNow()
+                Thread.currentThread().interrupt()
+            }
+        } else {
+            tasks.forEach { it.run() }
         }
     }
 
