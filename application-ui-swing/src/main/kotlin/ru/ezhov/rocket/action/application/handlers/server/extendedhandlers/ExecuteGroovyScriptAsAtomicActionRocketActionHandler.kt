@@ -7,50 +7,50 @@ import ru.ezhov.rocket.action.api.handler.RocketActionHandlerCommandContract
 import ru.ezhov.rocket.action.api.handler.RocketActionHandlerProperty
 import ru.ezhov.rocket.action.api.handler.RocketActionHandlerPropertyKey
 import ru.ezhov.rocket.action.api.handler.RocketActionHandlerPropertySpec
-import ru.ezhov.rocket.action.application.chainaction.application.AtomicActionService
-import ru.ezhov.rocket.action.application.chainaction.application.ChainActionService
 import ru.ezhov.rocket.action.application.chainaction.domain.ActionExecutor
 import ru.ezhov.rocket.action.application.chainaction.domain.ProgressExecutingAction
 import ru.ezhov.rocket.action.application.chainaction.domain.model.AtomicAction
+import ru.ezhov.rocket.action.application.chainaction.domain.model.AtomicActionEngine
+import ru.ezhov.rocket.action.application.chainaction.domain.model.AtomicActionSource
+import ru.ezhov.rocket.action.application.chainaction.domain.model.ContractType
+import java.util.*
 
-private const val COMMAND_NAME = "execute-action"
-private const val ACTION_ID_KEY = "_id"
-private const val PARAM_KEY = "text"
+private const val COMMAND_NAME = "execute-script"
+private const val PARAM_KEY_SCRIPT = "script"
+private const val PARAM_KEY_TEXT = "text"
 private const val RESULT_KEY = "result"
 
 @Component
-class ExecuteActionRocketActionHandler(
-    private val chainActionService: ChainActionService,
-    private val atomicActionService: AtomicActionService,
+class ExecuteGroovyScriptAsAtomicActionRocketActionHandler(
     private val actionExecutor: ActionExecutor
 ) : ExtendedRocketActionHandler {
-    override fun id(): String = "48344b6d-cea7-4460-8c0e-7824d661d10e"
+    override fun id(): String = "70c5601c-396f-45e2-a052-af7c3f551dbb"
 
     override fun contracts(): List<RocketActionHandlerCommandContract> = listOf(
         object : RocketActionHandlerCommandContract {
             override fun commandName(): String = COMMAND_NAME
 
-            override fun title(): String = "Execute chain or atomic action"
+            override fun title(): String = "Execute script as atomic action"
 
-            override fun description(): String = "Execute chain or atomic action"
+            override fun description(): String = "Execute script as atomic action"
 
             override fun inputArguments(): List<RocketActionHandlerProperty> = listOf(
                 object : RocketActionHandlerProperty {
-                    override fun key(): RocketActionHandlerPropertyKey = RocketActionHandlerPropertyKey(ACTION_ID_KEY)
+                    override fun key(): RocketActionHandlerPropertyKey =
+                        RocketActionHandlerPropertyKey(PARAM_KEY_SCRIPT)
 
-                    override fun name(): String = "Action ID"
+                    override fun name(): String = "Script"
 
-                    override fun description(): String = "Action ID"
+                    override fun description(): String = "Script"
 
                     override fun isRequired(): Boolean = true
 
                     override fun property(): RocketActionHandlerPropertySpec =
                         RocketActionHandlerPropertySpec.StringPropertySpec()
-
                 },
                 object : RocketActionHandlerProperty {
                     override fun key(): RocketActionHandlerPropertyKey =
-                        RocketActionHandlerPropertyKey(PARAM_KEY)
+                        RocketActionHandlerPropertyKey(PARAM_KEY_TEXT)
 
                     override fun name(): String = "Action parameter"
 
@@ -83,26 +83,33 @@ class ExecuteActionRocketActionHandler(
 
     override fun handle(command: RocketActionHandlerCommand): RocketActionHandleStatus {
         return if (command.commandName == COMMAND_NAME) {
-            val id = command.arguments[ACTION_ID_KEY]
-                ?: return RocketActionHandleStatus.InvalidInputData(listOf("Parameter '$ACTION_ID_KEY' is required"))
+            val script = command.arguments[PARAM_KEY_SCRIPT]
+                ?: return RocketActionHandleStatus.InvalidInputData(listOf("Parameter '$PARAM_KEY_SCRIPT' is required"))
 
-            val text = command.arguments[PARAM_KEY]
-
-            val action = chainActionService.byId(id) ?: atomicActionService.atomicBy(id)
-            ?: return RocketActionHandleStatus.InvalidInputData(listOf("Action by ID '$id' is not found"))
+            val text = command.arguments[PARAM_KEY_TEXT]
 
             var executeResult: RocketActionHandleStatus? = null
 
+            val id = UUID.randomUUID()
             actionExecutor.execute(
                 input = text,
-                action = action,
+                action = AtomicAction(
+                    id = "rest-stub-$id",
+                    name = "Dynamic Rest API atomic action $id",
+                    description = "skipped",
+                    contractType = ContractType.IN_OUT,
+                    engine = AtomicActionEngine.GROOVY,
+                    source = AtomicActionSource.TEXT,
+                    data = script,
+                    alias = null,
+                    icon = null,
+                ),
                 progressExecutingAction = object : ProgressExecutingAction {
                     override fun onComplete(result: Any?, lastAtomicAction: AtomicAction) {
                         executeResult = if (result == null) {
                             RocketActionHandleStatus.Success()
                         } else {
                             RocketActionHandleStatus.Success(mapOf(RESULT_KEY to result.toString()))
-
                         }
                     }
 
