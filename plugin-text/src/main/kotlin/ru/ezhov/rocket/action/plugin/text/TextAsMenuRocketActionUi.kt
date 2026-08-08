@@ -17,7 +17,6 @@ import ru.ezhov.rocket.action.ui.utils.swing.common.toImage
 import java.awt.BorderLayout
 import java.awt.Component
 import java.awt.Font
-import java.awt.GraphicsEnvironment
 import java.awt.Toolkit
 import java.awt.datatransfer.StringSelection
 import java.awt.event.ActionEvent
@@ -66,7 +65,6 @@ class TextAsMenuRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
     override fun properties(): List<RocketActionConfigurationProperty> =
         listOf(
             createRocketActionProperty(key = LABEL, name = LABEL, description = "Title", required = true),
-            createRocketActionProperty(key = LABEL, name = LABEL, description = "Title", required = true),
             createRocketActionProperty(key = TEXT, name = TEXT, description = "Text", required = true),
             createRocketActionProperty(
                 key = DESCRIPTION,
@@ -82,16 +80,20 @@ class TextAsMenuRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
             ),
         )
 
-    private fun getFonts(): List<String> =
-        GraphicsEnvironment
-            .getLocalGraphicsEnvironment()
-            .availableFontFamilyNames
-            .toList()
-            .sorted()
-
     override fun create(settings: RocketActionSettings, context: RocketActionContext): RocketAction? =
         settings.settings()[LABEL]?.takeIf { it.isNotEmpty() }?.let { label ->
             settings.settings()[TEXT]?.takeIf { it.isNotEmpty() }?.let { text ->
+                val newFont = settings.settings()[FONT_NAME]
+                    ?.let { fontName ->
+                        try {
+                            Font(fontName, Font.PLAIN, 12)
+                        } catch (ex: Exception) {
+                            logger.warn(ex) { "Wrong font name '$fontName' for set font" }
+                            null
+                        }
+                    }
+
+
                 val description = settings.settings()[DESCRIPTION]
                 val menu = JMenu(label).apply {
                     this.icon = actionContext!!.icon().by(AppIcon.TEXT)
@@ -134,6 +136,7 @@ class TextAsMenuRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
                                                     .by(AppIcon.ROCKET_APP)
                                                     .toImage()
                                                 frame.add(JScrollPane(JTextPane().apply {
+                                                    newFont?.let { font = it }
                                                     this.text = text
                                                     isEditable = false
                                                 }))
@@ -151,16 +154,6 @@ class TextAsMenuRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
                         },
                         BorderLayout.NORTH
                     )
-
-                    val newFont = settings.settings()[FONT_NAME]
-                        ?.let { fontName ->
-                            try {
-                                Font(fontName, Font.PLAIN, 12)
-                            } catch (ex: Exception) {
-                                logger.warn(ex) { "Wrong font name '$fontName' for set font" }
-                                null
-                            }
-                        }
 
                     panel.add(
                         JTextPane().apply {
