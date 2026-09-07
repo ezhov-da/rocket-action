@@ -74,7 +74,11 @@ class GroupRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
             val cache = RocketActionComponentCacheFactory.cache
             settings.actions().forEach { settings ->
                 // the mandatory presence of a child component controls the creation of groups last
-                menu.add(cache.by(settings.id())!!.origin.component())
+
+                val actionCached = cache.by(settings.id())
+                    ?: throw RuntimeException("Action by '${settings.id()}' is not found")
+
+                menu.add(actionCached.origin.component())
             }
 
             DomainEventFactory.subscriberRegistrar.subscribe(
