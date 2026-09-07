@@ -9,6 +9,7 @@ class AtomicActionExecutorPublicApiImpl(
     private val engineFactory: EngineFactory,
     private val variablesApplication: VariablesApplication,
     private val atomicActionService: AtomicActionService,
+    private val contextMap: Map<String, Any?>
 ) : AtomicActionExecutorPublicApi {
     override fun execute(alias: String, arg: Any?): Any? {
         val atomic = atomicActionService.byAlias(alias)
@@ -18,6 +19,7 @@ class AtomicActionExecutorPublicApiImpl(
             engineFactory = engineFactory,
             variablesApplication = variablesApplication,
             atomicActionService = atomicActionService,
+            contextMap = contextMap,
         ).executeScript(arg, atomic)
     }
 }

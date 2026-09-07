@@ -1,5 +1,5 @@
 {
-  "changedDate" : [ 2026, 4, 23, 10, 17, 41, 908000000 ],
+  "changedDate" : [ 2026, 9, 7, 23, 40, 49, 516000000 ],
   "atomicActions" : [ {
     "id" : "ccb3ea04-68ef-4988-84f1-2d95e14c0046",
     "name" : "Убирает начальные и конечные пробелы у строки (test)",
@@ -178,6 +178,36 @@
     "engine" : "GROOVY",
     "source" : "TEXT",
     "data" : "Thread.sleep(60000)",
+    "alias" : null,
+    "icon" : null
+  }, {
+    "id" : "d66ca5a7-6b7d-4f5e-9c6d-05cbab19ca40",
+    "name" : "Действие для тестирования контекста 1 | Кладём в контекст",
+    "description" : "",
+    "contractType" : "UNIT_UNIT",
+    "engine" : "GROOVY",
+    "source" : "TEXT",
+    "data" : "_CONTEXT[\"test1\"] = \"test1\"",
+    "alias" : null,
+    "icon" : null
+  }, {
+    "id" : "f016cedb-0488-49a8-9729-9c6430832641",
+    "name" : "Действие для тестирования контекста 2 | Кладём в контекст",
+    "description" : "",
+    "contractType" : "UNIT_UNIT",
+    "engine" : "GROOVY",
+    "source" : "TEXT",
+    "data" : "_CONTEXT[\"test2\"] = \"test2\"",
+    "alias" : null,
+    "icon" : null
+  }, {
+    "id" : "665c4fa7-0786-4886-94a2-12fde8321a20",
+    "name" : "Действие для тестирования контекста 3 | Получаем из контекста",
+    "description" : "",
+    "contractType" : "UNIT_OUT",
+    "engine" : "GROOVY",
+    "source" : "TEXT",
+    "data" : "_CONTEXT[\"test1\"] + \" | \" + _CONTEXT[\"test2\"]",
     "alias" : null,
     "icon" : null
   } ]

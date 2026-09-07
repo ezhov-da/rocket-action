@@ -15,6 +15,7 @@ class AtomicActionScriptExecutor(
     private val engineFactory: EngineFactory,
     private val variablesApplication: VariablesApplication,
     private val atomicActionService: AtomicActionService,
+    private val contextMap: Map<String, Any?>
 ) {
     fun executeScript(inputValue: Any?, atomicAction: AtomicAction): Any? {
         val script = when (atomicAction.source) {
@@ -44,11 +45,16 @@ class AtomicActionScriptExecutor(
                         value = inputValue,
                     ) +
                     EngineVariable(
+                        name = ActionExecutor.CONTEXT_NAME,
+                        value = contextMap,
+                    ) +
+                    EngineVariable(
                         name = ActionExecutor.ATOMIC_ACTION_EXECUTOR_ARG_NAME,
                         value = AtomicActionExecutorPublicApiImpl(
                             engineFactory = engineFactory,
                             variablesApplication = variablesApplication,
                             atomicActionService = atomicActionService,
+                            contextMap = contextMap,
                         ),
                     ) +
                     EngineVariable(

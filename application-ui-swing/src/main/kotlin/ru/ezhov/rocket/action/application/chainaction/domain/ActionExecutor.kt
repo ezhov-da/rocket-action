@@ -6,6 +6,7 @@ import ru.ezhov.rocket.action.application.engine.domain.Engine
 interface ActionExecutor {
     companion object {
         const val INPUT_ARG_NAME = "_INPUT"
+        const val CONTEXT_NAME = "_CONTEXT"
         const val ATOMIC_ACTION_EXECUTOR_ARG_NAME = "_AA"
         const val ATOMIC_ACTION_VARIABLE_UPDATER_ARG_NAME = "_V"
     }
@@ -16,6 +17,11 @@ interface ActionExecutor {
         AdditionalVariable(
             name = INPUT_ARG_NAME,
             description = "Variable storing input value",
+        ),
+        AdditionalVariable(
+            name = CONTEXT_NAME,
+            description = "Variable as a map for sharing context between actions. " +
+                "Call map method for get or put value",
         ),
         AdditionalVariable(
             name = Engine.VARIABLES_NAME,
@@ -30,8 +36,7 @@ interface ActionExecutor {
             name = ATOMIC_ACTION_VARIABLE_UPDATER_ARG_NAME,
             description = "Object API for update variable. " +
                 "Call method `${ATOMIC_ACTION_VARIABLE_UPDATER_ARG_NAME}.updateValue(\"name\", \"value\")`",
-        )
-
+        ),
     )
 }
 

@@ -393,9 +393,8 @@ private class RunWorker(
     override fun done() {
         callback?.let { cb ->
             try {
-                get()?.let {
-                    cb.invoke(it)
-                }
+                get()
+                    ?.let { cb.invoke(it) }
             } catch (ex: Exception) {
                 cb.invoke("${ex.message}\n${ex.stackTraceToString()}")
             }
