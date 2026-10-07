@@ -29,7 +29,7 @@
         <logback-classic.version>1.2.11</logback-classic.version>
         <swingx.version>1.6.5-1</swingx.version>
         <mustache.version>0.9.10</mustache.version>
-        <groovy.version>4.0.13</groovy.version>
+        <groovy.version>4.0.33</groovy.version>
         <mockk.version>1.13.4</mockk.version>
         <jackson.version>2.18.5</jackson.version>
         <snakeyaml.version>1.30</snakeyaml.version>
