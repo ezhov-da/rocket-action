@@ -12,7 +12,6 @@ import ru.ezhov.rocket.action.application.plugin.manager.infrastructure.loaders.
 import ru.ezhov.rocket.action.application.plugin.manager.infrastructure.loaders.GroovyPluginLoader
 import ru.ezhov.rocket.action.application.plugin.manager.infrastructure.loaders.InnerPluginLoader
 import ru.ezhov.rocket.action.application.plugin.manager.infrastructure.loaders.JarsPluginLoader
-import ru.ezhov.rocket.action.application.plugin.manager.infrastructure.loaders.KotlinPluginLoader
 import java.util.concurrent.ConcurrentLinkedQueue
 import kotlin.system.measureTimeMillis
 
@@ -24,7 +23,6 @@ class PluginsReflectionRocketActionPluginRepository(
     private val jarsPluginLoader: JarsPluginLoader,
     private val classPathPluginLoader: ClassPathPluginLoader,
     private val groovyPluginLoader: GroovyPluginLoader,
-    private val kotlinPluginLoader: KotlinPluginLoader,
     private val rocketActionContextFactory: RocketActionContextFactory,
 ) : RocketActionPluginRepository {
     private var list: ConcurrentLinkedQueue<RocketActionPluginSpec> = ConcurrentLinkedQueue()
@@ -73,24 +71,13 @@ class PluginsReflectionRocketActionPluginRepository(
                 .awaitAll()
                 .toList()
 
-            // from kotlin plugin
-            val fromKotlin = kotlinPluginLoader
-                .plugins()
-                .map { file ->
-                    async {
-                        kotlinPluginLoader.loadPlugin(file)
-                    }
-                }
-                .awaitAll()
-                .toList()
 
             logger.info {
                 "Load plugins. " +
                     "jars='${fromJars.size}' " +
                     "inner='${inner.size}' " +
                     "extended='${extended.size}' " +
-                    "groovy='${fromGroovy.size}' " +
-                    "kotlin='${fromKotlin.size}' "
+                    "groovy='${fromGroovy.size}' "
             }
 
             val allPlugins = ConcurrentLinkedQueue<RocketActionPluginSpec>()
@@ -98,7 +85,6 @@ class PluginsReflectionRocketActionPluginRepository(
             allPlugins.addAll(inner)
             allPlugins.addAll(extended)
             allPlugins.addAll(fromGroovy)
-            allPlugins.addAll(fromKotlin)
 
             list = allPlugins
         }

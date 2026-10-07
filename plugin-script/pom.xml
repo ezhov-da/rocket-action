@@ -10,7 +10,7 @@
     </parent>
 
     <artifactId>rocket-action-plugin-script</artifactId>
-    <version>${plugin-api.version}_5</version>
+    <version>${plugin-api.version}_6</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -29,12 +29,6 @@
             <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-stdlib</artifactId>
             <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.jetbrains.kotlin</groupId>
-            <artifactId>kotlin-scripting-jsr223</artifactId>
-            <version>${kotlin.version}</version>
         </dependency>
 
         <dependency>

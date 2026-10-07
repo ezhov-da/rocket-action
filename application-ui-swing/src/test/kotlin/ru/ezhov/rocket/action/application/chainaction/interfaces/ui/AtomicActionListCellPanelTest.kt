@@ -26,7 +26,7 @@ fun main(args: Array<String>) {
                     name = "Test name",
                     description = "Test description",
                     contractType = ContractType.IN_OUT,
-                    engine = AtomicActionEngine.KOTLIN,
+                    engine = AtomicActionEngine.GROOVY,
                     source = AtomicActionSource.FILE,
                     data = "Text",
                 ),

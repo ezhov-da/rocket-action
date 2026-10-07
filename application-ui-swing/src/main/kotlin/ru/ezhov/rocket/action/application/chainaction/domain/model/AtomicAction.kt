@@ -62,5 +62,4 @@ enum class AtomicActionSource {
 
 enum class AtomicActionEngine {
     GROOVY,
-    KOTLIN,
 }

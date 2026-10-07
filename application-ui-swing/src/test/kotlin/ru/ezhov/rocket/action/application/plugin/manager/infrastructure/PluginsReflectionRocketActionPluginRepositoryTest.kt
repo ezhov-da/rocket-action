@@ -8,7 +8,6 @@ import ru.ezhov.rocket.action.application.plugin.manager.infrastructure.loaders.
 import ru.ezhov.rocket.action.application.plugin.manager.infrastructure.loaders.GroovyPluginLoader
 import ru.ezhov.rocket.action.application.plugin.manager.infrastructure.loaders.InnerPluginLoader
 import ru.ezhov.rocket.action.application.plugin.manager.infrastructure.loaders.JarsPluginLoader
-import ru.ezhov.rocket.action.application.plugin.manager.infrastructure.loaders.KotlinPluginLoader
 
 class PluginsReflectionRocketActionPluginRepositoryTest {
     @Test
@@ -19,7 +18,6 @@ class PluginsReflectionRocketActionPluginRepositoryTest {
             jarsPluginLoader = context.getBean(JarsPluginLoader::class.java),
             classPathPluginLoader = context.getBean(ClassPathPluginLoader::class.java),
             groovyPluginLoader = context.getBean(GroovyPluginLoader::class.java),
-            kotlinPluginLoader = context.getBean(KotlinPluginLoader::class.java),
             rocketActionContextFactory = context.getBean(RocketActionContextFactory::class.java),
         )
         val list = repo.all()

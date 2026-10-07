@@ -35,7 +35,7 @@ internal class ActionExecutorImplTest {
                 source = AtomicActionSource.TEXT,
                 data = "_INPUT + 2",
                 contractType = ContractType.IN_OUT,
-                engine = AtomicActionEngine.KOTLIN,
+                engine = AtomicActionEngine.GROOVY,
                 name = "Int plus Int",
                 description = "Int plus Int",
             )
@@ -106,7 +106,7 @@ internal class ActionExecutorImplTest {
                 source = AtomicActionSource.TEXT,
                 data = "_INPUT +. 2",
                 contractType = ContractType.IN_OUT,
-                engine = AtomicActionEngine.KOTLIN,
+                engine = AtomicActionEngine.GROOVY,
                 name = "Int plus Int",
                 description = "Int plus Int",
             )
@@ -235,7 +235,7 @@ internal class ActionExecutorImplTest {
                 source = AtomicActionSource.TEXT,
                 data = "_INPUT +. 2",
                 contractType = ContractType.IN_OUT,
-                engine = AtomicActionEngine.KOTLIN,
+                engine = AtomicActionEngine.GROOVY,
                 name = "Int plus Int",
                 description = "Int plus Int",
             ),

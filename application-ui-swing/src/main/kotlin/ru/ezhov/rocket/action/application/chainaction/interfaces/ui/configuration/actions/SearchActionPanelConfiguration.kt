@@ -27,7 +27,6 @@ class SearchActionPanelConfiguration : JPanel(MigLayout("insets 0")) {
     private val unitOutButton = JToggleButton(ChainIcons.UNIT_OUT_ICON_16x16)
     private val unitUnitButton = JToggleButton(ChainIcons.UNIT_UNIT_ICON_16x16)
     private val allEngineButton = JToggleButton("All")
-    private val kotlinButton = JToggleButton(Icons.Advanced.KOTLIN_16x16)
     private val groovyButton = JToggleButton(Icons.Advanced.GROOVY_16x16)
     private val allSourceButton = JToggleButton("All")
     private val textButton = JToggleButton(Icons.Standard.ALIGN_CENTER_16x16)
@@ -49,7 +48,6 @@ class SearchActionPanelConfiguration : JPanel(MigLayout("insets 0")) {
 
         ButtonGroup().apply {
             add(allEngineButton)
-            add(kotlinButton)
             add(groovyButton)
         }
 
@@ -69,7 +67,6 @@ class SearchActionPanelConfiguration : JPanel(MigLayout("insets 0")) {
 
         allEngineButton.isSelected = true
         add(allEngineButton)
-        add(kotlinButton, "wmax 35, hmax 25")
         add(groovyButton, "wmax 35, hmax 25")
         add(JSeparator(JSeparator.VERTICAL), "wmin 10, wmax 35, hmax 25")
 
@@ -97,7 +94,6 @@ class SearchActionPanelConfiguration : JPanel(MigLayout("insets 0")) {
         unitUnitButton.addActionListener(actionListener)
 
         allEngineButton.addActionListener(actionListener)
-        kotlinButton.addActionListener(actionListener)
         groovyButton.addActionListener(actionListener)
 
         allSourceButton.addActionListener(actionListener)
@@ -125,7 +121,8 @@ class SearchActionPanelConfiguration : JPanel(MigLayout("insets 0")) {
     private fun searchText(inputText: String): List<String> =
         searchTextTransformer.transformedText(inputText)
 
-    fun searchAction(): SearchAction = SearchAction.SearchInfo(conditions = searchConditions(), text = searchText(textField.text))
+    fun searchAction(): SearchAction =
+        SearchAction.SearchInfo(conditions = searchConditions(), text = searchText(textField.text))
 
     private fun searchConditions(): List<SearchAction.SearchCondition> =
         mutableListOf<SearchAction.SearchCondition>().apply {
@@ -133,7 +130,6 @@ class SearchActionPanelConfiguration : JPanel(MigLayout("insets 0")) {
             inUnitButton.takeIf { it.isSelected }?.let { add(SearchAction.SearchCondition.IN_UNIT) }
             unitOutButton.takeIf { it.isSelected }?.let { add(SearchAction.SearchCondition.UNIT_OUT) }
             unitUnitButton.takeIf { it.isSelected }?.let { add(SearchAction.SearchCondition.UNIT_UNIT) }
-            kotlinButton.takeIf { it.isSelected }?.let { add(SearchAction.SearchCondition.KOTLIN) }
             groovyButton.takeIf { it.isSelected }?.let { add(SearchAction.SearchCondition.GROOVY) }
             textButton.takeIf { it.isSelected }?.let { add(SearchAction.SearchCondition.TEXT) }
             fileButton.takeIf { it.isSelected }?.let { add(SearchAction.SearchCondition.FILE) }
@@ -157,7 +153,6 @@ sealed class SearchAction(
         IN_UNIT,
         UNIT_OUT,
         UNIT_UNIT,
-        KOTLIN,
         GROOVY,
         TEXT,
         FILE,

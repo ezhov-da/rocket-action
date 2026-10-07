@@ -76,7 +76,6 @@ class ScriptMenu(
     ) : JPanel() {
         val textPaneScript = RSyntaxTextArea().apply {
             syntaxEditingStyle = when (scriptEngine.type()) {
-                ScriptEngineType.KOTLIN -> SyntaxConstants.SYNTAX_STYLE_KOTLIN
                 ScriptEngineType.GROOVY -> SyntaxConstants.SYNTAX_STYLE_KOTLIN
             }
             isCodeFoldingEnabled = true

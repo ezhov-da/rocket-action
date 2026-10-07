@@ -66,8 +66,7 @@ class CreateAndEditAtomicActionDialog(
     private val unitUnitRadioButton: JRadioButton = JRadioButton("UNIT and UNIT")
 
     private val engineLabel: JLabel = JLabel("Engine:")
-    private val kotlinEngine: JRadioButton = JRadioButton("Kotlin")
-    private val groovyEngine: JRadioButton = JRadioButton("Groovy")
+    private val groovyEngine: JRadioButton = JRadioButton("Groovy").apply { isSelected = true }
 
     private val sourceLabel: JLabel = JLabel("Source:")
     private val textSource: JRadioButton = JRadioButton("Text")
@@ -85,9 +84,7 @@ class CreateAndEditAtomicActionDialog(
     private val actionExecutePanel = ActionExecutePanel(actionExecutorService)
 
     init {
-        kotlinEngine.isSelected = true
         val engineButtonGroup = ButtonGroup()
-        engineButtonGroup.add(kotlinEngine)
         engineButtonGroup.add(groovyEngine)
 
         textSource.isSelected = true
@@ -122,8 +119,7 @@ class CreateAndEditAtomicActionDialog(
         contentPane.add(unitOutRadioButton)
         contentPane.add(unitUnitRadioButton, "wrap")
 
-        contentPane.add(engineLabel, "split 3")
-        contentPane.add(kotlinEngine)
+        contentPane.add(engineLabel, "split 2")
         contentPane.add(groovyEngine, "wrap")
 
         contentPane.add(sourceLabel, "split 3")
@@ -151,11 +147,6 @@ class CreateAndEditAtomicActionDialog(
         buttonSaveAndClose.addActionListener { onOK(isClosed = true) }
         buttonCancel.addActionListener { onCancel() }
 
-        setKotlinSyntax()
-        kotlinEngine.addActionListener {
-            setKotlinSyntax()
-        }
-
         setGroovySyntax()
         groovyEngine.addActionListener {
             setGroovySyntax()
@@ -178,12 +169,6 @@ class CreateAndEditAtomicActionDialog(
 
         size = SizeUtil.dimension(0.8, 0.8)
         setLocationRelativeTo(null)
-    }
-
-    private fun setKotlinSyntax() {
-        if (kotlinEngine.isSelected) {
-            dataTextPane.syntaxEditingStyle = SyntaxConstants.SYNTAX_STYLE_KOTLIN
-        }
     }
 
     private fun setGroovySyntax() {
@@ -210,11 +195,7 @@ class CreateAndEditAtomicActionDialog(
                         } else {
                             ContractType.UNIT_UNIT
                         },
-                        engine = if (groovyEngine.isSelected) {
-                            AtomicActionEngine.GROOVY
-                        } else {
-                            AtomicActionEngine.KOTLIN
-                        },
+                        engine = AtomicActionEngine.GROOVY,
                         source = if (textSource.isSelected) {
                             AtomicActionSource.TEXT
                         } else {
@@ -240,11 +221,7 @@ class CreateAndEditAtomicActionDialog(
                     } else {
                         ContractType.UNIT_UNIT
                     }
-                    engine = if (groovyEngine.isSelected) {
-                        AtomicActionEngine.GROOVY
-                    } else {
-                        AtomicActionEngine.KOTLIN
-                    }
+                    engine = AtomicActionEngine.GROOVY
                     source = if (textSource.isSelected) {
                         AtomicActionSource.TEXT
                     } else {
@@ -279,7 +256,7 @@ class CreateAndEditAtomicActionDialog(
         idTextField.text = ""
         nameTextField.text = ""
         descriptionTextPane.text = ""
-        kotlinEngine.isSelected = true
+        groovyEngine.isSelected = true
         textSource.isSelected = true
         dataTextPane.text = ""
         aliasTextField.text = ""
@@ -323,7 +300,6 @@ class CreateAndEditAtomicActionDialog(
         }
 
         when (action.engine) {
-            AtomicActionEngine.KOTLIN -> kotlinEngine.isSelected = true
             AtomicActionEngine.GROOVY -> groovyEngine.isSelected = true
         }
 

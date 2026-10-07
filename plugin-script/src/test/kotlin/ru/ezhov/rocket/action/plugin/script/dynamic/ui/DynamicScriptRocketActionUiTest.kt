@@ -12,7 +12,7 @@ import ru.ezhov.rocket.action.api.context.notification.NotificationService
 import ru.ezhov.rocket.action.api.context.notification.NotificationType
 import ru.ezhov.rocket.action.api.context.search.Search
 import ru.ezhov.rocket.action.api.context.variables.VariablesService
-import ru.ezhov.rocket.action.plugin.script.kotlin.ui.KotlinScriptRocketActionUi
+import ru.ezhov.rocket.action.plugin.script.groovy.ui.GroovyScriptRocketActionUi
 import java.awt.BorderLayout
 import javax.swing.ImageIcon
 import javax.swing.JFrame
@@ -49,39 +49,41 @@ fun main() {
                 every { register(any(), any()) } returns Unit
             }
         })
-        val rocketAction = factory.create(object : RocketActionSettings {
-            override fun id(): String = "123"
+        val rocketAction = factory.create(
+            object : RocketActionSettings {
+                override fun id(): String = "123"
 
-            override fun type(): RocketActionType = RocketActionType { KotlinScriptRocketActionUi.TYPE }
+                override fun type(): RocketActionType = RocketActionType { GroovyScriptRocketActionUi.TYPE }
 
-            override fun settings(): Map<String, String> = mapOf(
-                DynamicScriptRocketActionUi.LABEL to "TEST",
-                DynamicScriptRocketActionUi.SCRIPT to "\"\$_v1 \$_v2\"",
-                DynamicScriptRocketActionUi.DESCRIPTION to "Description",
-                DynamicScriptRocketActionUi.COUNT_VARIABLES to "2",
-                DynamicScriptRocketActionUi.SELECTED_SCRIPT_LANG to "GROOVY",
-                DynamicScriptRocketActionUi.FIELD_NAMES to "First field: And default value\nSecond field",
-                DynamicScriptRocketActionUi.INSTRUCTION to "First row\nSecond row",
-            )
+                override fun settings(): Map<String, String> = mapOf(
+                    DynamicScriptRocketActionUi.LABEL to "TEST",
+                    DynamicScriptRocketActionUi.SCRIPT to "\"\$_v1 \$_v2\"",
+                    DynamicScriptRocketActionUi.DESCRIPTION to "Description",
+                    DynamicScriptRocketActionUi.COUNT_VARIABLES to "2",
+                    DynamicScriptRocketActionUi.SELECTED_SCRIPT_LANG to "GROOVY",
+                    DynamicScriptRocketActionUi.FIELD_NAMES to "First field: And default value\nSecond field",
+                    DynamicScriptRocketActionUi.INSTRUCTION to "First row\nSecond row",
+                )
 
-            override fun actions(): List<RocketActionSettings> = emptyList()
-        }, context = object : RocketActionContext {
-            override fun icon(): IconService = mockk {
-                every { by(any()) } returns ImageIcon()
-            }
+                override fun actions(): List<RocketActionSettings> = emptyList()
+            },
+            context = object : RocketActionContext {
+                override fun icon(): IconService = mockk {
+                    every { by(any()) } returns ImageIcon()
+                }
 
-            override fun notification(): NotificationService = notificationServiceTestImpl
+                override fun notification(): NotificationService = notificationServiceTestImpl
 
-            override fun cache(): CacheService = mockk()
+                override fun cache(): CacheService = mockk()
 
-            override fun variables(): VariablesService = object : VariablesService {
-                override fun variables(): Map<String, String> = emptyMap()
-            }
+                override fun variables(): VariablesService = object : VariablesService {
+                    override fun variables(): Map<String, String> = emptyMap()
+                }
 
-            override fun search(): Search = mockk {
-                every { register(any(), any()) } returns Unit
-            }
-        })
+                override fun search(): Search = mockk {
+                    every { register(any(), any()) } returns Unit
+                }
+            })
         val component = rocketAction!!.component()
 
         JFrame().apply {

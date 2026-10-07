@@ -24,7 +24,6 @@ class AtomicActionScriptExecutor(
         }
 
         val engine = when (atomicAction.engine) {
-            AtomicActionEngine.KOTLIN -> engineFactory.by(EngineType.KOTLIN)
             AtomicActionEngine.GROOVY -> engineFactory.by(EngineType.GROOVY)
         }
 

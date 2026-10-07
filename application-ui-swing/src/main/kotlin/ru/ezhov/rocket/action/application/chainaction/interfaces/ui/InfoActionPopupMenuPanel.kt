@@ -45,7 +45,6 @@ class InfoActionPopupMenuPanel(
         when (action) {
             is AtomicAction -> {
                 dataTextPane.syntaxEditingStyle = when (action.engine) {
-                    AtomicActionEngine.KOTLIN -> SyntaxConstants.SYNTAX_STYLE_KOTLIN
                     AtomicActionEngine.GROOVY -> SyntaxConstants.SYNTAX_STYLE_GROOVY
                 }
                 dataTextPane.text = action.data

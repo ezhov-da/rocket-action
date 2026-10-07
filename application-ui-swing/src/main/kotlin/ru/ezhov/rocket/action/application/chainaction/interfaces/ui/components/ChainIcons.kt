@@ -37,7 +37,6 @@ fun ContractType.toIcon8x8(): Icon = when (this) {
 }
 
 fun AtomicActionEngine.toIcon8x8(): Icon = when (this) {
-    AtomicActionEngine.KOTLIN -> Icons.Advanced.KOTLIN_8x8
     AtomicActionEngine.GROOVY -> Icons.Advanced.GROOVY_8x8
 }
 

@@ -67,9 +67,6 @@ object AtomicActionsFilter {
                 SearchAction.SearchCondition.UNIT_UNIT -> filterByConditions =
                     filterByConditions.filter { it.contractType == ContractType.UNIT_UNIT }
 
-                SearchAction.SearchCondition.KOTLIN -> filterByConditions =
-                    filterByConditions.filter { it.engine == AtomicActionEngine.KOTLIN }
-
                 SearchAction.SearchCondition.GROOVY -> filterByConditions =
                     filterByConditions.filter { it.engine == AtomicActionEngine.GROOVY }
 

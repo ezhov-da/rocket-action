@@ -19,7 +19,7 @@ fun main() {
         context.getBean(GeneralPropertiesRepository::class.java),
         context.getBean(EngineFactory::class.java),
     )
-    val pluginSpec = loader.loadPlugin(File("./groovy-plugins/simple-groovy-plugin.groovy"))!!
+    val pluginSpec = loader.loadPlugin(File("./groovy-plugins/simple-groovy-plugin.groovy"))
 
     SwingUtilities.invokeLater {
         JFrame().apply {
