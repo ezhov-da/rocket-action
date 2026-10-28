@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service
 import ru.ezhov.rocket.action.api.handler.RocketActionHandleStatus
 import ru.ezhov.rocket.action.api.handler.RocketActionHandlerCommand
 import ru.ezhov.rocket.action.application.handlers.apikey.application.ApiKeysApplication
+import ru.ezhov.rocket.action.application.handlers.server.mcp.McpServerService
 import ru.ezhov.rocket.action.application.handlers.server.swagger.JsonSwaggerGenerator
 import ru.ezhov.rocket.action.application.properties.GeneralPropertiesRepository
 import ru.ezhov.rocket.action.application.properties.UsedPropertiesName
@@ -17,6 +18,7 @@ import spark.kotlin.ignite
 private val logger = KotlinLogging.logger {}
 const val HEADER_NAME = "X-Rocket-Action-Handler-Key"
 const val BASE_API_PATH = "/api/v1/handlers"
+const val MCP_PATH = "/mcp"
 
 @Service
 class HttpServer(
@@ -24,6 +26,7 @@ class HttpServer(
     private val rocketActionHandlerService: RocketActionHandlerService,
     private val objectMapper: ObjectMapper,
     private val apiKeysApplication: ApiKeysApplication,
+    private val mcpServerService: McpServerService,
 ) {
 
     fun port(): Int = generalPropertiesRepository
@@ -39,13 +42,15 @@ class HttpServer(
             logger.info { "Server port is '$port'" }
             http.port(port)
         }
-        http.staticFiles.location("/swagger");
+        http.staticFiles.location("/swagger")
 
         disableCors(http)
         swaggerJson(http)
         executeHandlerEndpoint(http)
+        mcpEndpoint(http)
 
         logger.info { "Server started. port='${http.port()}' auth-header-name='$HEADER_NAME'. Use 'API keys' for access to the API" }
+        logger.info { "MCP endpoint is available by POST 'http://localhost:${http.port()}$MCP_PATH' with header '$HEADER_NAME'" }
     }
 
     private fun disableCors(http: Http) {
@@ -99,6 +104,28 @@ class HttpServer(
                 logger.info { "Handler called. id=$id command=$command body=$map" }
 
                 processRequest(id, command, map)
+            }
+        }
+    }
+
+    private fun mcpEndpoint(http: Http) {
+        http.post(MCP_PATH) {
+            checkKeyAndExecuteBlock(this) {
+                val result = mcpServerService.handle(request.body())
+
+                response.status(result.status)
+                result.body?.let { body ->
+                    response.type("application/json")
+                    body
+                } ?: ""
+            }
+        }
+
+        http.get(MCP_PATH) {
+            checkKeyAndExecuteBlock(this) {
+                response.status(405)
+                response.header("Allow", "POST")
+                "Method Not Allowed. MCP endpoint accepts only POST with a JSON-RPC message"
             }
         }
     }
@@ -185,7 +212,7 @@ private object CorsFilter {
     }
 
     fun apply() =
-        Filter { request, response ->
+        Filter { _, response ->
             corsHeaders.forEach { (key, value) ->
                 response.header(key, value)
             }

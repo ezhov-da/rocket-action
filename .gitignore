@@ -6,6 +6,11 @@ target
 /plugin-jars
 /.rocket-action/plugins/notes
 /.rocket-action/cache
+/.rocket-action/action-schedulers
 /.rocket-action/actions.yml
 /notes.s3db
 /plugin-note/test_notes.s3db
+/notes
+/cache
+/application-ui-swing/actions.yml
+/.jira-plugin
