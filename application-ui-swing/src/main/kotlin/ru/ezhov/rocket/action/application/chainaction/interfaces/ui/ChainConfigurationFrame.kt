@@ -9,6 +9,10 @@ import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.configuratio
 import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.configuration.chains.ChainsConfigurationPanel
 import ru.ezhov.rocket.action.application.chainaction.scheduler.application.ActionSchedulerService
 import ru.ezhov.rocket.action.application.chainaction.scheduler.interfaces.ui.AllActionSchedulersFrame
+import ru.ezhov.rocket.action.application.chainaction.startup.application.StartupActionRunner
+import ru.ezhov.rocket.action.application.chainaction.startup.application.StartupActionService
+import ru.ezhov.rocket.action.application.chainaction.startup.domain.StartupActionLogRepository
+import ru.ezhov.rocket.action.application.chainaction.startup.interfaces.ui.StartupActionsFrame
 import ru.ezhov.rocket.action.application.eventui.ConfigurationUiListener
 import ru.ezhov.rocket.action.application.eventui.ConfigurationUiObserverFactory
 import ru.ezhov.rocket.action.application.eventui.model.ConfigurationUiEvent
@@ -34,7 +38,10 @@ class ChainConfigurationFrame(
     atomicActionService: AtomicActionService,
     actionExecutor: ActionExecutor,
     iconRepository: IconRepository,
-    private val actionSchedulerService: ActionSchedulerService
+    private val actionSchedulerService: ActionSchedulerService,
+    private val startupActionService: StartupActionService,
+    private val startupActionRunner: StartupActionRunner,
+    private val startupActionLogRepository: StartupActionLogRepository,
 ) : JFrame() {
     private val contentPane = JPanel(MigLayout(/*"debug"*/))
 
@@ -42,7 +49,12 @@ class ChainConfigurationFrame(
         toolTipText = "Open schedulers"
     }
 
+    private val openStartupButton = JButton("Startup", Icons.Standard.POWER_STANDBY_16x16).apply {
+        toolTipText = "Open the actions executed when the application starts"
+    }
+
     private var actionSchedulersFrame: AllActionSchedulersFrame? = null
+    private var startupActionsFrame: StartupActionsFrame? = null
 
     private val createChainActionDialog = CreateAndEditChainActionDialog(
         actionExecutorService = actionExecutorService,
@@ -87,6 +99,7 @@ class ChainConfigurationFrame(
 
         val panelToolbar = JPanel(MigLayout("insets 5 5 0 5"))
         panelToolbar.add(openSchedulersButton, "align left")
+        panelToolbar.add(openStartupButton, "align left")
 
         contentPane.add(panelToolbar, "span 2, width 100%, wrap")
         contentPane.add(panelChainAction, "width 50%")
@@ -94,6 +107,10 @@ class ChainConfigurationFrame(
 
         openSchedulersButton.addActionListener {
             openSchedulers()
+        }
+
+        openStartupButton.addActionListener {
+            openStartupActions()
         }
 
         setContentPane(contentPane)
@@ -133,6 +150,22 @@ class ChainConfigurationFrame(
             val frame = actionSchedulersFrame
                 ?: AllActionSchedulersFrame(actionSchedulerService)
                     .also { actionSchedulersFrame = it }
+
+            frame.showToFront(this)
+        }
+    }
+
+    /**
+     * Opens the window with the actions executed when the application starts.
+     */
+    fun openStartupActions() {
+        SwingUtilities.invokeLater {
+            val frame = startupActionsFrame
+                ?: StartupActionsFrame(
+                    startupActionService = startupActionService,
+                    startupActionRunner = startupActionRunner,
+                    startupActionLogRepository = startupActionLogRepository,
+                ).also { startupActionsFrame = it }
 
             frame.showToFront(this)
         }

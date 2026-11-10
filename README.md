@@ -252,6 +252,50 @@ in the plugin folder.
 | `url-parser`       | `URL_PARSER`                                                | Parses URL parts and copies them.                        |
 | `template`         | `COPY_TO_CLIPBOARD_TEMPLATE`                                | Example plugin: copies text rendered from a template.    |
 
+## Startup actions
+
+Rocket Action can run an ordered list of AtomicAction and ChainAction entries right after
+the main window appears. The list is managed in a separate **Startup** window
+(**Chains → Startup**).
+
+| Element | Default | Description |
+|---|---|---|
+| List file | `./.rocket-action/startup-actions.json` | Ordered list of entries and the `stopOnError` flag. |
+| Run log | `./.rocket-action/startup-actions/log.txt` | Append-only history of finished runs. |
+| Run order | — | Array order in the JSON file. |
+| `stopOnError` | `false` | Stop the run after the first execution failure. Missing actions never stop the run. |
+| `input` | empty | Passed only to actions that accept input; for a chain the first AtomicAction decides. |
+| `enabled` | `true` | Disabled entries are skipped. |
+| `rocket.action.startup-actions.enabled` | `true` | Kill switch for automatic execution at start; `Run now` keeps working. |
+
+`startup-actions.json`:
+
+```json
+{
+  "stopOnError": false,
+  "startupActions": [
+    {
+      "id": "entry-1",
+      "actionId": "action-1",
+      "input": null,
+      "enabled": true
+    }
+  ]
+}
+```
+
+Behavior details:
+
+- The list runs in the background after the main window becomes visible; the application stays usable.
+- A run executes a snapshot of the saved list. Edits apply to the next run.
+- **Run now** executes only the saved list. When the editor has unsaved changes, the application offers `Save and run`.
+- While a run is active, editing controls in the Startup window are disabled, but the list, the last-run
+  results and the log stay readable. The rest of the application is not blocked.
+- Only an execution failure counts as an error. An entry that references a deleted action is skipped
+  with a warning, and the run continues.
+- Deleting an AtomicAction or ChainAction removes its startup entries.
+- The last-run result lives in memory and resets on restart; the log file keeps the history.
+
 ## Plugins
 
 Plugins are discovered at startup from two locations:
@@ -292,6 +336,9 @@ list is the `UsedPropertiesName` enum.
 | `rocket.action.groovy.plugin.folder`                    | `groovy-plugins`                     | Folder with Groovy plugins.                              |
 | `rocket.action.handler.server.port`                     | `4567`                               | Port of the embedded HTTP server.                        |
 | `rocket.action.chain-action.enabled`                    | `false`                              | Enables chain and atomic actions.                        |
+| `rocket.action.startup-actions.enabled`                 | `true`                               | Runs the startup actions list at application start.      |
+| `rocket.action.startup-actions.file.repository.path`    | `./.rocket-action/startup-actions.json` | File with the ordered startup list.                   |
+| `rocket.action.startup-actions.log.file.path`           | `./.rocket-action/startup-actions/log.txt` | Startup actions run log.                          |
 | `rocket.action.ui.tags.isEnabled`                       | `false`                              | Enables tags in the UI.                                  |
 | `rocket.action.ui.configuration.look_and_feel.class`    | `com.formdev.flatlaf.FlatLightLaf`   | FlatLaf look-and-feel class.                             |
 | `rocket.action.ui.base-dialog.opacity`                  | `0.4`                                | Base dialog opacity, from `0.1` to `1`.                  |
@@ -318,7 +365,8 @@ java -DLOGGER_NAME=ru.ezhov -DLOGBACK_LOGGER_LEVEL=INFO \
 ### Runtime data
 
 The application writes local state into `.rocket-action/` (`variables.json`,
-`api-keys.json`, `configurations.json`, `chain-actions.json`, `atomic-actions.json`), and
+`api-keys.json`, `configurations.json`, `chain-actions.json`, `atomic-actions.json`,
+`startup-actions.json`, `startup-actions/log.txt`), and
 uses `cache/`, `notes/` and `plugin-jars/` for runtime data. Do not commit these folders.
 
 ## HTTP API and MCP

@@ -10,6 +10,7 @@ build
 /.rocket-action/plugins/notes
 /.rocket-action/cache
 /.rocket-action/action-schedulers
+/.rocket-action/startup-actions
 /.rocket-action/actions.yml
 /notes.s3db
 /plugins/note/test_notes.s3db

@@ -2,6 +2,8 @@ package ru.ezhov.rocket.action.application
 
 
 import org.springframework.stereotype.Service
+import ru.ezhov.rocket.action.application.chainaction.startup.domain.StartupActionsRunStarter
+import ru.ezhov.rocket.action.application.chainaction.startup.domain.model.StartupRunTrigger
 import ru.ezhov.rocket.action.application.properties.GeneralPropertiesRepository
 import ru.ezhov.rocket.action.application.properties.UsedPropertiesName
 import java.util.*
@@ -14,6 +16,7 @@ class AppRunService(
     private val generalPropertiesRepository: GeneralPropertiesRepository,
     private val baseDialogFactory: BaseDialogFactory,
     private val chainActionDialogFactory: ChainActionDialogFactory,
+    private val startupActionsRunStarter: StartupActionsRunStarter,
 ) {
 
     /**
@@ -26,6 +29,9 @@ class AppRunService(
             baseDialogFactory.dialog.isVisible = true
             // Пока отключаем для тестирования // TODO ezhov
             //  chainActionDialogFactory.dialog?.isVisible = true
+
+            // The main window is already visible, so long startup actions can not delay it.
+            startupActionsRunStarter.startAsync(StartupRunTrigger.STARTUP)
 
         } catch (e: UiQuickActionServiceException) {
             e.printStackTrace()

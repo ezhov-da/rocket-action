@@ -7,6 +7,9 @@ import ru.ezhov.rocket.action.application.chainaction.application.AtomicActionSe
 import ru.ezhov.rocket.action.application.chainaction.application.ChainActionService
 import ru.ezhov.rocket.action.application.chainaction.domain.ActionExecutor
 import ru.ezhov.rocket.action.application.chainaction.scheduler.application.ActionSchedulerService
+import ru.ezhov.rocket.action.application.chainaction.startup.application.StartupActionRunner
+import ru.ezhov.rocket.action.application.chainaction.startup.application.StartupActionService
+import ru.ezhov.rocket.action.application.chainaction.startup.domain.StartupActionLogRepository
 import ru.ezhov.rocket.action.application.icon.infrastructure.IconRepository
 
 @Service
@@ -17,6 +20,9 @@ class ChainConfigurationFrameFactory(
     private val actionExecutor: ActionExecutor,
     private val iconRepository: IconRepository,
     private val actionSchedulerService: ActionSchedulerService,
+    private val startupActionService: StartupActionService,
+    private val startupActionRunner: StartupActionRunner,
+    private val startupActionLogRepository: StartupActionLogRepository,
 ) : InitializingBean {
 
     companion object {
@@ -31,6 +37,9 @@ class ChainConfigurationFrameFactory(
             actionExecutor = actionExecutor,
             iconRepository = iconRepository,
             actionSchedulerService = actionSchedulerService,
+            startupActionService = startupActionService,
+            startupActionRunner = startupActionRunner,
+            startupActionLogRepository = startupActionLogRepository,
         )
     }
 }

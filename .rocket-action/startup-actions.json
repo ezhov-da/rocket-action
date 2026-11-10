@@ -1,0 +1,9 @@
+{
+  "stopOnError" : true,
+  "startupActions" : [ {
+    "id" : "39aa8117-67eb-4fbb-8a29-f8f5a6e92466",
+    "actionId" : "79ce0f96-08f9-4267-b9a2-cf58d86a8711",
+    "input" : null,
+    "enabled" : true
+  } ]
+}

@@ -161,6 +161,39 @@ enum class UsedPropertiesName(val propertyName: String, val description: String)
         """.trimIndent()
     ),
 
+    STARTUP_ACTIONS_FILE_REPOSITORY_PATH(
+        "$PREFIX.startup-actions.file.repository.path",
+        """
+            Path to the file with the ordered list of startup actions.
+
+            Example:
+            - relative path `./.rocket-action/startup-actions.json`
+            - absolute path `C:/folder/startup-actions.json`
+        """.trimIndent()
+    ),
+
+    STARTUP_ACTIONS_LOG_FILE_PATH(
+        "$PREFIX.startup-actions.log.file.path",
+        """
+            Path to the file with the startup actions run history.
+
+            Example:
+            - relative path `./.rocket-action/startup-actions/log.txt`
+            - absolute path `C:/folder/log.txt`
+        """.trimIndent()
+    ),
+
+    STARTUP_ACTIONS_ENABLED(
+        "$PREFIX.startup-actions.enabled",
+        """
+            Run the startup actions list automatically when the application starts.
+
+            The saved list is kept and the "Run now" button still works when this is `false`.
+
+            Example: `true`
+        """.trimIndent()
+    ),
+
     APPLICATION_CONFIGURATION_FILE_REPOSITORY_PATH(
         "$PREFIX.application.configuration.file.repository.path",
         """
