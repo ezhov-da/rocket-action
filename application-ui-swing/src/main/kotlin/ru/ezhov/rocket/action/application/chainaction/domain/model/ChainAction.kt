@@ -8,6 +8,10 @@ data class ChainAction(
     var description: String,
     var actions: List<ActionOrder>,
     var icon: String? = null,
+    /**
+     * Publish this chain action as an MCP tool.
+     */
+    var isTool: Boolean = false,
 ) : Action {
     override fun id(): String = id
 
@@ -22,6 +26,7 @@ data class ChainAction(
         name = this.name,
         description = this.name,
         actions = this.actions,
+        isTool = this.isTool,
     )
 }
 

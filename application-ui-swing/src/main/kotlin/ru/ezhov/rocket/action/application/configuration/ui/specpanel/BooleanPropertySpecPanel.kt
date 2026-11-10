@@ -16,7 +16,7 @@ class BooleanPropertySpecPanel(
                 .also { cb ->
                     when (initValue == null) {
                         true -> cb.isSelected = configProperty.defaultValue.toBoolean()
-                        false -> cb.isSelected = initValue.value.toBoolean()
+                        false -> cb.isSelected = initValue!!.value.toBoolean()
                     }
 
                     valueCallback = { SpecValue(cb.isSelected.toString(), null) }

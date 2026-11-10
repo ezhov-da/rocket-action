@@ -22,6 +22,7 @@ import java.awt.event.WindowEvent
 import java.util.*
 import javax.swing.ButtonGroup
 import javax.swing.JButton
+import javax.swing.JCheckBox
 import javax.swing.JComponent
 import javax.swing.JFrame
 import javax.swing.JLabel
@@ -58,6 +59,10 @@ class CreateAndEditAtomicActionDialog(
 
     private val descriptionTextPane: RSyntaxTextArea = RSyntaxTextArea()
     private val descriptionLabel: JLabel = JLabel("Description:").apply { labelFor = descriptionTextPane }
+
+    private val isToolCheckBox: JCheckBox = JCheckBox("Use for MCP").apply {
+        toolTipText = "Publish this atomic action as an MCP tool"
+    }
 
     private val contractLabel: JLabel = JLabel("Contract:")
     private val inOutRadioButton: JRadioButton = JRadioButton("IN and OUT")
@@ -111,7 +116,9 @@ class CreateAndEditAtomicActionDialog(
 
 
         contentPane.add(descriptionLabel, "wrap")
-        contentPane.add(RTextScrollPane(descriptionTextPane, false), "span, grow, shrink 50, hmin 18%")
+        contentPane.add(RTextScrollPane(descriptionTextPane, false), "span, grow, shrink 50, hmin 18%, wrap")
+
+        contentPane.add(isToolCheckBox, "span, wrap")
 
         contentPane.add(contractLabel, "split 5")
         contentPane.add(inOutRadioButton)
@@ -204,6 +211,7 @@ class CreateAndEditAtomicActionDialog(
                         data = dataTextPane.text,
                         alias = aliasTextField.text.takeIf { it.isNotEmpty() },
                         icon = selectIconPanel.selectedIcon(),
+                        isTool = isToolCheckBox.isSelected,
                     )
                 )
             }
@@ -230,6 +238,7 @@ class CreateAndEditAtomicActionDialog(
                     data = dataTextPane.text
                     alias = aliasTextField.text.takeIf { it.isNotEmpty() }
                     icon = selectIconPanel.selectedIcon()
+                    isTool = isToolCheckBox.isSelected
                 }
 
                 atomicActionService.updateAtomic(atomicAction = currentAction!!)
@@ -260,6 +269,7 @@ class CreateAndEditAtomicActionDialog(
         textSource.isSelected = true
         dataTextPane.text = ""
         aliasTextField.text = ""
+        isToolCheckBox.isSelected = false
 
         selectIconPanel.setIcon(null)
 
@@ -309,6 +319,7 @@ class CreateAndEditAtomicActionDialog(
         }
         dataTextPane.text = action.data
         aliasTextField.text = action.alias.orEmpty()
+        isToolCheckBox.isSelected = action.isTool
 
         isVisible = true
     }

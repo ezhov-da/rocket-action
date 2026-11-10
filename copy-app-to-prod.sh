@@ -12,6 +12,6 @@ fi
 
 # Copy root application
 
-cp ./application-ui-swing/target/rocket-action.jar $ROOT_ROCKET_ACTION
+cp ./application-ui-swing/build/libs/rocket-action.jar $ROOT_ROCKET_ACTION
 
 echo "Application copied successfully"

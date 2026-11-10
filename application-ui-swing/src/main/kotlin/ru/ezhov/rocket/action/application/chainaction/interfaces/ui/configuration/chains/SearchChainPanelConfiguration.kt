@@ -14,6 +14,7 @@ import javax.swing.BorderFactory
 import javax.swing.ButtonGroup
 import javax.swing.JButton
 import javax.swing.JPanel
+import javax.swing.JSeparator
 import javax.swing.JToggleButton
 
 class SearchChainPanelConfiguration : JPanel(MigLayout("insets 0")) {
@@ -27,6 +28,13 @@ class SearchChainPanelConfiguration : JPanel(MigLayout("insets 0")) {
     private val inUnitButton = JToggleButton(ChainIcons.IN_UNIT_ICON_16x16)
     private val unitOutButton = JToggleButton(ChainIcons.UNIT_OUT_ICON_16x16)
     private val unitUnitButton = JToggleButton(ChainIcons.UNIT_UNIT_ICON_16x16)
+    private val allUsageButton = JToggleButton("All")
+    private val mcpButton = JToggleButton(Icons.Standard.CLOUD_16x16).apply {
+        toolTipText = "Used for MCP"
+    }
+    private val schedulerButton = JToggleButton(Icons.Standard.CLOCK_16x16).apply {
+        toolTipText = "Used in scheduler"
+    }
 
     private val textField = TextFieldWithText("Search")
     private val resetButton = JButton(Icons.Standard.X_16x16)
@@ -42,12 +50,24 @@ class SearchChainPanelConfiguration : JPanel(MigLayout("insets 0")) {
             add(unitUnitButton)
         }
 
+        ButtonGroup().apply {
+            add(allUsageButton)
+            add(mcpButton)
+            add(schedulerButton)
+        }
+
         allContractButton.isSelected = true
 //        add(allContractButton)
 //        add(inOutButton, "wmax 35, hmax 25")
 //        add(inUnitButton, "wmax 35, hmax 25")
 //        add(unitOutButton, "wmax 35, hmax 25")
 //        add(unitUnitButton, "wmax 35, hmax 25")
+
+        allUsageButton.isSelected = true
+        add(allUsageButton)
+        add(mcpButton, "wmax 35, hmax 25")
+        add(schedulerButton, "wmax 35, hmax 25")
+        add(JSeparator(JSeparator.VERTICAL), "wmin 10, wmax 35, hmax 25")
 
         add(textField, "width 100%")
         add(resetButton, "wmax 25, hmax 25")
@@ -65,6 +85,10 @@ class SearchChainPanelConfiguration : JPanel(MigLayout("insets 0")) {
         inUnitButton.addActionListener(actionListener)
         unitOutButton.addActionListener(actionListener)
         unitUnitButton.addActionListener(actionListener)
+
+        allUsageButton.addActionListener(actionListener)
+        mcpButton.addActionListener(actionListener)
+        schedulerButton.addActionListener(actionListener)
 
         textField.addKeyListener(object : KeyAdapter() {
             override fun keyReleased(e: KeyEvent) {
@@ -91,6 +115,8 @@ class SearchChainPanelConfiguration : JPanel(MigLayout("insets 0")) {
             inUnitButton.takeIf { it.isSelected }?.let { add(SearchAction.SearchCondition.IN_UNIT) }
             unitOutButton.takeIf { it.isSelected }?.let { add(SearchAction.SearchCondition.UNIT_OUT) }
             unitUnitButton.takeIf { it.isSelected }?.let { add(SearchAction.SearchCondition.UNIT_UNIT) }
+            mcpButton.takeIf { it.isSelected }?.let { add(SearchAction.SearchCondition.MCP) }
+            schedulerButton.takeIf { it.isSelected }?.let { add(SearchAction.SearchCondition.SCHEDULER) }
         }
 
     private fun searchText(inputText: String): List<String> =
@@ -110,13 +136,15 @@ sealed class SearchAction(
     ) : SearchAction(conditions)
 
     enum class SearchCondition(
-        val input: InputValueContractType,
-        val outputValueContractType: OutputValueContractType
+        val input: InputValueContractType? = null,
+        val outputValueContractType: OutputValueContractType? = null
     ) {
         IN_OUT(InputValueContractType.IN, OutputValueContractType.OUT),
         IN_UNIT(InputValueContractType.IN, OutputValueContractType.UNIT),
         UNIT_OUT(InputValueContractType.UNIT, OutputValueContractType.OUT),
         UNIT_UNIT(InputValueContractType.UNIT, OutputValueContractType.UNIT),
+        MCP,
+        SCHEDULER,
     }
 }
 

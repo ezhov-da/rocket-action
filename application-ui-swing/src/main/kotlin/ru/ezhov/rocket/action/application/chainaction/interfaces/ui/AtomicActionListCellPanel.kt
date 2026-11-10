@@ -3,6 +3,7 @@ package ru.ezhov.rocket.action.application.chainaction.interfaces.ui
 import net.miginfocom.swing.MigLayout
 import ru.ezhov.rocket.action.application.chainaction.application.ChainActionService
 import ru.ezhov.rocket.action.application.chainaction.domain.model.AtomicAction
+import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.components.McpToolIconComponent
 import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.components.toIcon8x8
 import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.renderer.ActionSchedulerStatusComponentService
 import ru.ezhov.rocket.action.plugin.markdown.Markdown
@@ -45,6 +46,7 @@ class AtomicActionListCellPanel(
         add(iconLabel)
         add(contractLabel)
         add(engineLabel)
+        add(McpToolIconComponent.component(atomicAction.isTool))
         add(actionSchedulerStatusComponentService.component(atomicAction.id()))
         add(nameLabel)
     }

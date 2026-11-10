@@ -6,7 +6,12 @@ import ru.ezhov.rocket.action.application.chainaction.domain.model.AtomicActionS
 import ru.ezhov.rocket.action.application.chainaction.domain.model.ContractType
 
 object AtomicActionsFilter {
-    fun filter(sortInfo: SortInfo, searchAction: SearchAction, actions: List<AtomicAction>): List<AtomicAction> {
+    fun filter(
+        sortInfo: SortInfo,
+        searchAction: SearchAction,
+        actions: List<AtomicAction>,
+        scheduledActionIds: Set<String> = emptySet(),
+    ): List<AtomicAction> {
         val atomics = actions
 
         val sortedAtomics = when (sortInfo.sortField) {
@@ -75,6 +80,12 @@ object AtomicActionsFilter {
 
                 SearchAction.SearchCondition.FILE -> filterByConditions =
                     filterByConditions.filter { it.source == AtomicActionSource.FILE }
+
+                SearchAction.SearchCondition.MCP -> filterByConditions =
+                    filterByConditions.filter { it.isTool }
+
+                SearchAction.SearchCondition.SCHEDULER -> filterByConditions =
+                    filterByConditions.filter { it.id in scheduledActionIds }
             }
         }
 

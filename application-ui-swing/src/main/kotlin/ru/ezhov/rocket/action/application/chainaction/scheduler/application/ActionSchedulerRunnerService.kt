@@ -10,7 +10,9 @@ import org.quartz.JobDetail
 import org.quartz.JobExecutionContext
 import org.quartz.JobKey
 import org.quartz.Scheduler
+import org.quartz.Trigger
 import org.quartz.TriggerBuilder.newTrigger
+import org.quartz.TriggerKey
 import org.springframework.beans.factory.InitializingBean
 import org.springframework.stereotype.Service
 import ru.ezhov.rocket.action.application.chainaction.application.ActionExecutorService
@@ -63,7 +65,12 @@ class ActionSchedulerRunnerService(
         val runners = actionSchedulerService.all().filter { it.actionScheduler.cron != null }
         val scheduler = schedulerSingleton.get()
         runners.forEach { sh ->
-            registerActionScheduler(sh.action.id(), scheduler)
+            try {
+                registerActionScheduler(sh.action.id(), scheduler)
+            } catch (e: Exception) {
+                // A broken schedule must not prevent the application (and other schedules) from starting.
+                logger.error(e) { "Can not register scheduler for action '${sh.action.id()}'" }
+            }
         }
     }
 
@@ -71,43 +78,109 @@ class ActionSchedulerRunnerService(
         actionId: String,
         scheduler: Scheduler
     ) {
-        actionSchedulerService
+        val definition = buildJobDefinition(actionId)
+        if (definition == null) {
+            logger.info { "Job with ID '$actionId' is not registered: cron expression is empty" }
+            return
+        }
+
+        scheduler.scheduleJob(definition.job, definition.trigger)
+
+        logger.info { "Job with ID '$actionId' is registered" }
+    }
+
+    /**
+     * Builds a job/trigger pair without touching the scheduler, so an invalid cron
+     * expression cannot remove an already registered schedule.
+     */
+    private fun buildJobDefinition(actionId: String): JobDefinition? {
+        val asch = actionSchedulerService
             .all()
             .firstOrNull { it.actionScheduler.actionId == actionId }
-            ?.let { asch ->
-                val job: JobDetail = JobBuilder
-                    .newJob(ActionExecuteJob::class.java)
-                    .usingJobData(
-                        JobDataMap(
-                            mutableMapOf(
-                                JOB_DATA_KEY_ACTION_ID to actionId,
-                                JOB_DATA_KEY_ACTION_SCHEDULER_SERVICE to actionSchedulerService,
-                                JOB_DATA_KEY_ACTION_EXECUTOR_SERVICE to actionExecutorService,
-                            )
-                        )
+            ?: return null
+
+        val cron = asch.actionScheduler.cron?.trim()
+        if (cron.isNullOrEmpty()) {
+            return null
+        }
+
+        CronExpressionValidator.validate(cron)
+
+        val job: JobDetail = JobBuilder
+            .newJob(ActionExecuteJob::class.java)
+            .usingJobData(
+                JobDataMap(
+                    mutableMapOf(
+                        JOB_DATA_KEY_ACTION_ID to actionId,
+                        JOB_DATA_KEY_ACTION_SCHEDULER_SERVICE to actionSchedulerService,
+                        JOB_DATA_KEY_ACTION_EXECUTOR_SERVICE to actionExecutorService,
                     )
-                    .withIdentity(actionId, JOB_GROUP_NAME)
-                    .build()
+                )
+            )
+            .withIdentity(actionId, JOB_GROUP_NAME)
+            .build()
 
-                val trigger: CronTrigger = newTrigger()
-                    .withIdentity(actionId, JOB_GROUP_NAME)
-                    .withSchedule(cronSchedule(asch.actionScheduler.cron))
-                    .build()
+        val trigger: CronTrigger = newTrigger()
+            .withIdentity(actionId, JOB_GROUP_NAME)
+            .withSchedule(cronSchedule(cron))
+            .build()
 
-                scheduler.scheduleJob(job, trigger)
-
-                logger.info { "Job with ID '$actionId' is registered" }
-            }
+        return JobDefinition(job = job, trigger = trigger)
     }
 
     private fun update(actionId: String) {
-        actionSchedulerService.all().firstOrNull { it.actionScheduler.actionId == actionId }?.let { asch ->
-            deleteJob(actionId)
-            registerActionScheduler(asch.action.id(), schedulerSingleton.get())
+        if (actionSchedulerService.all().none { it.actionScheduler.actionId == actionId }) {
+            return
+        }
 
+        // Build (and validate) the new schedule before deleting the old one.
+        val definition = buildJobDefinition(actionId)
+        val scheduler = schedulerSingleton.get()
+
+        if (definition == null) {
+            deleteJob(actionId)
+            logger.info { "Job with ID '$actionId' is deleted: cron expression is empty" }
+            return
+        }
+
+        val jobKey = JobKey(actionId, JOB_GROUP_NAME)
+        val triggerKey = TriggerKey(actionId, JOB_GROUP_NAME)
+        val previousJob = scheduler.getJobDetail(jobKey)
+        val previousTrigger = scheduler.getTrigger(triggerKey)
+
+        deleteJob(actionId)
+        try {
+            scheduler.scheduleJob(definition.job, definition.trigger)
             logger.info { "Job with ID '$actionId' is updated" }
+        } catch (ex: Exception) {
+            logger.error(ex) { "Can not update job with ID '$actionId'. Restoring the previous schedule" }
+            restoreJob(scheduler, actionId, previousJob, previousTrigger)
+            throw ex
         }
     }
+
+    private fun restoreJob(
+        scheduler: Scheduler,
+        actionId: String,
+        job: JobDetail?,
+        trigger: Trigger?,
+    ) {
+        if (job == null || trigger == null) {
+            return
+        }
+
+        try {
+            scheduler.scheduleJob(job, trigger)
+            logger.info { "Previous job with ID '$actionId' is restored" }
+        } catch (ex: Exception) {
+            logger.error(ex) { "Can not restore previous job with ID '$actionId'" }
+        }
+    }
+
+    private data class JobDefinition(
+        val job: JobDetail,
+        val trigger: CronTrigger,
+    )
 
     private fun deleteJob(actionId: String) {
         val scheduler = schedulerSingleton.get()
@@ -119,37 +192,72 @@ class ActionSchedulerRunnerService(
     class ActionExecuteJob : Job {
         override fun execute(context: JobExecutionContext) {
             val actionId = context.jobDetail.jobDataMap.getString(JOB_DATA_KEY_ACTION_ID)
-            val actionSchedulerService = context.jobDetail.jobDataMap[JOB_DATA_KEY_ACTION_SCHEDULER_SERVICE] as ActionSchedulerService
-            val actionExecutorService = context.jobDetail.jobDataMap[JOB_DATA_KEY_ACTION_EXECUTOR_SERVICE] as ActionExecutorService
-            actionSchedulerService.scheduler(actionId)?.let { actionSch ->
-                actionExecutorService.actionExecutor.execute(
-                    input = null,
-                    action = actionSch.action,
-                    progressExecutingAction = object : ProgressExecutingAction {
-                        override fun onComplete(result: Any?, lastAtomicAction: AtomicAction) {
-                            actionSchedulerService.updateStatus(
-                                UpdateStatusActionSchedulerDto(
-                                    actionId = actionId,
-                                    status = UpdateStatusInfoActionSchedulerDto.Success(result.toString())
-                                )
-                            )
-                        }
+            val actionSchedulerService =
+                context.jobDetail.jobDataMap[JOB_DATA_KEY_ACTION_SCHEDULER_SERVICE] as? ActionSchedulerService
+            val actionExecutorService =
+                context.jobDetail.jobDataMap[JOB_DATA_KEY_ACTION_EXECUTOR_SERVICE] as? ActionExecutorService
 
-                        override fun onAtomicActionSuccess(orderId: String, result: Any?, atomicAction: AtomicAction) {
-                            println(result)
-                        }
+            try {
+                if (actionId == null || actionSchedulerService == null || actionExecutorService == null) {
+                    throw IllegalStateException(
+                        "Scheduled action job data is incomplete: " +
+                            "actionId='$actionId', " +
+                            "actionSchedulerService=${actionSchedulerService != null}, " +
+                            "actionExecutorService=${actionExecutorService != null}"
+                    )
+                }
 
-                        override fun onAtomicActionFailure(orderId: String, atomicAction: AtomicAction?, ex: Exception) {
-                            actionSchedulerService.updateStatus(
-                                UpdateStatusActionSchedulerDto(
-                                    actionId = actionId,
-                                    status = UpdateStatusInfoActionSchedulerDto.Error(ex)
+                actionSchedulerService.scheduler(actionId)?.let { actionSch ->
+                    actionExecutorService.actionExecutor.execute(
+                        input = null,
+                        action = actionSch.action,
+                        progressExecutingAction = object : ProgressExecutingAction {
+                            override fun onComplete(result: Any?, lastAtomicAction: AtomicAction) {
+                                actionSchedulerService.updateStatus(
+                                    UpdateStatusActionSchedulerDto(
+                                        actionId = actionId,
+                                        status = UpdateStatusInfoActionSchedulerDto.Success(result.toString())
+                                    )
                                 )
+                            }
+
+                            override fun onAtomicActionSuccess(orderId: String, result: Any?, atomicAction: AtomicAction) {
+                                logger.debug { "Scheduled atomic action '$orderId' completed. Result: $result" }
+                            }
+
+                            override fun onAtomicActionFailure(orderId: String, atomicAction: AtomicAction?, ex: Exception) {
+                                actionSchedulerService.updateStatus(
+                                    UpdateStatusActionSchedulerDto(
+                                        actionId = actionId,
+                                        status = UpdateStatusInfoActionSchedulerDto.Error(ex)
+                                    )
+                                )
+                            }
+                        }
+                    )
+                }
+            } catch (ex: Throwable) {
+                // Never leave a schedule without a recorded result: the executor handles
+                // most failures itself, but errors outside that path must also be saved.
+                logger.error(ex) { "Unexpected error when executing scheduled action '$actionId'" }
+                if (actionId != null && actionSchedulerService != null) {
+                    try {
+                        actionSchedulerService.updateStatus(
+                            UpdateStatusActionSchedulerDto(
+                                actionId = actionId,
+                                status = UpdateStatusInfoActionSchedulerDto.Error(ex.toException())
                             )
+                        )
+                    } catch (statusEx: Exception) {
+                        logger.error(statusEx) {
+                            "Can not save error status for scheduled action '$actionId'"
                         }
                     }
-                )
+                }
             }
         }
+
+        private fun Throwable.toException(): Exception =
+            this as? Exception ?: RuntimeException(this)
     }
 }

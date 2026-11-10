@@ -1,5 +1,6 @@
 package ru.ezhov.rocket.action.application.chainaction.scheduler.application
 
+import mu.KotlinLogging
 import org.springframework.beans.factory.InitializingBean
 import org.springframework.stereotype.Service
 import ru.ezhov.rocket.action.application.chainaction.application.AtomicActionService
@@ -22,6 +23,8 @@ import ru.ezhov.rocket.action.application.event.domain.DomainEvent
 import ru.ezhov.rocket.action.application.event.domain.DomainEventSubscriber
 import ru.ezhov.rocket.action.application.event.infrastructure.DomainEventFactory
 import java.time.LocalDateTime
+
+private val logger = KotlinLogging.logger {}
 
 @Service
 class ActionSchedulerService(
@@ -67,6 +70,12 @@ class ActionSchedulerService(
     fun exists(actionId: String): Boolean =
         actionSchedulerRepository.all().schedulers.any { it.actionId == actionId }
 
+    /**
+     * Identifiers of actions that have a scheduler, used for list filtering.
+     */
+    fun scheduledActionIds(): Set<String> =
+        actionSchedulerRepository.all().schedulers.map { it.actionId }.toSet()
+
     fun scheduler(actionId: String): ActionSchedulerDto? =
         actionSchedulerRepository
             .all()
@@ -89,12 +98,15 @@ class ActionSchedulerService(
             .associateBy { it.id() }
 
     fun createOrUpdate(action: CreateOrUpdateActionScheduler) {
+        val cron = action.cron?.trim()?.takeIf { it.isNotEmpty() }
+        cron?.let { CronExpressionValidator.validate(it) }
+
         val scheduler = actionSchedulerRepository.all().schedulers.firstOrNull { it.actionId == action.actionId }
 
         actionSchedulerRepository.save(
             ActionScheduler(
                 action.actionId,
-                action.cron,
+                cron,
                 dateOfTheLastLaunch = null,
                 schedulerStatus = ActionSchedulerStatus.NOT_LAUNCHED
             )
@@ -125,26 +137,31 @@ class ActionSchedulerService(
                 )
             }
 
-        when (update.status) {
-            is UpdateStatusInfoActionSchedulerDto.Error ->
-                actionSchedulerLogRepository.save(
-                    update.actionId,
-                    now,
-                    update.status.status,
-                    result = null,
-                    ex = update.status.ex
+        try {
+            when (update.status) {
+                is UpdateStatusInfoActionSchedulerDto.Error ->
+                    actionSchedulerLogRepository.save(
+                        update.actionId,
+                        now,
+                        update.status.status,
+                        result = null,
+                        ex = update.status.ex
 
-                )
+                    )
 
-            is UpdateStatusInfoActionSchedulerDto.Success ->
-                actionSchedulerLogRepository.save(
-                    update.actionId,
-                    now,
-                    update.status.status,
-                    result = update.status.result,
-                    ex = null
+                is UpdateStatusInfoActionSchedulerDto.Success ->
+                    actionSchedulerLogRepository.save(
+                        update.actionId,
+                        now,
+                        update.status.status,
+                        result = update.status.result,
+                        ex = null
 
-                )
+                    )
+            }
+        } catch (ex: Exception) {
+            // A log write problem must not prevent the status from being published.
+            logger.error(ex) { "Can not save scheduler log for action '${update.actionId}'" }
         }
 
         DomainEventFactory.publisher.publish(

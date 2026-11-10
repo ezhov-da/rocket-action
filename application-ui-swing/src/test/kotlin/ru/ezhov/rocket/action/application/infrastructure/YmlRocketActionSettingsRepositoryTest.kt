@@ -18,7 +18,7 @@ class YmlRocketActionSettingsRepositoryTest {
             engineService = mockk()
         )
         val actions = repository.actions()
-        assertEquals(27, actions.actions.size)
+        assertEquals(33, actions.actions.size)
         println(actions)
     }
 

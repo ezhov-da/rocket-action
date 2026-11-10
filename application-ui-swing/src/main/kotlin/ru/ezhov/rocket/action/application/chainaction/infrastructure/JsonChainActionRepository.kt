@@ -78,6 +78,7 @@ class JsonChainActionRepository(
         description = description,
         actions = actions,
         icon = icon,
+        isTool = isTool,
     )
 
     private fun ChainActionDto.toChainAction(): ChainAction = ChainAction(
@@ -86,5 +87,6 @@ class JsonChainActionRepository(
         description = description,
         actions = actions,
         icon = icon,
+        isTool = isTool,
     )
 }

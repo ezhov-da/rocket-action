@@ -21,6 +21,10 @@ import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.dnd.ListDrop
 import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.renderer.AtomicActionListCellRenderer
 import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.renderer.OrderAtomicActionListCellRenderer
 import ru.ezhov.rocket.action.application.chainaction.scheduler.application.ActionSchedulerService
+import ru.ezhov.rocket.action.application.chainaction.scheduler.domain.event.ActionSchedulerCreatedDomainEvent
+import ru.ezhov.rocket.action.application.chainaction.scheduler.domain.event.ActionSchedulerDeletedDomainEvent
+import ru.ezhov.rocket.action.application.chainaction.scheduler.domain.event.ActionSchedulerStatusUpdatedDomainEvent
+import ru.ezhov.rocket.action.application.chainaction.scheduler.domain.event.ActionSchedulerUpdatedDomainEvent
 import ru.ezhov.rocket.action.application.event.domain.DomainEvent
 import ru.ezhov.rocket.action.application.event.domain.DomainEventSubscriber
 import ru.ezhov.rocket.action.application.event.infrastructure.DomainEventFactory
@@ -40,6 +44,7 @@ import javax.swing.BorderFactory
 import javax.swing.DefaultListModel
 import javax.swing.DropMode
 import javax.swing.JButton
+import javax.swing.JCheckBox
 import javax.swing.JComponent
 import javax.swing.JFrame
 import javax.swing.JLabel
@@ -58,7 +63,7 @@ class CreateAndEditChainActionDialog(
     private val chainActionService: ChainActionService,
     private val atomicActionService: AtomicActionService,
     iconRepository: IconRepository,
-    actionSchedulerService: ActionSchedulerService,
+    private val actionSchedulerService: ActionSchedulerService,
 ) : JFrame() {
 
     private val createAndEditAtomicActionDialog = CreateAndEditAtomicActionDialog(
@@ -91,6 +96,10 @@ class CreateAndEditChainActionDialog(
 
     private val descriptionTextPane: RSyntaxTextArea = RSyntaxTextArea()
     private val descriptionLabel: JLabel = JLabel("Description:").apply { labelFor = descriptionTextPane }
+
+    private val isToolCheckBox: JCheckBox = JCheckBox("Use for MCP").apply {
+        toolTipText = "Publish this chain action as an MCP tool"
+    }
 
     private val allListActionsModel = DefaultListModel<AtomicAction>()
     private val allListActions = JList(allListActionsModel)
@@ -131,13 +140,18 @@ class CreateAndEditChainActionDialog(
 
         DomainEventFactory.subscriberRegistrar.subscribe(object : DomainEventSubscriber {
             override fun handleEvent(event: DomainEvent) {
-                fillList()
+                SwingUtilities.invokeLater { fillList() }
             }
 
             override fun subscribedToEventType(): List<Class<*>> = listOf(
                 AtomicActionCreatedDomainEvent::class.java,
                 AtomicActionDeletedDomainEvent::class.java,
                 AtomicActionUpdatedDomainEvent::class.java,
+
+                ActionSchedulerCreatedDomainEvent::class.java,
+                ActionSchedulerUpdatedDomainEvent::class.java,
+                ActionSchedulerDeletedDomainEvent::class.java,
+                ActionSchedulerStatusUpdatedDomainEvent::class.java,
             )
         })
 
@@ -190,6 +204,8 @@ class CreateAndEditChainActionDialog(
 
         contentPane.add(descriptionLabel, "wrap")
         contentPane.add(RTextScrollPane(descriptionTextPane, false), "span, wrap, width max, hmin 18%")
+
+        contentPane.add(isToolCheckBox, "span, wrap")
 
         contentPane.add(
             JPanel(MigLayout())
@@ -261,7 +277,12 @@ class CreateAndEditChainActionDialog(
         val sortInfo = sortActionPanelConfiguration.sortInfo()
         val searchAction = searchActionPanelConfiguration.searchAction()
 
-        val filtered = AtomicActionsFilter.filter(sortInfo, searchAction, atomicActionService.atomics())
+        val filtered = AtomicActionsFilter.filter(
+            sortInfo = sortInfo,
+            searchAction = searchAction,
+            actions = atomicActionService.atomics(),
+            scheduledActionIds = actionSchedulerService.scheduledActionIds(),
+        )
 
         allListActionsModel.removeAllElements()
         filtered.forEach {
@@ -286,6 +307,7 @@ class CreateAndEditChainActionDialog(
                             )
                         },
                         icon = selectIconPanel.selectedIcon(),
+                        isTool = isToolCheckBox.isSelected,
                     )
                 )
             }
@@ -301,6 +323,7 @@ class CreateAndEditChainActionDialog(
                         )
                     }
                     icon = selectIconPanel.selectedIcon()
+                    isTool = isToolCheckBox.isSelected
                 })
             }
         }
@@ -322,6 +345,7 @@ class CreateAndEditChainActionDialog(
         idTextField.text = ""
         nameTextField.text = ""
         descriptionTextPane.text = ""
+        isToolCheckBox.isSelected = false
         selectedListActionsModel.removeAllElements()
 
         actionExecutePanel.isVisible = false
@@ -339,6 +363,7 @@ class CreateAndEditChainActionDialog(
         idTextField.text = ""
         nameTextField.text = ""
         descriptionTextPane.text = ""
+        isToolCheckBox.isSelected = false
 
         selectedListActionsModel.removeAllElements()
 
@@ -365,6 +390,7 @@ class CreateAndEditChainActionDialog(
         this.currentEditChainAction = chainAction
         nameTextField.text = chainAction.name
         descriptionTextPane.text = chainAction.description
+        isToolCheckBox.isSelected = chainAction.isTool
 
         actionExecutePanel.isVisible = true
         actionExecutePanel.setCurrentAction(chainAction)

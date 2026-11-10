@@ -71,13 +71,13 @@ class ActionExecuteStatusPanel(
 
                     override fun onAtomicActionSuccess(orderId: String, result: Any?, atomicAction: AtomicAction) {
                         SwingUtilities.invokeLater {
-                            map[orderId]!!.setSuccess(ProgressActionInfo.Success(result, atomicAction))
+                            map[orderId]?.setSuccess(ProgressActionInfo.Success(result, atomicAction))
                         }
                     }
 
                     override fun onAtomicActionFailure(orderId: String, atomicAction: AtomicAction?, ex: Exception) {
                         SwingUtilities.invokeLater {
-                            map[orderId]!!.setFailure(ProgressActionInfo.Failure(atomicAction, ex))
+                            map[orderId]?.setFailure(ProgressActionInfo.Failure(atomicAction, ex))
                         }
                         logger.warn(ex) {
                             "Error on action ID '${atomicAction?.id} in orderId '$orderId''. Action '$atomicAction'"

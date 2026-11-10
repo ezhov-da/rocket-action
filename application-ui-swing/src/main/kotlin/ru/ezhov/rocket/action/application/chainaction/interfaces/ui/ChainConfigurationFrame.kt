@@ -8,21 +8,25 @@ import ru.ezhov.rocket.action.application.chainaction.domain.ActionExecutor
 import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.configuration.actions.ActionsConfigurationPanel
 import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.configuration.chains.ChainsConfigurationPanel
 import ru.ezhov.rocket.action.application.chainaction.scheduler.application.ActionSchedulerService
+import ru.ezhov.rocket.action.application.chainaction.scheduler.interfaces.ui.AllActionSchedulersFrame
 import ru.ezhov.rocket.action.application.eventui.ConfigurationUiListener
 import ru.ezhov.rocket.action.application.eventui.ConfigurationUiObserverFactory
 import ru.ezhov.rocket.action.application.eventui.model.ConfigurationUiEvent
 import ru.ezhov.rocket.action.application.eventui.model.ShowChainActionConfigurationUiEvent
 import ru.ezhov.rocket.action.application.icon.infrastructure.IconRepository
+import ru.ezhov.rocket.action.application.resources.Icons
 import ru.ezhov.rocket.action.ui.utils.swing.common.SizeUtil
 import ru.ezhov.rocket.action.ui.utils.swing.common.showToFront
 import ru.ezhov.rocket.action.ui.utils.swing.common.toImage
 import java.awt.event.KeyEvent
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
+import javax.swing.JButton
 import javax.swing.JComponent
 import javax.swing.JFrame
 import javax.swing.JPanel
 import javax.swing.KeyStroke
+import javax.swing.SwingUtilities
 
 class ChainConfigurationFrame(
     actionExecutorService: ActionExecutorService,
@@ -30,9 +34,15 @@ class ChainConfigurationFrame(
     atomicActionService: AtomicActionService,
     actionExecutor: ActionExecutor,
     iconRepository: IconRepository,
-    actionSchedulerService: ActionSchedulerService
+    private val actionSchedulerService: ActionSchedulerService
 ) : JFrame() {
     private val contentPane = JPanel(MigLayout(/*"debug"*/))
+
+    private val openSchedulersButton = JButton("Schedulers", Icons.Standard.CLOCK_16x16).apply {
+        toolTipText = "Open schedulers"
+    }
+
+    private var actionSchedulersFrame: AllActionSchedulersFrame? = null
 
     private val createChainActionDialog = CreateAndEditChainActionDialog(
         actionExecutorService = actionExecutorService,
@@ -75,8 +85,16 @@ class ChainConfigurationFrame(
         val panelChainAction = JPanel(MigLayout())
         panelChainAction.add(chainsConfigurationPanel, "height max, width max")
 
+        val panelToolbar = JPanel(MigLayout("insets 5 5 0 5"))
+        panelToolbar.add(openSchedulersButton, "align left")
+
+        contentPane.add(panelToolbar, "span 2, width 100%, wrap")
         contentPane.add(panelChainAction, "width 50%")
         contentPane.add(panelAtomicAction, "width 50%")
+
+        openSchedulersButton.addActionListener {
+            openSchedulers()
+        }
 
         setContentPane(contentPane)
 
@@ -105,6 +123,19 @@ class ChainConfigurationFrame(
     private fun onOK() {
         // add your code here
         dispose()
+    }
+
+    /**
+     * Opens the window with all action schedulers.
+     */
+    fun openSchedulers() {
+        SwingUtilities.invokeLater {
+            val frame = actionSchedulersFrame
+                ?: AllActionSchedulersFrame(actionSchedulerService)
+                    .also { actionSchedulersFrame = it }
+
+            frame.showToFront(this)
+        }
     }
 
     private fun onCancel() {

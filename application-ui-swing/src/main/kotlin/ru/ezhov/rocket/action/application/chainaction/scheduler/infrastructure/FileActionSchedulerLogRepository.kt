@@ -20,7 +20,7 @@ class FileActionSchedulerLogRepository(
 
     private val folderPath =
         generalPropertiesRepository
-            .asStringOrNull(UsedPropertiesName.API_KEYS_FILE_REPOSITORY_PATH)
+            .asStringOrNull(UsedPropertiesName.ACTION_SCHEDULERS_LOG_FILE_FOLDER_PATH)
             ?: "./.rocket-action/action-schedulers/logs"
 
 

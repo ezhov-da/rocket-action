@@ -10,7 +10,7 @@ internal class GroovyEngineTest {
         val engine = GroovyEngine()
 
         val result = engine.execute(
-            template = "\"\$test \$test2 \${_variables['test2']}\"",
+            template = "\"\$test \$test2 \${_VARIABLES['test2']}\"",
             variables = listOf(
                 EngineVariable(
                     name = "test",
@@ -23,7 +23,8 @@ internal class GroovyEngineTest {
             )
         )
 
-        assertThat(result).isEqualTo("Hello world! world!")
+        // Groovy returns a GString, so compare its textual representation.
+        assertThat(result.toString()).isEqualTo("Hello world! world!")
     }
 
     @Test
@@ -44,6 +45,7 @@ internal class GroovyEngineTest {
             )
         )
 
-        assertThat(result).isEqualTo("Hello")
+        // Groovy returns a GString, so compare its textual representation.
+        assertThat(result.toString()).isEqualTo("Hello")
     }
 }

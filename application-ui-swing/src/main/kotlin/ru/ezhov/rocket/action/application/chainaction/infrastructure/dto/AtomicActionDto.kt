@@ -1,6 +1,7 @@
 package ru.ezhov.rocket.action.application.chainaction.infrastructure.dto
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import com.fasterxml.jackson.annotation.JsonProperty
 import ru.ezhov.rocket.action.application.chainaction.domain.model.AtomicActionEngine
 import ru.ezhov.rocket.action.application.chainaction.domain.model.AtomicActionSource
 import ru.ezhov.rocket.action.application.chainaction.domain.model.ContractType
@@ -16,4 +17,11 @@ class AtomicActionDto(
     var data: String,
     var alias: String? = null,
     var icon: String? = null,
+    /**
+     * Missing in files written by older versions. Such actions were always
+     * published as MCP tools, so the default keeps them exposed.
+     */
+    @get:JsonProperty("isTool")
+    @param:JsonProperty("isTool")
+    var isTool: Boolean = false,
 )

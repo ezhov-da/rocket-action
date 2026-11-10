@@ -1,8 +1,9 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="GroovyPluginLoaderUITestKt" type="JetRunConfigurationType" nameIsGenerated="true">
     <option name="MAIN_CLASS_NAME" value="ru.ezhov.rocket.action.application.plugin.manager.infrastructure.loaders.GroovyPluginLoaderUITestKt" />
-    <module name="rocket-action-application-ui-swing" />
+    <module name="rocket-action.application-ui-swing" />
     <shortenClasspath name="NONE" />
+    <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
     <method v="2">
       <option name="Make" enabled="true" />
     </method>

@@ -2,7 +2,6 @@ package ru.ezhov.rocket.action.application
 
 
 import org.springframework.stereotype.Service
-import ru.ezhov.rocket.action.application.handlers.server.HttpServer
 import ru.ezhov.rocket.action.application.properties.GeneralPropertiesRepository
 import ru.ezhov.rocket.action.application.properties.UsedPropertiesName
 import java.util.*
@@ -13,7 +12,6 @@ import kotlin.system.exitProcess
 @Service
 class AppRunService(
     private val generalPropertiesRepository: GeneralPropertiesRepository,
-    private val httpServer: HttpServer,
     private val baseDialogFactory: BaseDialogFactory,
     private val chainActionDialogFactory: ChainActionDialogFactory,
 ) {
@@ -22,8 +20,6 @@ class AppRunService(
      * All UI must be created without Spring because LaF is not init in Spring
      */
     fun run(args: Array<String>) {
-        runServer() // TODO decorate beautifully
-
         try {
             getFont()?.let { font -> setUIFont(font) }
 
@@ -56,9 +52,5 @@ class AppRunService(
             val value = UIManager.get(key)
             if (value is FontUIResource) UIManager.put(key, f)
         }
-    }
-
-    private fun runServer() {
-        httpServer.run()
     }
 }

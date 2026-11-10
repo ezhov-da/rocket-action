@@ -5,8 +5,8 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import mu.KotlinLogging
 import org.springframework.context.annotation.Bean
-import org.springframework.context.annotation.ComponentScan
 import org.springframework.context.annotation.Configuration
+import org.springframework.context.annotation.Primary
 import ru.ezhov.rocket.action.application.CommandLineArgsSingleton
 import ru.ezhov.rocket.action.application.UiQuickActionService
 import ru.ezhov.rocket.action.application.core.domain.EngineService
@@ -22,7 +22,6 @@ import java.io.File
 private val logger = KotlinLogging.logger { }
 
 @Configuration
-@ComponentScan(basePackages = ["ru.ezhov.rocket.action"], lazyInit = false /*load all beans*/)
 open class AppConfigCoreSpring {
     /**
      * Usage for sync in Group plugin
@@ -30,7 +29,10 @@ open class AppConfigCoreSpring {
     @Bean
     open fun rocketActionComponentCache(): RocketActionComponentCache = RocketActionComponentCacheFactory.cache
 
+    // @Primary: Spring Boot auto-configures its own ObjectMapper bean; this one
+    // is the application-wide mapper and must win when an ObjectMapper is injected.
     @Bean
+    @Primary
     open fun objectMapper(): ObjectMapper =
         ObjectMapper()
             .registerKotlinModule()
@@ -47,7 +49,7 @@ open class AppConfigCoreSpring {
             logger.info { "Develop mode enabled. absolute path to `$testActions` file as argument" }
 
             YmlRocketActionSettingsRepository(
-                uri = UiQuickActionService::class.java.getResource(testActions).toURI(),
+                uri = UiQuickActionService::class.java.getResource(testActions)!!.toURI(),
                 engineService
             )
         } else {

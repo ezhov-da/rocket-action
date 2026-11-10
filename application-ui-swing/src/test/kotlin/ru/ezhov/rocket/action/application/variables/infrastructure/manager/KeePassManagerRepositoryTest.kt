@@ -20,7 +20,7 @@ class KeePassManagerRepositoryTest {
                 }
             )
 
-        assertThat(variables).hasSize(6)
+        assertThat(variables).hasSize(9)
         assertThat(variables[0].name).isEqualTo("TEST_SECRET_USERNAME")
         assertThat(variables[0].value).isEqualTo("")
         assertThat(variables[0].type).isEqualTo(VariableType.KEE_PASS)

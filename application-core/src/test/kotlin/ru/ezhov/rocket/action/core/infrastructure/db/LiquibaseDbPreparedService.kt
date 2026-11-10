@@ -7,6 +7,8 @@ import liquibase.Liquibase
 import liquibase.database.Database
 import liquibase.database.DatabaseFactory
 import liquibase.database.jvm.JdbcConnection
+import liquibase.resource.ClassLoaderResourceAccessor
+import liquibase.resource.CompositeResourceAccessor
 import liquibase.resource.FileSystemResourceAccessor
 import mu.KotlinLogging
 import ru.ezhov.rocket.action.core.infrastructure.db.h2.H2DbCredentialsFactorySampleData
@@ -41,7 +43,12 @@ class LiquibaseDbPreparedService private constructor(
             DatabaseFactory.getInstance().findCorrectDatabaseImplementation(JdbcConnection(connection))
         val liquibase = Liquibase(
             "dbchangelog.xml",
-            FileSystemResourceAccessor(File("./../liquibase")),
+            // The classpath accessor lets Liquibase resolve the bundled
+            // dbchangelog-*.xsd instead of downloading it from liquibase.org.
+            CompositeResourceAccessor(
+                FileSystemResourceAccessor(File("./../liquibase")),
+                ClassLoaderResourceAccessor(),
+            ),
             database
         )
         liquibase.update(Contexts("dev"), LabelExpression())

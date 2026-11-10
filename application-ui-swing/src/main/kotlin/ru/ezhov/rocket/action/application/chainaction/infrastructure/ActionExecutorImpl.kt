@@ -45,7 +45,6 @@ class ActionExecutorImpl(
         progressExecutingAction: ProgressExecutingAction
     ) {
         var currentAtomicActionOrderId: String? = null
-        var currentAtomicActionId: String?
         var currentAtomicAction: AtomicAction? = null
         var lastResult: Any? = null
         try {
@@ -53,15 +52,16 @@ class ActionExecutorImpl(
 
             var inputValue = input
             chainAction.actions.forEach { atomicActionOrder ->
-                currentAtomicActionOrderId = atomicActionOrder.chainOrderId
-                currentAtomicActionId = atomicActionOrder.actionId
-                val atomicAction = atomicActionService.atomicBy(currentAtomicActionId!!)
+                val orderId = atomicActionOrder.chainOrderId
+                currentAtomicActionOrderId = orderId
+                val atomicActionId = atomicActionOrder.actionId
+                val atomicAction = atomicActionService.atomicBy(atomicActionId)
                 if (atomicAction == null) {
                     progressExecutingAction.onAtomicActionFailure(
-                        orderId = currentAtomicActionOrderId!!,
+                        orderId = orderId,
                         atomicAction = null,
                         ex = IllegalStateException(
-                            "Action with ID '${currentAtomicActionId!!}' not found for chain '${chainAction.name}'"
+                            "Action with ID '$atomicActionId' not found for chain '${chainAction.name}'"
                         )
                     )
                     return
@@ -78,19 +78,33 @@ class ActionExecutorImpl(
                 inputValue = executeResult
                 lastResult = executeResult
                 progressExecutingAction.onAtomicActionSuccess(
-                    orderId = currentAtomicActionOrderId!!,
+                    orderId = orderId,
                     result = lastResult,
-                    atomicAction = currentAtomicAction!!
+                    atomicAction = atomicAction
                 )
             }
 
-            progressExecutingAction.onComplete(result = lastResult, lastAtomicAction = currentAtomicAction!!)
+            val lastAtomicAction = currentAtomicAction
+            if (lastAtomicAction == null) {
+                progressExecutingAction.onAtomicActionFailure(
+                    orderId = chainAction.id,
+                    atomicAction = null,
+                    ex = IllegalStateException(
+                        "Chain action '${chainAction.name}' with ID '${chainAction.id}' has no actions"
+                    )
+                )
+                return
+            }
+
+            progressExecutingAction.onComplete(result = lastResult, lastAtomicAction = lastAtomicAction)
 
             logger.debug { "Chain action by ID '${chainAction.id}'. Input '$input'. Completed" }
         } catch (ex: Exception) {
+            // The failure callback must always be called, even when the error happened
+            // before the current atomic action was resolved.
             progressExecutingAction.onAtomicActionFailure(
-                orderId = currentAtomicActionOrderId!!,
-                atomicAction = currentAtomicAction!!,
+                orderId = currentAtomicActionOrderId ?: chainAction.id,
+                atomicAction = currentAtomicAction,
                 ex = ex
             )
         }

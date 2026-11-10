@@ -17,6 +17,10 @@ import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.CreateAndEdi
 import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.InfoActionPopupMenuPanel
 import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.renderer.AtomicActionListCellRenderer
 import ru.ezhov.rocket.action.application.chainaction.scheduler.application.ActionSchedulerService
+import ru.ezhov.rocket.action.application.chainaction.scheduler.domain.event.ActionSchedulerCreatedDomainEvent
+import ru.ezhov.rocket.action.application.chainaction.scheduler.domain.event.ActionSchedulerDeletedDomainEvent
+import ru.ezhov.rocket.action.application.chainaction.scheduler.domain.event.ActionSchedulerStatusUpdatedDomainEvent
+import ru.ezhov.rocket.action.application.chainaction.scheduler.domain.event.ActionSchedulerUpdatedDomainEvent
 import ru.ezhov.rocket.action.application.chainaction.scheduler.interfaces.ui.ActionSchedulerJMenu
 import ru.ezhov.rocket.action.application.event.domain.DomainEvent
 import ru.ezhov.rocket.action.application.event.domain.DomainEventSubscriber
@@ -33,6 +37,7 @@ import javax.swing.JMenu
 import javax.swing.JPanel
 import javax.swing.JPopupMenu
 import javax.swing.JScrollPane
+import javax.swing.SwingUtilities
 import javax.swing.SwingWorker
 
 class ActionsConfigurationPanel(
@@ -153,6 +158,13 @@ class ActionsConfigurationPanel(
                     is ChainActionDeletedDomainEvent -> {
                         allListActions.repaint()
                     }
+
+                    is ActionSchedulerCreatedDomainEvent,
+                    is ActionSchedulerUpdatedDomainEvent,
+                    is ActionSchedulerDeletedDomainEvent,
+                    is ActionSchedulerStatusUpdatedDomainEvent -> {
+                        SwingUtilities.invokeLater { refreshSchedulerDependentState() }
+                    }
                 }
             }
 
@@ -164,6 +176,11 @@ class ActionsConfigurationPanel(
                 ChainActionCreatedDomainEvent::class.java,
                 ChainActionUpdatedDomainEvent::class.java,
                 ChainActionDeletedDomainEvent::class.java,
+
+                ActionSchedulerCreatedDomainEvent::class.java,
+                ActionSchedulerUpdatedDomainEvent::class.java,
+                ActionSchedulerDeletedDomainEvent::class.java,
+                ActionSchedulerStatusUpdatedDomainEvent::class.java,
             )
         })
 
@@ -202,20 +219,43 @@ class ActionsConfigurationPanel(
     private fun fillList() {
         val sortInfo = sortActionPanelConfiguration.sortInfo()
         val searchAction = searchActionPanelConfiguration.searchAction()
-        SearchWorker(sortInfo, searchAction, atomicActionService, allListActionsModel).execute()
+        SearchWorker(
+            sortInfo = sortInfo,
+            searchAction = searchAction,
+            atomicActionService = atomicActionService,
+            actionSchedulerService = actionSchedulerService,
+            allListActionsModel = allListActionsModel,
+        ).execute()
+    }
+
+    /**
+     * The scheduler state affects the rendered scheduler status and the "used in scheduler" filter.
+     */
+    private fun refreshSchedulerDependentState() {
+        if (searchActionPanelConfiguration
+                .searchAction()
+                .conditions
+                .contains(SearchAction.SearchCondition.SCHEDULER)
+        ) {
+            fillList()
+        } else {
+            allListActions.repaint()
+        }
     }
 
     private class SearchWorker(
         private val sortInfo: SortInfo,
         private val searchAction: SearchAction,
         private val atomicActionService: AtomicActionService,
+        private val actionSchedulerService: ActionSchedulerService,
         private val allListActionsModel: DefaultListModel<AtomicAction>,
     ) : SwingWorker<List<AtomicAction>, Unit>() {
         override fun doInBackground(): List<AtomicAction> =
             AtomicActionsFilter.filter(
                 sortInfo = sortInfo,
                 searchAction = searchAction,
-                actions = atomicActionService.atomics()
+                actions = atomicActionService.atomics(),
+                scheduledActionIds = actionSchedulerService.scheduledActionIds(),
             )
 
         override fun done() {

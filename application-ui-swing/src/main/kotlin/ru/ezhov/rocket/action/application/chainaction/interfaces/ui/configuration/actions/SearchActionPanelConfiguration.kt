@@ -31,6 +31,13 @@ class SearchActionPanelConfiguration : JPanel(MigLayout("insets 0")) {
     private val allSourceButton = JToggleButton("All")
     private val textButton = JToggleButton(Icons.Standard.ALIGN_CENTER_16x16)
     private val fileButton = JToggleButton(Icons.Standard.FILE_16x16)
+    private val allUsageButton = JToggleButton("All")
+    private val mcpButton = JToggleButton(Icons.Standard.CLOUD_16x16).apply {
+        toolTipText = "Used for MCP"
+    }
+    private val schedulerButton = JToggleButton(Icons.Standard.CLOCK_16x16).apply {
+        toolTipText = "Used in scheduler"
+    }
 
     private val textField = TextFieldWithText("Search")
     private val resetButton = JButton(Icons.Standard.X_16x16)
@@ -57,6 +64,12 @@ class SearchActionPanelConfiguration : JPanel(MigLayout("insets 0")) {
             add(fileButton)
         }
 
+        ButtonGroup().apply {
+            add(allUsageButton)
+            add(mcpButton)
+            add(schedulerButton)
+        }
+
         allContractButton.isSelected = true
         add(allContractButton)
         add(inOutButton, "wmax 35, hmax 25")
@@ -74,6 +87,12 @@ class SearchActionPanelConfiguration : JPanel(MigLayout("insets 0")) {
         add(allSourceButton)
         add(textButton, "wmax 35, hmax 25")
         add(fileButton, "wmax 35, hmax 25")
+        add(JSeparator(JSeparator.VERTICAL), "wmin 10, wmax 35, hmax 25")
+
+        allUsageButton.isSelected = true
+        add(allUsageButton)
+        add(mcpButton, "wmax 35, hmax 25")
+        add(schedulerButton, "wmax 35, hmax 25")
         add(JSeparator(JSeparator.VERTICAL), "wmin 10, wmax 35, hmax 25")
 
         add(textField, "width 100%")
@@ -99,6 +118,10 @@ class SearchActionPanelConfiguration : JPanel(MigLayout("insets 0")) {
         allSourceButton.addActionListener(actionListener)
         textButton.addActionListener(actionListener)
         fileButton.addActionListener(actionListener)
+
+        allUsageButton.addActionListener(actionListener)
+        mcpButton.addActionListener(actionListener)
+        schedulerButton.addActionListener(actionListener)
 
 
         textField.addKeyListener(object : KeyAdapter() {
@@ -133,6 +156,8 @@ class SearchActionPanelConfiguration : JPanel(MigLayout("insets 0")) {
             groovyButton.takeIf { it.isSelected }?.let { add(SearchAction.SearchCondition.GROOVY) }
             textButton.takeIf { it.isSelected }?.let { add(SearchAction.SearchCondition.TEXT) }
             fileButton.takeIf { it.isSelected }?.let { add(SearchAction.SearchCondition.FILE) }
+            mcpButton.takeIf { it.isSelected }?.let { add(SearchAction.SearchCondition.MCP) }
+            schedulerButton.takeIf { it.isSelected }?.let { add(SearchAction.SearchCondition.SCHEDULER) }
         }
 }
 
@@ -156,6 +181,8 @@ sealed class SearchAction(
         GROOVY,
         TEXT,
         FILE,
+        MCP,
+        SCHEDULER,
     }
 }
 

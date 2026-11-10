@@ -14,6 +14,10 @@ import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.InfoActionPo
 import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.renderer.ActionSchedulerStatusComponentService
 import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.renderer.ChainActionListCellRenderer
 import ru.ezhov.rocket.action.application.chainaction.scheduler.application.ActionSchedulerService
+import ru.ezhov.rocket.action.application.chainaction.scheduler.domain.event.ActionSchedulerCreatedDomainEvent
+import ru.ezhov.rocket.action.application.chainaction.scheduler.domain.event.ActionSchedulerDeletedDomainEvent
+import ru.ezhov.rocket.action.application.chainaction.scheduler.domain.event.ActionSchedulerStatusUpdatedDomainEvent
+import ru.ezhov.rocket.action.application.chainaction.scheduler.domain.event.ActionSchedulerUpdatedDomainEvent
 import ru.ezhov.rocket.action.application.chainaction.scheduler.interfaces.ui.ActionSchedulerJMenu
 import ru.ezhov.rocket.action.application.event.domain.DomainEvent
 import ru.ezhov.rocket.action.application.event.domain.DomainEventSubscriber
@@ -29,6 +33,7 @@ import javax.swing.JMenu
 import javax.swing.JPanel
 import javax.swing.JPopupMenu
 import javax.swing.JScrollPane
+import javax.swing.SwingUtilities
 import javax.swing.SwingWorker
 
 class ChainsConfigurationPanel(
@@ -132,6 +137,13 @@ class ChainsConfigurationPanel(
                         // Atomic action can change contract
                         allListChains.repaint()
                     }
+
+                    is ActionSchedulerCreatedDomainEvent,
+                    is ActionSchedulerUpdatedDomainEvent,
+                    is ActionSchedulerDeletedDomainEvent,
+                    is ActionSchedulerStatusUpdatedDomainEvent -> {
+                        SwingUtilities.invokeLater { refreshSchedulerDependentState() }
+                    }
                 }
             }
 
@@ -141,6 +153,11 @@ class ChainsConfigurationPanel(
                 ChainActionUpdatedDomainEvent::class.java,
 
                 AtomicActionUpdatedDomainEvent::class.java,
+
+                ActionSchedulerCreatedDomainEvent::class.java,
+                ActionSchedulerUpdatedDomainEvent::class.java,
+                ActionSchedulerDeletedDomainEvent::class.java,
+                ActionSchedulerStatusUpdatedDomainEvent::class.java,
             )
         })
 
@@ -183,11 +200,27 @@ class ChainsConfigurationPanel(
         fillActions(sortInfo, searchAction)
     }
 
+    /**
+     * The scheduler state affects the rendered scheduler status and the "used in scheduler" filter.
+     */
+    private fun refreshSchedulerDependentState() {
+        if (searchChainPanelConfiguration
+                .searchAction()
+                .conditions
+                .contains(SearchAction.SearchCondition.SCHEDULER)
+        ) {
+            fillList()
+        } else {
+            allListChains.repaint()
+        }
+    }
+
     private fun fillActions(sortInfo: SortInfo, searchAction: SearchAction) {
         SearchWorker(
             sortInfo = sortInfo,
             searchAction = searchAction,
             chainActionService = chainActionService,
+            actionSchedulerService = actionSchedulerService,
             allListChainsModel = allListChainsModel,
         ).execute()
     }
@@ -196,6 +229,7 @@ class ChainsConfigurationPanel(
         private val sortInfo: SortInfo,
         private val searchAction: SearchAction,
         private val chainActionService: ChainActionService,
+        private val actionSchedulerService: ActionSchedulerService,
         private val allListChainsModel: DefaultListModel<ChainAction>,
     ) : SwingWorker<List<ChainAction>, Unit>() {
         override fun doInBackground(): List<ChainAction> {
@@ -233,33 +267,22 @@ class ChainsConfigurationPanel(
             }
 
             var filterByConditions = filterByText
-//        searchAction.conditions.forEach { condition ->
-//            when (condition) {
-//                SearchAction.SearchCondition.IN_OUT -> filterByConditions =
-//                    filterByConditions.filter { it.contractType == ContractType.IN_OUT }
-//
-//                SearchAction.SearchCondition.IN_UNIT -> filterByConditions =
-//                    filterByConditions.filter { it.contractType == ContractType.IN_UNIT }
-//
-//                SearchAction.SearchCondition.UNIT_OUT -> filterByConditions =
-//                    filterByConditions.filter { it.contractType == ContractType.UNIT_OUT }
-//
-//                SearchAction.SearchCondition.UNIT_UNIT -> filterByConditions =
-//                    filterByConditions.filter { it.contractType == ContractType.UNIT_UNIT }
-//
-//                SearchAction.SearchCondition.KOTLIN -> filterByConditions =
-//                    filterByConditions.filter { it.engine == AtomicActionEngine.KOTLIN }
-//
-//                SearchAction.SearchCondition.GROOVY -> filterByConditions =
-//                    filterByConditions.filter { it.engine == AtomicActionEngine.GROOVY }
-//
-//                SearchAction.SearchCondition.TEXT -> filterByConditions =
-//                    filterByConditions.filter { it.source == AtomicActionSource.TEXT }
-//
-//                SearchAction.SearchCondition.FILE -> filterByConditions =
-//                    filterByConditions.filter { it.source == AtomicActionSource.FILE }
-//            }
-//        }
+            val scheduledActionIds = if (searchAction.conditions.contains(SearchAction.SearchCondition.SCHEDULER)) {
+                actionSchedulerService.scheduledActionIds()
+            } else {
+                emptySet()
+            }
+            searchAction.conditions.forEach { condition ->
+                when (condition) {
+                    SearchAction.SearchCondition.MCP -> filterByConditions =
+                        filterByConditions.filter { it.isTool }
+
+                    SearchAction.SearchCondition.SCHEDULER -> filterByConditions =
+                        filterByConditions.filter { it.id in scheduledActionIds }
+
+                    else -> {}
+                }
+            }
             return filterByConditions
         }
 

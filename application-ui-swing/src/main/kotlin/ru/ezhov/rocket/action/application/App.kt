@@ -3,6 +3,8 @@ package ru.ezhov.rocket.action.application
 import com.formdev.flatlaf.FlatLightLaf
 import mu.KotlinLogging
 import ru.ezhov.rocket.action.application.properties.UsedPropertiesName
+import java.awt.GraphicsEnvironment
+import java.awt.Toolkit
 import javax.swing.LookAndFeel
 import javax.swing.SwingUtilities
 import kotlin.system.exitProcess
@@ -14,12 +16,20 @@ fun main(args: Array<String>) {
     //  We temporarily launch everything in this thread so that all forms are initialized with the same L&F
     SwingUtilities.invokeLater {
         try {
+            // AWT must be initialized before Spring Boot runs: Boot sets
+            // java.awt.headless=true (the server part is headless), and after
+            // GraphicsEnvironment has been initialized this no longer affects
+            // the desktop UI.
+            GraphicsEnvironment.isHeadless()
+            Toolkit.getDefaultToolkit()
+
             // It is necessary to initialize L&F before working with the context,
             // otherwise some elements will not pick up the new L&F
             FlatLightLaf.setup(lookAndFeel())
 
             CommandLineArgsSingleton.args = args
-            val appRunService: AppRunService = ApplicationContextFactory.context().getBean(AppRunService::class.java)
+            val context = ApplicationContextFactory.start(args)
+            val appRunService: AppRunService = context.getBean(AppRunService::class.java)
             appRunService.run(args)
         } catch (ex: Throwable) {
             logger.error(ex) { "Error when run application" }

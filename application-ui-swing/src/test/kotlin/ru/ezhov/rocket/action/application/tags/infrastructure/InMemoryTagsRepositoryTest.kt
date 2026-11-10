@@ -20,7 +20,7 @@ internal class InMemoryTagsRepositoryTest {
     fun `should create tree tags`() {
         val repository = InMemoryTagsRepository()
         repository.replaceOrAdd(key = "1", tags = listOf("test", "another", "very_good"))
-        repository.replaceOrAdd(key = "2", tags = listOf("test", " another2", " very_good2"))
+        repository.replaceOrAdd(key = "2", tags = listOf("test", "another2", "very_good2"))
 
         val nodes = repository.tagsTree()
 
@@ -54,6 +54,7 @@ internal class InMemoryTagsRepositoryTest {
                     ),
                     keys = mutableSetOf("1", "2")
                 )
+                    .build()
             )
         )
     }

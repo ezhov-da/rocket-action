@@ -2,6 +2,7 @@ package ru.ezhov.rocket.action.application.chainaction.interfaces.ui
 
 import net.miginfocom.swing.MigLayout
 import ru.ezhov.rocket.action.application.chainaction.domain.model.ChainAction
+import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.components.McpToolIconComponent
 import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.renderer.ActionSchedulerStatusComponentService
 import ru.ezhov.rocket.action.ui.utils.swing.common.toIcon
 import java.awt.Color
@@ -33,6 +34,7 @@ class ChainActionListCellPanel(
         }
         add(iconLabel)
         contractLabel?.let { add(it) }
+        add(McpToolIconComponent.component(chainAction.isTool))
         add(actionSchedulerStatusComponentService.component(chainAction.id))
         add(nameLabel)
         add(countAtomicAction)

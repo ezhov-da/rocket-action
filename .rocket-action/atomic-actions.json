@@ -1,5 +1,5 @@
 {
-  "changedDate" : [ 2026, 9, 7, 23, 40, 49, 516000000 ],
+  "changedDate" : [ 2026, 11, 7, 19, 14, 4, 293748800 ],
   "atomicActions" : [ {
     "id" : "ccb3ea04-68ef-4988-84f1-2d95e14c0046",
     "name" : "Убирает начальные и конечные пробелы у строки (test)",
@@ -9,7 +9,8 @@
     "source" : "TEXT",
     "data" : "// test\n\n_INPUT.trim()",
     "alias" : null,
-    "icon" : null
+    "icon" : null,
+    "isTool" : false
   }, {
     "id" : "8dba925e-07fb-4d88-af27-18d38eefede0",
     "name" : "Заменяет все символы `a` на `1`",
@@ -19,7 +20,8 @@
     "source" : "TEXT",
     "data" : "_INPUT.replace(\"а\", \"1\").replace(\"a\", \"1\")",
     "alias" : null,
-    "icon" : null
+    "icon" : null,
+    "isTool" : false
   }, {
     "id" : "0f023251-5b90-44d2-bb40-2224f504bb92",
     "name" : "Открытие ссылки по Jira задаче",
@@ -29,7 +31,8 @@
     "source" : "TEXT",
     "data" : "import java.awt.*\r\n\r\nString jiraNumber = _INPUT\r\n\r\nif (Desktop.desktopSupported) {\r\n    Desktop.desktop.browse(\"https://jira.app.local/browse/INTRASTAR-${jiraNumber.trim()}\".toURI())\r\n}",
     "alias" : "openJiraUrlByNumber",
-    "icon" : null
+    "icon" : null,
+    "isTool" : false
   }, {
     "id" : "79ce0f96-08f9-4267-b9a2-cf58d86a8711",
     "name" : "UNIT - UNIT",
@@ -39,7 +42,8 @@
     "source" : "TEXT",
     "data" : "println(\"Test row!\")\n",
     "alias" : null,
-    "icon" : "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAALEwAACxMBAJqcGAAAAEhJREFUOI3l0CEOADAIQ9EenZtvBoGAUsjcmiD/EwB85reaATh+YyTGYySLZYTFLaLE65/8MsODJypIGStIGzNEjjNkHEeExhdnCUfFMOnPyAAAAABJRU5ErkJggg=="
+    "icon" : "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAALEwAACxMBAJqcGAAAAEhJREFUOI3l0CEOADAIQ9EenZtvBoGAUsjcmiD/EwB85reaATh+YyTGYySLZYTFLaLE65/8MsODJypIGStIGzNEjjNkHEeExhdnCUfFMOnPyAAAAABJRU5ErkJggg==",
+    "isTool" : false
   }, {
     "id" : "3ac9741e-9c63-410e-8488-3dc52e5c92f6",
     "name" : "Отдаём строку",
@@ -49,7 +53,8 @@
     "source" : "TEXT",
     "data" : "\"строка\"",
     "alias" : null,
-    "icon" : null
+    "icon" : null,
+    "isTool" : false
   }, {
     "id" : "d4b03ab3-09bd-4d65-bc43-368ac169346f",
     "name" : "Буд-то принимаем, но ничего не возвращаем",
@@ -59,7 +64,8 @@
     "source" : "TEXT",
     "data" : "",
     "alias" : null,
-    "icon" : null
+    "icon" : null,
+    "isTool" : true
   }, {
     "id" : "66f98f16-75a7-4848-ae48-d94af5c8d35a",
     "name" : "Заменяет все символы `a` на `2` (Дубликат)",
@@ -69,7 +75,8 @@
     "source" : "TEXT",
     "data" : "_INPUT.replace(\"а\", \"2\").replace(\"a\", \"2\")",
     "alias" : null,
-    "icon" : null
+    "icon" : null,
+    "isTool" : false
   }, {
     "id" : "cbb13a8a-52cc-4a47-991c-aafc3d304179",
     "name" : "Получить заголовок страницы по URL",
@@ -79,7 +86,8 @@
     "source" : "TEXT",
     "data" : "import org.jsoup.Jsoup\n\ndef urlText = _INPUT\n\ndef doc = Jsoup.parse(new URL(urlText), 5000)\n\ndoc.select(\"head > title\").text()",
     "alias" : null,
-    "icon" : null
+    "icon" : null,
+    "isTool" : false
   }, {
     "id" : "e1811227-8089-4d84-bfdf-dcab99d470d6",
     "name" : "Действие для тестирования вызова другого скрипта",
@@ -89,7 +97,8 @@
     "source" : "TEXT",
     "data" : "_AA.execute(\"openJiraUrlByNumber\", 123)",
     "alias" : null,
-    "icon" : null
+    "icon" : null,
+    "isTool" : false
   }, {
     "id" : "cb6b43b2-5d27-47ca-aa54-4c03eb3b42fb",
     "name" : "Действие для тестирования вызова другого скрипта (2)",
@@ -99,7 +108,8 @@
     "source" : "TEXT",
     "data" : "_AA.execute(\"openJiraUrlByNumber\", 123)",
     "alias" : null,
-    "icon" : null
+    "icon" : null,
+    "isTool" : false
   }, {
     "id" : "fcfeab32-cfa5-4ec9-a0d0-282c5244eb03",
     "name" : "Пробуем создать действие, которое создаёт ссылку",
@@ -109,7 +119,8 @@
     "source" : "TEXT",
     "data" : "import ru.ezhov.rocket.action.application.api.RaPublicApi\n\nRaPublicApi.createService.create(\"de16aba8-c229-11ec-9d64-0242ac3420002\", \"OPEN_URL\", [\"url\":_INPUT], null)",
     "alias" : null,
-    "icon" : null
+    "icon" : null,
+    "isTool" : false
   }, {
     "id" : "d47e7dad-71d4-4809-95a5-c2fc905de6bb",
     "name" : "Буд-то принимаем, но ничего не возвращаем",
@@ -119,7 +130,8 @@
     "source" : "TEXT",
     "data" : "",
     "alias" : null,
-    "icon" : null
+    "icon" : null,
+    "isTool" : false
   }, {
     "id" : "1a997d34-d98f-47d6-830d-e5dbad65ddaa",
     "name" : "Test job",
@@ -129,7 +141,8 @@
     "source" : "TEXT",
     "data" : "println(\"I'am from JOB\")",
     "alias" : null,
-    "icon" : null
+    "icon" : null,
+    "isTool" : false
   }, {
     "id" : "c79aff58-c84f-400a-a539-88ee8bcb86bd",
     "name" : "Test job с ошибкой",
@@ -139,7 +152,8 @@
     "source" : "TEXT",
     "data" : "throw Exception(\"ERROR\")",
     "alias" : null,
-    "icon" : null
+    "icon" : null,
+    "isTool" : false
   }, {
     "id" : "317d81d8-ea40-4b4b-96cb-167db9c7c1c7",
     "name" : "Тестирование обновления переменных приложения из скрипта",
@@ -149,7 +163,8 @@
     "source" : "TEXT",
     "data" : "_V.updateValue(\"TEST\", \"33333333333333333\")\n\n_V.updateValue(\"111111111111\", \"33333333333333333\")",
     "alias" : null,
-    "icon" : null
+    "icon" : null,
+    "isTool" : false
   }, {
     "id" : "9fbd793c-1ac2-4a77-b5ee-c3021decb4fd",
     "name" : "Пример действия с конфигурированием ответа",
@@ -159,7 +174,8 @@
     "source" : "TEXT",
     "data" : "ru.ezhov.rocket.action.application.chainaction.api.ResultApi.withPercentSize(\n\t\t\"Это пример текста111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111\",\n\t\t0.9D,\n\t\t0.9D,\n\t\tfalse\n\t)",
     "alias" : null,
-    "icon" : null
+    "icon" : null,
+    "isTool" : false
   }, {
     "id" : "5ff1263b-81a0-433f-b234-2b1284131f1c",
     "name" : "KeePass password show",
@@ -169,7 +185,8 @@
     "source" : "TEXT",
     "data" : "VERY_SECRET_SECRET",
     "alias" : null,
-    "icon" : null
+    "icon" : null,
+    "isTool" : false
   }, {
     "id" : "bd17e314-3d7b-4ac0-8772-ded761fa68ac",
     "name" : "Долгое действие",
@@ -179,7 +196,8 @@
     "source" : "TEXT",
     "data" : "Thread.sleep(60000)",
     "alias" : null,
-    "icon" : null
+    "icon" : null,
+    "isTool" : false
   }, {
     "id" : "d66ca5a7-6b7d-4f5e-9c6d-05cbab19ca40",
     "name" : "Действие для тестирования контекста 1 | Кладём в контекст",
@@ -189,7 +207,8 @@
     "source" : "TEXT",
     "data" : "_CONTEXT[\"test1\"] = \"test1\"",
     "alias" : null,
-    "icon" : null
+    "icon" : null,
+    "isTool" : false
   }, {
     "id" : "f016cedb-0488-49a8-9729-9c6430832641",
     "name" : "Действие для тестирования контекста 2 | Кладём в контекст",
@@ -199,7 +218,8 @@
     "source" : "TEXT",
     "data" : "_CONTEXT[\"test2\"] = \"test2\"",
     "alias" : null,
-    "icon" : null
+    "icon" : null,
+    "isTool" : false
   }, {
     "id" : "665c4fa7-0786-4886-94a2-12fde8321a20",
     "name" : "Действие для тестирования контекста 3 | Получаем из контекста",
@@ -209,6 +229,7 @@
     "source" : "TEXT",
     "data" : "_CONTEXT[\"test1\"] + \" | \" + _CONTEXT[\"test2\"]",
     "alias" : null,
-    "icon" : null
+    "icon" : null,
+    "isTool" : false
   } ]
 }

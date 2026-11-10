@@ -1,0 +1,27 @@
+rootProject.name = "rocket-action"
+
+include(
+    "application-core",
+    "utils",
+    "ui-utils",
+    "plugins",
+    "plugins:api",
+    "plugins:note-on-file",
+    "plugins:copy-to-clipboard",
+    "plugins:exec",
+    "plugins:gist",
+    "plugins:note",
+    "plugins:open-file",
+    "plugins:open-url",
+    "plugins:script",
+    "plugins:separator",
+    "plugins:show-image",
+    "plugins:show-image-svg",
+    "plugins:template",
+    "plugins:text",
+    "plugins:todoist",
+    "plugins:url-parser",
+    "plugins:jira",
+    "plugins:temporary-file",
+    "application-ui-swing",
+)

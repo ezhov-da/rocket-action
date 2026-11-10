@@ -12,6 +12,10 @@ data class AtomicAction(
     var data: String,
     var alias: String? = null,
     var icon: String? = null,
+    /**
+     * Publish this atomic action as an MCP tool.
+     */
+    var isTool: Boolean = false,
 ) : Action {
     override fun id(): String = id
 
@@ -30,6 +34,7 @@ data class AtomicAction(
         source = this.source,
         data = this.data,
         alias = this.alias,
+        isTool = this.isTool,
     )
 }
 

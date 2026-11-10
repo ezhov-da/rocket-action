@@ -1,23 +1,25 @@
 package ru.ezhov.rocket.action.application.handlers.server.mcp
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import io.modelcontextprotocol.common.McpTransportContext
 import io.modelcontextprotocol.json.McpJsonMapper
-import io.modelcontextprotocol.json.jackson2.JacksonMcpJsonMapper
 import io.modelcontextprotocol.json.schema.jackson2.DefaultJsonSchemaValidator
 import io.modelcontextprotocol.server.McpServer
-import io.modelcontextprotocol.server.McpStatelessServerFeatures
-import io.modelcontextprotocol.server.McpStatelessServerHandler
-import io.modelcontextprotocol.server.McpStatelessSyncServer
-import io.modelcontextprotocol.spec.McpError
+import io.modelcontextprotocol.server.McpServerFeatures
+import io.modelcontextprotocol.server.McpSyncServer
+import io.modelcontextprotocol.server.transport.HttpServletStreamableServerTransportProvider
 import io.modelcontextprotocol.spec.McpSchema
-import io.modelcontextprotocol.spec.McpStatelessServerTransport
 import mu.KotlinLogging
+import org.springframework.beans.factory.DisposableBean
+import org.springframework.beans.factory.InitializingBean
 import org.springframework.stereotype.Service
-import reactor.core.publisher.Mono
 import ru.ezhov.rocket.action.api.handler.RocketActionHandleStatus
 import ru.ezhov.rocket.action.application.CreateMenuDomainEvent
-import ru.ezhov.rocket.action.application.chainaction.domain.model.AtomicAction
+import ru.ezhov.rocket.action.application.chainaction.domain.event.AtomicActionCreatedDomainEvent
+import ru.ezhov.rocket.action.application.chainaction.domain.event.AtomicActionDeletedDomainEvent
+import ru.ezhov.rocket.action.application.chainaction.domain.event.AtomicActionUpdatedDomainEvent
+import ru.ezhov.rocket.action.application.chainaction.domain.event.ChainActionCreatedDomainEvent
+import ru.ezhov.rocket.action.application.chainaction.domain.event.ChainActionDeletedDomainEvent
+import ru.ezhov.rocket.action.application.chainaction.domain.event.ChainActionUpdatedDomainEvent
 import ru.ezhov.rocket.action.application.chainaction.domain.model.ContractType
 import ru.ezhov.rocket.action.application.event.domain.DomainEvent
 import ru.ezhov.rocket.action.application.event.domain.DomainEventSubscriber
@@ -27,106 +29,27 @@ import ru.ezhov.rocket.action.application.properties.UsedPropertiesName
 
 private val logger = KotlinLogging.logger {}
 
-private const val MAX_REQUEST_SIZE = 1024 * 1024
-
-data class McpHttpResult(
-    val status: Int,
-    val body: String? = null,
-)
-
-/**
- * Адаптер "stateless" транспорта MCP поверх Spark (javax.servlet/Jetty 9).
- *
- * Формат обмена: один POST = один JSON-RPC request/notification, ответ - обычный JSON.
- * Такой транспорт не требует Jakarta Servlet API, сессий и SSE, поэтому работает
- * на том же Spark-сервере, что и остальной HTTP API приложения.
- */
-class SparkStatelessMcpTransport(
-    private val jsonMapper: McpJsonMapper,
-    private val maxRequestSize: Int = MAX_REQUEST_SIZE,
-) : McpStatelessServerTransport {
-
-    @Volatile
-    private var handler: McpStatelessServerHandler? = null
-
-    override fun setMcpHandler(mcpHandler: McpStatelessServerHandler) {
-        handler = mcpHandler
-    }
-
-    override fun closeGracefully(): Mono<Void> {
-        handler = null
-        return Mono.empty()
-    }
-
-    fun handle(body: String): McpHttpResult {
-        if (body.toByteArray(Charsets.UTF_8).size > maxRequestSize) {
-            return error(413, McpSchema.ErrorCodes.INVALID_REQUEST, "Payload too large")
-        }
-
-        val message = try {
-            McpSchema.deserializeJsonRpcMessage(jsonMapper, body)
-        } catch (e: Exception) {
-            logger.warn(e) { "Can't parse MCP message" }
-            return error(400, McpSchema.ErrorCodes.PARSE_ERROR, "Invalid message format")
-        }
-
-        val currentHandler = handler
-            ?: return error(503, McpSchema.ErrorCodes.INTERNAL_ERROR, "MCP server is not started")
-
-        return try {
-            when (message) {
-                is McpSchema.JSONRPCRequest -> {
-                    val response = currentHandler.handleRequest(McpTransportContext.EMPTY, message).block()
-                    McpHttpResult(200, jsonMapper.writeValueAsString(response))
-                }
-
-                is McpSchema.JSONRPCNotification -> {
-                    currentHandler.handleNotification(McpTransportContext.EMPTY, message).block()
-                    McpHttpResult(202)
-                }
-
-                else -> error(400, McpSchema.ErrorCodes.INVALID_REQUEST, "Only requests or notifications are accepted")
-            }
-        } catch (e: Exception) {
-            logger.error(e) { "MCP message handling failed" }
-            error(500, McpSchema.ErrorCodes.INTERNAL_ERROR, "Failed to handle message: ${e.message}")
-        }
-    }
-
-    private fun error(httpStatus: Int, code: Int, message: String): McpHttpResult {
-        val jsonRpcError = McpError.builder(code).message(message).build().jsonRpcError
-        val body = linkedMapOf<String, Any?>(
-            "jsonrpc" to "2.0",
-            "id" to null,
-            "error" to linkedMapOf<String, Any?>(
-                "code" to jsonRpcError.code(),
-                "message" to jsonRpcError.message(),
-            ),
-        )
-
-        return McpHttpResult(httpStatus, jsonMapper.writeValueAsString(body))
-    }
-}
-
 /**
  * MCP-сервер приложения.
  *
- * Каждый контракт каждого [ru.ezhov.rocket.action.application.chainaction.domain.model.AtomicAction]
- * публикуется как отдельный MCP-инструмент. При вызове инструмента обработчик
- * ищется заново по id, поэтому перезагрузка плагинов не приводит к вызову
- * устаревшего экземпляра обработчика.
+ * Публикуются атомарные действия и цепочки действий, отмеченные как используемые для MCP.
+ * При вызове инструмента обработчик ищется заново по id, поэтому перезагрузка
+ * плагинов не приводит к вызову устаревшего экземпляра обработчика.
+ *
+ * Транспорт ([HttpServletStreamableServerTransportProvider]) регистрируется как
+ * сервлет в [McpServerConfig]; здесь к нему подключается сам MCP-сервер.
  */
 @Service
 class McpServerService(
     private val mcpExecuteActionRocketActionHandler: McpActionRocketActionService,
     private val generalPropertiesRepository: GeneralPropertiesRepository,
     private val objectMapper: ObjectMapper,
-) {
-    private val jsonMapper: McpJsonMapper = JacksonMcpJsonMapper(objectMapper)
-    private val transport = SparkStatelessMcpTransport(jsonMapper)
+    private val transportProvider: HttpServletStreamableServerTransportProvider,
+    private val mcpJsonMapper: McpJsonMapper,
+) : InitializingBean, DisposableBean {
 
     @Volatile
-    private var server: McpStatelessSyncServer? = null
+    private var server: McpSyncServer? = null
 
     init {
         // Меню пересобирается после перезагрузки настроек/плагинов,
@@ -141,14 +64,23 @@ class McpServerService(
                     }
                 }
 
-                override fun subscribedToEventType(): List<Class<*>> = listOf(CreateMenuDomainEvent::class.java)
+                override fun subscribedToEventType(): List<Class<*>> = listOf(
+                    CreateMenuDomainEvent::class.java,
+
+                    ChainActionCreatedDomainEvent::class.java,
+                    ChainActionUpdatedDomainEvent::class.java,
+                    ChainActionDeletedDomainEvent::class.java,
+
+                    AtomicActionCreatedDomainEvent::class.java,
+                    AtomicActionUpdatedDomainEvent::class.java,
+                    AtomicActionDeletedDomainEvent::class.java,
+                )
             }
         )
     }
 
-    fun handle(body: String): McpHttpResult {
-        ensureStarted()
-        return transport.handle(body)
+    override fun afterPropertiesSet() {
+        start()
     }
 
     fun start() {
@@ -191,24 +123,21 @@ class McpServerService(
         logger.info { "MCP tools refreshed. count='${actual.size}'" }
     }
 
+    override fun destroy() {
+        close()
+    }
+
     fun close() {
         server?.closeGracefully()
         server = null
     }
 
-    private fun ensureStarted() {
-        if (server == null) {
-            start()
-        }
-    }
-
-    private fun build(): McpStatelessSyncServer =
-        McpServer.sync(transport)
+    private fun build(): McpSyncServer =
+        McpServer.sync(transportProvider)
             .serverInfo(SERVER_INFO_NAME, version())
             .instructions("Rocket Action handlers and commands exposed as MCP tools")
-            // stateless-транспорт не может присылать listChanged-нотификации
-            .capabilities(McpSchema.ServerCapabilities.builder().tools(false).build())
-            .jsonMapper(jsonMapper)
+            .capabilities(McpSchema.ServerCapabilities.builder().tools(true).build())
+            .jsonMapper(mcpJsonMapper)
             .jsonSchemaValidator(DefaultJsonSchemaValidator(objectMapper))
             .tools(toolSpecifications())
             .build()
@@ -217,22 +146,25 @@ class McpServerService(
         .asStringOrNull(UsedPropertiesName.VERSION)
         ?: UNKNOWN_VERSION
 
-    private fun toolSpecifications(): List<McpStatelessServerFeatures.SyncToolSpecification> =
+    private fun toolSpecifications(): List<McpServerFeatures.SyncToolSpecification> =
         mcpExecuteActionRocketActionHandler.all().map { action ->
             toolSpecification(action)
         }
 
     private fun toolSpecification(
-        action: AtomicAction,
-    ): McpStatelessServerFeatures.SyncToolSpecification =
-        McpStatelessServerFeatures.SyncToolSpecification.builder()
+        action: McpAction,
+    ): McpServerFeatures.SyncToolSpecification =
+        McpServerFeatures.SyncToolSpecification.builder()
             .tool(
-                McpSchema.Tool.builder(toolName(action.id(), action.name()), inputSchema(action))
-                    .title(action.name())
-                    .description(action.description())
+                McpSchema.Tool.builder(
+                    toolName(action.action.id(), action.action.name()),
+                    inputSchema(action.contractType),
+                )
+                    .title(action.action.name())
+                    .description(action.action.description())
                     .build()
             )
-            .callHandler { _, request -> execute(action.id, request) }
+            .callHandler { _, request -> execute(action.action.id(), request) }
             .build()
 
     private fun execute(
@@ -273,17 +205,17 @@ class McpServerService(
     /**
      * Input-параметры контракта обработчика -> JSON Schema инструмента.
      */
-    private fun inputSchema(action: AtomicAction): Map<String, Any> {
+    private fun inputSchema(contractType: ContractType?): Map<String, Any> {
         val properties = linkedMapOf<String, Any>()
         val required = mutableListOf<String>()
 
-        val schema = when (action.contractType) {
+        val schema = when (contractType) {
             ContractType.IN_OUT, ContractType.IN_UNIT -> {
                 required.add("input")
                 linkedMapOf<String, Any>("type" to "string")
             }
 
-            ContractType.UNIT_OUT, ContractType.UNIT_UNIT -> linkedMapOf()
+            ContractType.UNIT_OUT, ContractType.UNIT_UNIT, null -> linkedMapOf()
         }
 
         properties["input"] = schema

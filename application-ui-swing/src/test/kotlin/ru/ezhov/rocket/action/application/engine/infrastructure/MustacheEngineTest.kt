@@ -13,6 +13,7 @@ internal class MustacheEngineTest {
                 listOf(EngineVariable("testKey", "Hello"))
             )
 
-        assertThat(result).isEqualTo("Hello world!")
+        // MustacheEngine returns a StringWriter, so compare its textual representation.
+        assertThat(result.toString()).isEqualTo("Hello world!")
     }
 }

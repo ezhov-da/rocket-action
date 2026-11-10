@@ -1,17 +1,19 @@
 # Скрипты наката БД
 
-Запустить в модуле `application-core` команду `mvn liquibase:update`.
+Запустить из корня проекта задачу Gradle модуля `application-core`:
 
-Запуск в модуле `application-core` через командную строку
+```shell
+.\gradlew.bat :application-core:liquibaseUpdate
+```
 
 ## PROD
 
 ```shell
-mvn liquibase:update -Dliquibase.contexts='!dev'
+.\gradlew.bat :application-core:liquibaseUpdate "-Pliquibase.contexts=!dev"
 ```
 
 ## DEV
 
 ```shell
-mvn liquibase:update -Dliquibase.contexts='dev'
+.\gradlew.bat :application-core:liquibaseUpdate -Pliquibase.contexts=dev
 ```
