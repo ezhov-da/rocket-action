@@ -76,6 +76,7 @@ class JsonAtomicActionRepository(
         alias = alias,
         icon = icon,
         isTool = isTool,
+        mcpToolName = mcpToolName,
     )
 
     private fun AtomicActionDto.toAtomicActionDto(): AtomicAction = AtomicAction(
@@ -89,5 +90,6 @@ class JsonAtomicActionRepository(
         alias = alias,
         icon = icon,
         isTool = isTool,
+        mcpToolName = mcpToolName,
     )
 }

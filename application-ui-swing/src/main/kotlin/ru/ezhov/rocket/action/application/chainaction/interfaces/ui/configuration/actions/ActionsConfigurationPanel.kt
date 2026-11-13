@@ -63,6 +63,7 @@ class ActionsConfigurationPanel(
 
     private val createAndEditAtomicActionDialog = CreateAndEditAtomicActionDialog(
         atomicActionService = atomicActionService,
+        chainActionService = chainActionService,
         actionExecutorService = actionExecutorService,
         iconRepository = iconRepository,
     )

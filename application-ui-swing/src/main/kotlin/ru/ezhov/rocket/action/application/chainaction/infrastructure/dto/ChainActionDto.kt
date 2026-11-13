@@ -17,4 +17,11 @@ class ChainActionDto(
     @get:JsonProperty("isTool")
     @param:JsonProperty("isTool")
     var isTool: Boolean = false,
+    /**
+     * Custom MCP tool name. Missing in files written by older versions,
+     * where the name was always generated.
+     */
+    @get:JsonProperty("mcpToolName")
+    @param:JsonProperty("mcpToolName")
+    var mcpToolName: String? = null,
 )

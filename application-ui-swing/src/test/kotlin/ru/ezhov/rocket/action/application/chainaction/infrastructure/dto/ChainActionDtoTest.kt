@@ -22,6 +22,21 @@ class ChainActionDtoTest {
         assertThat(objectMapper.writeValueAsString(dto)).contains("\"isTool\":true")
     }
 
+    @Test
+    fun `reads a legacy chain action without a custom mcp tool name`() {
+        val dto = objectMapper.readValue(LEGACY_CHAIN_ACTION, ChainActionDto::class.java)
+
+        assertThat(dto.mcpToolName).isNull()
+    }
+
+    @Test
+    fun `reads and writes the custom mcp tool name`() {
+        val dto = objectMapper.readValue(CHAIN_ACTION_WITH_TOOL_NAME, ChainActionDto::class.java)
+
+        assertThat(dto.mcpToolName).isEqualTo("custom_chain")
+        assertThat(objectMapper.writeValueAsString(dto)).contains("\"mcpToolName\":\"custom_chain\"")
+    }
+
     private companion object {
         private val LEGACY_CHAIN_ACTION = """
             {
@@ -41,6 +56,18 @@ class ChainActionDtoTest {
               "actions": [],
               "icon": null,
               "isTool": true
+            }
+        """.trimIndent()
+
+        private val CHAIN_ACTION_WITH_TOOL_NAME = """
+            {
+              "id": "chain-id",
+              "name": "Chain name",
+              "description": "Chain description",
+              "actions": [],
+              "icon": null,
+              "isTool": true,
+              "mcpToolName": "custom_chain"
             }
         """.trimIndent()
     }

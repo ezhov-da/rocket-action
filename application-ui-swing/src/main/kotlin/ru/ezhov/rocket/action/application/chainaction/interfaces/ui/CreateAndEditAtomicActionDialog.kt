@@ -6,11 +6,13 @@ import org.fife.ui.rsyntaxtextarea.SyntaxConstants
 import org.fife.ui.rtextarea.RTextScrollPane
 import ru.ezhov.rocket.action.application.chainaction.application.ActionExecutorService
 import ru.ezhov.rocket.action.application.chainaction.application.AtomicActionService
+import ru.ezhov.rocket.action.application.chainaction.application.ChainActionService
 import ru.ezhov.rocket.action.application.chainaction.domain.model.AtomicAction
 import ru.ezhov.rocket.action.application.chainaction.domain.model.AtomicActionEngine
 import ru.ezhov.rocket.action.application.chainaction.domain.model.AtomicActionSource
 import ru.ezhov.rocket.action.application.chainaction.domain.model.ContractType
 import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.base.ActionExecutePanel
+import ru.ezhov.rocket.action.application.handlers.server.mcp.McpToolName
 import ru.ezhov.rocket.action.application.icon.infrastructure.IconRepository
 import ru.ezhov.rocket.action.application.icon.interfaces.ui.SelectIconPanel
 import ru.ezhov.rocket.action.application.resources.Icons
@@ -26,6 +28,7 @@ import javax.swing.JCheckBox
 import javax.swing.JComponent
 import javax.swing.JFrame
 import javax.swing.JLabel
+import javax.swing.JOptionPane
 import javax.swing.JPanel
 import javax.swing.JRadioButton
 import javax.swing.JTextField
@@ -33,6 +36,7 @@ import javax.swing.KeyStroke
 
 class CreateAndEditAtomicActionDialog(
     private val atomicActionService: AtomicActionService,
+    private val chainActionService: ChainActionService,
     iconRepository: IconRepository,
     actionExecutorService: ActionExecutorService,
 ) : JFrame() {
@@ -63,6 +67,13 @@ class CreateAndEditAtomicActionDialog(
     private val isToolCheckBox: JCheckBox = JCheckBox("Use for MCP").apply {
         toolTipText = "Publish this atomic action as an MCP tool"
     }
+
+    private val mcpToolNameTextField: JTextField = JTextField().apply {
+        isEnabled = false
+        toolTipText = "Leave empty to use the name generated from the action name and ID. " +
+            "Cyrillic characters are transliterated and other unsupported characters are replaced with '_'"
+    }
+    private val mcpToolNameLabel: JLabel = JLabel("MCP tool name:").apply { labelFor = mcpToolNameTextField }
 
     private val contractLabel: JLabel = JLabel("Contract:")
     private val inOutRadioButton: JRadioButton = JRadioButton("IN and OUT")
@@ -118,7 +129,9 @@ class CreateAndEditAtomicActionDialog(
         contentPane.add(descriptionLabel, "wrap")
         contentPane.add(RTextScrollPane(descriptionTextPane, false), "span, grow, shrink 50, hmin 18%, wrap")
 
-        contentPane.add(isToolCheckBox, "span, wrap")
+        contentPane.add(isToolCheckBox, "split 3")
+        contentPane.add(mcpToolNameLabel)
+        contentPane.add(mcpToolNameTextField, "grow, wrap")
 
         contentPane.add(contractLabel, "split 5")
         contentPane.add(inOutRadioButton)
@@ -159,6 +172,10 @@ class CreateAndEditAtomicActionDialog(
             setGroovySyntax()
         }
 
+        isToolCheckBox.addActionListener {
+            mcpToolNameTextField.isEnabled = isToolCheckBox.isSelected
+        }
+
         // call onCancel() when cross is clicked
         defaultCloseOperation = DO_NOTHING_ON_CLOSE
         addWindowListener(object : WindowAdapter() {
@@ -186,6 +203,16 @@ class CreateAndEditAtomicActionDialog(
 
     // TODO ezhov
     private fun onOK(isClosed: Boolean) {
+        val mcpToolName = if (isToolCheckBox.isSelected) {
+            mcpToolNameTextField.text.trim().takeIf { it.isNotEmpty() }
+        } else {
+            null
+        }
+
+        if (!validateMcpToolName(mcpToolName)) {
+            return
+        }
+
         when (dialogType!!) {
             DialogType.CREATE -> {
                 atomicActionService.addAtomic(
@@ -212,6 +239,7 @@ class CreateAndEditAtomicActionDialog(
                         alias = aliasTextField.text.takeIf { it.isNotEmpty() },
                         icon = selectIconPanel.selectedIcon(),
                         isTool = isToolCheckBox.isSelected,
+                        mcpToolName = mcpToolName,
                     )
                 )
             }
@@ -239,6 +267,7 @@ class CreateAndEditAtomicActionDialog(
                     alias = aliasTextField.text.takeIf { it.isNotEmpty() }
                     icon = selectIconPanel.selectedIcon()
                     isTool = isToolCheckBox.isSelected
+                    this.mcpToolName = mcpToolName
                 }
 
                 atomicActionService.updateAtomic(atomicAction = currentAction!!)
@@ -248,6 +277,36 @@ class CreateAndEditAtomicActionDialog(
         if (isClosed) {
             dispose()
         }
+    }
+
+    /**
+     * A custom name must not steal the tool name of another published action.
+     */
+    private fun validateMcpToolName(mcpToolName: String?): Boolean {
+        if (mcpToolName == null) {
+            return true
+        }
+
+        val publishedActions = buildList {
+            addAll(atomicActionService.atomics().filter { it.isTool })
+            addAll(chainActionService.chains().filter { it.isTool })
+        }
+
+        val conflict = McpToolName.conflict(
+            candidate = mcpToolName,
+            actions = publishedActions,
+            exceptId = currentAction?.id,
+        ) ?: return true
+
+        JOptionPane.showMessageDialog(
+            this,
+            "MCP tool name '${McpToolName.normalize(mcpToolName)}' is already used " +
+                "by action '${conflict.name()}' (${conflict.id()})",
+            "MCP tool name conflict",
+            JOptionPane.WARNING_MESSAGE,
+        )
+
+        return false
     }
 
     private fun onCancel() {
@@ -270,6 +329,8 @@ class CreateAndEditAtomicActionDialog(
         dataTextPane.text = ""
         aliasTextField.text = ""
         isToolCheckBox.isSelected = false
+        mcpToolNameTextField.text = ""
+        mcpToolNameTextField.isEnabled = false
 
         selectIconPanel.setIcon(null)
 
@@ -320,6 +381,8 @@ class CreateAndEditAtomicActionDialog(
         dataTextPane.text = action.data
         aliasTextField.text = action.alias.orEmpty()
         isToolCheckBox.isSelected = action.isTool
+        mcpToolNameTextField.text = action.mcpToolName.orEmpty()
+        mcpToolNameTextField.isEnabled = action.isTool
 
         isVisible = true
     }

@@ -22,6 +22,21 @@ class AtomicActionDtoTest {
         assertThat(objectMapper.writeValueAsString(dto)).contains("\"isTool\":false")
     }
 
+    @Test
+    fun `reads a legacy action without a custom mcp tool name`() {
+        val dto = objectMapper.readValue(LEGACY_ATOMIC_ACTION, AtomicActionDto::class.java)
+
+        assertThat(dto.mcpToolName).isNull()
+    }
+
+    @Test
+    fun `reads and writes the custom mcp tool name`() {
+        val dto = objectMapper.readValue(ATOMIC_ACTION_WITH_TOOL_NAME, AtomicActionDto::class.java)
+
+        assertThat(dto.mcpToolName).isEqualTo("custom_tool")
+        assertThat(objectMapper.writeValueAsString(dto)).contains("\"mcpToolName\":\"custom_tool\"")
+    }
+
     private companion object {
         private val LEGACY_ATOMIC_ACTION = """
             {
@@ -49,6 +64,22 @@ class AtomicActionDtoTest {
               "alias": null,
               "icon": null,
               "isTool": false
+            }
+        """.trimIndent()
+
+        private val ATOMIC_ACTION_WITH_TOOL_NAME = """
+            {
+              "id": "action-id",
+              "name": "Action name",
+              "description": "Action description",
+              "contractType": "IN_OUT",
+              "engine": "GROOVY",
+              "source": "TEXT",
+              "data": "_INPUT",
+              "alias": null,
+              "icon": null,
+              "isTool": true,
+              "mcpToolName": "custom_tool"
             }
         """.trimIndent()
     }

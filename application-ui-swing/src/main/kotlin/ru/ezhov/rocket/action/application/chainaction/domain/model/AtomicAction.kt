@@ -16,6 +16,11 @@ data class AtomicAction(
      * Publish this atomic action as an MCP tool.
      */
     var isTool: Boolean = false,
+    /**
+     * Custom name under which the action is published as an MCP tool.
+     * Null or blank means the name is generated from [name] and [id].
+     */
+    var mcpToolName: String? = null,
 ) : Action {
     override fun id(): String = id
 
@@ -24,6 +29,8 @@ data class AtomicAction(
     override fun description(): String = description
 
     override fun icon(): String? = icon
+
+    override fun mcpToolName(): String? = this.mcpToolName
 
     fun duplicate(): AtomicAction = AtomicAction(
         id = UUID.randomUUID().toString(),
@@ -35,6 +42,7 @@ data class AtomicAction(
         data = this.data,
         alias = this.alias,
         isTool = this.isTool,
+        mcpToolName = this.mcpToolName,
     )
 }
 

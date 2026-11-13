@@ -22,7 +22,13 @@ private const val RESULT_KEY = "result"
 data class McpAction(
     val action: Action,
     val contractType: ContractType?,
-)
+) {
+    /**
+     * Custom name of the action or the name generated from it.
+     */
+    val toolName: String =
+        McpToolName.resolve(action.mcpToolName(), action.id(), action.name())
+}
 
 @Component
 class McpActionRocketActionService(

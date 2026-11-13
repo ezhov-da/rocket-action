@@ -12,6 +12,11 @@ data class ChainAction(
      * Publish this chain action as an MCP tool.
      */
     var isTool: Boolean = false,
+    /**
+     * Custom name under which the action is published as an MCP tool.
+     * Null or blank means the name is generated from [name] and [id].
+     */
+    var mcpToolName: String? = null,
 ) : Action {
     override fun id(): String = id
 
@@ -21,12 +26,15 @@ data class ChainAction(
 
     override fun icon(): String? = icon
 
+    override fun mcpToolName(): String? = this.mcpToolName
+
     fun duplicate(): ChainAction = ChainAction(
         id = UUID.randomUUID().toString(),
         name = this.name,
         description = this.name,
         actions = this.actions,
         isTool = this.isTool,
+        mcpToolName = this.mcpToolName,
     )
 }
 

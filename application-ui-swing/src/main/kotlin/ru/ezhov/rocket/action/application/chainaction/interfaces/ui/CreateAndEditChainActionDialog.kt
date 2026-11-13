@@ -28,6 +28,7 @@ import ru.ezhov.rocket.action.application.chainaction.scheduler.domain.event.Act
 import ru.ezhov.rocket.action.application.event.domain.DomainEvent
 import ru.ezhov.rocket.action.application.event.domain.DomainEventSubscriber
 import ru.ezhov.rocket.action.application.event.infrastructure.DomainEventFactory
+import ru.ezhov.rocket.action.application.handlers.server.mcp.McpToolName
 import ru.ezhov.rocket.action.application.icon.infrastructure.IconRepository
 import ru.ezhov.rocket.action.application.icon.interfaces.ui.SelectIconPanel
 import ru.ezhov.rocket.action.application.resources.Icons
@@ -50,6 +51,7 @@ import javax.swing.JFrame
 import javax.swing.JLabel
 import javax.swing.JList
 import javax.swing.JMenu
+import javax.swing.JOptionPane
 import javax.swing.JPanel
 import javax.swing.JPopupMenu
 import javax.swing.JScrollPane
@@ -68,6 +70,7 @@ class CreateAndEditChainActionDialog(
 
     private val createAndEditAtomicActionDialog = CreateAndEditAtomicActionDialog(
         atomicActionService = atomicActionService,
+        chainActionService = chainActionService,
         actionExecutorService = actionExecutorService,
         iconRepository = iconRepository,
     )
@@ -100,6 +103,13 @@ class CreateAndEditChainActionDialog(
     private val isToolCheckBox: JCheckBox = JCheckBox("Use for MCP").apply {
         toolTipText = "Publish this chain action as an MCP tool"
     }
+
+    private val mcpToolNameTextField: JTextField = JTextField().apply {
+        isEnabled = false
+        toolTipText = "Leave empty to use the name generated from the action name and ID. " +
+            "Cyrillic characters are transliterated and other unsupported characters are replaced with '_'"
+    }
+    private val mcpToolNameLabel: JLabel = JLabel("MCP tool name:").apply { labelFor = mcpToolNameTextField }
 
     private val allListActionsModel = DefaultListModel<AtomicAction>()
     private val allListActions = JList(allListActionsModel)
@@ -205,7 +215,9 @@ class CreateAndEditChainActionDialog(
         contentPane.add(descriptionLabel, "wrap")
         contentPane.add(RTextScrollPane(descriptionTextPane, false), "span, wrap, width max, hmin 18%")
 
-        contentPane.add(isToolCheckBox, "span, wrap")
+        contentPane.add(isToolCheckBox, "split 3")
+        contentPane.add(mcpToolNameLabel)
+        contentPane.add(mcpToolNameTextField, "grow, wrap")
 
         contentPane.add(
             JPanel(MigLayout())
@@ -256,6 +268,10 @@ class CreateAndEditChainActionDialog(
         buttonSaveAndClose.addActionListener { onOK(isClosed = true) }
         buttonCancel.addActionListener { onCancel() }
 
+        isToolCheckBox.addActionListener {
+            mcpToolNameTextField.isEnabled = isToolCheckBox.isSelected
+        }
+
         // call onCancel() when cross is clicked
         defaultCloseOperation = DO_NOTHING_ON_CLOSE
         addWindowListener(object : WindowAdapter() {
@@ -293,6 +309,12 @@ class CreateAndEditChainActionDialog(
     private var dialogType: DialogType? = null
     private var currentEditChainAction: ChainAction? = null
     private fun onOK(isClosed: Boolean) {
+        val mcpToolName = mcpToolName()
+
+        if (!validateMcpToolName(mcpToolName)) {
+            return
+        }
+
         when (dialogType!!) {
             DialogType.CREATE -> {
                 chainActionService.addChain(
@@ -308,6 +330,7 @@ class CreateAndEditChainActionDialog(
                         },
                         icon = selectIconPanel.selectedIcon(),
                         isTool = isToolCheckBox.isSelected,
+                        mcpToolName = mcpToolName,
                     )
                 )
             }
@@ -324,6 +347,7 @@ class CreateAndEditChainActionDialog(
                     }
                     icon = selectIconPanel.selectedIcon()
                     isTool = isToolCheckBox.isSelected
+                    this.mcpToolName = mcpToolName
                 })
             }
         }
@@ -331,6 +355,43 @@ class CreateAndEditChainActionDialog(
         if (isClosed) {
             dispose()
         }
+    }
+
+    private fun mcpToolName(): String? =
+        if (isToolCheckBox.isSelected) {
+            mcpToolNameTextField.text.trim().takeIf { it.isNotEmpty() }
+        } else {
+            null
+        }
+
+    /**
+     * A custom name must not steal the tool name of another published action.
+     */
+    private fun validateMcpToolName(mcpToolName: String?): Boolean {
+        if (mcpToolName == null) {
+            return true
+        }
+
+        val publishedActions = buildList {
+            addAll(atomicActionService.atomics().filter { it.isTool })
+            addAll(chainActionService.chains().filter { it.isTool })
+        }
+
+        val conflict = McpToolName.conflict(
+            candidate = mcpToolName,
+            actions = publishedActions,
+            exceptId = currentEditChainAction?.id,
+        ) ?: return true
+
+        JOptionPane.showMessageDialog(
+            this,
+            "MCP tool name '${McpToolName.normalize(mcpToolName)}' is already used " +
+                "by action '${conflict.name()}' (${conflict.id()})",
+            "MCP tool name conflict",
+            JOptionPane.WARNING_MESSAGE,
+        )
+
+        return false
     }
 
     private fun onCancel() {
@@ -346,6 +407,8 @@ class CreateAndEditChainActionDialog(
         nameTextField.text = ""
         descriptionTextPane.text = ""
         isToolCheckBox.isSelected = false
+        mcpToolNameTextField.text = ""
+        mcpToolNameTextField.isEnabled = false
         selectedListActionsModel.removeAllElements()
 
         actionExecutePanel.isVisible = false
@@ -364,6 +427,8 @@ class CreateAndEditChainActionDialog(
         nameTextField.text = ""
         descriptionTextPane.text = ""
         isToolCheckBox.isSelected = false
+        mcpToolNameTextField.text = ""
+        mcpToolNameTextField.isEnabled = false
 
         selectedListActionsModel.removeAllElements()
 
@@ -391,6 +456,8 @@ class CreateAndEditChainActionDialog(
         nameTextField.text = chainAction.name
         descriptionTextPane.text = chainAction.description
         isToolCheckBox.isSelected = chainAction.isTool
+        mcpToolNameTextField.text = chainAction.mcpToolName.orEmpty()
+        mcpToolNameTextField.isEnabled = chainAction.isTool
 
         actionExecutePanel.isVisible = true
         actionExecutePanel.setCurrentAction(chainAction)
