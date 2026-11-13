@@ -31,8 +31,6 @@ fun main(args: Array<String>) {
                     data = "Text",
                 ),
                 backgroundColor = null,
-                chainActionService = mockk(),
-                actionSchedulerStatusComponentService = mockk(),
             )
         )
         frame.setSize(1000, 600);

@@ -26,6 +26,7 @@ import ru.ezhov.rocket.action.application.chainaction.domain.model.Action
 import ru.ezhov.rocket.action.application.chainaction.domain.model.AtomicAction
 import ru.ezhov.rocket.action.application.chainaction.infrastructure.ActionExecutorFactory
 import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.base.SelectChainListPanel
+import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.renderer.ActionRowDecorationBuilder
 import ru.ezhov.rocket.action.application.chainaction.scheduler.application.ActionSchedulerService
 import ru.ezhov.rocket.action.application.event.domain.DomainEvent
 import ru.ezhov.rocket.action.application.event.domain.DomainEventSubscriber
@@ -287,13 +288,18 @@ private class ActionsComponentPanel(
     private var selectedPanel: SelectChainListPanel
 
     init {
+        val chains = chainActionService.chains()
+        val atomics = atomicActionService.atomics()
+
         selectedPanel = SelectChainListPanel(
-            actionService = atomicActionService,
-            chainActionService = chainActionService,
-            chains = chainActionService.chains(),
-            atomics = atomicActionService.atomics(),
+            chains = chains,
+            atomics = atomics,
+            decorationSnapshot = ActionRowDecorationBuilder.build(
+                chains = chains,
+                atomics = atomics,
+                schedulers = actionSchedulerService.schedulers(),
+            ),
             searchTextTransformer = searchTextTransformer,
-            actionSchedulerService = actionSchedulerService,
             selectedChainCallback = { },
         )
 

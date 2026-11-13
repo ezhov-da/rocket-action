@@ -1,17 +1,17 @@
 package ru.ezhov.rocket.action.application.chainaction.interfaces.ui.renderer
 
-import ru.ezhov.rocket.action.application.chainaction.application.ChainActionService
 import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.AtomicActionListCellPanel
 import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.SelectedAtomicAction
-import ru.ezhov.rocket.action.application.chainaction.scheduler.application.ActionSchedulerService
 import java.awt.Component
 import javax.swing.DefaultListCellRenderer
 import javax.swing.JLabel
 import javax.swing.JList
 
+/**
+ * Renders a selected atomic action row from [snapshot] only.
+ */
 class OrderAtomicActionListCellRenderer(
-    private val chainActionService: ChainActionService,
-    private val actionSchedulerService: ActionSchedulerService,
+    var snapshot: ActionRowDecorationSnapshot = ActionRowDecorationSnapshot.EMPTY,
 ) : DefaultListCellRenderer() {
     override fun getListCellRendererComponent(
         list: JList<*>?,
@@ -24,9 +24,8 @@ class OrderAtomicActionListCellRenderer(
         return if (value is SelectedAtomicAction) {
             AtomicActionListCellPanel(
                 atomicAction = value.atomicAction,
+                decoration = snapshot[value.atomicAction.id],
                 backgroundColor = label.background,
-                chainActionService = chainActionService,
-                actionSchedulerStatusComponentService = ActionSchedulerStatusComponentService(actionSchedulerService)
             )
         } else {
             label

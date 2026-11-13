@@ -8,12 +8,19 @@ import ru.ezhov.rocket.action.application.chainaction.domain.event.AtomicActionU
 import ru.ezhov.rocket.action.application.chainaction.domain.event.ChainActionCreatedDomainEvent
 import ru.ezhov.rocket.action.application.chainaction.domain.event.ChainActionDeletedDomainEvent
 import ru.ezhov.rocket.action.application.chainaction.domain.event.ChainActionUpdatedDomainEvent
+import ru.ezhov.rocket.action.application.chainaction.domain.model.AtomicAction
 import ru.ezhov.rocket.action.application.chainaction.domain.model.ChainAction
+import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.ActionListCellHeight
 import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.CreateAndEditChainActionDialog
 import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.InfoActionPopupMenuPanel
-import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.renderer.ActionSchedulerStatusComponentService
+import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.LatestSearchWorker
+import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.configureFixedRowHeight
+import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.replaceItems
+import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.renderer.ActionRowDecorationBuilder
+import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.renderer.ActionRowDecorationSnapshot
 import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.renderer.ChainActionListCellRenderer
 import ru.ezhov.rocket.action.application.chainaction.scheduler.application.ActionSchedulerService
+import ru.ezhov.rocket.action.application.chainaction.scheduler.domain.model.ActionScheduler
 import ru.ezhov.rocket.action.application.chainaction.scheduler.domain.event.ActionSchedulerCreatedDomainEvent
 import ru.ezhov.rocket.action.application.chainaction.scheduler.domain.event.ActionSchedulerDeletedDomainEvent
 import ru.ezhov.rocket.action.application.chainaction.scheduler.domain.event.ActionSchedulerStatusUpdatedDomainEvent
@@ -34,7 +41,6 @@ import javax.swing.JPanel
 import javax.swing.JPopupMenu
 import javax.swing.JScrollPane
 import javax.swing.SwingUtilities
-import javax.swing.SwingWorker
 
 class ChainsConfigurationPanel(
     private val actionExecutorService: ActionExecutorService,
@@ -51,14 +57,19 @@ class ChainsConfigurationPanel(
     private val buttonDuplicate: JButton = JButton("Duplicate").apply { isEnabled = false }
     private val buttonDeleteChain: JButton = JButton("Delete").apply { isEnabled = false }
 
-    private val allListChainsModel = DefaultListModel<ChainAction>()
+    private var allListChainsModel = DefaultListModel<ChainAction>()
     private val allListChains = JList(allListChainsModel)
+    private val cellRenderer = ChainActionListCellRenderer()
+
+    private var lastAtomics: List<AtomicAction> = emptyList()
+    private var lastChains: List<ChainAction> = emptyList()
+    private var lastSchedulers: List<ActionScheduler> = emptyList()
+    private val searchWorker =
+        LatestSearchWorker<SearchResult>(onResult = { result -> applySearchResult(result) })
 
     init {
-        allListChains.cellRenderer = ChainActionListCellRenderer(
-            atomicActionService = atomicActionService,
-            actionSchedulerStatusComponentService = ActionSchedulerStatusComponentService(actionSchedulerService)
-        )
+        allListChains.cellRenderer = cellRenderer
+        allListChains.configureFixedRowHeight(ActionListCellHeight.chain())
 
         buttonEditChain.addActionListener {
             allListChains.selectedValue?.let {
@@ -101,40 +112,18 @@ class ChainsConfigurationPanel(
         DomainEventFactory.subscriberRegistrar.subscribe(object : DomainEventSubscriber {
             override fun handleEvent(event: DomainEvent) {
                 when (event) {
-                    is ChainActionCreatedDomainEvent -> {
-                        allListChainsModel.addElement(event.chainAction)
-
+                    is ChainActionCreatedDomainEvent,
+                    is ChainActionDeletedDomainEvent,
+                    is ChainActionUpdatedDomainEvent -> {
                         fillList()
                     }
 
-                    is ChainActionDeletedDomainEvent -> {
-                        val iterator = allListChainsModel.elements()
-                        while (iterator.hasMoreElements()) {
-                            val action = iterator.nextElement()
-                            if (action.id == event.id) {
-                                allListChainsModel.removeElement(action)
-                                break
-                            }
-                        }
-                    }
-
-                    is ChainActionUpdatedDomainEvent -> {
-                        val iterator = allListChainsModel.elements()
-                        while (iterator.hasMoreElements()) {
-                            val action = iterator.nextElement()
-                            if (action.id == event.chainAction.id) {
-                                val index = allListChainsModel.indexOf(action)
-
-                                allListChainsModel.set(index, event.chainAction)
-
-                                fillList()
-                                break
-                            }
-                        }
-                    }
-
                     is AtomicActionUpdatedDomainEvent -> {
-                        // Atomic action can change contract
+                        // An atomic action can change the contract icon of a chain.
+                        lastAtomics = lastAtomics.map {
+                            if (it.id == event.atomicAction.id) event.atomicAction else it
+                        }
+                        applySnapshot()
                         allListChains.repaint()
                     }
 
@@ -197,104 +186,72 @@ class ChainsConfigurationPanel(
         val sortInfo = sortChainPanelConfiguration.sortInfo()
         val searchAction = searchChainPanelConfiguration.searchAction()
 
-        fillActions(sortInfo, searchAction)
+        searchWorker.submit { loadChains(sortInfo, searchAction) }
+    }
+
+    private fun loadChains(sortInfo: SortInfo, searchAction: SearchAction): SearchResult {
+        val chains = chainActionService.chains()
+        val atomics = atomicActionService.atomics()
+        val schedulers = actionSchedulerService.schedulers()
+
+        return SearchResult(
+            chains = ChainActionsFilter.filter(
+                sortInfo = sortInfo,
+                searchAction = searchAction,
+                chains = chains,
+                scheduledActionIds = schedulers.map { it.actionId }.toSet(),
+            ),
+            decoration = ActionRowDecorationBuilder.build(
+                chains = chains,
+                atomics = atomics,
+                schedulers = schedulers,
+            ),
+            atomics = atomics,
+            allChains = chains,
+            schedulers = schedulers,
+        )
+    }
+
+    private fun applySearchResult(result: SearchResult) {
+        cellRenderer.snapshot = result.decoration
+        allListChainsModel = allListChains.replaceItems(result.chains)
+        lastAtomics = result.atomics
+        lastChains = result.allChains
+        lastSchedulers = result.schedulers
+    }
+
+    private fun applySnapshot() {
+        cellRenderer.snapshot = ActionRowDecorationBuilder.build(
+            chains = lastChains,
+            atomics = lastAtomics,
+            schedulers = lastSchedulers,
+        )
     }
 
     /**
      * The scheduler state affects the rendered scheduler status and the "used in scheduler" filter.
      */
     private fun refreshSchedulerDependentState() {
+        lastSchedulers = actionSchedulerService.schedulers()
+        applySnapshot()
+        allListChains.repaint()
+
         if (searchChainPanelConfiguration
                 .searchAction()
                 .conditions
                 .contains(SearchAction.SearchCondition.SCHEDULER)
         ) {
             fillList()
-        } else {
-            allListChains.repaint()
         }
     }
 
-    private fun fillActions(sortInfo: SortInfo, searchAction: SearchAction) {
-        SearchWorker(
-            sortInfo = sortInfo,
-            searchAction = searchAction,
-            chainActionService = chainActionService,
-            actionSchedulerService = actionSchedulerService,
-            allListChainsModel = allListChainsModel,
-        ).execute()
-    }
-
-    private class SearchWorker(
-        private val sortInfo: SortInfo,
-        private val searchAction: SearchAction,
-        private val chainActionService: ChainActionService,
-        private val actionSchedulerService: ActionSchedulerService,
-        private val allListChainsModel: DefaultListModel<ChainAction>,
-    ) : SwingWorker<List<ChainAction>, Unit>() {
-        override fun doInBackground(): List<ChainAction> {
-            val chains = chainActionService.chains()
-
-            val sortedChains = when (sortInfo.sortField) {
-                SortField.NAME -> when (sortInfo.direction) {
-                    Direction.ASC -> chains.sortedBy { it.name }
-                    Direction.DESC -> chains.sortedByDescending { it.name }
-                }
-
-                SortField.ACTIONS_COUNT -> when (sortInfo.direction) {
-                    Direction.ASC -> chains.sortedBy { it.actions.size }
-                    Direction.DESC -> chains.sortedByDescending { it.actions.size }
-                }
-            }
-
-            val filterByText = when (searchAction) {
-                is SearchAction.SearchInfo -> {
-                    if (searchAction.text.isEmpty()) {
-                        sortedChains
-                    } else {
-                        sortedChains
-                            .filter { ch ->
-                                searchAction.text.any { st ->
-                                    ch.id.lowercase().lowercase().contains(st) ||
-                                        ch.name.lowercase().lowercase().contains(st) ||
-                                        ch.description.lowercase().lowercase().contains(st)
-                                }
-                            }
-                    }
-                }
-
-                is SearchAction.Reset -> sortedChains
-            }
-
-            var filterByConditions = filterByText
-            val scheduledActionIds = if (searchAction.conditions.contains(SearchAction.SearchCondition.SCHEDULER)) {
-                actionSchedulerService.scheduledActionIds()
-            } else {
-                emptySet()
-            }
-            searchAction.conditions.forEach { condition ->
-                when (condition) {
-                    SearchAction.SearchCondition.MCP -> filterByConditions =
-                        filterByConditions.filter { it.isTool }
-
-                    SearchAction.SearchCondition.SCHEDULER -> filterByConditions =
-                        filterByConditions.filter { it.id in scheduledActionIds }
-
-                    else -> {}
-                }
-            }
-            return filterByConditions
-        }
-
-        override fun done() {
-            get().let {
-                allListChainsModel.removeAllElements()
-                it.forEach {
-                    allListChainsModel.addElement(it)
-                }
-            }
-        }
-    }
+    private data class SearchResult(
+        val chains: List<ChainAction>,
+        val decoration: ActionRowDecorationSnapshot,
+        val atomics: List<AtomicAction>,
+        val allChains: List<ChainAction>,
+        val schedulers: List<ActionScheduler>,
+    )
 
     private fun showPopupMenu(element: ChainAction, event: MouseEvent) {
         val popup = JPopupMenu()

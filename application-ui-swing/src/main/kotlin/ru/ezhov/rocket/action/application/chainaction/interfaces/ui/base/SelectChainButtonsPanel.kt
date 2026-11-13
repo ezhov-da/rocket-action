@@ -2,12 +2,11 @@ package ru.ezhov.rocket.action.application.chainaction.interfaces.ui.base
 
 import net.miginfocom.swing.MigLayout
 import org.jdesktop.swingx.JXTitledSeparator
-import ru.ezhov.rocket.action.application.chainaction.application.AtomicActionService
 import ru.ezhov.rocket.action.application.chainaction.domain.model.Action
 import ru.ezhov.rocket.action.application.chainaction.domain.model.AtomicAction
 import ru.ezhov.rocket.action.application.chainaction.domain.model.ChainAction
-import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.chainIcon
 import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.components.toIcon8x8
+import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.renderer.ActionRowDecorationSnapshot
 import ru.ezhov.rocket.action.ui.utils.swing.common.toIcon
 import tips4java.CompoundIcon
 import java.awt.BorderLayout
@@ -19,18 +18,18 @@ import javax.swing.JPanel
 import javax.swing.SwingConstants
 
 class SelectChainButtonsPanel(
-    actionService: AtomicActionService,
     chains: List<ChainAction>,
     atomics: List<AtomicAction>,
+    decorationSnapshot: ActionRowDecorationSnapshot,
     selectedChainCallback: (Action) -> Unit
 ) : JPanel(BorderLayout()) {
 
     init {
         add(
             InnerButtonsPanel(
-                actionService = actionService,
                 chains = chains,
                 atomics = atomics,
+                decorationSnapshot = decorationSnapshot,
                 selectedChainCallback = selectedChainCallback,
             ),
             BorderLayout.CENTER
@@ -39,16 +38,16 @@ class SelectChainButtonsPanel(
 
 
     private class InnerButtonsPanel(
-        actionService: AtomicActionService,
         chains: List<ChainAction>,
         atomics: List<AtomicAction>,
+        decorationSnapshot: ActionRowDecorationSnapshot,
         selectedChainCallback: (Action) -> Unit
     ) : JPanel(MigLayout("", "[fill][fill]")) {
         init {
             val chainButtons = chains.map { ch ->
 
                 JButton(ch.name).apply {
-                    val i = chainIcon(chain = ch, atomicActionService = actionService)
+                    val i = decorationSnapshot[ch.id]?.chainIcon
                     ch.icon?.let {
                         icon = CompoundIcon(i, it.toIcon())
                     } ?: run {

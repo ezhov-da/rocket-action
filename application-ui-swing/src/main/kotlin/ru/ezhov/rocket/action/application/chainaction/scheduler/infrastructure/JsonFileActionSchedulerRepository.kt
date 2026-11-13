@@ -18,33 +18,70 @@ private val logger = KotlinLogging.logger {}
 class JsonFileActionSchedulerRepository(
     generalPropertiesRepository: GeneralPropertiesRepository,
     private val objectMapper: ObjectMapper,
+    folderPathOverride: String? = null,
 ) : ActionSchedulerRepository {
     val lock = Any()
 
     private val folderPath =
-        generalPropertiesRepository
-            .asStringOrNull(UsedPropertiesName.ACTION_SCHEDULERS_FILE_FOLDER_REPOSITORY_PATH)
+        folderPathOverride
+            ?: generalPropertiesRepository
+                .asStringOrNull(UsedPropertiesName.ACTION_SCHEDULERS_FILE_FOLDER_REPOSITORY_PATH)
             ?: "./.rocket-action/action-schedulers"
+
+    private var allCached: ActionSchedulers? = null
+    private var indexCached: Map<String, ActionScheduler>? = null
 
     override fun all(): ActionSchedulers {
         synchronized(lock) {
-            val files = folder().listFiles { _, name -> name.endsWith(".json") }.orEmpty()
-            val schedulers =
-                files
-                    .mapNotNull { f ->
-                        try {
-                            objectMapper.readValue(f, JsonActionScheduler::class.java).toActionScheduler()
-                        } catch (ex: Exception) {
-                            logger.warn(ex) { "Error when read action scheduler from file '${f.absolutePath}'. Return null" }
-                            null
-                        }
-                    }
+            allCached?.let { return it }
 
-            return ActionSchedulers(schedulers)
+            val schedulers = readSchedulers()
+            cache(schedulers)
+            return schedulers
         }
     }
 
-    private fun folder(): File {
+    override fun byActionId(actionId: String): ActionScheduler? {
+        synchronized(lock) {
+            if (indexCached == null) {
+                cache(readSchedulers())
+            }
+            return indexCached?.get(actionId)
+        }
+    }
+
+    private fun readSchedulers(): ActionSchedulers {
+        val files = folder().listFiles { _, name -> name.endsWith(".json") }.orEmpty()
+        val schedulers =
+            files
+                .mapNotNull { f ->
+                    try {
+                        objectMapper.readValue(f, JsonActionScheduler::class.java).toActionScheduler()
+                    } catch (ex: Exception) {
+                        logger.warn(ex) { "Error when read action scheduler from file '${f.absolutePath}'. Return null" }
+                        null
+                    }
+                }
+
+        return ActionSchedulers(schedulers)
+    }
+
+    private fun cache(schedulers: ActionSchedulers) {
+        allCached = schedulers
+        indexCached = schedulers.schedulers.associateBy { it.actionId }
+    }
+
+    private fun invalidate() {
+        allCached = null
+        indexCached = null
+    }
+
+    /**
+     * The read path must not create the folder as a side effect.
+     */
+    private fun folder(): File = File(folderPath)
+
+    private fun writableFolder(): File {
         val file = File(folderPath)
         if (!file.exists()) {
             file.mkdirs()
@@ -53,42 +90,39 @@ class JsonFileActionSchedulerRepository(
         return file
     }
 
-    private fun file(): File {
-        val file = File(folderPath)
-        if (!file.exists()) {
-            file.parentFile.mkdirs()
-        }
-
-        return file
-    }
-
     override fun save(schedulers: ActionSchedulers) {
-        schedulers.schedulers.forEach { scheduler ->
-            writeScheduler(scheduler)
+        synchronized(lock) {
+            schedulers.schedulers.forEach { scheduler ->
+                writeScheduler(scheduler)
+            }
+            invalidate()
         }
     }
 
     override fun save(scheduler: ActionScheduler) {
-        writeScheduler(scheduler)
+        synchronized(lock) {
+            writeScheduler(scheduler)
+            invalidate()
+        }
     }
 
     override fun delete(actionId: String) {
-        actionSchedulerFile(actionId).let { f ->
-            if (f.exists()) {
-                f.delete()
+        synchronized(lock) {
+            val file = File(folder(), "$actionId.json")
+            if (file.exists()) {
+                file.delete()
             }
+            invalidate()
         }
     }
 
     private fun writeScheduler(scheduler: ActionScheduler) {
-        synchronized(lock) {
-            val file = actionSchedulerFile(scheduler.actionId)
-            objectMapper.writerWithDefaultPrettyPrinter().writeValue(file, scheduler)
-        }
+        val file = actionSchedulerFile(scheduler.actionId)
+        objectMapper.writerWithDefaultPrettyPrinter().writeValue(file, scheduler)
     }
 
     private fun actionSchedulerFile(actionId: String) =
-        File(folder(), "$actionId.json")
+        File(writableFolder(), "$actionId.json")
 }
 
 private fun JsonActionSchedulers.toActionSchedulers() =

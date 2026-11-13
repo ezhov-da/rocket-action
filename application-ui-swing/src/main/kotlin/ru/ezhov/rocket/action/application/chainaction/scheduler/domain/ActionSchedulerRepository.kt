@@ -6,6 +6,11 @@ import ru.ezhov.rocket.action.application.chainaction.scheduler.domain.model.Act
 interface ActionSchedulerRepository {
     fun all(): ActionSchedulers
 
+    /**
+     * Returns the scheduler for the action without loading the actions the scheduler points to.
+     */
+    fun byActionId(actionId: String): ActionScheduler?
+
     fun save(schedulers: ActionSchedulers)
 
     fun save(scheduler: ActionScheduler)

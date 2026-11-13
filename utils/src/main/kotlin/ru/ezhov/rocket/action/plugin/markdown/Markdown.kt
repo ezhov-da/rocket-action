@@ -8,6 +8,19 @@ import org.commonmark.renderer.html.AttributeProvider
 import org.commonmark.renderer.html.HtmlRenderer
 
 object Markdown {
+    private val extensions = listOf(TablesExtension.create())
+
+    /**
+     * CommonMark components are configured once and reused; they are safe to use concurrently
+     * after configuration.
+     */
+    internal val parser: Parser = Parser.builder().extensions(extensions).build()
+
+    internal val renderer: HtmlRenderer = HtmlRenderer.builder()
+        .extensions(extensions)
+        .attributeProviderFactory { ImageAttributeProvider() }
+        .build()
+
     fun textMarkdownToHtml(text: String): String =
         markdownToHtml(text)
 
@@ -19,14 +32,7 @@ object Markdown {
 
     private fun markdownToHtml(markdown: String): String {
         // https://github.com/commonmark/commonmark-java
-        val extensions = listOf(TablesExtension.create())
-        val parser: Parser = Parser.builder().extensions(extensions).build()
         val document: Node = parser.parse(markdown)
-
-        val renderer: HtmlRenderer = HtmlRenderer.builder()
-            .extensions(extensions)
-            .attributeProviderFactory { ImageAttributeProvider() }
-            .build()
         return renderer.render(document)
     }
 

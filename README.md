@@ -369,6 +369,11 @@ The application writes local state into `.rocket-action/` (`variables.json`,
 `startup-actions.json`, `startup-actions/log.txt`), and
 uses `cache/`, `notes/` and `plugin-jars/` for runtime data. Do not commit these folders.
 
+`atomic-actions.json`, `chain-actions.json` and the files under `.rocket-action/action-schedulers/`
+are cached in memory to keep the action lists responsive. Every change saved through the
+application invalidates the corresponding cache immediately, so the UI shows saved data at once.
+Files edited manually while the application is running are re-read only after a restart.
+
 ## HTTP API and MCP
 
 The desktop application always starts an embedded Spring Boot server (port `4567` by

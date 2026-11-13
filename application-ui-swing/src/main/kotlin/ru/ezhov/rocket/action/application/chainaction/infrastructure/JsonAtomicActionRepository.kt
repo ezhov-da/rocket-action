@@ -13,10 +13,12 @@ import java.time.LocalDateTime
 @Primary
 @Repository
 class JsonAtomicActionRepository(
-    private val objectMapper: ObjectMapper
+    private val objectMapper: ObjectMapper,
+    private val filePath: File = File("./.rocket-action/atomic-actions.json"),
 ) : AtomicActionRepository {
-    private val filePath = File("./.rocket-action/atomic-actions.json")
+    private var allCached: List<AtomicAction>? = null
 
+    @Synchronized
     override fun save(atomicAction: AtomicAction) {
         val actions = all().toMutableList()
 
@@ -37,10 +39,15 @@ class JsonAtomicActionRepository(
         )
 
         objectMapper.writerWithDefaultPrettyPrinter().writeValue(filePath, actionsDto)
+
+        allCached = null
     }
 
-    override fun all(): List<AtomicAction> =
-        when (filePath.exists()) {
+    @Synchronized
+    override fun all(): List<AtomicAction> {
+        allCached?.let { return it }
+
+        val loaded = when (filePath.exists()) {
             true ->
                 objectMapper.readValue(
                     filePath,
@@ -53,8 +60,13 @@ class JsonAtomicActionRepository(
             }
         }
 
+        allCached = loaded
+        return loaded
+    }
+
     override fun byId(id: String): AtomicAction? = all().firstOrNull { it.id == id }
 
+    @Synchronized
     override fun delete(id: String) {
         val actions = all().toMutableList()
         val index = actions.indexOfFirst { aa -> aa.id == id }

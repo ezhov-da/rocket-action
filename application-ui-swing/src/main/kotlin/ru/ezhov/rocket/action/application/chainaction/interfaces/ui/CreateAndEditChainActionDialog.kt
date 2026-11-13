@@ -18,6 +18,8 @@ import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.configuratio
 import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.configuration.actions.SortActionPanelConfiguration
 import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.dnd.DragListener
 import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.dnd.ListDropHandler
+import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.renderer.ActionRowDecorationBuilder
+import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.renderer.ActionRowDecorationSnapshot
 import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.renderer.AtomicActionListCellRenderer
 import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.renderer.OrderAtomicActionListCellRenderer
 import ru.ezhov.rocket.action.application.chainaction.scheduler.application.ActionSchedulerService
@@ -111,22 +113,22 @@ class CreateAndEditChainActionDialog(
     }
     private val mcpToolNameLabel: JLabel = JLabel("MCP tool name:").apply { labelFor = mcpToolNameTextField }
 
-    private val allListActionsModel = DefaultListModel<AtomicAction>()
+    private var allListActionsModel = DefaultListModel<AtomicAction>()
     private val allListActions = JList(allListActionsModel)
+    private val allActionsRenderer = AtomicActionListCellRenderer()
+    private val selectedActionsRenderer = OrderAtomicActionListCellRenderer()
     private val selectedListActionsModel = DefaultListModel<SelectedAtomicAction>()
     private val selectedListActions = JList(selectedListActionsModel)
+    private val searchWorker =
+        LatestSearchWorker<SearchResult>(onResult = { result -> applySearchResult(result) })
 
     private val actionExecutePanel = ActionExecutePanel(actionExecutorService)
 
     init {
-        allListActions.cellRenderer = AtomicActionListCellRenderer(
-            chainActionService = chainActionService,
-            actionSchedulerService = actionSchedulerService,
-        )
-        selectedListActions.cellRenderer = OrderAtomicActionListCellRenderer(
-            chainActionService = chainActionService,
-            actionSchedulerService = actionSchedulerService
-        )
+        allListActions.cellRenderer = allActionsRenderer
+        allListActions.configureFixedRowHeight(ActionListCellHeight.atomic())
+        selectedListActions.cellRenderer = selectedActionsRenderer
+        selectedListActions.configureFixedRowHeight(ActionListCellHeight.atomic())
         selectedListActions.selectionMode = ListSelectionModel.SINGLE_SELECTION
 
         selectedListActions.dragEnabled = true
@@ -293,18 +295,37 @@ class CreateAndEditChainActionDialog(
         val sortInfo = sortActionPanelConfiguration.sortInfo()
         val searchAction = searchActionPanelConfiguration.searchAction()
 
-        val filtered = AtomicActionsFilter.filter(
-            sortInfo = sortInfo,
-            searchAction = searchAction,
-            actions = atomicActionService.atomics(),
-            scheduledActionIds = actionSchedulerService.scheduledActionIds(),
-        )
+        searchWorker.submit {
+            val atomics = atomicActionService.atomics()
+            val chains = chainActionService.chains()
+            val schedulers = actionSchedulerService.schedulers()
 
-        allListActionsModel.removeAllElements()
-        filtered.forEach {
-            allListActionsModel.addElement(it)
+            SearchResult(
+                actions = AtomicActionsFilter.filter(
+                    sortInfo = sortInfo,
+                    searchAction = searchAction,
+                    actions = atomics,
+                    scheduledActionIds = schedulers.map { it.actionId }.toSet(),
+                ),
+                decoration = ActionRowDecorationBuilder.build(
+                    chains = chains,
+                    atomics = atomics,
+                    schedulers = schedulers,
+                ),
+            )
         }
     }
+
+    private fun applySearchResult(result: SearchResult) {
+        allActionsRenderer.snapshot = result.decoration
+        selectedActionsRenderer.snapshot = result.decoration
+        allListActionsModel = allListActions.replaceItems(result.actions)
+    }
+
+    private data class SearchResult(
+        val actions: List<AtomicAction>,
+        val decoration: ActionRowDecorationSnapshot,
+    )
 
     private var dialogType: DialogType? = null
     private var currentEditChainAction: ChainAction? = null

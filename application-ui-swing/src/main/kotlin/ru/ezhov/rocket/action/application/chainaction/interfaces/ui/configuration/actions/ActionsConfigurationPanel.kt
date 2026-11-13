@@ -11,12 +11,20 @@ import ru.ezhov.rocket.action.application.chainaction.domain.event.ChainActionCr
 import ru.ezhov.rocket.action.application.chainaction.domain.event.ChainActionDeletedDomainEvent
 import ru.ezhov.rocket.action.application.chainaction.domain.event.ChainActionUpdatedDomainEvent
 import ru.ezhov.rocket.action.application.chainaction.domain.model.AtomicAction
+import ru.ezhov.rocket.action.application.chainaction.domain.model.ChainAction
+import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.ActionListCellHeight
 import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.ChainsSelectPanel
 import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.CreateAndEditAtomicActionDialog
 import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.CreateAndEditChainActionDialog
 import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.InfoActionPopupMenuPanel
+import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.LatestSearchWorker
+import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.configureFixedRowHeight
+import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.replaceItems
+import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.renderer.ActionRowDecorationBuilder
+import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.renderer.ActionRowDecorationSnapshot
 import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.renderer.AtomicActionListCellRenderer
 import ru.ezhov.rocket.action.application.chainaction.scheduler.application.ActionSchedulerService
+import ru.ezhov.rocket.action.application.chainaction.scheduler.domain.model.ActionScheduler
 import ru.ezhov.rocket.action.application.chainaction.scheduler.domain.event.ActionSchedulerCreatedDomainEvent
 import ru.ezhov.rocket.action.application.chainaction.scheduler.domain.event.ActionSchedulerDeletedDomainEvent
 import ru.ezhov.rocket.action.application.chainaction.scheduler.domain.event.ActionSchedulerStatusUpdatedDomainEvent
@@ -38,7 +46,6 @@ import javax.swing.JPanel
 import javax.swing.JPopupMenu
 import javax.swing.JScrollPane
 import javax.swing.SwingUtilities
-import javax.swing.SwingWorker
 
 class ActionsConfigurationPanel(
     private val atomicActionService: AtomicActionService,
@@ -58,8 +65,15 @@ class ActionsConfigurationPanel(
     private val buttonEditAction: JButton = JButton("Edit").apply { isEnabled = false }
     private val buttonDeleteAction: JButton = JButton("Delete").apply { isEnabled = false }
 
-    private val allListActionsModel = DefaultListModel<AtomicAction>()
+    private var allListActionsModel = DefaultListModel<AtomicAction>()
     private val allListActions = JList(allListActionsModel)
+    private val cellRenderer = AtomicActionListCellRenderer()
+
+    private var lastAtomics: List<AtomicAction> = emptyList()
+    private var lastChains: List<ChainAction> = emptyList()
+    private var lastSchedulers: List<ActionScheduler> = emptyList()
+    private val searchWorker =
+        LatestSearchWorker<SearchResult>(onResult = { result -> applySearchResult(result) })
 
     private val createAndEditAtomicActionDialog = CreateAndEditAtomicActionDialog(
         atomicActionService = atomicActionService,
@@ -69,10 +83,8 @@ class ActionsConfigurationPanel(
     )
 
     init {
-        allListActions.cellRenderer = AtomicActionListCellRenderer(
-            chainActionService = chainActionService,
-            actionSchedulerService = actionSchedulerService,
-        )
+        allListActions.cellRenderer = cellRenderer
+        allListActions.configureFixedRowHeight(ActionListCellHeight.atomic())
 
         allListActions.addListSelectionListener {
             allListActions.selectedValue?.let {
@@ -127,36 +139,40 @@ class ActionsConfigurationPanel(
                     }
 
                     is AtomicActionDeletedDomainEvent -> {
-                        val iterator = allListActionsModel.elements()
-                        while (iterator.hasMoreElements()) {
-                            val action = iterator.nextElement()
-                            if (action.id == event.id) {
-                                allListActionsModel.removeElement(action)
-                                break
-                            }
-                        }
-
+                        lastAtomics = lastAtomics.filterNot { it.id == event.id }
                         fillList()
                     }
 
                     is AtomicActionUpdatedDomainEvent -> {
-                        val iterator = allListActionsModel.elements()
-                        while (iterator.hasMoreElements()) {
-                            val action = iterator.nextElement()
-                            if (action.id == event.atomicAction.id) {
-                                val index = allListActionsModel.indexOf(action)
-
-                                allListActionsModel.set(index, event.atomicAction)
-                                break
-                            }
+                        val index = allListActionsModel.elements().toList().indexOfFirst { it.id == event.atomicAction.id }
+                        if (index >= 0) {
+                            allListActionsModel.set(index, event.atomicAction)
                         }
 
+                        lastAtomics = lastAtomics.map {
+                            if (it.id == event.atomicAction.id) event.atomicAction else it
+                        }
+                        applySnapshot()
                         fillList()
                     }
 
-                    is ChainActionCreatedDomainEvent,
-                    is ChainActionUpdatedDomainEvent,
+                    is ChainActionCreatedDomainEvent -> {
+                        lastChains = lastChains.filterNot { it.id == event.chainAction.id } + event.chainAction
+                        applySnapshot()
+                        allListActions.repaint()
+                    }
+
+                    is ChainActionUpdatedDomainEvent -> {
+                        lastChains = lastChains.map {
+                            if (it.id == event.chainAction.id) event.chainAction else it
+                        }
+                        applySnapshot()
+                        allListActions.repaint()
+                    }
+
                     is ChainActionDeletedDomainEvent -> {
+                        lastChains = lastChains.filterNot { it.id == event.id }
+                        applySnapshot()
                         allListActions.repaint()
                     }
 
@@ -220,54 +236,73 @@ class ActionsConfigurationPanel(
     private fun fillList() {
         val sortInfo = sortActionPanelConfiguration.sortInfo()
         val searchAction = searchActionPanelConfiguration.searchAction()
-        SearchWorker(
-            sortInfo = sortInfo,
-            searchAction = searchAction,
-            atomicActionService = atomicActionService,
-            actionSchedulerService = actionSchedulerService,
-            allListActionsModel = allListActionsModel,
-        ).execute()
+
+        searchWorker.submit {
+            val atomics = atomicActionService.atomics()
+            val chains = chainActionService.chains()
+            val schedulers = actionSchedulerService.schedulers()
+            val filtered = AtomicActionsFilter.filter(
+                sortInfo = sortInfo,
+                searchAction = searchAction,
+                actions = atomics,
+                scheduledActionIds = schedulers.map { it.actionId }.toSet(),
+            )
+            val snapshot = ActionRowDecorationBuilder.build(
+                chains = chains,
+                atomics = atomics,
+                schedulers = schedulers,
+            )
+
+            SearchResult(
+                actions = filtered,
+                decoration = snapshot,
+                atomics = atomics,
+                chains = chains,
+                schedulers = schedulers,
+            )
+        }
+    }
+
+    private fun applySearchResult(result: SearchResult) {
+        cellRenderer.snapshot = result.decoration
+        allListActionsModel = allListActions.replaceItems(result.actions)
+        lastAtomics = result.atomics
+        lastChains = result.chains
+        lastSchedulers = result.schedulers
+    }
+
+    private fun applySnapshot() {
+        cellRenderer.snapshot = ActionRowDecorationBuilder.build(
+            chains = lastChains,
+            atomics = lastAtomics,
+            schedulers = lastSchedulers,
+        )
     }
 
     /**
      * The scheduler state affects the rendered scheduler status and the "used in scheduler" filter.
      */
     private fun refreshSchedulerDependentState() {
+        lastSchedulers = actionSchedulerService.schedulers()
+        applySnapshot()
+        allListActions.repaint()
+
         if (searchActionPanelConfiguration
                 .searchAction()
                 .conditions
                 .contains(SearchAction.SearchCondition.SCHEDULER)
         ) {
             fillList()
-        } else {
-            allListActions.repaint()
         }
     }
 
-    private class SearchWorker(
-        private val sortInfo: SortInfo,
-        private val searchAction: SearchAction,
-        private val atomicActionService: AtomicActionService,
-        private val actionSchedulerService: ActionSchedulerService,
-        private val allListActionsModel: DefaultListModel<AtomicAction>,
-    ) : SwingWorker<List<AtomicAction>, Unit>() {
-        override fun doInBackground(): List<AtomicAction> =
-            AtomicActionsFilter.filter(
-                sortInfo = sortInfo,
-                searchAction = searchAction,
-                actions = atomicActionService.atomics(),
-                scheduledActionIds = actionSchedulerService.scheduledActionIds(),
-            )
-
-        override fun done() {
-            get().let {
-                allListActionsModel.removeAllElements()
-                it.forEach {
-                    allListActionsModel.addElement(it)
-                }
-            }
-        }
-    }
+    private data class SearchResult(
+        val actions: List<AtomicAction>,
+        val decoration: ActionRowDecorationSnapshot,
+        val atomics: List<AtomicAction>,
+        val chains: List<ChainAction>,
+        val schedulers: List<ActionScheduler>,
+    )
 
 
     private fun showPopupMenu(element: AtomicAction, event: MouseEvent) {
@@ -286,8 +321,7 @@ class ActionsConfigurationPanel(
                 add(
                     ChainsSelectPanel(
                         chains = chains,
-                        atomicActionService = atomicActionService,
-                        actionSchedulerService = actionSchedulerService,
+                        decorationSnapshot = cellRenderer.snapshot,
                         selectChainCallback = { chain -> createAndEditChainActionDialog.showEditDialog(chain) }
                     )
                 )

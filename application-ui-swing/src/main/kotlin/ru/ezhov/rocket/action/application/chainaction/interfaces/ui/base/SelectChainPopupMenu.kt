@@ -2,14 +2,15 @@ package ru.ezhov.rocket.action.application.chainaction.interfaces.ui.base
 
 import net.miginfocom.swing.MigLayout
 import ru.ezhov.rocket.action.application.applicationConfiguration.application.ConfigurationApplication
-import ru.ezhov.rocket.action.application.chainaction.application.AtomicActionService
-import ru.ezhov.rocket.action.application.chainaction.application.ChainActionService
 import ru.ezhov.rocket.action.application.chainaction.domain.model.Action
 import ru.ezhov.rocket.action.application.chainaction.domain.model.AtomicAction
 import ru.ezhov.rocket.action.application.chainaction.domain.model.ChainAction
+import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.renderer.ActionRowDecorationBuilder
+import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.renderer.ActionRowDecorationSnapshot
 import ru.ezhov.rocket.action.application.chainaction.scheduler.application.ActionSchedulerService
 import ru.ezhov.rocket.action.application.search.application.SearchTextTransformer
 import java.awt.BorderLayout
+import java.awt.Dimension
 import java.awt.FlowLayout
 import java.awt.event.ActionListener
 import javax.swing.ButtonGroup
@@ -21,8 +22,6 @@ import javax.swing.SwingUtilities
 
 class SelectChainPopupMenu(
     private val configurationApplication: ConfigurationApplication,
-    private val actionService: AtomicActionService,
-    private val chainActionService: ChainActionService,
     private val searchTextTransformer: SearchTextTransformer,
     private val actionSchedulerService: ActionSchedulerService,
     chains: List<ChainAction>,
@@ -30,6 +29,12 @@ class SelectChainPopupMenu(
     private val selectedChainCallback: (Action) -> Unit
 ) : JPopupMenu() {
     private var selectChainListPanel: SelectChainListPanel? = null
+
+    private val decorationSnapshot: ActionRowDecorationSnapshot = ActionRowDecorationBuilder.build(
+        chains = chains,
+        atomics = atomics,
+        schedulers = actionSchedulerService.schedulers(),
+    )
 
     init {
         val chainsSortedByName = chains.sortedBy { it.name }
@@ -42,6 +47,8 @@ class SelectChainPopupMenu(
         val partCount = configurationApplication.all().numberButtonsOnChainActionSelectionPanel
         val stubUpPanel = JPanel(BorderLayout())
         val stubBottomPanel = JPanel(BorderLayout())
+        stubBottomPanel.preferredSize = Dimension(1, LIST_HEIGHT)
+        stubBottomPanel.minimumSize = Dimension(0, LIST_HEIGHT)
 
         panel.add(
             JPanel(FlowLayout(FlowLayout.RIGHT)).apply {
@@ -77,6 +84,8 @@ class SelectChainPopupMenu(
                             stubBottomPanel.add(it, BorderLayout.CENTER)
                         }
 
+                        stubBottomPanel.preferredSize = Dimension(1, LIST_HEIGHT)
+                        stubBottomPanel.minimumSize = Dimension(0, LIST_HEIGHT)
                         selectChainDialog.repaint()
                         selectChainDialog.pack()
                     }
@@ -132,7 +141,7 @@ class SelectChainPopupMenu(
                 it, BorderLayout.CENTER
             )
         }
-        panel.add(stubBottomPanel, "hmax 250, width 100%")
+        panel.add(stubBottomPanel, "hmax $LIST_HEIGHT, width 100%")
 
         add(panel, BorderLayout.CENTER)
         pack()
@@ -144,6 +153,8 @@ class SelectChainPopupMenu(
         }
     }
 
+    internal fun listPanel(): SelectChainListPanel? = selectChainListPanel
+
     private fun buildButtonsPanel(
         chainsSortedByName: List<ChainAction>,
         atomicsSortedByName: List<AtomicAction>,
@@ -151,9 +162,9 @@ class SelectChainPopupMenu(
         selectChainDialog: SelectChainPopupMenu,
     ): SelectChainButtonsPanel =
         SelectChainButtonsPanel(
-            actionService = actionService,
             chains = chainsSortedByName.take(partCount),
             atomics = atomicsSortedByName.take(partCount),
+            decorationSnapshot = decorationSnapshot,
             selectedChainCallback = { sv ->
                 selectChainDialog.isVisible = false
                 selectedChainCallback(sv)
@@ -176,11 +187,9 @@ class SelectChainPopupMenu(
 
         return if (chainsForList.isNotEmpty() || atomicsForList.isNotEmpty()) {
             SelectChainListPanel(
-                actionService = actionService,
-                chainActionService = chainActionService,
                 chains = chainsForList,
                 atomics = atomicsForList,
-                actionSchedulerService = actionSchedulerService,
+                decorationSnapshot = decorationSnapshot,
                 searchTextTransformer = searchTextTransformer,
                 selectedChainCallback = { sv ->
                     selectChainDialog.isVisible = false
@@ -190,5 +199,9 @@ class SelectChainPopupMenu(
         } else {
             null
         }
+    }
+
+    private companion object {
+        private const val LIST_HEIGHT = 250
     }
 }

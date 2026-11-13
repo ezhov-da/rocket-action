@@ -1,13 +1,15 @@
 package ru.ezhov.rocket.action.application.chainaction.interfaces.ui.base
 
 import net.miginfocom.swing.MigLayout
-import ru.ezhov.rocket.action.application.chainaction.application.AtomicActionService
-import ru.ezhov.rocket.action.application.chainaction.application.ChainActionService
 import ru.ezhov.rocket.action.application.chainaction.domain.model.Action
 import ru.ezhov.rocket.action.application.chainaction.domain.model.AtomicAction
 import ru.ezhov.rocket.action.application.chainaction.domain.model.ChainAction
+import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.ActionListCellHeight
+import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.LatestSearchWorker
+import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.configureFixedRowHeight
+import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.replaceItems
+import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.renderer.ActionRowDecorationSnapshot
 import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.renderer.ChainAndAtomicActionListCellRenderer
-import ru.ezhov.rocket.action.application.chainaction.scheduler.application.ActionSchedulerService
 import ru.ezhov.rocket.action.application.resources.Icons
 import ru.ezhov.rocket.action.application.search.application.SearchTextTransformer
 import ru.ezhov.rocket.action.ui.utils.swing.common.TextFieldWithText
@@ -21,30 +23,29 @@ import javax.swing.JButton
 import javax.swing.JList
 import javax.swing.JPanel
 import javax.swing.JScrollPane
+import javax.swing.ListModel
 import javax.swing.SwingUtilities
-import javax.swing.SwingWorker
 
 class SelectChainListPanel(
-    actionService: AtomicActionService,
-    chainActionService: ChainActionService,
     private val chains: List<ChainAction>,
     private val atomics: List<AtomicAction>,
     private val searchTextTransformer: SearchTextTransformer,
-    actionSchedulerService: ActionSchedulerService,
+    decorationSnapshot: ActionRowDecorationSnapshot = ActionRowDecorationSnapshot.EMPTY,
     selectedChainCallback: (Action) -> Unit,
 ) : JPanel(BorderLayout()) {
     private val searchTextField = TextFieldWithText("Search")
     private val clearSearchButton = JButton(Icons.Standard.X_16x16)
-    private val listModel = DefaultListModel<Action>()
+    private var listModel = DefaultListModel<Action>()
     private val actionsList = JList(listModel)
+    private val cellRenderer = ChainAndAtomicActionListCellRenderer(decorationSnapshot)
+    private val searchWorker =
+        LatestSearchWorker<List<Action>>(onResult = { result -> applyResult(result) })
 
     init {
+        actionsList.cellRenderer = cellRenderer
+        actionsList.configureFixedRowHeight(ActionListCellHeight.atomic())
+
         fillList()
-        actionsList.cellRenderer = ChainAndAtomicActionListCellRenderer(
-            atomicActionService = actionService,
-            chainActionService = chainActionService,
-            actionSchedulerService = actionSchedulerService
-        )
 
         actionsList.addMouseListener(object : MouseAdapter() {
             override fun mouseReleased(e: MouseEvent) {
@@ -58,7 +59,7 @@ class SelectChainListPanel(
 
         add(JPanel(MigLayout()).apply {
             clearSearchButton.addActionListener {
-                SwingUtilities.invokeLater { searchTextField.text = "" }
+                SwingUtilities.invokeLater { clearSearch() }
             }
 
             searchTextField.addKeyListener(object : KeyAdapter() {
@@ -110,23 +111,7 @@ class SelectChainListPanel(
     }
 
     private fun fillList(text: String? = null) {
-        SearchWorker(
-            text = text,
-            searchTextTransformer = searchTextTransformer,
-            listModel = listModel,
-            chains = chains,
-            atomics = atomics,
-        ).execute()
-    }
-
-    private class SearchWorker(
-        private val text: String?,
-        private val searchTextTransformer: SearchTextTransformer,
-        private val listModel: DefaultListModel<Action>,
-        private val chains: List<ChainAction>,
-        private val atomics: List<AtomicAction>,
-    ) : SwingWorker<List<Action>, Unit>() {
-        override fun doInBackground(): List<Action> =
+        searchWorker.submit {
             if (text == null) {
                 chains + atomics
             } else {
@@ -137,16 +122,30 @@ class SelectChainListPanel(
                     atomics
                         .filter { aa -> searchTexts.any { st -> aa.name.lowercase().contains(st) } }
             }
-
-        override fun done() {
-            get().let {
-                listModel.removeAllElements()
-                it.forEach {
-                    listModel.addElement(it)
-                }
-            }
         }
     }
+
+    private fun applyResult(result: List<Action>) {
+        listModel = actionsList.replaceItems(result)
+    }
+
+    /**
+     * The clear control also restores the unfiltered list, not only the text field.
+     */
+    internal fun clearSearch() {
+        searchTextField.text = ""
+        fillList(null)
+    }
+
+    internal fun search(text: String?) {
+        searchTextField.text = text.orEmpty()
+        fillList(text)
+    }
+
+    internal fun currentItems(): List<Action> =
+        (actionsList.model as? ListModel<Action>)?.let { model ->
+            (0 until model.size).map { model.getElementAt(it) }
+        }.orEmpty()
 
     fun selectedAction(): Action? = actionsList.selectedValue
 

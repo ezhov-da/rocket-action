@@ -156,8 +156,6 @@ class ChainBasePanel(
 
     private fun showSelectedChain(text: String?) {
         SelectChainPopupMenu(
-            actionService = atomicActionService,
-            chainActionService = chainActionService,
             chains = chainActionService.chains(),
             atomics = atomicActionService.atomics(),
             searchTextTransformer = searchTextTransformer,

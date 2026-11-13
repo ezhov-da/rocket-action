@@ -38,15 +38,6 @@ fun main(args: Array<String>) {
         frame.add(
             ChainActionListCellPanel(
                 chainAction = chainAction,
-                chainIcon = chainIcon(chainAction, mockk {
-                    every { atomicBy("11") } returns mockk {
-                        every { contractType } returns ContractType.IN_OUT
-                    }
-                    every { atomicBy("22") } returns mockk {
-                        every { contractType } returns ContractType.IN_UNIT
-                    }
-                }),
-                actionSchedulerStatusComponentService = mockk(),
             )
         )
         frame.setSize(1000, 600);

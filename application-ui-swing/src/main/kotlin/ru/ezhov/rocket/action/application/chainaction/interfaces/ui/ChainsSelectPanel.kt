@@ -1,10 +1,8 @@
 package ru.ezhov.rocket.action.application.chainaction.interfaces.ui
 
-import ru.ezhov.rocket.action.application.chainaction.application.AtomicActionService
 import ru.ezhov.rocket.action.application.chainaction.domain.model.ChainAction
-import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.renderer.ActionSchedulerStatusComponentService
+import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.renderer.ActionRowDecorationSnapshot
 import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.renderer.ChainActionListCellRenderer
-import ru.ezhov.rocket.action.application.chainaction.scheduler.application.ActionSchedulerService
 import ru.ezhov.rocket.action.ui.utils.swing.common.SizeUtil
 import java.awt.BorderLayout
 import java.awt.event.MouseAdapter
@@ -18,18 +16,15 @@ import javax.swing.SwingConstants
 
 class ChainsSelectPanel(
     private val chains: List<ChainAction>,
-    atomicActionService: AtomicActionService,
-    actionSchedulerService: ActionSchedulerService,
+    decorationSnapshot: ActionRowDecorationSnapshot = ActionRowDecorationSnapshot.EMPTY,
     private val selectChainCallback: (chain: ChainAction) -> Unit
 ) : JPanel(BorderLayout()) {
-    private val allListChainsModel = DefaultListModel<ChainAction>()
+    private var allListChainsModel = DefaultListModel<ChainAction>()
     private val allListChains = JList(allListChainsModel)
 
     init {
-        allListChains.cellRenderer = ChainActionListCellRenderer(
-            atomicActionService = atomicActionService,
-            actionSchedulerStatusComponentService = ActionSchedulerStatusComponentService(actionSchedulerService)
-        )
+        allListChains.cellRenderer = ChainActionListCellRenderer(decorationSnapshot)
+        allListChains.configureFixedRowHeight(ActionListCellHeight.chain())
 
         allListChains.addMouseListener(object : MouseAdapter() {
             override fun mouseClicked(e: MouseEvent) {
@@ -64,13 +59,9 @@ class ChainsSelectPanel(
     }
 
     private fun fillList() {
-        fillActions()
+        allListChainsModel = allListChains.replaceItems(chains.sortedBy { it.name })
     }
 
-    private fun fillActions() {
-        allListChainsModel.removeAllElements()
-        chains.sortedBy { it.name }.forEach {
-            allListChainsModel.addElement(it)
-        }
-    }
+    internal fun currentItems(): List<ChainAction> =
+        (0 until allListChainsModel.size()).map { allListChainsModel.getElementAt(it) }
 }

@@ -74,24 +74,24 @@ class ActionSchedulerService(
      * Identifiers of actions that have a scheduler, used for list filtering.
      */
     fun scheduledActionIds(): Set<String> =
-        actionSchedulerRepository.all().schedulers.map { it.actionId }.toSet()
+        schedulers().map { it.actionId }.toSet()
 
-    fun scheduler(actionId: String): ActionSchedulerDto? =
-        actionSchedulerRepository
-            .all()
-            .schedulers
-            .firstOrNull { it.actionId == actionId }
-            ?.let { sch ->
-                getActions().let { actions ->
-                    actions[sch.actionId]?.let {
-                        ActionSchedulerDto(
-                            action = it,
-                            actionScheduler = sch,
-                            logFile = actionSchedulerLogRepository.get(sch.actionId)
-                        )
-                    }
-                }
-            }
+    /**
+     * Scheduler entries without resolving the actions they point to.
+     */
+    fun schedulers(): List<ActionScheduler> =
+        actionSchedulerRepository.all().schedulers
+
+    fun scheduler(actionId: String): ActionSchedulerDto? {
+        val scheduler = actionSchedulerRepository.byActionId(actionId) ?: return null
+        val action = chainActionService.byId(actionId) ?: atomicActionService.atomicBy(actionId) ?: return null
+
+        return ActionSchedulerDto(
+            action = action,
+            actionScheduler = scheduler,
+            logFile = actionSchedulerLogRepository.get(scheduler.actionId),
+        )
+    }
 
     private fun getActions() =
         (chainActionService.chains() + atomicActionService.atomics())
