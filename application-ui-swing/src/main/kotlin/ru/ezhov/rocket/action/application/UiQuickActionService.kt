@@ -9,6 +9,7 @@ import ru.ezhov.rocket.action.api.context.notification.NotificationType
 import ru.ezhov.rocket.action.application.applicationConfiguration.application.ConfigurationApplication
 import ru.ezhov.rocket.action.application.chainaction.interfaces.ui.ChainBasePanelFactory
 import ru.ezhov.rocket.action.application.configuration.ui.ConfigurationFrameFactory
+import ru.ezhov.rocket.action.application.core.application.ActionReloadScope
 import ru.ezhov.rocket.action.application.core.application.RocketActionSettingsService
 import ru.ezhov.rocket.action.application.core.event.RocketActionSettingsCreatedDomainEvent
 import ru.ezhov.rocket.action.application.event.domain.DomainEvent
@@ -27,6 +28,7 @@ import ru.ezhov.rocket.action.application.search.application.SearchTextTransform
 import ru.ezhov.rocket.action.application.tags.application.TagsService
 import ru.ezhov.rocket.action.application.tags.domain.TagNode
 import ru.ezhov.rocket.action.application.ui.color.ColorConstants
+import ru.ezhov.rocket.action.application.variables.application.VariablesApplication
 import ru.ezhov.rocket.action.ui.utils.swing.common.MoveUtil
 import ru.ezhov.rocket.action.ui.utils.swing.common.TextFieldWithText
 import java.awt.BorderLayout
@@ -52,10 +54,12 @@ import javax.swing.JTextField
 import javax.swing.KeyStroke
 import javax.swing.SwingUtilities
 import javax.swing.SwingWorker
+import java.util.concurrent.TimeUnit
 import kotlin.system.exitProcess
 
 private val logger = KotlinLogging.logger { }
 
+@Suppress("TooManyFunctions")
 @Service
 class UiQuickActionService(
     private val rocketActionSettingsService: RocketActionSettingsService,
@@ -67,12 +71,25 @@ class UiQuickActionService(
     private val searchTextTransformer: SearchTextTransformer,
     private val configurationApplication: ConfigurationApplication,
     private val chainBasePanelFactory: ChainBasePanelFactory,
+    private val variablesApplication: VariablesApplication,
 ) {
     private var baseDialog: JDialog? = null
     private var searchComponent: SearchComponent? = null
 
     // The field is required for synchronization throughout the class
     private var currentMenu: JMenu? = null
+
+    // Chrome is built once per dialog and survives every reload.
+    private var menuBar: JMenuBar? = null
+    private var tagsMenu: JMenu? = null
+    private var refreshMenuItem: JMenuItem? = null
+
+    private val reloadLock = Any()
+    private var reloadRunning = false
+    private var reloadQueued = false
+
+    private val isTagsEnabled: Boolean
+        get() = generalPropertiesRepository.asBoolean(UsedPropertiesName.IS_ENABLE_TAGS, false)
 
     init {
         DomainEventFactory.subscriberRegistrar.subscribe(object : DomainEventSubscriber {
@@ -93,41 +110,23 @@ class UiQuickActionService(
         })
     }
 
+    /**
+     * Builds the menu bar once and starts the first content load. Subsequent reloads only
+     * replace the content of the content menu, so the bar, the search field and hot keys stay.
+     */
     fun createMenu(baseDialog: JDialog): ManuAndSearchPanel {
         this.baseDialog = baseDialog
         return try {
+            val firstCreation = menuBar == null
+            val bar = menuBar ?: buildMenuBar(baseDialog).also { menuBar = it }
+            val searchField = searchComponent!!
 
-            val menuBar = JMenuBar()
-            val menu = JMenu()
-            menuBar.add(menu)
-            //TODO: favorites
-            //menuBar.add(createFavoriteComponent());
-
-            val tagsMenu = createEmptyTagsMenu()
-
-            if (generalPropertiesRepository.asBoolean(UsedPropertiesName.IS_ENABLE_TAGS, false)) {
-                menuBar.add(tagsMenu)
+            if (firstCreation || currentMenu?.itemCount == 0) {
+                startReload()
             }
 
-            val searchField = searchComponent ?: createSearchField()
-            searchComponent = searchField
-
-            menuBar.add(searchField.component)
-
-            menuBar.add(chainBasePanelFactory.chainBasePanel.openAvailableActionsButton())
-
-            val moveLabel = JLabel(rocketActionContextFactory.context.icon().by(AppIcon.MOVE))
-            MoveUtil.addMoveAction(movableComponent = baseDialog, grabbedComponent = moveLabel)
-
-            menuBar.add(createTools(baseDialog))
-
-            menuBar.add(moveLabel)
-            CreateMenuOrGetExistsWorker(menu, Action.Create(tagsMenu)).execute()
-
-            currentMenu = menu
-
             ManuAndSearchPanel(
-                menu = menuBar,
+                menu = bar,
                 search = searchField,
                 executeStatusPanel = chainBasePanelFactory.chainBasePanel.actionExecuteStatusPanel()
             )
@@ -135,6 +134,45 @@ class UiQuickActionService(
             throw UiQuickActionServiceException("Error", e)
         }
     }
+
+    private fun buildMenuBar(baseDialog: JDialog): JMenuBar {
+        val menuBar = JMenuBar()
+        val menu = JMenu().apply {
+            // the reload no longer swaps the icon; the main menu keeps the application icon
+            icon = rocketActionContextFactory.context.icon().by(AppIcon.ROCKET_APP)
+        }
+        currentMenu = menu
+        menuBar.add(menu)
+        //TODO: favorites
+        //menuBar.add(createFavoriteComponent());
+
+        if (isTagsEnabled) {
+            tagsMenu = createEmptyTagsMenu().also { menuBar.add(it) }
+        }
+
+        val searchField = searchComponent ?: createSearchField()
+        searchComponent = searchField
+
+        menuBar.add(searchField.component)
+
+        menuBar.add(chainBasePanelFactory.chainBasePanel.openAvailableActionsButton())
+
+        val moveLabel = JLabel(rocketActionContextFactory.context.icon().by(AppIcon.MOVE))
+        MoveUtil.addMoveAction(movableComponent = baseDialog, grabbedComponent = moveLabel)
+
+        menuBar.add(createTools(baseDialog))
+
+        menuBar.add(moveLabel)
+
+        menu.add(loadingPlaceholder())
+
+        return menuBar
+    }
+
+    private fun loadingPlaceholder(): JMenuItem =
+        JMenuItem("Loading…").apply {
+            isEnabled = false
+        }
 
     private fun registerGlobalHotKeys(
         textField: TextFieldWithText,
@@ -348,6 +386,7 @@ class UiQuickActionService(
         menuItemUpdate.icon = rocketActionContextFactory.context.icon().by(AppIcon.RELOAD)
         menuItemUpdate.addActionListener(updateListener())
         menuTools.add(menuItemUpdate)
+        refreshMenuItem = menuItemUpdate
 
         menuTools.add(JSeparator())
 
@@ -409,62 +448,128 @@ class UiQuickActionService(
         ActionListener { updateMenu() }
 
     private fun updateMenu() {
-        SwingUtilities.invokeLater {
-            var newMenuBar: JMenuBar? = null
-            try {
-                newMenuBar = createMenu(baseDialog!!).menu
-            } catch (ex: UiQuickActionServiceException) {
-                ex.printStackTrace()
-                rocketActionContextFactory.context.notification()
-                    .show(NotificationType.ERROR, "Error creating tool menu")
+        SwingUtilities.invokeLater { startReload() }
+    }
+
+    private fun startReload() {
+        val menu = currentMenu ?: return
+
+        synchronized(reloadLock) {
+            if (reloadRunning) {
+                reloadQueued = true
+                return
             }
-            if (newMenuBar != null) {
-                // while a crutch, but we know that "yet" :)
-                baseDialog!!.jMenuBar.removeAll()
-                baseDialog!!.jMenuBar = newMenuBar
-                baseDialog!!.revalidate()
-                baseDialog!!.repaint()
+            reloadRunning = true
+        }
+
+        try {
+            // the manual Refresh always re-reads variables and the password store
+            variablesApplication.invalidate()
+        } catch (ex: Exception) {
+            logger.warn(ex) { "Error when invalidate variables before reload" }
+        }
+
+        refreshMenuItem?.isEnabled = false
+
+        val scope = rocketActionSettingsService.newReloadScope()
+        if (menu.itemCount == 0) {
+            menu.add(loadingPlaceholder())
+        }
+
+        CreateMenuOrGetExistsWorker(menu, Action.Create, scope).execute()
+    }
+
+    private fun finishReload() {
+        val runAgain = synchronized(reloadLock) {
+            reloadRunning = false
+            if (reloadQueued) {
+                reloadQueued = false
+                true
+            } else {
+                false
             }
         }
+
+        refreshMenuItem?.isEnabled = true
+
+        if (runAgain) {
+            startReload()
+        }
+    }
+
+    private fun swapContent(menu: JMenu, components: List<Component>) {
+        menu.removeAll()
+        components.forEach { menu.add(it) }
+        menu.revalidate()
+        menu.repaint()
+    }
+
+    private fun refreshTags() {
+        val tags = tagsMenu ?: return
+        if (!isTagsEnabled) {
+            return
+        }
+
+        tags.removeAll()
+        fillTagsMenu(currentMenu!!, tags)
+    }
+
+    private fun logReload(scope: ActionReloadScope) {
+        Thread(
+            { scope.log() },
+            "rocket-action-reload-log",
+        ).apply { isDaemon = true }.start()
     }
 
     private inner class CreateMenuOrGetExistsWorker(
         private val baseMenu: JMenu,
-        private val action: Action
+        private val action: Action,
+        private val scope: ActionReloadScope? = null,
     ) : SwingWorker<List<Component>, String?>() {
 
-        init {
-            baseMenu.icon = rocketActionContextFactory.context.icon().by(AppIcon.LOADER)
-            baseMenu.removeAll()
-        }
-
         override fun doInBackground(): List<Component> = when (action) {
-            is Action.Create -> {
-                val components = rocketActionSettingsService.loadAndGetAllComponents()
-                fillTagsMenu(baseMenu, action.tagsMenu)
-                DomainEventFactory.publisher.publish(listOf(CreateMenuDomainEvent()))
-                components
-            }
+            Action.Create ->
+                if (scope == null) {
+                    rocketActionSettingsService.loadAndGetAllComponents()
+                } else {
+                    rocketActionSettingsService.loadAndGetAllComponents(scope)
+                }
 
-            is Action.Restore -> {
-                DomainEventFactory.publisher.publish(listOf(RestoreMenuDomainEvent()))
-                rocketActionSettingsService.getAllExistsComponents()
-            }
+            Action.Restore -> rocketActionSettingsService.getAllExistsComponents()
         }
 
         override fun done() {
             try {
                 val components = this.get()
-                components.forEach { baseMenu.add(it) }
-                baseMenu.icon = rocketActionContextFactory.context.icon().by(AppIcon.ROCKET_APP)
+                val swapStartedAt = System.nanoTime()
+                swapContent(baseMenu, components)
+
+                if (action === Action.Create) {
+                    scope?.swapped(TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - swapStartedAt))
+                    refreshTags()
+                    DomainEventFactory.publisher.publish(
+                        listOf(
+                            MenuContentReplacedDomainEvent(scope),
+                            CreateMenuDomainEvent(),
+                        )
+                    )
+                    scope?.let { logReload(it) }
+                }
             } catch (ex: Exception) {
                 logger.error(ex) { "Error when load app" }
+                scope?.failure()
+                rocketActionContextFactory.context.notification()
+                    .show(NotificationType.ERROR, "Error creating tool menu")
+            } finally {
+                if (action === Action.Create) {
+                    finishReload()
+                }
             }
         }
     }
 
     sealed class Action {
-        class Create(val tagsMenu: JMenu) : Action()
+        object Create : Action()
         object Restore : Action()
     }
 }

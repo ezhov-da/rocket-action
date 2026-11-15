@@ -27,6 +27,9 @@ class PluginsReflectionRocketActionPluginRepository(
 ) : RocketActionPluginRepository {
     private var list: ConcurrentLinkedQueue<RocketActionPluginSpec> = ConcurrentLinkedQueue()
 
+    @Volatile
+    private var byType: Map<String, RocketActionPluginSpec.Success> = emptyMap()
+
     private fun load() = runBlocking {
         val times = measureTimeMillis {
             logger.info { "Initialise configuration rocket action repository" }
@@ -87,8 +90,28 @@ class PluginsReflectionRocketActionPluginRepository(
             allPlugins.addAll(fromGroovy)
 
             list = allPlugins
+            byType = buildByType(allPlugins)
         }
         logger.info { "Configuration rocket action repository initialize successful. timeMs=$times count=${list.size}" }
+    }
+
+    private fun buildByType(allPlugins: Collection<RocketActionPluginSpec>): Map<String, RocketActionPluginSpec.Success> {
+        val result = mutableMapOf<String, RocketActionPluginSpec.Success>()
+        allPlugins
+            .filterIsInstance(RocketActionPluginSpec.Success::class.java)
+            .forEach { spec ->
+                try {
+                    val type = spec.rocketActionPlugin
+                        .configuration(context = rocketActionContextFactory.context)
+                        .type()
+                        .value()
+                    // the first plugin wins, as the previous linear scan did
+                    result.putIfAbsent(type, spec)
+                } catch (ex: Exception) {
+                    logger.warn(ex) { "Error when resolve type of plugin '${spec.from}'" }
+                }
+            }
+        return result
     }
 
     override fun all(): List<RocketActionPluginSpec> {
@@ -98,14 +121,10 @@ class PluginsReflectionRocketActionPluginRepository(
         return list.toList()
     }
 
-    override fun by(type: String): RocketActionPluginSpec.Success? =
+    override fun by(type: String): RocketActionPluginSpec.Success? {
         all()
-            .filterIsInstance(RocketActionPluginSpec.Success::class.java)
-            .firstOrNull { r: RocketActionPluginSpec.Success ->
-                r.rocketActionPlugin.configuration(context = rocketActionContextFactory.context)
-                    .type()
-                    .value() == type
-            }
+        return byType[type]
+    }
 }
 
 

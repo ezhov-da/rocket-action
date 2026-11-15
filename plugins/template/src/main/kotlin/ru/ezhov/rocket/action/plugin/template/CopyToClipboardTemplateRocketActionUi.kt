@@ -52,7 +52,15 @@ class CopyToClipboardTemplateRocketActionUi : AbstractRocketAction(), RocketActi
                 context = context
             )
             val menu = JMenu(label)
-            menu.icon = actionContext!!.icon().by(AppIcon.CLIPBOARD)
+            menu.icon = context.icon().load(
+                iconUrl = settings.settings()[ICON_URL].orEmpty(),
+                defaultIcon = actionContext!!.icon().by(AppIcon.CLIPBOARD),
+                onLoaded = { icon ->
+                    // the callback runs on the EDT, so the component can be updated in place
+                    menu.icon = icon
+                    menu.repaint()
+                },
+            )
             menu.toolTipText = description
             menu.add(notePanelEngine)
 
@@ -87,7 +95,13 @@ class CopyToClipboardTemplateRocketActionUi : AbstractRocketAction(), RocketActi
                 description = "Description",
                 required = false
             ),
-            createRocketActionProperty(key = TEXT, name = TEXT, description = "Template for copy", required = true)
+            createRocketActionProperty(key = TEXT, name = TEXT, description = "Template for copy", required = true),
+            createRocketActionProperty(
+                key = ICON_URL,
+                name = ICON_URL,
+                description = "Optional remote icon URL; it is loaded in the background",
+                required = false,
+            ),
         )
     }
 
@@ -99,5 +113,6 @@ class CopyToClipboardTemplateRocketActionUi : AbstractRocketAction(), RocketActi
         private val LABEL = "label"
         private val DESCRIPTION = "description"
         private val TEXT = "text"
+        private val ICON_URL = "iconUrl"
     }
 }

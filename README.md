@@ -322,6 +322,32 @@ The result is `plugins/note/build/libs/rocket-action-plugin-note-fat.jar`.
 Plugin modules use `compileOnly` for `plugins/api` and `kotlin-stdlib`: the application
 provides them at runtime, so plugin fat JARs do not bundle them.
 
+### Action icons
+
+`RocketActionContext.icon()` never blocks on the network. Both `load` overloads return
+immediately:
+
+- `load(iconUrl, defaultIcon)` returns the default icon when the remote icon is not cached
+  yet; the icon is downloaded in the background and appears on a later reload.
+- `load(iconUrl, defaultIcon, onLoaded)` also returns immediately but delivers the downloaded
+  icon through `onLoaded` on the Swing event dispatch thread, so the component can be updated
+  in place:
+
+```kotlin
+val menu = JMenu(label)
+menu.icon = context.icon().load(
+    iconUrl = settings.settings()["iconUrl"].orEmpty(),
+    defaultIcon = context.icon().by(AppIcon.PROJECT),
+    onLoaded = { icon ->
+        menu.icon = icon
+        menu.repaint()
+    },
+)
+```
+
+Never wait for or download an icon inside `RocketActionFactoryUi.create`: doing so delays the
+whole menu reload for every remote action.
+
 ## Configuration
 
 All settings are JVM system properties with the `rocket.action.` prefix. Defaults live in
@@ -361,6 +387,26 @@ Logging is configured with Logback and controlled by two system properties:
 java -DLOGGER_NAME=ru.ezhov -DLOGBACK_LOGGER_LEVEL=INFO \
   -jar application-ui-swing/build/libs/rocket-action.jar
 ```
+
+Every action-menu reload logs exactly one metrics line after the new content is applied:
+
+```
+Menu reload: total=812ms actions=2033 groups=57 settings=214ms evaluations=67 variables=3ms cacheFill=402ms components=189ms swap=7ms mcp=41ms iconHits=118 iconMisses=4 failures=0
+```
+
+- `total` — wall-clock time of the reload (from the start of the load to the EDT swap).
+- `actions` / `groups` — how many actions and group entries the new menu contains.
+- `settings` — time spent reading the effective action settings.
+- `evaluations` — how many template-engine evaluations were performed (one per action per reload).
+- `variables` — time spent reading the variables/password-store snapshot.
+- `cacheFill` — time spent filling the component cache (including reused entries).
+- `components` — time spent resolving the action components.
+- `swap` — time spent replacing the menu content on the EDT.
+- `mcp` — MCP tools refresh duration, or `timeout` when it did not finish within two seconds.
+- `iconHits` / `iconMisses` — remote icons served from the in-memory cache and remote icons requested.
+- `failures` — actions or groups that failed to build; they are reported to the user in one notification and do not abort the reload.
+
+The old `Loading time and receiving all components '<n>' ms` line is kept for compatibility.
 
 ### Runtime data
 

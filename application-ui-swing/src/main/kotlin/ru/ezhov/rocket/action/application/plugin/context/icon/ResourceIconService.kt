@@ -15,5 +15,7 @@ class ResourceIconService(
 
     override fun load(iconUrl: String, defaultIcon: Icon): Icon =
         resourceLoaderService.load(iconUrl, defaultIcon)
-}
 
+    override fun load(iconUrl: String, defaultIcon: Icon, onLoaded: (Icon) -> Unit): Icon =
+        resourceLoaderService.load(iconUrl, defaultIcon, onLoaded)
+}

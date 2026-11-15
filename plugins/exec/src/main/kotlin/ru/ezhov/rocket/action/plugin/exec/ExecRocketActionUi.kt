@@ -61,9 +61,15 @@ class ExecRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
             val label = settings.settings()[LABEL]?.takeIf { it.isNotEmpty() } ?: command
             val description = settings.settings()[DESCRIPTION]?.takeIf { it.isNotEmpty() } ?: command
             val iconUrl = settings.settings()[ICON_URL].orEmpty()
-            val menuIcon = icon(iconUrl = iconUrl, command = command, iconService = context.icon())
             val menu = JMenuItem(label).apply {
-                icon = menuIcon
+                icon = icon(
+                    iconUrl = iconUrl,
+                    command = command,
+                    iconService = context.icon(),
+                ) { loadedIcon ->
+                    icon = loadedIcon
+                    repaint()
+                }
                 toolTipText = description
                 addActionListener { executeCommand(workingDir, command, notification = context.notification()) }
                 addMouseListener(object : MouseAdapter() {
@@ -91,11 +97,21 @@ class ExecRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
             }
         }
 
-    private fun icon(iconUrl: String, command: String, iconService: IconService): Icon {
+    private fun icon(
+        iconUrl: String,
+        command: String,
+        iconService: IconService,
+        onLoaded: (Icon) -> Unit,
+    ): Icon {
         var menuIcon = iconService.load(
             iconUrl = iconUrl,
-            defaultIcon = actionContext!!.icon().by(AppIcon.FIRE)
-        )
+            defaultIcon = actionContext!!.icon().by(AppIcon.FIRE),
+        ) { loadedIcon ->
+            // an icon of an existing file wins over the remote one
+            if (!File(command).exists()) {
+                onLoaded(loadedIcon)
+            }
+        }
         try {
             val file = File(command)
             if (file.exists()) {

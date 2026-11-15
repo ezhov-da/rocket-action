@@ -68,8 +68,11 @@ class OpenUrlWithTextRocketActionUi : AbstractRocketAction(), RocketActionPlugin
             val menu = JMenu(label)
             menu.icon = context.icon().load(
                 iconUrl = iconUrl,
-                defaultIcon = actionContext!!.icon().by(AppIcon.LINK_INTACT)
-            )
+                defaultIcon = actionContext!!.icon().by(AppIcon.LINK_INTACT),
+            ) { loadedIcon ->
+                menu.icon = loadedIcon
+                menu.repaint()
+            }
             val panel = JPanel()
             panel.layout = BoxLayout(panel, BoxLayout.LINE_AXIS)
             panel.add(JLabel(actionContext!!.icon().by(AppIcon.LINK_INTACT)))

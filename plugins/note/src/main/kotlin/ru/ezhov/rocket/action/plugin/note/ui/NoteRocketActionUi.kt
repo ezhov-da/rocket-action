@@ -65,8 +65,11 @@ class NoteRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
                         settings.settings()[ICON_URL].let { icon ->
                             menu.icon = actionContext!!.icon().load(
                                 iconUrl = icon ?: "",
-                                defaultIcon = actionContext!!.icon().by(AppIcon.CLIPBOARD)
-                            )
+                                defaultIcon = actionContext!!.icon().by(AppIcon.CLIPBOARD),
+                            ) { loadedIcon ->
+                                menu.icon = loadedIcon
+                                menu.repaint()
+                            }
                         }
                         menu.toolTipText = description
 

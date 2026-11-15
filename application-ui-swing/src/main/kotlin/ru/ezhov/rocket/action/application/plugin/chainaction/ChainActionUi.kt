@@ -62,17 +62,23 @@ class ChainActionUi : AbstractRocketAction(), RocketActionPlugin {
     override fun factory(context: RocketActionContext): RocketActionFactoryUi = this
         .apply {
             actionContext = context
+            // the factory may be used without the configuration UI, so the services must be ready here
+            initServices()
         }
 
     override fun configuration(context: RocketActionContext): RocketActionConfiguration = this
         .apply {
             actionContext = context
-            chainActionService = ChainActionService.INSTANCE
-            atomicActionService = AtomicActionService.INSTANCE
-            actionExecutor = ActionExecutorFactory.INSTANCE
-            searchTextTransformer = SearchTextTransformer.INSTANCE
-            actionSchedulerService = ActionSchedulerService.INSTANCE
+            initServices()
         }
+
+    private fun initServices() {
+        chainActionService = ChainActionService.INSTANCE
+        atomicActionService = AtomicActionService.INSTANCE
+        actionExecutor = ActionExecutorFactory.INSTANCE
+        searchTextTransformer = SearchTextTransformer.INSTANCE
+        actionSchedulerService = ActionSchedulerService.INSTANCE
+    }
 
     override fun info(): RocketActionPluginInfo = object : RocketActionPluginInfo {
         override fun version(): String = Properties().let {
@@ -87,7 +93,7 @@ class ChainActionUi : AbstractRocketAction(), RocketActionPlugin {
 
     override fun create(settings: RocketActionSettings, context: RocketActionContext): RocketAction? =
         settings.settings()[ID]?.takeIf { it.isNotEmpty() }?.let { id ->
-            (chainActionService!!.byId(id) ?: atomicActionService!!.atomicBy(id))?.let { action ->
+            (chainActionService?.byId(id) ?: atomicActionService?.atomicBy(id))?.let { action ->
                 settings.settings()[UI_TYPE]?.let { uiType ->
                     createByType(action, uiType)?.let { component ->
                         object : RocketAction {

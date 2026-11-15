@@ -11,6 +11,7 @@ import java.nio.charset.StandardCharsets
 import java.security.SecureRandom
 import java.security.cert.X509Certificate
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.atomic.AtomicBoolean
 import javax.net.ssl.HttpsURLConnection
 import javax.net.ssl.SSLContext
 import javax.net.ssl.SSLSession
@@ -23,13 +24,19 @@ class DiskCacheService : CacheService {
     private val cacheFolder = File("./.rocket-action/cache")
     private val cache: ConcurrentHashMap<String, String> = ConcurrentHashMap()
 
-    override fun get(url: URL): File? {
-        if (!cacheFolder.exists()) {
-            val result = cacheFolder.mkdirs()
-            logger.debug { "Cache folder='$cacheFolder' created with result='$result'" }
+    override fun getIfPresent(url: URL): File? {
+        ensureCacheFolder()
+        val file = File(cacheFolder, getHashFrom(url.toString()))
+        return if (file.exists()) {
+            logger.debug { "Return url='$url' from cache file='${file.absolutePath}'" }
+            file
         } else {
-            logger.debug { "Cache folder='$cacheFolder' already exists" }
+            null
         }
+    }
+
+    override fun get(url: URL): File? {
+        ensureCacheFolder()
         checkQuietly()
 
         val sha256hexUrl = getHashFrom(url.toString())
@@ -43,6 +50,15 @@ class DiskCacheService : CacheService {
         } else {
             logger.debug { "Cache file does not exists. Load file from url='$url'" }
             readFromUrl(url, file)
+        }
+    }
+
+    private fun ensureCacheFolder() {
+        if (!cacheFolder.exists()) {
+            val result = cacheFolder.mkdirs()
+            logger.debug { "Cache folder='$cacheFolder' created with result='$result'" }
+        } else {
+            logger.debug { "Cache folder='$cacheFolder' already exists" }
         }
     }
 
@@ -65,7 +81,11 @@ class DiskCacheService : CacheService {
             .toString()
 
     private fun readFromUrl(url: URL, file: File): File? = try {
-        url.openStream().use { inputStream ->
+        val connection = url.openConnection().apply {
+            connectTimeout = CONNECT_TIMEOUT_MS
+            readTimeout = READ_TIMEOUT_MS
+        }
+        connection.getInputStream().use { inputStream ->
             FileOutputStream(file).use { fileOutputStream ->
                 val buf = ByteArray(256)
                 var p: Int
@@ -76,12 +96,22 @@ class DiskCacheService : CacheService {
         }
         file
     } catch (e: Exception) {
-        e.printStackTrace()
+        logger.warn(e) { "Error when load file from url='$url'" }
+        file.delete()
         null
     }
 
     companion object {
+        private const val CONNECT_TIMEOUT_MS = 5_000
+        private const val READ_TIMEOUT_MS = 10_000
+
+        private val tlsReady = AtomicBoolean(false)
+
         fun checkQuietly() {
+            if (!tlsReady.compareAndSet(false, true)) {
+                return
+            }
+
             try {
                 HttpsURLConnection
                     .setDefaultHostnameVerifier { _: String?, _: SSLSession? -> true }
@@ -97,7 +127,7 @@ class DiskCacheService : CacheService {
                 )
                 HttpsURLConnection.setDefaultSSLSocketFactory(context.socketFactory)
             } catch (e: Exception) {
-                e.printStackTrace()
+                logger.warn(e) { "Error when initialize TLS" }
             }
         }
     }

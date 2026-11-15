@@ -13,13 +13,9 @@ import ru.ezhov.rocket.action.api.RocketActionType
 import ru.ezhov.rocket.action.api.context.RocketActionContext
 import ru.ezhov.rocket.action.api.context.icon.AppIcon
 import ru.ezhov.rocket.action.api.support.AbstractRocketAction
-import ru.ezhov.rocket.action.application.CreateMenuDomainEvent
-import ru.ezhov.rocket.action.application.RestoreMenuDomainEvent
+import ru.ezhov.rocket.action.application.core.application.ActionReloadScope
 import ru.ezhov.rocket.action.application.core.domain.model.RocketActionCachedState
 import ru.ezhov.rocket.action.application.core.infrastructure.RocketActionComponentCacheFactory
-import ru.ezhov.rocket.action.application.event.domain.DomainEvent
-import ru.ezhov.rocket.action.application.event.domain.DomainEventSubscriber
-import ru.ezhov.rocket.action.application.event.infrastructure.DomainEventFactory
 import java.awt.Component
 import java.util.*
 import javax.swing.Icon
@@ -67,50 +63,55 @@ class GroupRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
             val menu = JMenu(labelFinal)
             menu.icon = context.icon().load(
                 iconUrl = iconUrl,
-                defaultIcon = context.icon().by(AppIcon.PROJECT)
+                defaultIcon = context.icon().by(AppIcon.PROJECT),
+                onLoaded = { icon ->
+                    menu.icon = icon
+                    menu.repaint()
+                },
             )
             menu.toolTipText = description
 
             val cache = RocketActionComponentCacheFactory.cache
-            settings.actions().forEach { settings ->
-                // the mandatory presence of a child component controls the creation of groups last
-
-                val actionCached = cache.by(settings.id())
-                    ?: throw RuntimeException("Action by '${settings.id()}' is not found")
-
-                menu.add(actionCached.origin.component())
+            val missingChildren = mutableListOf<String>()
+            settings.actions().forEach { child ->
+                val actionCached = cache.by(child.id())
+                if (actionCached == null) {
+                    missingChildren.add(child.id())
+                } else {
+                    menu.add(actionCached.origin.component())
+                }
             }
 
-            DomainEventFactory.subscriberRegistrar.subscribe(
-                object : DomainEventSubscriber {
-                    override fun handleEvent(event: DomainEvent) {
-                        if (menu.menuComponents.size != settings.actions().size) {
-                            menu.removeAll()
-                            logger.debug { "Refill group menu '$labelFinal' by event ${RestoreMenuDomainEvent::class.java.name}" }
-
-                            settings.actions().forEach { settings ->
-                                // the mandatory presence of a child component controls the creation of groups last
-                                menu.add(cache.by(settings.id())!!.origin.component())
-                            }
-                        }
-                    }
-
-                    override fun subscribedToEventType(): List<Class<*>> =
-                        listOf(
-                            CreateMenuDomainEvent::class.java,
-                            RestoreMenuDomainEvent::class.java,
-                        )
+            if (missingChildren.isNotEmpty()) {
+                logger.warn {
+                    "Group '$labelFinal' (id='${settings.id()}') references missing children " +
+                        "'$missingChildren'. The available children are shown."
                 }
-            )
+                ActionReloadScope.currentOrNull()?.failure()
+            }
 
             object : RocketAction {
                 override fun contains(search: String): Boolean = false
 
-                override fun isChanged(actionSettings: RocketActionSettings): Boolean =
-                    !(settings.id() == actionSettings.id() &&
-                        settings.settings() == actionSettings.settings()) ||
-                        childrenIds.size != actionSettings.actions().size ||
-                        cache.byIds(childrenIds).any { it.state == RocketActionCachedState.CHANGED_SINCE_LAST_LOAD }
+                override fun isChanged(actionSettings: RocketActionSettings): Boolean {
+                    if (settings.id() != actionSettings.id() || settings.settings() != actionSettings.settings()) {
+                        return true
+                    }
+
+                    val newChildrenIds = actionSettings.actions().map { it.id() }.toSet()
+                    if (childrenIds != newChildrenIds) {
+                        return true
+                    }
+
+                    val scope = ActionReloadScope.currentOrNull()
+                    if (scope != null) {
+                        return scope.isChangedAny(childrenIds)
+                    }
+
+                    // outside a reload keep the previous behaviour
+                    return cache.byIds(childrenIds)
+                        .any { it.state == RocketActionCachedState.CHANGED_SINCE_LAST_LOAD }
+                }
 
                 override fun component(): Component = menu
             }

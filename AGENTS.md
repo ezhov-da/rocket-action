@@ -47,6 +47,15 @@
 - Обнаружение плагинов: JAR-файлы в `plugins/` (или в каталоге из `rocket.action.jar.plugin.folder`), FQCN по одному в строке в `META-INF/rocket-action-plugins.properties`; Groovy-скрипты в `groovy-plugins/*.groovy` должны возвращать `RocketActionPlugin`. Встроенные плагины GROUP и CHAIN_ACTION находятся в `InnerPluginLoader`.
 - UI должен создаваться вне Spring: FlatLaf инициализируется до контекста Spring (`App.kt`); не переносите создание UI в бины.
 
+## Перезагрузка меню действий
+
+- Одна перезагрузка — один `ActionReloadScope` (`application/core/application/ActionReloadScope.kt`). Он мемоизирует вычисленные настройки (`settingsOf`), помнит изменённые id (`markChanged`/`isChanged`) и собирает метрики. Не вызывайте `RocketActionSettingsModel.settings()` вне scope многократно: это повторно прогоняет шаблонизатор; используйте `to(scope)` и один вызов на действие.
+- `UiQuickActionService` строит chrome (bar, поиск, tools, tags) один раз; перезагрузка только заменяет содержимое content-меню в `done()` на EDT. У `JMenu` элементы лежат в popup-меню, поэтому для проверки/очистки используйте `itemCount`/`removeAll()`, а не `componentCount` (последний всегда 0).
+- Одна перезагрузка пишет ровно одну строку `Menu reload: ...` (формат — `ActionReloadScope.render`), плюс прежнюю `Loading time and receiving all components '<n>' ms`. MCP-обновление идёт асинхронно и добавляет в эту же строку `mcp=<ms>` или `mcp=timeout`.
+- `VariablesApplication.all()` кеширует снимок переменных по отпечатку `variables.json`/`configurations.json`/`.kdbx`; `save()`, `updateVariable()`, `ConfigurationApplication.save()` и ручной Refresh инвалидируют кеш. Сбой чтения KeePass не фатален: переменные без KeePass возвращаются, повторная попытка — через 30 секунд.
+- Иконки: `IconService.load` не блокирует загрузку меню. Двухаргументная форма возвращает default-иконку и качает в фоне; форма с `onLoaded` вызывает колбэк на EDT. Не скачивайте иконки внутри `RocketActionFactoryUi.create`.
+- Скомпилированные Groovy-шаблоны кешируются в `GroovyScriptClassCache` (LRU 256) и переиспользуются с новым `Binding`; не возвращайте `GroovyShell` на каждый вызов.
+
 ## Соглашения по плагинам, зависимостям и сборке
 
 - Версии модулей задаются в `moduleVersions` корневого `build.gradle.kts` по путям Gradle-проектов (`:plugins:api`, `:plugins:note`, ...); версия `plugin-api` используется в версиях плагинов (`${plugin-api.version}_N`). При изменении синхронизируйте `plugins/api` и зависимые плагины.

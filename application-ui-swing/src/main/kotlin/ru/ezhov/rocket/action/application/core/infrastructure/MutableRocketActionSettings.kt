@@ -18,14 +18,9 @@ class MutableRocketActionSettings(
 ) {
 
     fun to(engineService: EngineService): RocketActionSettings = object : RocketActionSettings {
-        override fun id(): String = id
-
-        override fun type(): RocketActionType = RocketActionType { type }
-
-        override fun settings(): Map<String, String> =
+        private val evaluatedSettings: Map<String, String> by lazy {
             try {
                 settings.associate { set ->
-                    // TODO ezhov opportunity for optimization
                     val resultVal = engineService.processWithEngine(set).toString()
                     set.name to resultVal
                 }
@@ -33,8 +28,17 @@ class MutableRocketActionSettings(
                 logger.warn(ex) { "Error when get settings for action with id='$id'" }
                 emptyMap()
             }
+        }
 
-        override fun actions(): List<RocketActionSettings> = actions.map { it.to(engineService) }
+        private val evaluatedActions: List<RocketActionSettings> by lazy { actions.map { it.to(engineService) } }
+
+        override fun id(): String = id
+
+        override fun type(): RocketActionType = RocketActionType { type }
+
+        override fun settings(): Map<String, String> = evaluatedSettings
+
+        override fun actions(): List<RocketActionSettings> = evaluatedActions
     }
 
     fun copy(source: MutableRocketActionSettings): MutableRocketActionSettings =

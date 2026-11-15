@@ -14,6 +14,7 @@ import org.springframework.beans.factory.InitializingBean
 import org.springframework.stereotype.Service
 import ru.ezhov.rocket.action.api.handler.RocketActionHandleStatus
 import ru.ezhov.rocket.action.application.CreateMenuDomainEvent
+import ru.ezhov.rocket.action.application.MenuContentReplacedDomainEvent
 import ru.ezhov.rocket.action.application.chainaction.domain.event.AtomicActionCreatedDomainEvent
 import ru.ezhov.rocket.action.application.chainaction.domain.event.AtomicActionDeletedDomainEvent
 import ru.ezhov.rocket.action.application.chainaction.domain.event.AtomicActionUpdatedDomainEvent
@@ -51,20 +52,21 @@ class McpServerService(
     @Volatile
     private var server: McpSyncServer? = null
 
+    // Tool rebuilds run off the Swing thread and are serialised.
+    private val refreshScheduler = McpRefreshScheduler(refresh = ::refreshTools)
+
     init {
         // Меню пересобирается после перезагрузки настроек/плагинов,
         // в этот момент и обновляем список MCP-инструментов.
         DomainEventFactory.subscriberRegistrar.subscribe(
             object : DomainEventSubscriber {
                 override fun handleEvent(event: DomainEvent) {
-                    try {
-                        refreshTools()
-                    } catch (e: Exception) {
-                        logger.error(e) { "Can't refresh MCP tools" }
-                    }
+                    val scope = (event as? MenuContentReplacedDomainEvent)?.scope
+                    refreshScheduler.submit(scope)
                 }
 
                 override fun subscribedToEventType(): List<Class<*>> = listOf(
+                    MenuContentReplacedDomainEvent::class.java,
                     CreateMenuDomainEvent::class.java,
 
                     ChainActionCreatedDomainEvent::class.java,

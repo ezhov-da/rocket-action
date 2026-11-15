@@ -72,8 +72,11 @@ class OpenUrlRocketActionUi : AbstractRocketAction(), RocketActionPlugin {
             val menu = JMenuItem(label).apply {
                 icon = context.icon().load(
                     iconUrl = iconUrl,
-                    defaultIcon = context.icon().by(AppIcon.LINK_INTACT)
-                )
+                    defaultIcon = context.icon().by(AppIcon.LINK_INTACT),
+                ) { loadedIcon ->
+                    icon = loadedIcon
+                    repaint()
+                }
                 toolTipText = description
                 isFocusable = true
                 addMouseListener(object : MouseAdapter() {

@@ -67,8 +67,11 @@ class OpenUrlWithTextHistoryRocketActionUi :
             val menu = JMenu(label)
             menu.icon = context.icon().load(
                 iconUrl = iconUrl,
-                defaultIcon = actionContext!!.icon().by(AppIcon.LINK_INTACT)
-            )
+                defaultIcon = actionContext!!.icon().by(AppIcon.LINK_INTACT),
+            ) { loadedIcon ->
+                menu.icon = loadedIcon
+                menu.repaint()
+            }
             val textField = TextFieldWithText(label)
             textField.columns = 10
             textField.toolTipText = description

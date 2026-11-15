@@ -1,10 +1,4 @@
 import org.apache.tools.ant.filters.ReplaceTokens
-import org.gradle.api.file.DuplicatesStrategy
-import org.gradle.api.plugins.BasePluginExtension
-import org.gradle.api.plugins.JavaPluginExtension
-import org.gradle.api.tasks.SourceSetContainer
-import org.gradle.api.tasks.compile.JavaCompile
-import org.gradle.api.tasks.testing.Test
 import org.gradle.jvm.tasks.Jar
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
@@ -19,7 +13,7 @@ plugins {
 group = "ru.ezhov"
 version = "0.0.1"
 
-val pluginApiVersion = "0.22.0"
+val pluginApiVersion = "0.23.0"
 
 // Module versions are kept exactly as in the Maven POMs. Keys are Gradle
 // project paths, which keeps plugin subprojects of ":plugins" unambiguous.
