@@ -256,8 +256,7 @@ class UiQuickActionService(
 
                 executor.execute()
             } else {
-                SwingUtilities.invokeLater { tf.background = Color.WHITE }
-                CreateMenuOrGetExistsWorker(currentMenu!!, Action.Restore).execute()
+                resetSearch(textField = tf, menu = currentMenu!!)
             }
         } else if (e.keyCode == KeyEvent.VK_ESCAPE) {
             resetSearch(textField = tf, menu = currentMenu!!)
@@ -374,8 +373,21 @@ class UiQuickActionService(
 
     private fun resetSearch(textField: JTextField, menu: JMenu) {
         textField.text = ""
-        SwingUtilities.invokeLater { textField.background = Color.WHITE }
-        CreateMenuOrGetExistsWorker(menu, Action.Restore).execute()
+        // one EDT batch: reset the field and re-attach the content in the same event
+        SwingUtilities.invokeLater {
+            textField.background = Color.WHITE
+            restoreContent(menu)
+        }
+    }
+
+    /**
+     * Returns the menu to the placement snapshot of the last reload. The assembly re-parents the
+     * cached components, so it runs on the EDT and only touches the content menu when there is
+     * something to restore.
+     */
+    private fun restoreContent(menu: JMenu) {
+        val components = rocketActionSettingsService.restoreMenuContent() ?: return
+        swapContent(menu, components)
     }
 
     private fun createTools(baseDialog: JDialog): JMenu {
@@ -476,7 +488,7 @@ class UiQuickActionService(
             menu.add(loadingPlaceholder())
         }
 
-        CreateMenuOrGetExistsWorker(menu, Action.Create, scope).execute()
+        CreateMenuContentWorker(menu, scope).execute()
     }
 
     private fun finishReload() {
@@ -521,22 +533,13 @@ class UiQuickActionService(
         ).apply { isDaemon = true }.start()
     }
 
-    private inner class CreateMenuOrGetExistsWorker(
+    private inner class CreateMenuContentWorker(
         private val baseMenu: JMenu,
-        private val action: Action,
-        private val scope: ActionReloadScope? = null,
+        private val scope: ActionReloadScope,
     ) : SwingWorker<List<Component>, String?>() {
 
-        override fun doInBackground(): List<Component> = when (action) {
-            Action.Create ->
-                if (scope == null) {
-                    rocketActionSettingsService.loadAndGetAllComponents()
-                } else {
-                    rocketActionSettingsService.loadAndGetAllComponents(scope)
-                }
-
-            Action.Restore -> rocketActionSettingsService.getAllExistsComponents()
-        }
+        override fun doInBackground(): List<Component> =
+            rocketActionSettingsService.loadAndGetAllComponents(scope)
 
         override fun done() {
             try {
@@ -544,33 +547,24 @@ class UiQuickActionService(
                 val swapStartedAt = System.nanoTime()
                 swapContent(baseMenu, components)
 
-                if (action === Action.Create) {
-                    scope?.swapped(TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - swapStartedAt))
-                    refreshTags()
-                    DomainEventFactory.publisher.publish(
-                        listOf(
-                            MenuContentReplacedDomainEvent(scope),
-                            CreateMenuDomainEvent(),
-                        )
+                scope.swapped(TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - swapStartedAt))
+                refreshTags()
+                DomainEventFactory.publisher.publish(
+                    listOf(
+                        MenuContentReplacedDomainEvent(scope),
+                        CreateMenuDomainEvent(),
                     )
-                    scope?.let { logReload(it) }
-                }
+                )
+                logReload(scope)
             } catch (ex: Exception) {
                 logger.error(ex) { "Error when load app" }
-                scope?.failure()
+                scope.failure()
                 rocketActionContextFactory.context.notification()
                     .show(NotificationType.ERROR, "Error creating tool menu")
             } finally {
-                if (action === Action.Create) {
-                    finishReload()
-                }
+                finishReload()
             }
         }
-    }
-
-    sealed class Action {
-        object Create : Action()
-        object Restore : Action()
     }
 }
 

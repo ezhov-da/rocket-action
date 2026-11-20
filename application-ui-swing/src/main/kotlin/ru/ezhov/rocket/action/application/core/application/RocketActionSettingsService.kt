@@ -21,6 +21,7 @@ import java.awt.Component
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
+import javax.swing.JMenu
 import javax.swing.SwingUtilities
 import kotlin.system.measureTimeMillis
 
@@ -36,7 +37,13 @@ class RocketActionSettingsService(
     private val engineService: EngineService,
     private val rocketActionComponentCache: RocketActionComponentCache,
 ) {
-    private var rocketActionAndComponents: List<RocketActionAndComponent> = emptyList()
+    /**
+     * Placement of the menu captured by the last successful reload. The assembly uses it as the
+     * only source of the menu structure: the cached Swing components show where search moved them,
+     * not where they belong.
+     */
+    @Volatile
+    private var menuStructure: MenuStructure? = null
 
     // One pool for the whole application: a reload does not create/tear down threads any more.
     private val fillExecutor: ExecutorService by lazy {
@@ -69,21 +76,22 @@ class RocketActionSettingsService(
         DomainEventFactory.publisher.publish(listOf(ActionModelSavedDomainEvent(actions)))
     }
 
-    fun getAllExistsComponents(): List<Component> = rocketActionAndComponents.map { it.component }
+    /**
+     * Rebuilds the menu content from the placement snapshot of the last reload and returns the
+     * top-level components. Every group is cleared and refilled from the cache, so entries that
+     * a search re-parented into the content menu return to their groups at any depth.
+     *
+     * @return the content, or `null` when no reload has been performed yet.
+     */
+    fun restoreMenuContent(): List<Component>? {
+        val structure = menuStructure ?: return null
+        return assembleMenu(structure)
+    }
 
     /**
      * A scope that evaluates settings through the engine and owns the work reused during one reload.
      */
     fun newReloadScope(): ActionReloadScope = ActionReloadScope(engineService::processWithEngine)
-
-    /**
-     * Loads the menu and logs the reload metrics. Callers that need the swap and the MCP refresh
-     * inside the same metrics line create a scope with [newReloadScope] and call the overload.
-     */
-    fun loadAndGetAllComponents(): List<Component> {
-        val scope = newReloadScope()
-        return loadAndGetAllComponents(scope).also { scope.log() }
-    }
 
     fun loadAndGetAllComponents(scope: ActionReloadScope): List<Component> =
         ActionReloadScope.withCurrent(scope) {
@@ -110,48 +118,68 @@ class RocketActionSettingsService(
             }
             scope.cacheFilled(cacheFillMs)
 
-            val components = mutableListOf<RocketActionAndComponent>()
+            // The snapshot is replaced only after the cache is filled: until then the previous
+            // structure (and the components it points to) stays the source for a restore.
+            val structure = MenuStructure.of(actionsModel.actions)
+            menuStructure = structure
+
+            var components: List<Component> = emptyList()
             val componentsMs = measureTimeMillis {
-                for (rocketActionSettings in actionsModel.actions) {
-                    try {
-                        rocketActionPluginApplicationService.by(rocketActionSettings.type)
-                            ?.factory(rocketActionContextFactory.context)
-
-                        rocketActionComponentCache
-                            .by(rocketActionSettings.id)
-                            ?.let { action ->
-                                logger.debug {
-                                    "found in cache type='${rocketActionSettings.type}'" +
-                                        "id='${rocketActionSettings.id}"
-                                }
-
-                                components.add(
-                                    RocketActionAndComponent(
-                                        rocketAction = action,
-                                        component = action.origin.component()
-                                    )
-                                )
-                            }
-                    } catch (ex: Throwable) {
-                        logger.error(ex) {
-                            "Error when resolve component type='${rocketActionSettings.type}' " +
-                                "id='${rocketActionSettings.id}'"
-                        }
-                        scope.failure()
-                    }
-                }
+                components = assembleMenu(structure)
             }
             scope.componentsResolved(componentsMs)
-
-            rocketActionAndComponents = components.toList()
 
             notifyAggregatedFailures(scope)
 
             val totalMs = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - wholeTime)
             logger.info { "Loading time and receiving all components '$totalMs' ms" }
 
-            rocketActionAndComponents.map { it.component }
+            components
         }
+
+    /**
+     * Attaches the cached components according to [structure]: every group is emptied and refilled
+     * with its children in catalog order. The same call serves a full reload and a restore, so a
+     * menu damaged by a search is repaired by either of them.
+     *
+     * Only cached components are touched: nothing is created and no settings are evaluated.
+     */
+    private fun assembleMenu(structure: MenuStructure): List<Component> {
+        val placed = mutableSetOf<String>()
+
+        fun attach(id: String, path: Set<String>): Component? {
+            if (id in path) {
+                logger.warn {
+                    "Cyclic action reference detected: '${(path + id).joinToString(" -> ")}'. " +
+                        "The repeated entry is skipped."
+                }
+                return null
+            }
+            if (!placed.add(id)) {
+                // the same id is placed twice: keep the first placement, the cache keeps one component
+                return null
+            }
+
+            val component = try {
+                rocketActionComponentCache.by(id)?.origin?.component()
+            } catch (ex: Throwable) {
+                logger.error(ex) { "Error when resolve component id='$id'" }
+                ActionReloadScope.currentOrNull()?.failure()
+                null
+            } ?: return null
+
+            if (id in structure.containers && component is JMenu) {
+                component.removeAll()
+                structure.children[id].orEmpty().forEach { childId ->
+                    attach(childId, path + id)?.let(component::add)
+                }
+            }
+
+            return component
+        }
+
+        return structure.roots.mapNotNull { attach(it, emptySet()) }
+    }
 
     private fun logDuplicateIds(actionsModel: ActionsModel, scope: ActionReloadScope) {
         val duplicates = duplicatesOf(actionsModel.actions)
@@ -346,8 +374,3 @@ internal fun duplicatesOf(actions: List<RocketActionSettingsModel>): List<String
     visit(actions)
     return duplicates.toList()
 }
-
-private data class RocketActionAndComponent(
-    val rocketAction: RocketActionCached,
-    val component: Component,
-)
